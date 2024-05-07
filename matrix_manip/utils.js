@@ -69,7 +69,140 @@ var utils = {
     trapezoid:10,
   }
 }
+/*
+class matrix_2d{
 
+  constructor(list = [1, 0, 0,  0, 1, 0,  0, 0, 1,  0, 0, 1])
+  {
+    this.value = Matrix(list);
+  }
+
+  create_from_trs(t,r,s)
+  {
+    let ca = cos(r)
+    let sa = sin(r)
+    ca*= s
+    sa*= s
+    this.value = Matrix([ ca, sa,0, -sa, ca,0, t.x,t.y0,1] )
+  }
+
+  get_row(i)
+  {
+    return createVector( this.value[i*3+0], this.value[i*3+1] )
+  }
+
+  set_row(i,v)
+  {
+    this.value[i*4+0] = v.x
+    this.value[i*4+1] = v.y
+  }  
+
+  get_inverse()
+  {
+    let deteminant = 1/(this.value[0]*this.value[3]-this.value[1]*this.value[2])
+    let adjoint = [ this.value[3], this.value[1]*-1, this.value[2]*-1, this.value[0] ]
+    let new_value = [
+                    adjoint[0] * deteminant,
+                    adjoint[1] * deteminant,
+                    adjoint[2] * deteminant,
+                    adjoint[3] * deteminant,
+                    this.value[4]*-1,
+                    this.value[5]*-1]
+    return new_value
+  }
+
+  inverse()
+  {
+    this.value = this.get_inverse()
+  }
+
+
+  multiplyMatrixAndPoint(matrix, point) {
+    // Give a simple variable name to each part of the matrix, a column and row number
+    let c0r0 = matrix[0],
+      c1r0 = matrix[1],
+      c2r0 = matrix[2],
+      c3r0 = matrix[3];
+    let c0r1 = matrix[4],
+      c1r1 = matrix[5],
+      c2r1 = matrix[6],
+      c3r1 = matrix[7];
+    let c0r2 = matrix[8],
+      c1r2 = matrix[9],
+      c2r2 = matrix[10],
+      c3r2 = matrix[11];
+    let c0r3 = matrix[12],
+      c1r3 = matrix[13],
+      c2r3 = matrix[14],
+      c3r3 = matrix[15];
+  
+    // Now set some simple names for the point
+    let x = point[0];
+    let y = point[1];
+    let z = point[2];
+    let w = point[3];
+  
+    // Multiply the point against each part of the 1st column, then add together
+    let resultX = x * c0r0 + y * c0r1 + z * c0r2 + w * c0r3;
+  
+    // Multiply the point against each part of the 2nd column, then add together
+    let resultY = x * c1r0 + y * c1r1 + z * c1r2 + w * c1r3;
+  
+    // Multiply the point against each part of the 3rd column, then add together
+    let resultZ = x * c2r0 + y * c2r1 + z * c2r2 + w * c2r3;
+  
+    // Multiply the point against each part of the 4th column, then add together
+    let resultW = x * c3r0 + y * c3r1 + z * c3r2 + w * c3r3;
+  
+    return [resultX, resultY, resultZ, resultW];
+  }
+
+  //matrixB • matrixA
+  multiplyMatrices(matrixA, matrixB) {
+    // Slice the second matrix up into rows
+    let row0 = [matrixB[0], matrixB[1], matrixB[2], matrixB[3]];
+    let row1 = [matrixB[4], matrixB[5], matrixB[6], matrixB[7]];
+    let row2 = [matrixB[8], matrixB[9], matrixB[10], matrixB[11]];
+    let row3 = [matrixB[12], matrixB[13], matrixB[14], matrixB[15]];
+
+    // Multiply each row by matrixA
+    let result0 = multiplyMatrixAndPoint(matrixA, row0);
+    let result1 = multiplyMatrixAndPoint(matrixA, row1);
+    let result2 = multiplyMatrixAndPoint(matrixA, row2);
+    let result3 = multiplyMatrixAndPoint(matrixA, row3);
+
+    // Turn the result rows back into a single matrix
+    return [
+      result0[0],
+      result0[1],
+      result0[2],
+      result0[3],
+      result1[0],
+      result1[1],
+      result1[2],
+      result1[3],
+      result2[0],
+      result2[1],
+      result2[2],
+      result2[3],
+      result3[0],
+      result3[1],
+      result3[2],
+      result3[3],
+    ];
+  }
+  
+
+  get_mult_vector(v)
+  {
+    let new_v = this.get_row(2)
+    new_v = p5.Vector.add( new_v, p5.Vector.mult(this.get_row(0),new_v.x) )
+    new_v = p5.Vector.add( new_v, p5.Vector.mult(this.get_row(1),new_v.y) )
+    return this.multiplyMatrixAndPoint(this.m, [v.x,v.y,0,0])
+  }  
+
+}
+*/
 
 class constraint_build{
   
@@ -122,7 +255,6 @@ class constraint_build{
 
   update()
   {
-    this.cns.pointB = this.pB
   }
 
   draw(){
@@ -180,7 +312,7 @@ class cns_axe{
       extra_rotation : 0, 
       pos_override : null, 
       axe_rotation: 0,
-      axe_rotation_center:new Vector(0,0),     
+      axe_rotation_center:createVector(0,0),     
     }   
     
     const args = { ...defaultOptions, ...in_options };
@@ -202,89 +334,85 @@ class cns_axe{
     
     if( ( this.vLine == null )&&( args.axe != null) )
     {
-      this.vLineBase = null
-      if( args.axe == 0 )
-        this.vLineBase = new Vector(1,0)
-      else
-        this.vLineBase = new Vector(0,1)
-
+      this.vLineBase = createVector(0,0)
+      if( args.axe == 0 )this.vLineBase.x = 1.0
+      else          this.vLineBase.y = 1.0
       if( this.Follower.rot != null)
         this.vLineBase.rotate(this.Follower.rot)
     }
 
     if( ( this.pLineBase == null )&&( this.Follower != null) )
-      this.pLineBase = this.Follower.get_matrix().get_row(2)
+      this.pLineBase = createVector(this.Follower.x,this.Follower.y)
   }
 
 
-  apply()
+  apply(rot,rot_center)
   {
+    rot = this.axe_rotation 
+    rot_center = this.axe_rotation_center 
 
-    if( this.Follower != null)
-      this.pLineBase = this.Follower.get_matrix().get_row(2)
-
-    
-
-    let rot = this.axe_rotation 
-    let rot_center = this.axe_rotation_center 
-
-    //let extra_rotation_center = new Vector(200,200)
+    //let extra_rotation_center = createVector(200,200)
     if( this.enable == false)
       return
 
-    let vLine = new Vector(this.vLineBase)
-    let pLine = new Vector(this.pLineBase)
+    let vLine = createVector(this.vLineBase.x,this.vLineBase.y)
+    let pLine = createVector(this.pLineBase.x,this.pLineBase.y)
 
     // Update axe postion rotation
     vLine.rotate(rad(rot))
-    let vTmp = pLine.getSub(rot_center)
+    let vTmp = p5.Vector.sub( pLine, rot_center)
     vTmp.rotate(rad(rot))
-    pLine = rot_center.getAdd(vTmp)
+    pLine = p5.Vector.add(rot_center,vTmp)
 
 
     
     // Set Follower on the line
-    
-    let pCurrent = this.Follower.get_position();
-    let vDelta = pCurrent.getSub(pLine);
-    let vToClosestPoint = vLine.getMult( vDelta.dot(vLine) );
-    let pClosest = pLine.getAdd(vToClosestPoint);
+    let B = this.Follower.body
+    let pCurrent = createVector(B.position.x,B.position.y);
+    let vDelta = p5.Vector.sub(pCurrent,pLine);
+    let vToClosestPoint = p5.Vector.mult( vLine, p5.Vector.dot(vDelta,vLine) );
+    let pClosest = p5.Vector.add(pLine,vToClosestPoint);
 
-    let velCurrent = this.Follower.get_velocity();
-    let vVelProj = vLine.getMult( velCurrent.dot(vLine) );
+    let velCurrent = createVector(B.velocity.x,B.velocity.y)
+    let vVelProj = p5.Vector.mult( vLine, p5.Vector.dot( velCurrent,vLine ) );
 
     if( pClosest != pCurrent)
     {
-      this.Follower.set_velocity(vVelProj)
-      this.Follower.set_position(pClosest)
+      Matter.Body.setVelocity(B,vVelProj)
+      Matter.Body.setPosition(B, pClosest)
       pCurrent = pClosest
     }
 
     
     // Set limit
-    var pLimitPos = new Vector()
+    var pLimitPos = createVector() 
     if( this.distPos != null )
     {
-      let vToLimit = new Vector(vLine)
-      vToLimit.normalize().mult(this.distPos)
-      pLimitPos = vToLimit.getAdd(pLine)
+      let vToLimit = createVector(vLine.x,vLine.y)
+      vToLimit.normalize()
+      vToLimit = p5.Vector.mult(vToLimit,this.distPos)
+      pLimitPos = p5.Vector.add(vToLimit,pLine)
     }
 
-    var pLimitNeg = new Vector()
+    var pLimitNeg = createVector()
     if( this.distNeg != null )
     {
-      let vToLimit = new Vector(vLine)
-      vToLimit.normalize().mult(this.distNeg*-1)
-      pLimitNeg = vToLimit.getAdd(pLine)
+      let vToLimit = createVector(vLine.x,vLine.y)
+      vToLimit.normalize()
+      vToLimit = p5.Vector.mult(vToLimit,this.distNeg*-1)
+      pLimitNeg = p5.Vector.add(vToLimit,pLine)
     }
 
-    vDelta = pCurrent.getSub(pLine);
-    let dot = vDelta.getNormalized().dot(vLine.getNormalized())
+    vDelta = p5.Vector.sub(pCurrent,pLine);
+    let dot = p5.Vector.dot( p5.Vector.normalize(vDelta),
+                             p5.Vector.normalize(vLine))
     if(0<dot)
     {
       if( ( this.distPos != null )&&(this.distPos<= vDelta.mag()) )
       {
-        this.Follower.set_position(pLimitPos)
+        let v2 = p5.Vector.sub(pLimitPos,pCurrent);
+        //Matter.Body.setVelocity(this.body, p5.Vector.add(v,v2))
+        Matter.Body.setPosition(B, pLimitPos)
         pCurrent = pLimitPos
       }
     }
@@ -292,7 +420,9 @@ class cns_axe{
     {
       if( ( this.distNeg != null )&&(this.distNeg<= vDelta.mag()) )
       {
-        this.Follower.set_position(pLimitNeg)
+        let v2 = p5.Vector.sub(pLimitNeg,pCurrent);
+        //Matter.Body.setVelocity(this.body, p5.Vector.add(v,v2) )
+        Matter.Body.setPosition(B, pLimitNeg)
         pCurrent = pLimitNeg
       }
     }
@@ -301,23 +431,24 @@ class cns_axe{
     // Angle
     if( this.fix_angle == true )
     {
-      this.Follower.set_angle(rad(rot))
-      this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
+      Matter.Body.setAngle(B, this.Follower.rot+rad(rot))
+      Matter.Body.setAngularVelocity(B, (B.angle - this.Follower.rot)*0.01)
     }
+
 
 
     // Debug
     if( this.distPos != null )this.debug_pts[0] = pLimitPos
-    else                      this.debug_pts[0] = vLine.getMult(width*2).add(pLine)
+    else                      this.debug_pts[0] = p5.Vector.add( pLine ,p5.Vector.mult(vLine,width*2))
 
     if( this.distNeg != null )this.debug_pts[1] = pLimitNeg
-    else                      this.debug_pts[1] = vLine.getMult(width*-2).add(pLine)
+    else                      this.debug_pts[1] = p5.Vector.add( pLine ,p5.Vector.mult(vLine,width*-2))
 
 
   
 
     // Position override
-    
+
     if( this.pos_override != null )
     {
       this.current_pos = this.pos_override
@@ -325,25 +456,28 @@ class cns_axe{
       let p_override = pLine;
       if( 0 < this.pos_override )
       {
-        let v_tmp = pLimitPos.getSub(pLine).mult(this.pos_override)
+        let v_tmp = p5.Vector.sub(pLimitPos, pLine)
+        v_tmp = p5.Vector.mult( v_tmp, this.pos_override);
         p_override.add(v_tmp)
       }
       else
       {
-        let v_tmp = pLimitNeg.getSub(pLine).mult(this.pos_override*-1)
+        let v_tmp = p5.Vector.sub(pLimitNeg, pLine)
+        v_tmp = p5.Vector.mult( v_tmp, abs(this.pos_override));
         p_override.add(v_tmp)
       }
-      this.Follower.set_position(p_override)
-      this.Follower.set_velocity(new Vector())
+
+      Matter.Body.setPosition(B, p_override)
+      Matter.Body.setVelocity(B, {x:0,y:0} )
     }
     else{
 
       if(0<dot)
       {
-        let vRef = pLimitPos.getSub(pLine)
+        let vRef = p5.Vector.sub(pLimitPos,pLine);
         if( 0 < vRef.mag() )
         {
-          let vCurrent = pCurrent.getSub(pLine)
+          let vCurrent = p5.Vector.sub(pCurrent,pLine);
           this.current_pos = vCurrent.mag() / vRef.mag() 
         }
         else
@@ -352,10 +486,10 @@ class cns_axe{
       }
       else
       {
-        let vRef = pLimitNeg.getSub(pLine)
+        let vRef = p5.Vector.sub(pLimitNeg,pLine);
         if( 0 < vRef.mag() )
         {
-          let vCurrent = pCurrent.getSub(pLine)
+          let vCurrent = p5.Vector.sub(pCurrent,pLine);
           this.current_pos = vCurrent.mag() / vRef.mag() *-1
         }
         else
@@ -375,8 +509,6 @@ class body_build{
   constructor( in_options ){
   // Default options
     const defaultOptions = {
-      m: new Matrix(),
-      m_offset: new Matrix(),
       x: 0,
       y: 0,
       w: 1,
@@ -397,8 +529,6 @@ class body_build{
     };
     const args = { ...defaultOptions, ...in_options };
     
-    this.m = args.m
-    this.m_offset = args.m_offset
     this.x = args.x
     this.y = args.y
     this.w = args.w
@@ -423,7 +553,7 @@ class body_build{
     this.constraints = []
     this.c_axe = null
     if(args.axe_constraint != null)
-      this.c_axe = new cns_axe({ Follower: this, ...args.axe_constraint})
+      this.c_axe = new cns_axe({ Follower:this, ...args.axe_constraint})
 
     var max_choice = 10
     if(args.type != -1)
@@ -492,53 +622,52 @@ class body_build{
         }
     }
 
-    let m_world = this.get_matrix()
-    let p = m_world.get_row(2).get_value()
+
     switch(this.type) {
       case 0:
-        this.body = Matter.Bodies.rectangle(p.x, p.y, this.w, this.h);
+        this.body = Matter.Bodies.rectangle(this.x, this.y, this.w, this.h);
         Matter.Body.rotate(this.body, this.rot)
         break;
       case 1:
-        this.body = Matter.Bodies.circle(p.x, p.y, this.w);
+        this.body = Matter.Bodies.circle(this.x, this.y, this.w);
         Matter.Body.rotate(this.body, this.rot)
         break;
       case 2:
-        this.body = Matter.Bodies.polygon(p.x, p.y, 3, this.w);
+        this.body = Matter.Bodies.polygon(this.x, this.y, 3, this.w);
         Matter.Body.rotate(this.body, this.rot)
         break;
       case 3:
-        this.body = Matter.Bodies.polygon(p.x, p.y, 5, this.w);
+        this.body = Matter.Bodies.polygon(this.x, this.y, 5, this.w);
         Matter.Body.rotate(this.body, this.rot)
         break;     
       case 4:
-        this.body = Matter.Bodies.polygon(p.x, p.y, 6, this.w);
+        this.body = Matter.Bodies.polygon(this.x, this.y, 6, this.w);
         Matter.Body.rotate(this.body, this.rot)
         break;  
       case 5:    
-        this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+        this.body = Matter.Bodies.fromVertices(this.x, this.y, this.shape_vertices)
         Matter.Body.rotate(this.body, this.rot)
         break;     
       case 6: 
-        this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+        this.body = Matter.Bodies.fromVertices(this.x, this.y, this.shape_vertices)
         Matter.Body.rotate(this.body, this.rot)
         break;    
       case 7:     
-        this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+        this.body = Matter.Bodies.fromVertices(this.x, this.y, this.shape_vertices)
         Matter.Body.rotate(this.body, this.rot)
         break;   
       case 8:     
-        this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+        this.body = Matter.Bodies.fromVertices(this.x, this.y, this.shape_vertices)
         Matter.Body.rotate(this.body, this.rot)
         break;      
       case 9:  
-        var bodyA = Matter.Bodies.rectangle(p.x, p.y, this.w, this.h/3);   
-        var bodyB = Matter.Bodies.rectangle(p.x, p.y, this.w/3, this.h); 
+        var bodyA = Matter.Bodies.rectangle(this.x, this.y, this.w, this.h/3);   
+        var bodyB = Matter.Bodies.rectangle(this.x, this.y, this.w/3, this.h); 
         this.body = Matter.Body.create({parts: [bodyA, bodyB]});
         Matter.Body.rotate(this.body, this.rot)
         break; 
       case 10:  
-        this.body = Matter.Bodies.trapezoid(p.x, p.y, this.w, this.h , rad(this.slop*2))
+        this.body = Matter.Bodies.trapezoid(this.x, this.y, this.w, this.h , rad(this.slop*2))
         Matter.Body.rotate(this.body, this.rot)
         break;        
       }
@@ -552,12 +681,11 @@ class body_build{
       var options = {
         bodyA: this.body,
         pA: { x: 0, y: 0 },
-        pB: { x: p.x, y: p.y },
+        pB: { x: this.x, y: this.y },
         stiffness: 1.0
       }
       this.constraints.push( new constraint_build(options) )
     }
-    
 
     if( this.collision )
     {
@@ -583,10 +711,7 @@ class body_build{
     this.colorStroke = [0,0,0]
   }
  
-  get_matrix()
-  {
-    return this.m_offset.getMult(this.m)
-  }
+
 
 
 
@@ -606,45 +731,16 @@ class body_build{
       this.body.collisionFilter.category = utils.collision_category.other
   }
 
-  get_position()
+  get_point()
   {
-    return new Vector( this.body.position.x, this.body.position.y)
+    return createVector( this.body.position.x, this.body.position.y)
   }
-
-  get_velocity()
-  {
-    return new Vector( this.body.velocity.x, this.body.velocity.y)
-  }  
-
-  set_position(v)
-  {
-    Matter.Body.setPosition(this.body, {x:v.v.x,y:v.v.y})
-  }
-
-  set_velocity(v)
-  {
-    Matter.Body.setVelocity(this.body, {x:v.v.x,y:v.v.y})
-  }  
-
-  set_angle(a)
-  {
-    Matter.Body.setAngle(this.body, this.rot+a)
-  }
-
-  set_anglular_velocity(a)
-  {
-    Matter.Body.setAngularVelocity(this.body, a)
-  }
-
-  apply_force(p,v)
-  {
-    Matter.Body.applyForce(this.body, p.v, v.v)
-  }
-
-
+  
   get_matrix()
   {
-    return this.m_offset.getMult(this.m)
+    let m = new matrix()
+    m.create_from_trs(this.get_point(),this.body.angle,1)
+    return m
   }  
 
   clean_velocity()
@@ -655,8 +751,6 @@ class body_build{
 
   update()
   {
-    //let p = this.get_matrix().get_row(2)
-    
 
     if(this.limit_rot!=null)
     {
@@ -679,14 +773,6 @@ class body_build{
 
     if(this.rot_override!=null)
       Matter.Body.setAngle(this.body, this.rot_override )
-
-    for( let i = 0; i < this.constraints.length; i++)
-    {
-      let p = this.get_matrix().get_row(2).get_value()
-      this.constraints[i].pB = p
-      this.constraints[i].update()
-    }
-      
    
   }
 
@@ -700,7 +786,7 @@ class body_build{
     if(this.debug)
     {
       if(( this.c_axe != null)&&(this.c_axe.debug_pts[0]!=null)&&(this.c_axe.enable == true ))
-        line(this.c_axe.debug_pts[0].x(), this.c_axe.debug_pts[0].y(), this.c_axe.debug_pts[1].x(), this.c_axe.debug_pts[1].y());
+        line(this.c_axe.debug_pts[0].x, this.c_axe.debug_pts[0].y, this.c_axe.debug_pts[1].x, this.c_axe.debug_pts[1].y);
     }
 
 
@@ -779,12 +865,12 @@ class body_build{
         rectMode(CENTER)
         let w = this.w/2
         let h = this.h/2
-        let ptA = new Vector(-w,  h)
-        let ptB = new Vector(-w, -h)
-        let ptC = new Vector( w, -h)
-        let ptD = new Vector( w,  h)
-        let vAB = ptB.getSub(ptA)
-        let vDC = ptC.getSub(ptD)
+        let ptA = createVector(-w,  h)
+        let ptB = createVector(-w, -h)
+        let ptC = createVector( w, -h)
+        let ptD = createVector( w,  h)
+        let vAB = p5.Vector.sub(ptB, ptA)
+        let vDC = p5.Vector.sub(ptC, ptD)
         let slop_rad = rad(this.slop)
         vAB.rotate(slop_rad)
         vDC.rotate(slop_rad*-1)
@@ -793,10 +879,10 @@ class body_build{
         let new_length = this.h/cos(slop_rad)
         vAB.mult(new_length)
         vDC.mult(new_length)
-        ptB = ptA.getAdd(vAB)
-        ptC = ptD.getAdd(vDC)
+        ptB = p5.Vector.add(ptA,vAB)
+        ptC = p5.Vector.add(ptD,vDC)
 
-        quad(ptA.x(), ptA.y(), ptB.x(), ptB.y(), ptC.x(), ptC.y(), ptD.x(), ptD.y());
+        quad(ptA.x, ptA.y, ptB.x, ptB.y, ptC.x, ptC.y, ptD.x, ptD.y);
         break;                                               
       } 
       
@@ -820,22 +906,22 @@ class body_build{
 function apply_force_to_all( vodies, pCenter, toggle )
 {
   
-  let vFromCenter = pCenter.getSub(new Vector(200,200))
+  let vFromCenter = p5.Vector.sub(pCenter,createVector(200,200))
   
   if( vFromCenter.mag() < 20 )
   {
     for( let B of bodies )
     {
-      let pB = new Vector(B.body.position.x,B.body.position.y)
+      let pB = createVector(B.body.position.x,B.body.position.y)
 
-      var v = pB.getSub(pCenter)
+      var v = p5.Vector.sub(pB,pCenter)
       if(toggle)
-        v = pCenter.getSub(pB)
+        v = p5.Vector.sub(pCenter,pB)
       v.normalize()
-      v.mult(0.02)
+      v = p5.Vector.mult(v,0.02)
+      let v2 = Matter.Vector.create(v.x,v.y)
 
-      B.apply_force(B.get_position(),v)
-
+      Matter.Body.applyForce( B.body, B.body.position,  v2 )  
     }
   }
 
@@ -869,15 +955,12 @@ function create_boundary_wall_collision(width,height,ground_enable=true)
 
 function change_selected_obj(mouse_cns,obj)
 {
-
-  let p_body = obj.get_position()
-  let p_mouse = new Vector( 
-    mouse_cns.constraint.pointA.x,
-    mouse_cns.constraint.pointA.y)
-  let p_local = p_mouse.getSub(p_body)
+  let p_local = createVector( 
+    mouse_cns.constraint.pointA.x - obj.body.position.x,
+    mouse_cns.constraint.pointA.y - obj.body.position.y)
 
   mouse_cns.constraint.bodyB = obj.body
-  mouse_cns.constraint.pointB = p_local.get_value() 
+  mouse_cns.constraint.pointB = {x: p_local.x , y: p_local.y}
   mouse_cns.constraint.angleB = 0
 }
 
@@ -1056,7 +1139,20 @@ function switch_selection( mouse_cns, next_elem = null , hack = false)
     mouse_cns.constraint.pointB = {x: - p_local.y, y: p_local.x}
   mouse_cns.constraint.angleB = 0
   
+  /*
+  //new
+  let m = next_elem.get_matrix()
+  console.log('matrix',m.value)
+  let p = createVector(mouse_cns.constraint.pointA.x,mouse_cns.constraint.pointA.y)
+  m.inverse() 
+  console.log('matrix',m.value,p)
+  let p_local = m.get_mult_vector(p) 
 
+ 
+  mouse_cns.constraint.bodyB = next_elem.body
+  mouse_cns.constraint.pointB = p_local
+  mouse_cns.constraint.angleB = 0
+  */
 
 }
 
@@ -1070,11 +1166,8 @@ class Chrono
 {
   constructor()
   {
-    this.p = createVector(0,0)
-    this.s = 1
-    this.startTime = null
+    this.statTime = null
     this.time_str = '00:00:00'
-    this.v = true
   }
 
   start()
@@ -1086,11 +1179,6 @@ class Chrono
   {
     this.startTime = null;
   } 
-
-  is_at_start()
-  {
-    return this.startTime == null;
-  }
 
 
   getHMS(m /* milliseconds */) {
@@ -1112,14 +1200,12 @@ class Chrono
     this.time_str = time
   }
 
-  draw()
+  draw(p,s)
   {
-    if(this.v == false)
-      return
     fill(255);
-    textSize(this.s);
+    textSize(s);
     textAlign(CENTER);
-    text(this.time_str, this.p.x, this.p.y);
+    text(this.time_str, p.x, p.y);
   }
 
 }

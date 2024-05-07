@@ -1,47 +1,27 @@
 
-class state_step_tpl{
-  constructor()
+
+
+class fidget_windmill extends fidget{
+
+
+  ////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////// SETUP
+  ////////////////////////////////////////////////////////////////////////////////////
+
+  constructor( m, s, debug=false,random_color=true)
   {
-      this.resoluton_coef = 0
-      this.resoluton_coef_last = 0
-      this.update_count = 0
-      this.apply_force_happened = false
-      this.in_use = false    
-      this.used = false 
-  } 
-}
+    super(m, s, debug)
 
-
-class fidget_windmill{
-
-  constructor( p, s, debug=false)
-  {
-    /*
-    // init
-    this.bodies = {
-      inter2:null,
-      circle:null,
-      rectangles:[],
-      inter1:null,
-      inter3:null,
-      trapezoids:[]
-    }
-
-    this.bodies_order = [
-      'inter2',
-      'inter1',
-      'inter3',
-      'circle',
-      'rectangles',      
-      'trapezoids',
-      ]
-    */
+    this.title = 'windmill'
 
     this.bodies = {
       inters : {
         A:null,
+        A_bg:null,
         B:null,
+        B_mask:null,
         C:null,
+        C_bg:null,
       },
       geos : {
         circle:null,
@@ -52,7 +32,10 @@ class fidget_windmill{
     this.bodies_draw_order = {
       inters : [
         'B',
+        'B_mask',
+        'A_bg',
         'A',
+        'C_bg',
         'C',
         ], 
       geos : [
@@ -61,52 +44,31 @@ class fidget_windmill{
         'trapezoids',
         ]         
     }
-    /*
-    this.inters_draw_order = [
-      'B',
-      'A',
-      'C',
-      ]
+    this.end_step = 4
 
-    this.bodies.geos = {
-      circle:null,
-      rectangles:[],
-      trapezoids:[]
+    this.possible_colors = [[utils.color.green,utils.color.red,utils.color.yellow],
+    [utils.color.cyan,utils.color.magenta,utils.color.orangeRed],
+    [utils.color.olive,utils.color.teal,utils.color.green],
+    [utils.color.purple,utils.color.aquamarine,utils.color.turquoise],
+    [utils.color.paleGreen,utils.color.skyBlue,utils.color.orangeRed],
+    [utils.color.orangeRed,utils.color.tomato,utils.color.khaki],
+    [utils.color.chocolate,utils.color.lavender,utils.color.red],
+    [utils.color.rosyBrown,utils.color.redLight,utils.color.gold]]
+
+    this.colors = [utils.color.green,utils.color.red,utils.color.yellow]
+    if(random_color)
+    {
+      let i_random = int(clamp( Math.random()*(this.possible_colors.length+1), 0,this.possible_colors.length-1))
+      this.colors = this.possible_colors[i_random]
     }
+    this.color_background = [ (this.colors[0][0]+0.2)*0.3,(this.colors[0][1]+0.2)*0.3,(this.colors[0][2]+0.2)*0.3]
+    this.show_step_helpers = [ 0, 0, 0 ]
 
-    this.geos_draw_order = [
-      'circle',
-      'rectangles',      
-      'trapezoids',
-      ]
-    */
-
-
-    this.state = {
-        update_count : 0,
-        resolution_coef : 0, 
-        resolution_coef_last:0,
-        switch_selection_happened_step : 0,
-        current_step : 0,
-        steps:[ 
-          new state_step_tpl, 
-          new state_step_tpl, 
-          new state_step_tpl, 
-          new state_step_tpl,
-          new state_step_tpl,
-          new state_step_tpl]
-      }
-
-    this.force_way = null
-    this.resolution_coef_override = null
-
-          
-
-
-
-    // build
-    this.bodies.inters.B = new body_build({  x:p.x,
-                                    y:p.y,
+    this.bodies.inters.B = new body_build({  
+                                    m:this.m,
+                                    m_offset:new Matrix(),
+                                    x:0,
+                                    y:0,
                                     w:400/2.4*s,
                                     type:utils.shape.circle,
                                     color: utils.color.grey,
@@ -117,22 +79,42 @@ class fidget_windmill{
                                     limit_rot: [ 0, rad(270)],
                                     })
 
-    this.bodies.geos.circle = new body_build({ x:p.x,
-                                      y:p.y,
+    this.bodies.inters.B_mask = new body_build({
+                                    m:this.m,
+                                    m_offset:new Matrix(),
+                                    x:0,
+                                    y:0,
+                                    w:230/2.4*s,
+                                    type:utils.shape.circle,
+                                    color: utils.color.grey,
+                                    collision_category: utils.collision_category.inter,
+                                    collision_mask: utils.collision_category.mouse ,    
+                                    fix_rot:true,
+                                    density:0.001,
+                                    limit_rot: [ 0, rad(270)],
+                                    })                                    
+
+
+    this.bodies.geos.circle = new body_build({ 
+                                      m:this.m,
+                                      m_offset:new Matrix(),
+                                      x:0,
+                                      y:0,
                                       w : 20*s, 
                                       h : 18*s, 
                                       type : utils.shape.circle,
-                                      color : utils.color.red,
+                                      color : this.colors[1],
                                       collision_category : utils.collision_category.blue,
                                       collision_mask : utils.collision_category.default ,    
                                       fix_rot:true,
                                     })
     let oRect = {
-      x:p.x,
-      y:p.y, 
+      m:this.m,
+      x:0,
+      y:0, 
       w : 7*s, 
       h : 30*s, 
-      color: utils.color.green,
+      color: this.colors[0],
       collision_category: utils.collision_category.blue,
       collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
       type: utils.shape.rectangle,
@@ -142,35 +124,65 @@ class fidget_windmill{
                           distNeg: 0.001,  
                         }
     } 
-                                      
+
+    let mo_rA = new Matrix()
+    
+    mo_rA.setTranslation(0,oRect.h)
     this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                                y:p.y+oRect.h,
+                                                m_offset:mo_rA,
+                                                y:oRect.h,
                                                 rot:0, 
                                                 collision:false,                                                 
                                               })) 
-
+    
+    let mo_rB = new Matrix()
+    mo_rB.setTranslation(0,-oRect.h)
     this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                                y:p.y-oRect.h,
+                                                 m_offset:mo_rB,
+                                                y:-oRect.h,
                                                 rot:180,   
                                                 collision:false, 
                                               })) 
-
+    let mo_rC = new Matrix()
+    mo_rC.setTranslation(-oRect.h,0)
     this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                                x:p.x-oRect.h,
+                                                 m_offset:mo_rC,
+                                                x:-oRect.h,
                                                 rot:90,  
                                                 collision:false,  
                                                 
                                               })) 
-
+    let mo_rD = new Matrix()
+    mo_rD.setTranslation(oRect.h,0)
     this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                                x:p.x+oRect.h,
+                                                m_offset:mo_rD,
+                                                x:oRect.h,
                                                 rot:-90,  
                                               })) 
 
+    this.bodies.inters.A_bg = new body_build({  
+                                    m:this.m,
+                                    m_offset: new Matrix(),
+                                    x:0,
+                                    y:0,
+                                    w:230/2.4*s,
+                                    type:utils.shape.circle,
+                                    color: utils.color.grey,
+                                    collision_category: utils.collision_category.inter,
+                                    collision_mask: utils.collision_category.mouse ,    
+                                    fix_rot:true,
+                                    density:0.001,
+                                    limit_rot: [ 0, rad(270)],
+                                    })    
 
-    this.bodies.inters.A = new body_build({ x:p.x,
-                                          y:p.y+oRect.h,
-                                          w:60/2.4*3*s,
+    let mo_iA = new Matrix()
+    mo_iA.setTranslation(0,oRect.h)                                    
+    this.bodies.inters.A = new body_build({ 
+                                          m:this.m,
+                                          m_offset:mo_iA,
+                                          x:0,
+                                          y:oRect.h,
+                                          w:40/2.4*3*s,
                                           type : utils.shape.circle,
                                           color:utils.color.grey,
                                           collision_category: utils.collision_category.inter,
@@ -182,10 +194,33 @@ class fidget_windmill{
                                           }
                                         })  
 
-    // other
 
-    this.bodies.inters.C = new body_build({ x:p.x+oRect.h,
-                                      y:p.y,
+
+    // other
+    let mo_iC_bg = new Matrix()
+    mo_iC_bg.setTranslation(50,0) 
+    this.bodies.inters.C_bg = new body_build({  
+                                    m:this.m,
+                                    m_offset:mo_iC_bg,
+                                    x:50,
+                                    y:0,
+                                    w:300/2.4*s,
+                                    type:utils.shape.circle,
+                                    color: utils.color.grey,
+                                    collision_category: utils.collision_category.inter,
+                                    collision_mask: utils.collision_category.mouse ,    
+                                    fix_rot:true,
+                                    density:0.001,
+                                    limit_rot: [ 0, rad(270)],
+                                    })    
+
+    let mo_iC = new Matrix()
+    mo_iC.setTranslation(oRect.h,0)                                     
+    this.bodies.inters.C = new body_build({ 
+                                      m:this.m,
+                                      m_offset:mo_iC,
+                                      x:oRect.h,
+                                      y:0,
                                       rot:-90,
                                       w:100/2.4*s,
                                       type : utils.shape.circle,
@@ -199,16 +234,16 @@ class fidget_windmill{
                                       }
                                     })
     this.bodies.inters.C.c_axe.pos_override =1
-    this.bodies.inters.C.c_axe.apply(0,createVector(0,0))
+    this.bodies.inters.C.c_axe.apply()
     this.bodies.inters.C.c_axe.pos_override =null
 
-
     let oTrap = { 
+      m:this.m,
       w : 46*s, 
       posCoef:0.7, 
       h : 7*s, 
       slop : 45, 
-      color: utils.color.blue,
+      color: this.colors[2],
       collision_category: utils.collision_category.blue,
       collision_mask: utils.collision_category.default ,
       type:utils.shape.trapezoid,
@@ -220,69 +255,78 @@ class fidget_windmill{
       }  
     } 
 
-  this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
-                                          x:p.x+oRect.h*oTrap.posCoef,
-                                          y:p.y+oRect.h*oTrap.posCoef,
+  let mo_tA = new Matrix()
+  mo_tA.setTranslation(oRect.h*oTrap.posCoef,
+                       oRect.h*oTrap.posCoef)             
+  this.bodies.geos.trapezoids.push(new body_build({ ...oTrap,
+                                          m_offset:mo_tA, 
+                                          x:oRect.h*oTrap.posCoef,
+                                          y:oRect.h*oTrap.posCoef,
                                           rot:-45,       
                                         })) 
 
+  let mo_tB = new Matrix()
+  mo_tB.setTranslation(-oRect.h*oTrap.posCoef,
+                       oRect.h*oTrap.posCoef)   
   this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
-                                          x:p.x-oRect.h*oTrap.posCoef,
-                                          y:p.y+oRect.h*oTrap.posCoef,
+                                          m_offset:mo_tB,
+                                          x:-oRect.h*oTrap.posCoef,
+                                          y:oRect.h*oTrap.posCoef,
                                           rot:45,  
                                         })) 
-
+  let mo_tC = new Matrix()
+  mo_tC.setTranslation(-oRect.h*oTrap.posCoef,
+                       -oRect.h*oTrap.posCoef)   
   this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
-                                          x:p.x-oRect.h*oTrap.posCoef,
-                                          y:p.y-oRect.h*oTrap.posCoef,
+                                          m_offset:mo_tC,
+                                          x:-oRect.h*oTrap.posCoef,
+                                          y:-oRect.h*oTrap.posCoef,
                                           rot:-45-180,      
                                         })) 
 
+  let mo_tD = new Matrix()
+  mo_tD.setTranslation(+oRect.h*oTrap.posCoef,
+                       -oRect.h*oTrap.posCoef)   
   this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
-                                          x:p.x+oRect.h*oTrap.posCoef,
-                                          y:p.y-oRect.h*oTrap.posCoef,
+                                          m_offset:mo_tD,
+                                          x:+oRect.h*oTrap.posCoef,
+                                          y:-oRect.h*oTrap.posCoef,
                                           rot:45+180,     
                                         })) 
-
-    this.set_debug( debug )
-
-    if( debug == false)
-    {
-      this.bodies.inters.A.visibility_override = false 
-      this.bodies.inters.B.visibility_override = false 
-      this.bodies.inters.C.visibility_override = false 
-    }
-    else{
-      this.bodies.inters.A.visibility_override = true 
-      this.bodies.inters.B.visibility_override = true 
-      this.bodies.inters.C.visibility_override = true 
-    }
-    
+  
 
   }
 
 
+  ////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////// UPDATE
+  //////////////////////////////////////////////////////////////////////////////////// 
 
-  get_resolution_coef_info( resolution_coef_override = null)
+  get_resolution_coef_info()
   {
-    let s = [0,1,2]   
+    
 
     let A = clamp(this.bodies.inters.A.c_axe.current_pos     ,0,1)
     let B = clamp(deg(this.bodies.inters.B.body.angle)/270   ,0,1)
     let C = clamp(1 - this.bodies.inters.C.c_axe.current_pos ,0,1) 
-    if ( resolution_coef_override != null )
+    let D = 0
+    if ( this.anim_mode )
     {
-      A = clamp(resolution_coef_override ,s[0],s[0]+1)
-      B = clamp(resolution_coef_override ,s[1],s[1]+1)-s[1]
-      C = clamp(resolution_coef_override ,s[2],s[2]+1)-s[2]
+      let s = [0,1,2,3]   
+      A = clamp(this.resolution_coef_override ,s[0],s[0]+1)
+      B = clamp(this.resolution_coef_override ,s[1],s[1]+1)-s[1]
+      C = clamp(this.resolution_coef_override ,s[2],s[2]+1)-s[2]
+      D = clamp(this.resolution_coef_override ,s[3],s[3]+1)-s[3]
     }
-    let coef = A + B + C
+    
+    let coef = A + B + C + D
 
     // fill resolution coef info
     this.state.resolution_coef = coef
     this.state.steps[0].resoluton_coef = A
     this.state.steps[1].resoluton_coef = B
     this.state.steps[2].resoluton_coef = C
+    this.state.steps[3].resoluton_coef = D
 
     this.state.current_step = 0
     if(A==1)
@@ -290,21 +334,12 @@ class fidget_windmill{
     if(B==1)
       this.state.current_step = 2   
     if(C==1)
-      this.state.current_step = 3       
+      this.state.current_step = 3      
+    if(D==1)
+      this.state.current_step = 4        
   }
 
-  update_step_count(step)
-  {
-    for( let i = 0; i < this.state.steps.length; i++ )
-    {
-      if(i == step)
-        this.state.steps[i].update_count += 1
-      else
-        this.state.steps[i].update_count = 0
-    } 
-  }
-
-  set_phase_resolution_control_0( res_coef, update_interaction = false)
+  set_phase_resolution_control_0( res_coef )
   {
       for( let i = 0; i < this.bodies.geos.rectangles.length; i++ )
       this.bodies.geos.rectangles[i].c_axe.pos_override = res_coef
@@ -312,13 +347,13 @@ class fidget_windmill{
     for( let i = 0; i < this.bodies.geos.trapezoids.length; i++ )
       this.bodies.geos.trapezoids[i].c_axe.pos_override = res_coef
 
-    if( update_interaction )   
+    if(  this.anim_mode )   
     {
       this.bodies.inters.A.c_axe.pos_override = res_coef
     }
   }
 
-  set_phase_resolution_control_2( res_coef, update_interaction = false)
+  set_phase_resolution_control_2( res_coef)
   {  
       for( let i = 0; i < this.bodies.geos.trapezoids.length; i++ )
         this.bodies.geos.trapezoids[i].c_axe.pos_override = res_coef*-2+1
@@ -337,13 +372,13 @@ class fidget_windmill{
       else                          
         this.bodies.geos.rectangles[2].enable(1)
   
-      if( update_interaction )   
+      if(  this.anim_mode )   
       {
         this.bodies.inters.B.rot_override = rad(res_coef*270)
       }
   }
 
-  set_phase_resolution_control_4( res_coef, update_interaction = false)
+  set_phase_resolution_control_4( res_coef)
   {  
     this.bodies.geos.rectangles[3].c_axe.pos_override = 1 - res_coef
 
@@ -356,66 +391,30 @@ class fidget_windmill{
       let current_r = this.bodies.geos.trapezoids[i].rot
       let r = current_r+ rad(270)+rot_tmp*rad(45);
       this.bodies.geos.trapezoids[i].rot_override = r
+
+      
+      this.bodies.geos.trapezoids[i].c_axe.pos_override = -1      
     }
 
-    if( update_interaction )   
+    if( this.anim_mode )   
     {
       this.bodies.inters.C.c_axe.pos_override = 1-res_coef
     }    
   } 
 
-  switch_selection_transition( current_step, selected_body, obj_last, obj_next)
-  {
-    if( this.state.switch_selection_happened_step != current_step)
-    {
-      if(selected_body != null)
-      {
-        if(this.force_way == null)
-        {
-          let current_way = 1
-          if(this.state.resolution_coef < this.state.resolution_coef_last)
-            current_way = -1
-          else
-            current_way = 1
-  
-          if(current_way == 1)
-          {
-            if(selected_body != obj_next.body)
-              switch_selection( mouseConstraint, obj_next)
-          }
-          else
-          {
-            if(selected_body != obj_last.body)
-              switch_selection(mouseConstraint, obj_last)     
-          }
-        }
-        else if(this.force_way == 1)
-        {
-          if(selected_body != obj_next.body)
-            switch_selection( mouseConstraint, obj_next)
-        }
-        else if(this.force_way == -1)
-        {
-          if(selected_body != obj_last.body)
-            switch_selection(mouseConstraint, obj_last) 
-        }
-      }
-      this.state.switch_selection_happened_step = current_step  
-    }
-  }
 
 
-  set_phase_resolution( resolution_coef, update_interaction = false)
+  set_step_resolution()
   {
     // utils
     var selected_body = mouseConstraint.constraint.bodyB
-
+    
     // clean
-    this.enable_existing_axe(true)
-    this.clean_axe_override()
-    this.modif_existing_constraint(1.0)
-    this.clean_rot_override()
-    this.enable( 0, true, false )
+    this.bodies_axe_enable(true)
+    this.bodies_axe_clean_override()
+    this.bodies_cns_modif(1.0)
+    this.bodies_rot_clean_override()
+    this.bodies_enable( 0, true, false )
 
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -425,12 +424,13 @@ class fidget_windmill{
     {
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.enable(1) 
+      this.bodies.inters.A_bg.enable(1) 
       this.bodies.inters.B.rot_override = 0
       this.bodies.inters.C.c_axe.pos_override = 1    
       //_________________________________________________________________Clean Other
 
       //_________________________________________________________________Control
-      this.set_phase_resolution_control_0( res_coef, update_interaction)
+      this.set_phase_resolution_control_0( res_coef)
 
       //_________________________________________________________________Update
       this.state.switch_selection_happened_step = step
@@ -445,6 +445,7 @@ class fidget_windmill{
     {         
       //_________________________________________________________________Clean Inter
       this.bodies.inters.B.enable(1) 
+      this.bodies.inters.B_mask.enable(1) 
   
       this.bodies.inters.A.c_axe.pos_override = 1
       this.bodies.inters.C.c_axe.pos_override = 1
@@ -454,7 +455,7 @@ class fidget_windmill{
         this.bodies.geos.rectangles[i].c_axe.pos_override = 1
 
       //_________________________________________________________________Control
-      this.set_phase_resolution_control_2( res_coef, update_interaction)
+      this.set_phase_resolution_control_2( res_coef)
       //_________________________________________________________________Mouse
       this.switch_selection_transition( step, selected_body, this.bodies.inters.A, this.bodies.inters.B)
       //_________________________________________________________________Update
@@ -470,6 +471,7 @@ class fidget_windmill{
     {
       //_________________________________________________________________Clean Inter
       this.bodies.inters.C.enable(1) 
+      this.bodies.inters.C_bg.enable(1) 
 
       this.bodies.inters.A.c_axe.pos_override = 1
       this.bodies.inters.B.rot_override = rad(270)
@@ -480,7 +482,7 @@ class fidget_windmill{
       this.bodies.geos.rectangles[2].enable(0)
 
       //_________________________________________________________________Control
-      this.set_phase_resolution_control_4( res_coef, update_interaction)
+      this.set_phase_resolution_control_4( res_coef)
       //_________________________________________________________________Mouse
       this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
       //_________________________________________________________________Update
@@ -504,10 +506,10 @@ class fidget_windmill{
       this.bodies.geos.rectangles[2].enable(0)
 
       for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
-        this.bodies.geos.trapezoids[i].rot_override = this.bodies.geos.trapezoids[i].rot+ rad(270)+rad(45);   
+        this.bodies.geos.trapezoids[i].rot_override = this.bodies.geos.trapezoids[i].rot+ rad(270)+rad(45)   
 
       //_________________________________________________________________Control
-      //this.set_phase_resolution_control_4( res_coef, update_interaction)
+      
       //_________________________________________________________________Mouse
       this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
       //_________________________________________________________________Update
@@ -515,18 +517,39 @@ class fidget_windmill{
       this.update_step_count(step) 
 
       //
-      
-      let wait_time = 20
-      let t = this.state.steps[step].update_count
-      if( t < wait_time )
+      if( this.anim_mode == false )
       {
-        this.do_pre_explode_animation(t,0,wait_time)
+        let wait_time = 20
+        let t = this.state.steps[step].update_count
+        if( t < wait_time )
+        {
+          this.do_pre_explode_animation(t,0,wait_time)
+        }
+        else{
+          this.do_explode(step)
+        }  
       }
-      else{
-        this.do_explode(step)
-      }  
+      else
+      {
+        this.set_phase_resolution_control_4( 0.95)
 
+        //this.bodies_cns_modif(0.0001, false, true)
+        //this.bodies_axe_enable(false, false, true)   
+        let y_offset = res_coef * 330  
+
+        this.m.setTranslation(200,200+y_offset)
+
+        //this.bodies.geos.circle.body.position.y = this.bodies.geos.circle.y + y_offset   
+        //for( let i=0; i < this.bodies.geos.rectangles.length; i++ )
+        //  this.bodies.geos.rectangles[i].body.position.y = this.bodies.geos.rectangles[i].y + y_offset     
+        //
+        //for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
+        //  this.bodies.geos.trapezoids[i].body.position.y = this.bodies.geos.trapezoids[i].y + y_offset     
+            
+      
+        }
     } 
+   
 
 
   }
@@ -548,75 +571,66 @@ class fidget_windmill{
       utils.color.white[1],
       utils.color.white[2])
 
-    this.set_color(lerpColor( c1,c2,a),false, true)
+    this.bodies_override_color(lerpColor( c1,c2,a),false, true)
    
   }
 
   do_explode(step)
   {
-    this.modif_existing_constraint(0.0001, false, true)
-    this.enable_existing_axe(false, false, true)
+    this.bodies_cns_modif(0.0001, false, true)
+    this.bodies_axe_enable(false, false, true)
     
     // custom color
-    this.set_color(null,false, true)
+    this.bodies_override_color(null,false, true)
 
 
     //gravity
-    Matter.Body.applyForce(
-      this.bodies.geos.circle.body, 
-      this.bodies.geos.circle.body.position, 
-      {x:0,y:0.05*0.13})
+    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_position(),
+                                          new Vector(0, 0.05*0.13) )
+
 
     for( let i=0; i < this.bodies.geos.rectangles.length; i++ )
-      Matter.Body.applyForce(
-        this.bodies.geos.rectangles[i].body, 
-        this.bodies.geos.rectangles[i].body.position,
-        {x:0,y:0.05*0.03})
+      this.bodies.geos.rectangles[i].apply_force( this.bodies.geos.rectangles[i].get_position(),
+                                                  new Vector(0, 0.05*0.03) )  
+
 
     for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
-      Matter.Body.applyForce(
-        this.bodies.geos.trapezoids[i].body, 
-        this.bodies.geos.trapezoids[i].body.position,
-        {x:0,y:0.05*0.03})
+      this.bodies.geos.trapezoids[i].apply_force( this.bodies.geos.trapezoids[i].get_position(),
+                                                  new Vector(0, 0.05*0.03) )  
+
+
 
 
     if( this.state.steps[step].apply_force_happened == false )
     {
       
-      //console.log('APPLY FORCE')
-      let p_force = {x:c.x,y:c.y}
-
-      let v_force = createVector(0.05,0)
+      let p_force = new Vector(this.m.get_row(2))
+      let v_force = new Vector(-0.05,0)
 
       let _v = null
 
-      Matter.Body.applyForce(this.bodies.geos.rectangles[3].body, p_force, v_force)
+      this.bodies.geos.rectangles[3].apply_force(p_force,v_force)
 
-      _v = p5.Vector.sub(createVector(0,-0.01),p5.Vector.mult(v_force,2))
-      Matter.Body.applyForce(this.bodies.geos.circle.body, p_force, _v,v_force)
 
-      _v = p5.Vector.sub(createVector(0.05,-0.05),p5.Vector.mult(v_force,2))
-      Matter.Body.applyForce(this.bodies.geos.trapezoids[0].body, p_force, _v )
-
-      _v = p5.Vector.sub(createVector(0.05,0.05),p5.Vector.mult(v_force,2))
-      Matter.Body.applyForce(this.bodies.geos.trapezoids[1].body, p_force, _v )
-
-      _v = p5.Vector.sub(createVector(-0.05,0.05),p5.Vector.mult(v_force,2))
-      Matter.Body.applyForce(this.bodies.geos.trapezoids[2].body, p_force, _v )
-
-      _v = p5.Vector.sub(createVector(-0.05,-0.05),p5.Vector.mult(v_force,2))
-      Matter.Body.applyForce(this.bodies.geos.trapezoids[3].body, p_force, _v )
+      _v = new Vector(0,-0.01)
+      this.bodies.geos.circle.apply_force( p_force, _v.add(v_force.getMult(2)) )
+      _v = new Vector(0.05,-0.05)
+      this.bodies.geos.trapezoids[0].apply_force( p_force, _v.add(v_force.getMult(2)) )
+      _v = new Vector(0.05,0.05)
+      this.bodies.geos.trapezoids[1].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
+      _v = new Vector(-0.05,0.05)
+      this.bodies.geos.trapezoids[2].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
+      _v = new Vector(-0.05,-0.05)
+      this.bodies.geos.trapezoids[3].apply_force( p_force, _v.add(v_force.getMult(2)) )
       
       this.state.steps[step].apply_force_happened = true
     }
   }  
 
-
-  update()
+  set_across_steps()
   {
-
     let a_inter2 = deg(this.bodies.inters.B.body.angle)
-    let center_tmp = createVector(c.x,c.y)
+    let center_tmp = new Vector(this.m.get_row(2))
 
     for( let i = 0; i < this.bodies.geos.rectangles.length; i++)
       this.bodies.geos.rectangles[i].c_axe.axe_rotation_center = center_tmp
@@ -635,411 +649,188 @@ class fidget_windmill{
     this.bodies.inters.A.c_axe.axe_rotation_center = center_tmp
     this.bodies.inters.C.c_axe.axe_rotation = min( 0  , a_inter2)
     this.bodies.inters.C.c_axe.axe_rotation_center = center_tmp
+  }
 
-  
+  track_user_drag_error()
+  {
+    //for( let i = 0; i < this.show_step_helpers.length; i++)
+    //  this.show_step_helpers[i] = 0
+    
+    if ( this.touch_enable == false )
+      return 
+
+    if( mouseIsPressed )
+    {
+      
+      this.mouse_pressed_positions_at_update.push( createVector( pmouseX , pmouseY ) )    
+      let size = this.mouse_pressed_positions_at_update.length
+      if( 1 < size )
+      {
+        let p_first = this.mouse_pressed_positions_at_update[0]
+        let p_last = this.mouse_pressed_positions_at_update[size-1]
+        let v_delta = p5.Vector.sub(p_last,p_first)
+        
+        if( 0.01 < v_delta.mag() )
+        {
+          
+          let A = this.obj_is_selected(mouseConstraint,this.bodies.inters.A)
+          let B = this.obj_is_selected(mouseConstraint,this.bodies.inters.B)
+          let C = this.obj_is_selected(mouseConstraint,this.bodies.inters.C)
+          if( (A == false)&&
+              (B == false)&&
+              (C == false))
+          {
+            this.bodies_override_color(utils.color.black,false,true)
+            this.color_background = utils.color.red
+          }
+          else
+          {
+            if(A && this.state.current_step == 0)this.show_step_helpers[0] = 100
+            if(B && this.state.current_step == 1)this.show_step_helpers[1] = 100
+            if(C && this.state.current_step == 2)this.show_step_helpers[2] = 100
+          }
+              
+        }
+      }
+    }
+    else if( 0 < this.mouse_pressed_positions_at_update.length )
+    {
+      this.bodies_override_color(null,false,true)
+      this.color_background = utils.color.dark
+      this.mouse_pressed_positions_at_update = []
+    }
+    else
+    {
+      this.mouse_pressed_positions_at_update = []
+    }
+  }
+
+  update()
+  {
+    this.anim_mode =  this.resolution_coef_override != null
+    this.set_across_steps()
     // resolution
     this.state.resolution_coef_last = this.state.resolution_coef
-
-    //this.resolution_coef_override = abs(sin(this.state.update_count/100))*3
-
-    this.get_resolution_coef_info( this.resolution_coef_override )
-    this.set_phase_resolution( this.state.resolution_coef, this.resolution_coef_override != null)
-  
-
-    //=====================================================================================================
-    this.update_bodies()
-
-
-
+    this.get_resolution_coef_info()
+    this.set_step_resolution()
+    this.track_user_drag_error()
+    this.bodies_update()
     this.state.update_count += 1
   }
 
- 
 
-  show()
+  ////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////// DRAW
+  ////////////////////////////////////////////////////////////////////////////////////
+
+
+  draw_background()
   {
-    
     let a = this.state.steps[3].update_count
-
     a -=30
     a = max(0,a)
     a *=15
+    if(this.anim_mode)
+      a = this.state.steps[3].resoluton_coef*200    
 
-    fill(50,40,50)
-    if( 0 < this.state.steps[3].update_count-15)
+    fill(this.color_background[0],
+      this.color_background[1],
+      this.color_background[2])//fill(50,40,50)
+    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
       fill(50,140,50)
     rect(0,0,width/2-a,height)
-    fill(50,50,40)
-    if( 0 < this.state.steps[3].update_count-15)
+
+    fill(255);
+    textSize(50);
+    textAlign(CENTER);
+    text( this.fidget_sequence_i, width*0.2-a,height*0.95)
+
+    fill(this.color_background[0],
+      this.color_background[1],
+      this.color_background[2])//fill(50,40,50)
+    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
       fill(50,140,50)
     rect(width/2+a,0,width,height)
 
+    fill(255);
+    textSize(20);
+    textAlign(CENTER);
+    text( this.title , width*0.8+a,height*0.95)
 
-    this.draw_bodies()
+  }
 
-
-    //=================================================================
-    let wait_count = 100
-
-    let c2 = color(
-      utils.color.yellow[0],
-      utils.color.yellow[1],
-      utils.color.yellow[2])
-
-    for( let i = 0; i < this.bodies.geos.rectangles.length; i++)
-      this.bodies.geos.rectangles[i].color = this.bodies.geos.rectangles[i].color_base
-
-    let c = this.state.steps[0].update_count
-    if( wait_count < c )
-    {
-      let a = abs(cos((c-wait_count)/20))
-      let c1 = color(
-        this.bodies.geos.rectangles[0].color_base[0],
-        this.bodies.geos.rectangles[0].color_base[1],
-        this.bodies.geos.rectangles[0].color_base[2])
-      
-      this.bodies.geos.rectangles[0].color = lerpColor( c1,c2,a)
-
-      fill( lerpColor( c1,c2,a) )
-      let p = p5.Vector.add( this.bodies.geos.rectangles[0].get_point(),createVector(0,50))
-      arrowHeads(p,createVector(0,1),1.0)
-
-    }
+  draw_help()
+  {
     
-    c = this.state.steps[1].update_count
-    if( wait_count < c )
+    /////////////////////////////////////////////////
+    if(this.show_step_helpers[0] )
     {
-      let a = abs(sin((c-wait_count)/20))
-      let c1 = color(
-        this.bodies.geos.rectangles[0].color_base[0],
-        this.bodies.geos.rectangles[0].color_base[1],
-        this.bodies.geos.rectangles[0].color_base[2])
+      let coef = this.show_step_helpers[0] / 100 *255
+      fill(0,0,0,0)
+      stroke(utils.color.yellow[0],
+        utils.color.yellow[1],
+        utils.color.yellow[2],
+        coef)
+      let w = 1
+      let h = 4
+      let p = this.bodies.inters.A.get_matrix().get_row(2).get_value()
       
-      this.bodies.geos.rectangles[0].color = lerpColor( c1,c2,a)
-      this.bodies.geos.rectangles[1].color = lerpColor( c1,c2,a)
-      this.bodies.geos.rectangles[2].color = lerpColor( c1,c2,a)
+      rect( p.x-w/2,
+            p.y,
+            w,
+            20*h)
+      stroke(0)
 
-
-      fill( lerpColor( c1,c2,a) )
-      let coef = (this.state.steps[2].resoluton_coef)*rad(270)
-      let vA = createVector(cos(coef+rad(180)),sin(coef+rad(180)))
-      let p = p5.Vector.add( this.bodies.geos.rectangles[0].get_point(),p5.Vector.mult(vA,20))
-      arrowHeads(p,vA,1.0)
-      
-      vA = createVector(cos(coef+rad(0)),sin(coef+rad(0)))
-      p = p5.Vector.add( this.bodies.geos.rectangles[1].get_point(),p5.Vector.mult(vA,20))
-      arrowHeads(p,vA,1.0)
-      
-      vA = createVector(cos(coef-rad(90)),sin(coef-rad(90)))
-      p = p5.Vector.add( this.bodies.geos.rectangles[2].get_point(),p5.Vector.mult(vA,20))
-      arrowHeads(p,vA,1.0)
-
-      
-
+      this.show_step_helpers[0] -= 2
     }
 
-    c = this.state.steps[2].update_count
-    if( wait_count < c )
+    if(this.show_step_helpers[1] )
     {
-      let a = abs(sin((c-wait_count)/20))
-      let c1 = color(
-        this.bodies.geos.rectangles[0].color_base[0],
-        this.bodies.geos.rectangles[0].color_base[1],
-        this.bodies.geos.rectangles[0].color_base[2])
-      
-      this.bodies.geos.rectangles[0].color = lerpColor( c1,c2,a)
-      this.bodies.geos.rectangles[1].color = lerpColor( c1,c2,a)
-      this.bodies.geos.rectangles[2].color = lerpColor( c1,c2,a)
+      let coef = this.show_step_helpers[1] / 100 *255
+      fill(0,0,0,0)
+      stroke(utils.color.yellow[0],
+        utils.color.yellow[1],
+        utils.color.yellow[2],
+        coef)
+      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
+      arc(p.x,
+        p.y, 
+        this.bodies.inters.B.w*1.6,
+        this.bodies.inters.B.w*1.6, HALF_PI, PI *2);
+      stroke(0)
 
-      fill( lerpColor( c1,c2,a) )
-      let coef = (this.state.steps[2].resoluton_coef)*rad(270)
-      let vA = createVector(cos(coef+rad(180)),sin(coef+rad(180)))
-      let p = p5.Vector.add( this.bodies.geos.rectangles[0].get_point(),p5.Vector.mult(vA,20))
-      arrowHeads(p,vA,1.0)
-      
-      vA = createVector(cos(coef+rad(0)),sin(coef+rad(0)))
-      p = p5.Vector.add( this.bodies.geos.rectangles[1].get_point(),p5.Vector.mult(vA,20))
-      arrowHeads(p,vA,1.0)
-      
-      vA = createVector(cos(coef-rad(90)),sin(coef-rad(90)))
-      p = p5.Vector.add( this.bodies.geos.rectangles[2].get_point(),p5.Vector.mult(vA,20))
-      arrowHeads(p,vA,1.0)
-      
-
+      this.show_step_helpers[1] -= 2
     }
 
-    c = this.state.steps[3].update_count
-    if( wait_count < c )
+    if(this.show_step_helpers[2] )
     {
-      let a = abs(sin((c-wait_count)/20))
-      let c1 = color(
-        this.bodies.geos.rectangles[0].color_base[0],
-        this.bodies.geos.rectangles[0].color_base[1],
-        this.bodies.geos.rectangles[0].color_base[2])
+      let coef = this.show_step_helpers[2] / 100 *255
+      fill(0,0,0,0)
+      stroke(utils.color.yellow[0],
+        utils.color.yellow[1],
+        utils.color.yellow[2],
+        coef)
+      let w = 1
+      let h = 4
+      
+      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
+      let pB = this.bodies.inters.C.get_matrix().get_row(2).get_value()
+      rect( p.x,
+            p.y,
+            (pB.x - p.x)*2.21,
+            0)
+      stroke(0)
 
-      this.bodies.geos.rectangles[3].color = lerpColor( c1,c2,a)
-
-      fill( lerpColor( c1,c2,a) )
-      let p = p5.Vector.add( this.bodies.geos.rectangles[3].get_point(),createVector(-50,0))
-      arrowHeads(p,createVector(-1,0),1.0)
-
+      this.show_step_helpers[2] -= 2
     }
 
-    c = this.state.steps[4].update_count
-    if( wait_count < c )
-    {
-      let a = abs(sin((c-wait_count)/20))
-      let c1 = color(
-        this.bodies.geos.rectangles[0].color_base[0],
-        this.bodies.geos.rectangles[0].color_base[1],
-        this.bodies.geos.rectangles[0].color_base[2])
-
-      this.bodies.geos.rectangles[3].color = lerpColor( c1,c2,a)
-    }
-    
   }  
 
-
-
-  //=======================================================================================================================
-  //=======================================================================================================================
-  //=======================================================================================================================
-  //=======================================================================================================================
-  //=======================================================================================================================
-  //=======================================================================================================================
-  //=======================================================================================================================
-  //=======================================================================================================================
-
-  update_bodies( inters = true, geos = true)
+  draw()
   {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              this.bodies[b_type][key][i].update()
-          }
-          else
-            this.bodies[b_type][key].update()
-        }  
-      } 
-    }
-  }
-
-  draw_bodies( inters = true, geos = true )
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              this.bodies[b_type][key][i].draw()
-          }
-          else
-            this.bodies[b_type][key].draw()
-        }  
-      } 
-    }
-  }
-
-  set_color(new_color = null,inters = true, geos = true)
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              this.bodies[b_type][key][i].color = new_color || this.bodies[b_type][key][i].color_base
-          }
-          else
-            this.bodies[b_type][key].color = new_color || this.bodies[b_type][key].color_base
-        }  
-      } 
-    }
-  }
-
-  clean_axe_override(inters = true, geos = true)
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              if(this.bodies[b_type][key][i].c_axe != null)
-                this.bodies[b_type][key][i].c_axe.pos_override = null
-          }
-          else
-            if(this.bodies[b_type][key].c_axe != null)
-              this.bodies[b_type][key].c_axe.pos_override = null
-        }  
-      } 
-    }  
-  }
-
-  enable_existing_axe(value, inters = true, geos = true)
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              if(this.bodies[b_type][key][i].c_axe != null)
-                this.bodies[b_type][key][i].c_axe.enable = value
-          }
-          else
-            if(this.bodies[b_type][key].c_axe != null)
-              this.bodies[b_type][key].c_axe.enable = value
-        }  
-      } 
-    }     
-  }
-
-  modif_existing_constraint(value, inters = true, geos = true)
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              for( let j = 0; j < this.bodies[b_type][key][i].constraints.length; j++)
-                this.bodies[b_type][key][i].constraints[j].cns.stiffness = value
-          }
-          else      
-            for( let j = 0; j < this.bodies[b_type][key].constraints.length; j++)
-              this.bodies[b_type][key].constraints[j].cns.stiffness = value   
-        }  
-      } 
-    }   
-  }
-
-  clean_rot_override(inters = true, geos = true)
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              this.bodies[b_type][key][i].rot_override = null 
-          }
-          else
-            this.bodies[b_type][key].rot_override = null 
-        }  
-      } 
-    }  
-  }
-
-  set_debug( value, inters = true, geos = true)
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              this.bodies[b_type][key][i].debug = value 
-          }
-          else
-            this.bodies[b_type][key].debug = value 
-        }  
-      } 
-    }       
-  }
-
-  enable( value, inters = true, geos = true )
-  {
-    for( let b_type in this.bodies)
-    {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-      {
-        for( let key of this.bodies_draw_order[b_type])
-        {      
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              this.bodies[b_type][key][i].enable(value)
-          }
-          else
-            this.bodies[b_type][key].enable(value)
-        }  
-      } 
-    } 
-   
-  }
-
-  mouse_select_highlight(mouse_cns, inters = true, geos = true )
-  {
-    if( mouse_cns.constraint.bodyB != null )
-    {
-      for( let b_type in this.bodies)
-      {   
-        if(( (b_type == 'inters')&&(inters==true) )
-        || ( (b_type == 'geos'  )&&(geos  ==true) ) )
-        {
-          for( let key of this.bodies_draw_order[b_type])
-          {      
-            if( this.bodies[b_type][key].constructor === Array)
-            {
-              for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              {
-                if( this.bodies[b_type][key][i].body == mouse_cns.constraint.bodyB )
-                  this.bodies[b_type][key][i].color = utils.color.redLight
-                else
-                  this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base           
-              }
-            }
-            else
-            {
-              if( this.bodies[b_type][key].body == mouse_cns.constraint.bodyB )
-                this.bodies[b_type][key].color = utils.color.redLight
-              else
-              this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
-            }
-
-          }  
-        } 
-      } 
- 
-    }    
+    this.draw_background()
+    this.bodies_draw()
+    this.draw_help()
   }
 
 

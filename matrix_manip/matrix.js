@@ -23,7 +23,7 @@
  * @prop {CanvasRenderingContext2D} [context] - set or get current canvas context
  * @constructor
  */
- function Matrix(m=null) {
+ function Matrix(context) {
 
 	this.a = 1;
 	this.b = 0;
@@ -31,16 +31,10 @@
 	this.d = 1;
 	this.e = 0;
 	this.f = 0;
+	this.context = context || null;
 
-	if( m != null)
-	{
-		this.a = m.a
-		this.b = m.b
-		this.c = m.c
-		this.d = m.d
-		this.e = m.e
-		this.f = m.f
-	}
+	// reset canvas transformations (if any) to enable 100% sync.
+	if (context) context.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 Matrix.prototype = {
@@ -204,7 +198,6 @@ Matrix.prototype = {
 
 		return this;
 	},
-
 	setScale: function(x,y) {
 
 		let vX = this.get_row(0)
@@ -510,30 +503,6 @@ Matrix.prototype = {
 		if(row == 0)return new Vector(this.a,this.b)//X
 		if(row == 1)return new Vector(this.c,this.d)//Y
 		if(row == 2)return new Vector(this.e,this.f)//P
-	},
-
-	log: function(title=null) {
-
-		if(title!=null)
-		{
-			console.log(title,
-			round(this.a,2),
-			round(this.b,2),
-			round(this.c,2),
-			round(this.d,2),
-			round(this.e,2),
-			round(this.f,2))
-		}
-		else
-		{
-			console.log(round(this.a,2),
-			round(this.b,2),
-			round(this.c,2),
-			round(this.d,2),
-			round(this.e,2),
-			round(this.f,2))
-		}
-
 	},
 
 	draw: function() {
