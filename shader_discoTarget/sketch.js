@@ -101,7 +101,7 @@ function draw() {
   shdr_blur.setUniform('uvOffsetY',tlc.y/400) 
   shdr_blur.setUniform('uvOffsetW',250/400) 
   shdr_blur.setUniform('uvOffsetH',150/400)   
-  shdr_blur.setUniform('texture',canvas_mix)  
+  shdr_blur.setUniform('text',canvas_mix)  
   canvas_blur.clear()
   canvas_blur.background(0,0,0);
   canvas_blur.shader(shdr_blur) // Use as background

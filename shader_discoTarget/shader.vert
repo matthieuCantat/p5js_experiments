@@ -1,16 +1,16 @@
-attribute vec3 aPosition;
+#version 300 es
 
-// texture coordinates
-attribute vec2 aTexCoord;
+in vec4 aPosition;
+in vec4 aTexCoord;
 
 // the varying variable will pass the texture coordinate to our fragment shader
-varying vec2 vTexCoord;
+out vec4 v_color;
 
 void main() {
   // assign attribute to varying, so it can be used in the fragment
-  vTexCoord = aTexCoord;
+  v_color = aTexCoord;
 
-  vec4 positionVec4 = vec4(aPosition, 1.0);
+  vec4 positionVec4 = aPosition;
   positionVec4.xy = positionVec4.xy * 2.0 - 1.0;
   gl_Position = positionVec4;
 }

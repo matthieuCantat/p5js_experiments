@@ -1,3 +1,4 @@
+#version 300 es
 
 #extension GL_OES_standard_derivatives : enable
 
@@ -10,8 +11,8 @@ uniform vec2 iMouse;
 
 
 //uniform vec3 myColor;
-
-varying vec2 vTexCoord; // For each instance, different value
+out vec4 fragColor;
+in vec4 v_color; // For each instance, different value
 #define PI 3.14159265358979323846
 
 
@@ -24,17 +25,17 @@ vec2 map(vec2 pcoord) {
 
 float sfract(float x) {
   //WITHOUT ANTIALIASING
-  return fract(x);
+  //return fract(x);
   //WITH ANTIALIASING
-  //float px = fwidth(x);
-  //x -= round(x);
-  //return mix( x+1.0 , x , smoothstep(-px,px,x));
+  float px = fwidth(x);
+  x -= round(x);
+  return mix( x+1.0 , x , smoothstep(-px,px,x));
 }
 
 ///////////////// FROM SHADERTOY
-//void mainImage( out vec4 fragColor, in vec2 fragCoord ) ---> void main( ) gl_FragColor, gl_FragCoord
+//void mainImage( out vec4 fragColor, in vec2 fragCoord ) ---> void main( ) fragColor, gl_FragCoord
 // out gl_FragColor
-// in gl_FragCoord
+// in fragColor
 
 
 void main( )
@@ -45,10 +46,10 @@ void main( )
 
     vec2 mouseN = iMouse.x <= 0.0 ? vec2(0): map(iMouse.xy);
     uv -= mouseN;
-    gl_FragColor.r = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.1)));
-    gl_FragColor.g = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.2)));
-    gl_FragColor.b = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.3))) ; 
-    gl_FragColor.a = 1.0;
+    fragColor.r = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.1)));
+    fragColor.g = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.2)));
+    fragColor.b = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.3))) ; 
+    fragColor.a = 1.0;
 
 }
 
