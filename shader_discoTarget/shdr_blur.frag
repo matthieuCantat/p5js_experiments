@@ -17,7 +17,7 @@ uniform float uvOffsetW;
 uniform float uvOffsetH;
 
 
-//---------------------------------------------------------------------------------
+//------------------------------------------------- blur
 // 16x acceleration of https://www.shadertoy.com/view/4tSyzy
 // by applying gaussian at intermediate MIPmap level.
 
@@ -41,7 +41,7 @@ vec4 blur(sampler2D sp, vec2 U, vec2 scale) {
     
     return O / O.a;
 }
-//---------------------------------------------------------------------------------
+//----------------------------------------------
 #define GOLDEN_ANGLE 2.3999632
 
 #define ITERATIONS 150
