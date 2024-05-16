@@ -12,8 +12,8 @@ var canvas_dims ={w:400, h:400}
 function preload() {
   // load each shader file 
   shdr_discoTarget = loadShader('shader.vert', 'shdr_discoTarget.frag');
-  shdr_checker = loadShader('shader.vert', 'shdr_checker.frag');
-  shdr_blur = loadShader('shader.vert', 'shdr_blur.frag');
+  shdr_checker = loadShader('shader.vert', 'shdr_backgroundA.frag');
+  shdr_blur = loadShader('shader.vert', 'shdr_bodyGrain.frag');
 }
 
 function setup() {
@@ -92,7 +92,7 @@ function draw() {
   canvas_mix.texture(canvas_discoTarget); // Use on geometry
   //canvas_mix.translate(-100,-100)
   //canvas_mix.rotate(draw_count/20)
-  canvas_mix.rect(-150/2,-50/2,250,150);
+  canvas_mix.rect(-150/2,-50/2,250,150, 10);
 
   image(canvas_mix,-200,-200,400,400)
   
@@ -107,7 +107,7 @@ function draw() {
   canvas_blur.shader(shdr_blur) // Use as background
   canvas_blur.rect();// INIT 
   texture(canvas_blur);
-  rect( tlc.x, tlc.y, 250,150);
+  rect( tlc.x, tlc.y, 250,150, 10);
 
   //shader(shdr_blur)
   //rect()// INIT SHADER
