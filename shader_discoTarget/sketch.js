@@ -202,20 +202,20 @@ function draw() {
   canvas_glow_mask.rect(-250/2,-250/2,250,150, 10);  
 
   // rectB
-  let tlc_pos = createVector(-250/2+draw_count,-150/2);//createVector(cos(draw_count/30+4)*100, cos(draw_count/20)*150-150/2)
+  let tlc_pos = createVector(cos(draw_count/30+4)*100, cos(draw_count/20)*150-150/2)
   let scale_rect = createVector(250,150);
   let center_offset =createVector(scale_rect.x/2,scale_rect.y/2);
   let rot_offset = draw_count/30.*-1.
 
   let center_pos = p5.Vector.add(tlc_pos, center_offset)
-  let center_at_top_left_coords_system = p5.Vector.add(center_pos, createVector(200,200))
-  let pos_uv = createVector( (center_at_top_left_coords_system.x)/400, (center_at_top_left_coords_system.y)/400);
+  let pos_uv = createVector( (center_pos.x)/400, (center_pos.y)/400);
   console.log(pos_uv.x,pos_uv.y)
 
   shdr_body.setUniform('uvOffsetX',pos_uv.x) 
   shdr_body.setUniform('uvOffsetY',pos_uv.y) 
   shdr_body.setUniform('objCanvasRatioW',scale_rect.x/400) 
-  shdr_body.setUniform('objCanvasRatioH',scale_rect.y/400)   
+  shdr_body.setUniform('objCanvasRatioH',scale_rect.y/400)
+  shdr_body.setUniform('uvRotatePivot',[0.5,0.5])   
   shdr_body.setUniform('uvOffsetRotate',rot_offset) 
   shdr_body.setUniform('text',canvas_main)  
 

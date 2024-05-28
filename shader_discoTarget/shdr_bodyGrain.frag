@@ -15,6 +15,7 @@ uniform float uvOffsetX;
 uniform float uvOffsetY;
 uniform float objCanvasRatioW;
 uniform float objCanvasRatioH;
+uniform vec2 uvRotatePivot;
 uniform float uvOffsetRotate;
 
 
@@ -342,23 +343,26 @@ void main()
 
     uv_move.y = 1.0 - uv_move.y; // inverse y
 
-    // scale the space 
-    uv_move.x = uv_move.x*objCanvasRatioW; // scale uv with size of the element compare to the global canvas
+    // scale
+    uv_move -= uvRotatePivot; // from the pivot point of the rectang ( here the middle) 
+    // scale down the canvas, to make the picture bigger 
+    uv_move.x = uv_move.x*objCanvasRatioW; 
     uv_move.y = uv_move.y*objCanvasRatioH;  
+    uv_move += uvRotatePivot ;
 
+    // rotation
     float rot = uvOffsetRotate * -1.;
     // move space from the center to the vec2(0.0)
-    uv_move -= vec2(uvOffsetX-objCanvasRatioW/2.,uvOffsetY-objCanvasRatioH/2.);
-  
+    uv_move -= uvRotatePivot;
     // rotate the space
     uv_move = rotate2d(rot)*uv_move;
-
     // move it back to the original place
-    uv_move += vec2(uvOffsetX-objCanvasRatioW/2.,uvOffsetY-objCanvasRatioH/2.) ;
+    uv_move += uvRotatePivot ;
+    
 
-    // translate the space
-    uv_move.x += uvOffsetX-objCanvasRatioW/2.;
-    uv_move.y += uvOffsetY-objCanvasRatioH/2.;
+    // translate
+    uv_move.x += uvOffsetX;
+    uv_move.y += uvOffsetY;
 
 
 
