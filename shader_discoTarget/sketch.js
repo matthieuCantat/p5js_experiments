@@ -26,27 +26,27 @@ class shader_build
     this.glow_background_size =0.; 
     this.glow_background =0.; 
   
-    this.background_transparency =0.; 
+    this.bg_transparency =0.; 
     this.boder_size =0.0;
     this.hatching_line =0.;
   
-    this.background_animation =0.0;
-    this.background_animation_offset =0.0;
-    this.background_grain =0.0;
-    this.background_grain_scale =2.0;
-    this.background_grid =0.0;
-    this.background_grid_scale = 4.;
-    this.background_grid_line_scale =1.0;
-    this.background_grid_point_scale =1.0; 
-    this.background_colorA =[255., 0., 114.];//vec3(.910, .510, .8,
-    this.background_colorB =[197., 255., 80.];//vec3(.957, .804, .623,
-    this.background_colorC =[48.96,97.92,237.915];//vec3(.192, .384, .933,
-    this.background_colorD =[89.25,181.05,243.015];//vec3(0.350, .71, .953,
-    this.background_typeA =0.0;
-    this.background_typeB =0.0;
-    this.background_typeC =0.0;
-    this.background_typeD =0.0;
-    this.background_type_discoTarget = 0.0;
+    this.bg_animation =0.0;
+    this.bg_animation_offset =0.0;
+    this.bg_grain =0.0;
+    this.bg_grain_scale =2.0;
+    this.bg_grid =0.0;
+    this.bg_grid_scale = 4.;
+    this.bg_grid_line_scale =1.0;
+    this.bg_grid_point_scale =1.0; 
+    this.bg_colorA =[255., 0., 114.];//vec3(.910, .510, .8,
+    this.bg_colorB =[197., 255., 80.];//vec3(.957, .804, .623,
+    this.bg_colorC =[48.96,97.92,237.915];//vec3(.192, .384, .933,
+    this.bg_colorD =[89.25,181.05,243.015];//vec3(0.350, .71, .953,
+    this.bg_typeA =0.0;
+    this.bg_typeB =0.0;
+    this.bg_typeC =0.0;
+    this.bg_typeD =0.0;
+    this.bg_type_discoTarget = 0.0;
   
     this.light_beam =0.;
     this.glow_power = 0.;
@@ -104,31 +104,31 @@ class shader_build
     this.shdr.setUniform('blur_background_samples_LOD',this.blur_background_samples_LOD)  
     this.shdr.setUniform('glow_background_size',this.glow_background_size) 
     this.shdr.setUniform('glow_background',this.glow_background) 
-    this.shdr.setUniform('background_transparency',this.background_transparency)//1.) 
+    this.shdr.setUniform('background_transparency',this.bg_transparency)//1.) 
     
     this.shdr.setUniform('boder_size',this.boder_size)//max(0.0,cos(draw_count/20)) )
     this.shdr.setUniform('hatching_line',this.hatching_line)
     
-    this.shdr.setUniform('background_animation',this.background_animation)
-    this.shdr.setUniform('background_animation_offset',this.background_animation_offset)
-    this.shdr.setUniform('background_grain',this.background_grain)
-    this.shdr.setUniform('background_grain_scale',this.background_grain_scale)
-    this.shdr.setUniform('background_grid',this.background_grid)
-    this.shdr.setUniform('background_grid_scale', this.background_grid_scale)
-    this.shdr.setUniform('background_grid_line_scale',this.background_grid_line_scale) 
-    this.shdr.setUniform('background_grid_point_scale',this.background_grid_point_scale) 
+    this.shdr.setUniform('background_animation',this.bg_animation)
+    this.shdr.setUniform('background_animation_offset',this.bg_animation_offset)
+    this.shdr.setUniform('background_grain',this.bg_grain)
+    this.shdr.setUniform('background_grain_scale',this.bg_grain_scale)
+    this.shdr.setUniform('background_grid',this.bg_grid)
+    this.shdr.setUniform('background_grid_scale', this.bg_grid_scale)
+    this.shdr.setUniform('background_grid_line_scale',this.bg_grid_line_scale) 
+    this.shdr.setUniform('background_grid_point_scale',this.bg_grid_point_scale) 
   
-    this.shdr.setUniform('background_colorA',this.background_colorA);//vec3(.910, .510, .8);
-    this.shdr.setUniform('background_colorB',this.background_colorB);//vec3(.957, .804, .623);
-    this.shdr.setUniform('background_colorC',this.background_colorC);//vec3(.192, .384, .933);
-    this.shdr.setUniform('background_colorD',this.background_colorD);//vec3(0.350, .71, .953);
+    this.shdr.setUniform('background_colorA',this.bg_colorA);//vec3(.910, .510, .8);
+    this.shdr.setUniform('background_colorB',this.bg_colorB);//vec3(.957, .804, .623);
+    this.shdr.setUniform('background_colorC',this.bg_colorC);//vec3(.192, .384, .933);
+    this.shdr.setUniform('background_colorD',this.bg_colorD);//vec3(0.350, .71, .953);
   
     
-    this.shdr.setUniform('background_typeA',this.background_typeA);
-    this.shdr.setUniform('background_typeB',this.background_typeB);
-    this.shdr.setUniform('background_typeC',this.background_typeC);
-    this.shdr.setUniform('background_typeD',this.background_typeD);
-    this.shdr.setUniform('background_type_discoTarget',this.background_type_discoTarget);
+    this.shdr.setUniform('background_typeA',this.bg_typeA);
+    this.shdr.setUniform('background_typeB',this.bg_typeB);
+    this.shdr.setUniform('background_typeC',this.bg_typeC);
+    this.shdr.setUniform('background_typeD',this.bg_typeD);
+    this.shdr.setUniform('background_type_discoTarget',this.bg_type_discoTarget);
     this.shdr.setUniform('light_beam',this.light_beam)
 
     this.shdr.setUniform('glow_remove_white_original',this.glow_remove_white_original)
@@ -183,24 +183,21 @@ let rect_body_dims = {x:250, y:50};
 let rect_body_center_offset = {x:rect_body_dims.x/2,y:rect_body_dims.y/2};
 
 
-let shader_background = new shader_build();
-let shader_body_A = new shader_build();
-let shader_body_B = new shader_build();
 
-let shader_glow = new shader_build();
+let shdr_bg = new shader_build();
+let shdr_bodyA = new shader_build();
+let shdr_bodyB = new shader_build();
+let shdr_glow = new shader_build();
+let shdr_end = new shader_build();
 
-let shader_post_process = new shader_build();
 
 function preload() {
   // load each shader file 
-  shader_background.preload()
-  shader_body_A.preload();
-  shader_body_B.preload();
-
-
-  shader_glow.preload()
-
-  shader_post_process.preload()
+  shdr_bg.preload()
+  shdr_bodyA.preload();
+  shdr_bodyB.preload();
+  shdr_glow.preload()
+  shdr_end.preload()
 }
 
 function setup() {
@@ -216,13 +213,11 @@ function setup() {
   canvas_glow.clear();
   canvas_glow.noStroke();// turn off the cg layers stroke    
   //
-  shader_background.setup(canvas_dims)
-  shader_body_A.setup(rect_body_dims);
-  shader_body_B.setup(rect_body_dims);
-
-  shader_glow.setup(canvas_dims)
-
-  shader_post_process.setup(canvas_dims)
+  shdr_bg.setup(canvas_dims)
+  shdr_bodyA.setup(rect_body_dims);
+  shdr_bodyB.setup(rect_body_dims);
+  shdr_glow.setup(canvas_dims)
+  shdr_end.setup(canvas_dims)
   
   //pixelDensity(1)
 }
@@ -238,44 +233,44 @@ function draw() {
   background(0);
 
   // background - beauty
-  shader_background.iFrame = frameCount;
-  shader_background.iTime = millis() / 1000.0; 
-  shader_background.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.x, canvas_dims.y, 0)*2};
+  shdr_bg.iFrame = frameCount;
+  shdr_bg.iTime = millis() / 1000.0; 
+  shdr_bg.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.x, canvas_dims.y, 0)*2};
 
-  shader_background.background_animation = 1.
-  shader_background.background_grain = 1.
-  shader_background.background_grain_scale = 4.
-  shader_background.background_grid = 1.0
-  shader_background.background_grid_scale = 10.0
-  shader_background.background_grid_line_scale =  2.0
-  shader_background.background_grid_point_scale =  2.0
+  shdr_bg.bg_animation = 1.
+  shdr_bg.bg_grain = 1.
+  shdr_bg.bg_grain_scale = 4.
+  shdr_bg.bg_grid = 1.0
+  shdr_bg.bg_grid_scale = 10.0
+  shdr_bg.bg_grid_line_scale =  2.0
+  shdr_bg.bg_grid_point_scale =  2.0
 
-  shader_background.background_typeA = mix_value_function(frameCount,0  ,200,900);
-  shader_background.background_typeB = mix_value_function(frameCount,200,200,900);
-  shader_background.background_typeC = mix_value_function(frameCount,400,200,900);
-  shader_background.background_typeD = mix_value_function(frameCount,600,200,900);
-  shader_background.background_type_discoTarget= mix_value_function(frameCount,800,200,900);
+  shdr_bg.bg_typeA = mix_value_function(frameCount,0  ,200,900);
+  shdr_bg.bg_typeB = mix_value_function(frameCount,200,200,900);
+  shdr_bg.bg_typeC = mix_value_function(frameCount,400,200,900);
+  shdr_bg.bg_typeD = mix_value_function(frameCount,600,200,900);
+  shdr_bg.bg_type_discoTarget= mix_value_function(frameCount,800,200,900);
 
-  shader_background.light_beam = 1.0
-  shader_background.debug = 0
+  shdr_bg.light_beam = 1.0
+  shdr_bg.debug = 0
 
-  shader_background.as_image(canvas_beauty)
+  shdr_bg.as_image(canvas_beauty)
 
   // background - glow
-  shader_background.background_typeA = 0.;
-  shader_background.background_typeB = 0.;
-  shader_background.background_typeC = 0.;
-  shader_background.background_typeD = 0.;
-  shader_background.background_type_discoTarget= 0.;
+  shdr_bg.bg_typeA = 0.;
+  shdr_bg.bg_typeB = 0.;
+  shdr_bg.bg_typeC = 0.;
+  shdr_bg.bg_typeD = 0.;
+  shdr_bg.bg_type_discoTarget= 0.;
 
-  shader_background.background_grain = 0.
-  shader_background.background_grid_scale = 10.0
-  shader_background.background_grid_line_scale =  0.0
-  shader_background.background_grid_point_scale =  4.0
+  shdr_bg.bg_grain = 0.
+  shdr_bg.bg_grid_scale = 10.0
+  shdr_bg.bg_grid_line_scale =  0.0
+  shdr_bg.bg_grid_point_scale =  4.0
 
-  shader_background.light_beam = 0.0
+  shdr_bg.light_beam = 0.0
 
-  shader_background.as_image(canvas_glow)
+  shdr_bg.as_image(canvas_glow)
 
   
   // rectC - beauty
@@ -292,24 +287,24 @@ function draw() {
 
   let body_b_rotate = draw_count/50
 
-  shader_body_B.iFrame = frameCount;
-  shader_body_B.iTime = millis() / 1000.0; 
-  shader_body_B.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.y, canvas_dims.y, 0)*2};
-  shader_body_B.uvOffset = pos_uv;
-  shader_body_B.objCanvasRatio.x = rect_body_dims.x/canvas_dims.x
-  shader_body_B.objCanvasRatio.y = rect_body_dims.y/canvas_dims.y
-  shader_body_B.uvOffsetRotate = body_b_rotate;
+  shdr_bodyB.iFrame = frameCount;
+  shdr_bodyB.iTime = millis() / 1000.0; 
+  shdr_bodyB.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.y, canvas_dims.y, 0)*2};
+  shdr_bodyB.uvOffset = pos_uv;
+  shdr_bodyB.objCanvasRatio.x = rect_body_dims.x/canvas_dims.x
+  shdr_bodyB.objCanvasRatio.y = rect_body_dims.y/canvas_dims.y
+  shdr_bodyB.uvOffsetRotate = body_b_rotate;
 
-  shader_body_B.background_grain = 1.0;
-  shader_body_B.background_grid = 1.0;
-  shader_body_B.background_grid_scale = 10.0
-  shader_body_B.background_grid_line_scale =  1.0
-  shader_body_B.background_grid_point_scale =  4.0
+  shdr_bodyB.bg_grain = 1.0;
+  shdr_bodyB.bg_grid = 1.0;
+  shdr_bodyB.bg_grid_scale = 10.0
+  shdr_bodyB.bg_grid_line_scale =  1.0
+  shdr_bodyB.bg_grid_point_scale =  4.0
 
-  shader_body_B.background_type_discoTarget = 1.0;
-  shader_body_B.debug = 0
+  shdr_bodyB.bg_type_discoTarget = 1.0;
+  shdr_bodyB.debug = 0
 
-  shader_body_B.as_texture(canvas_beauty)
+  shdr_bodyB.as_texture(canvas_beauty)
   canvas_beauty.push();
   canvas_beauty.translate(tlc_pos)
   canvas_beauty.rotate(body_b_rotate);
@@ -334,29 +329,29 @@ function draw() {
 
   let rot_offset = draw_count/30.*-1.
 
-  shader_body_A.iFrame = frameCount;
-  shader_body_A.iTime = millis() / 1000.0; 
-  shader_body_A.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.y, canvas_dims.y, 0)*2};
-  shader_body_A.uvOffset = pos_uv;
-  shader_body_A.objCanvasRatio.x = rect_body_dims.x/canvas_dims.x
-  shader_body_A.objCanvasRatio.y = rect_body_dims.y/canvas_dims.y
-  shader_body_A.uvOffsetRotate = rot_offset;
-  shader_body_A.text = canvas_beauty;
+  shdr_bodyA.iFrame = frameCount;
+  shdr_bodyA.iTime = millis() / 1000.0; 
+  shdr_bodyA.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.y, canvas_dims.y, 0)*2};
+  shdr_bodyA.uvOffset = pos_uv;
+  shdr_bodyA.objCanvasRatio.x = rect_body_dims.x/canvas_dims.x
+  shdr_bodyA.objCanvasRatio.y = rect_body_dims.y/canvas_dims.y
+  shdr_bodyA.uvOffsetRotate = rot_offset;
+  shdr_bodyA.text = canvas_beauty;
 
-  shader_body_A.blur_background = 1.
-  shader_body_A.background_transparency = 1.
+  shdr_bodyA.blur_background = 1.
+  shdr_bodyA.bg_transparency = 1.
 
-  shader_body_A.boder_size = 0.10
-  shader_body_A.hatching_line = max(0.0,cos(draw_count/20))
+  shdr_bodyA.boder_size = 0.10
+  shdr_bodyA.hatching_line = max(0.0,cos(draw_count/20))
 
-  shader_body_A.background_animation = 1.0;
-  shader_body_A.background_grain = 1.0;
-  shader_body_A.background_grid = 1.0;
+  shdr_bodyA.bg_animation = 1.0;
+  shdr_bodyA.bg_grain = 1.0;
+  shdr_bodyA.bg_grid = 1.0;
 
-  shader_body_A.background_typeA = 0.0;
-  shader_body_A.debug = 0
+  shdr_bodyA.bg_typeA = 0.0;
+  shdr_bodyA.debug = 0
 
-  shader_body_A.as_texture(canvas_beauty)
+  shdr_bodyA.as_texture(canvas_beauty)
   canvas_beauty.push();
   canvas_beauty.translate(center_pos.x,center_pos.y)
   canvas_beauty.rotate(rot_offset);
@@ -364,9 +359,9 @@ function draw() {
   canvas_beauty.pop(); 
 
   // rectB - glow
-  shader_body_A.text = canvas_glow;
-  shader_body_A.blur_background = 0.
-  shader_body_A.as_texture(canvas_glow)
+  shdr_bodyA.text = canvas_glow;
+  shdr_bodyA.blur_background = 0.
+  shdr_bodyA.as_texture(canvas_glow)
   canvas_glow.push();
   canvas_glow.translate(center_pos.x,center_pos.y)
   canvas_glow.rotate(rot_offset);
@@ -376,30 +371,30 @@ function draw() {
   
 
   // post process - glow
-  shader_glow.iFrame = frameCount;
-  shader_glow.iTime = millis() / 1000.0; 
-  shader_glow.text = canvas_glow
-  shader_glow.background_transparency = 1.;
-  shader_glow.blur_background = 1.1;
-  shader_glow.blur_background_samples = 35;
-  shader_glow.blur_background_samples_LOD = 2;
-  shader_glow.glow_remove_white_original = 0;
+  shdr_glow.iFrame = frameCount;
+  shdr_glow.iTime = millis() / 1000.0; 
+  shdr_glow.text = canvas_glow
+  shdr_glow.bg_transparency = 1.;
+  shdr_glow.blur_background = 1.1;
+  shdr_glow.blur_background_samples = 35;
+  shdr_glow.blur_background_samples_LOD = 2;
+  shdr_glow.glow_remove_white_original = 0;
 
-  shader_glow.as_image(canvas_glow)
+  shdr_glow.as_image(canvas_glow)
   
 
   // post process - beauty
-  shader_post_process.iFrame = frameCount;
-  shader_post_process.iTime = millis() / 1000.0; 
-  shader_post_process.text = canvas_beauty
-  shader_post_process.text_glow = canvas_glow
-  shader_post_process.glow_power = abs(cos(float(draw_count)*0.05))
-  shader_post_process.background_transparency = 1.;
-  shader_post_process.blur_background = 0.;
-  shader_post_process.blur_background_samples = 35;
-  shader_post_process.blur_background_samples_LOD = 2;
+  shdr_end.iFrame = frameCount;
+  shdr_end.iTime = millis() / 1000.0; 
+  shdr_end.text = canvas_beauty
+  shdr_end.text_glow = canvas_glow
+  shdr_end.glow_power = abs(cos(float(draw_count)*0.05))
+  shdr_end.bg_transparency = 1.;
+  shdr_end.blur_background = 0.;
+  shdr_end.blur_background_samples = 35;
+  shdr_end.blur_background_samples_LOD = 2;
 
-  shader_post_process.as_image(canvas_beauty)
+  shdr_end.as_image(canvas_beauty)
   
 
   // out
