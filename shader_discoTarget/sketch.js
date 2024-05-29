@@ -52,6 +52,8 @@ class shader_build
     this.glow_power = 0.;
     this.debug =0;  
 
+    this.glow_remove_white_original = 0.;
+
     this.shdr = null;
     this.canvas = null
   }
@@ -128,6 +130,8 @@ class shader_build
     this.shdr.setUniform('background_typeD',this.background_typeD);
     this.shdr.setUniform('background_type_discoTarget',this.background_type_discoTarget);
     this.shdr.setUniform('light_beam',this.light_beam)
+
+    this.shdr.setUniform('glow_remove_white_original',this.glow_remove_white_original)
   
     this.shdr.setUniform('debug',this.debug)   
 
@@ -137,15 +141,21 @@ class shader_build
     this.canvas.rect();// INIT     
   }
 
-  as_texture()
+  as_texture( out_canvas = null)
   {
     this.update()
-    texture(this.canvas);
+    if( out_canvas == null)
+      texture(this.canvas);
+    else
+      out_canvas.texture(this.canvas);
   }
-  as_image()
+  as_image(out_canvas = null)
   {
     this.update()
-    image(this.canvas,this.iResolution.x/2*-1,this.iResolution.y/2*-1,this.iResolution.x,this.iResolution.y) 
+    if( out_canvas == null)
+      image(this.canvas,this.iResolution.x/2*-1,this.iResolution.y/2*-1,this.iResolution.x,this.iResolution.y) 
+    else
+      out_canvas.image(this.canvas,this.iResolution.x/2*-1,this.iResolution.y/2*-1,this.iResolution.x,this.iResolution.y)     
   }
 
 }
@@ -164,12 +174,8 @@ function mix_value_function(value,pos,scale,max_loop)
   return alternate_valueA;
 }
 
-let shdr_glow_mask;
 
 let canvas_beauty;
-
-let canvas_background_glow;
-let canvas_glow_mask;
 let canvas_glow;
 
 var canvas_dims ={x:400, y:400}//*9/16}
@@ -177,85 +183,61 @@ let rect_body_dims = {x:250, y:50};
 let rect_body_center_offset = {x:rect_body_dims.x/2,y:rect_body_dims.y/2};
 
 
+let shader_background = new shader_build();
 let shader_body_A = new shader_build();
 let shader_body_B = new shader_build();
-let shader_background = new shader_build();
-let shader_post_process = new shader_build();
 
-let shader_background_glow = new shader_build();
-let shader_glow_mask = new shader_build();
 let shader_glow = new shader_build();
 
+let shader_post_process = new shader_build();
 
 function preload() {
   // load each shader file 
-  shdr_glow_mask = loadShader('shader.vert', 'shdr_bodyGrain.frag');
-
+  shader_background.preload()
   shader_body_A.preload();
   shader_body_B.preload();
-  shader_background.preload()
+
+
+  shader_glow.preload()
+
   shader_post_process.preload()
-  shader_background_glow.preload()
 }
 
 function setup() {
   // the canvas has to be created with WEBGL mode
-  canvas_beauty = createCanvas(canvas_dims.x, canvas_dims.y, WEBGL);
+  createCanvas(canvas_dims.x, canvas_dims.y, WEBGL);
   noStroke();
-  //
-  drawingContext.getExtension("OES_standard_derivatives");//canvas.getContext('webgl')
+  //drawingContext.getExtension("OES_standard_derivatives");//canvas.getContext('webgl') // ??????
+  canvas_beauty = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL);
+  canvas_beauty.clear();
+  canvas_beauty.noStroke();// turn off the cg layers stroke  
 
-  shader_background.setup(canvas_dims)
-  shader_background_glow.setup(canvas_dims)
-  shader_body_A.setup(rect_body_dims);
-  shader_body_B.setup(rect_body_dims);
-  shader_post_process.setup(canvas_dims)
-
-
-
-  // 
-  canvas_background_glow = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL); // create renderer 
-  canvas_background_glow.clear();
-  canvas_background_glow.noStroke();// turn off the cg layers stroke
-  //
-  canvas_glow_mask = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL); // create renderer 
-  canvas_glow_mask.clear();
-  canvas_glow_mask.noStroke();// turn off the cg layers stroke  
-
-  //
   canvas_glow = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL); // create renderer 
   canvas_glow.clear();
   canvas_glow.noStroke();// turn off the cg layers stroke    
+  //
+  shader_background.setup(canvas_dims)
+  shader_body_A.setup(rect_body_dims);
+  shader_body_B.setup(rect_body_dims);
 
+  shader_glow.setup(canvas_dims)
 
+  shader_post_process.setup(canvas_dims)
+  
   //pixelDensity(1)
 }
 
 var draw_count = 0
-
-
-
-
-
-
-
 function draw() {
  // here we're using setUniform() to send our uniform values to the shader
   // set uniform is smart enough to figure out what kind of variable we are sending it,
   // so there's no need to cast (unlike processing)
 
-
-  shdr_glow_mask.setUniform("iFrame", frameCount);
-  shdr_glow_mask.setUniform("iTime", millis() / 1000.0);
-     
-  
-
-
   /////////////////////////START
   clear()
   background(0);
 
-
+  // background - beauty
   shader_background.iFrame = frameCount;
   shader_background.iTime = millis() / 1000.0; 
   shader_background.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.x, canvas_dims.y, 0)*2};
@@ -277,33 +259,33 @@ function draw() {
   shader_background.light_beam = 1.0
   shader_background.debug = 0
 
-  shader_background.as_image()
+  shader_background.as_image(canvas_beauty)
+
+  // background - glow
+  shader_background.background_typeA = 0.;
+  shader_background.background_typeB = 0.;
+  shader_background.background_typeC = 0.;
+  shader_background.background_typeD = 0.;
+  shader_background.background_type_discoTarget= 0.;
+
+  shader_background.background_grain = 0.
+  shader_background.background_grid_scale = 10.0
+  shader_background.background_grid_line_scale =  0.0
+  shader_background.background_grid_point_scale =  4.0
+
+  shader_background.light_beam = 0.0
+
+  shader_background.as_image(canvas_glow)
+
   
+  // rectC - beauty
+  canvas_beauty.fill(255)
+  canvas_beauty.rect(-190/2,-90/2,50,50);
+  // rectC - glow
+  canvas_glow.fill(255)
+  canvas_glow.rect(-190/2,-90/2,50,50);
 
-
-  shader_background_glow.iFrame = frameCount;
-  shader_background_glow.iTime = millis() / 1000.0; 
-  shader_background_glow.iMouse = { x: mouseX*2, y: map(mouseY, 0, canvas_dims.x, canvas_dims.y, 0)*2};
-
-  shader_background_glow.background_grid = 1.0
-  shader_background_glow.background_grid_scale = 10.0
-  shader_background_glow.background_grid_line_scale =  0.0
-  shader_background_glow.background_grid_point_scale =  4.0
-
-  shader_background_glow.light_beam = 1.0
-  shader_background_glow.update()
-  
-  canvas_glow_mask.background(0);
-  canvas_glow_mask.image(shader_background_glow.canvas,canvas_dims.x/2*-1,canvas_dims.y/2*-1,canvas_dims.x,canvas_dims.y) // Use as background
-  // rectC
-
-  fill(255)
-  rect(-190/2,-90/2,50,50);
-
-  canvas_glow_mask.fill(255)
-  canvas_glow_mask.rect(-190/2,-90/2,50,50);
-
-  // rectA
+  // rectA - beauty
   let tlc_pos = createVector(cos(draw_count/30)*100, -10)  
   let center_pos = p5.Vector.add(tlc_pos, createVector(rect_body_center_offset.x,rect_body_center_offset.y))
   let pos_uv = createVector( (center_pos.x)/canvas_dims.x, (center_pos.y)/canvas_dims.y);
@@ -327,25 +309,25 @@ function draw() {
   shader_body_B.background_type_discoTarget = 1.0;
   shader_body_B.debug = 0
 
-  shader_body_B.as_texture()
+  shader_body_B.as_texture(canvas_beauty)
+  canvas_beauty.push();
+  canvas_beauty.translate(tlc_pos)
+  canvas_beauty.rotate(body_b_rotate);
+  canvas_beauty.rect(-rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
+  canvas_beauty.pop();
 
-  push();
-  translate(tlc_pos)
-  rotate(body_b_rotate);
-  rect(-rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
-  pop();
-
-  canvas_glow_mask.push();
-  canvas_glow_mask.translate(cos(draw_count/30)*100,-10)
-  canvas_glow_mask.rotate(draw_count/50);  
-  canvas_glow_mask.fill(0)
-  canvas_glow_mask.rect(-rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);    
-  canvas_glow_mask.pop();
+  // rectA - glow
+  canvas_glow.fill(0)  
+  canvas_glow.push();
+  canvas_glow.translate(cos(draw_count/30)*100,-10)
+  canvas_glow.rotate(draw_count/50);  
+  canvas_glow.rect(-rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);    
+  canvas_glow.pop();
 
   
   
 
-  // rectB
+  // rectB - beauty
   tlc_pos = createVector(cos(draw_count/30+4)*100-100, cos(draw_count/20)*150-150/2)  
   center_pos = p5.Vector.add(tlc_pos, createVector(rect_body_center_offset.x,rect_body_center_offset.y))
   pos_uv = createVector( (center_pos.x)/canvas_dims.x, (center_pos.y)/canvas_dims.y);
@@ -374,45 +356,39 @@ function draw() {
   shader_body_A.background_typeA = 0.0;
   shader_body_A.debug = 0
 
-  shader_body_A.as_texture()
+  shader_body_A.as_texture(canvas_beauty)
+  canvas_beauty.push();
+  canvas_beauty.translate(center_pos.x,center_pos.y)
+  canvas_beauty.rotate(rot_offset);
+  canvas_beauty.rect( -rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
+  canvas_beauty.pop(); 
 
-  push();
-  translate(center_pos.x,center_pos.y)
-  rotate(rot_offset);
-  rect( -rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
-  pop(); 
-  
-  //
-  canvas_glow_mask.push();
-  canvas_glow_mask.translate(center_pos.x,center_pos.y)
-  //canvas_glow_mask.rotate(rot_offset);
-  canvas_glow_mask.fill(0)
-  canvas_glow_mask.rect( -rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
-  canvas_glow_mask.pop(); 
+  // rectB - glow
+  shader_body_A.text = canvas_glow;
+  shader_body_A.blur_background = 0.
+  shader_body_A.as_texture(canvas_glow)
+  canvas_glow.push();
+  canvas_glow.translate(center_pos.x,center_pos.y)
+  canvas_glow.rotate(rot_offset);
+  canvas_glow.rect( -rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
+  canvas_glow.pop(); 
 
-
-
-  shdr_glow_mask.setUniform("iResolution", [canvas_dims.x, canvas_dims.y]);
-  shdr_glow_mask.setUniform("iMouse", [mouseX*2, map(mouseY, 0, canvas_dims.y, canvas_dims.y, 0)*2]); 
-  shdr_glow_mask.setUniform('uvOffset',[0,0]) 
-  shdr_glow_mask.setUniform('objCanvasRatio',[1,1])   
-  shdr_glow_mask.setUniform('uvRotatePivot',[0.5,0.5])  
-  shdr_glow_mask.setUniform('text',canvas_glow_mask)
-  shdr_glow_mask.setUniform('background_transparency',1.)//,1.-max(0.,cos(frameCount*0.005+1.)) )//1.)
-  shdr_glow_mask.setUniform('blur_background',1.1) 
-  shdr_glow_mask.setUniform('blur_background_samples', 35)
-  shdr_glow_mask.setUniform('blur_background_samples_LOD',2)  
-  //shdr_glow_mask.setUniform('glow_background_size',0.1) 
-  //shdr_glow_mask.setUniform('glow_background',0.05) 
-  shdr_glow_mask.setUniform('glow_remove_white_original',0)  
-  
-  canvas_glow.background(0);
-  canvas_glow.shader(shdr_glow_mask) // Use as background
-  canvas_glow.rect();// INIT 
   
 
-  // post process
+  // post process - glow
+  shader_glow.iFrame = frameCount;
+  shader_glow.iTime = millis() / 1000.0; 
+  shader_glow.text = canvas_glow
+  shader_glow.background_transparency = 1.;
+  shader_glow.blur_background = 1.1;
+  shader_glow.blur_background_samples = 35;
+  shader_glow.blur_background_samples_LOD = 2;
+  shader_glow.glow_remove_white_original = 0;
 
+  shader_glow.as_image(canvas_glow)
+  
+
+  // post process - beauty
   shader_post_process.iFrame = frameCount;
   shader_post_process.iTime = millis() / 1000.0; 
   shader_post_process.text = canvas_beauty
@@ -423,15 +399,12 @@ function draw() {
   shader_post_process.blur_background_samples = 35;
   shader_post_process.blur_background_samples_LOD = 2;
 
-  shader_post_process.as_image()
- 
-  /*
-  canvas_end.clear()
-  canvas_end.background(0);
-  canvas_end.shader(shdr_post_process) // Use as background
-  canvas_end.rect();// INIT 
-  //image(canvas_end,canvas_dims.x/2*-1,canvas_dims.y/2*-1,canvas_dims.x,canvas_dims.y)
-  */
+  shader_post_process.as_image(canvas_beauty)
+  
+
+  // out
+  image(canvas_beauty,canvas_dims.x/2*-1,canvas_dims.y/2*-1,canvas_dims.x,canvas_dims.y)
+
   
 
   draw_count += 1
