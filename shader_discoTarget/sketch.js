@@ -60,7 +60,7 @@ class shader_build
 
   preload()
   {
-    this.shdr = loadShader('shader.vert', 'shdr_bodyGrain.frag');
+    this.shdr = loadShader('shader.vert', 'shdr_body.frag');
   }
 
   setup(resolution,canvas_resolution=null)
@@ -175,15 +175,14 @@ function mix_value_function(value,pos,scale,max_loop)
 }
 
 
-let canvas_beauty;
-let canvas_glow;
+let do_glow = true;
 
 var canvas_dims ={x:400, y:400}//*9/16}
 let rect_body_dims = {x:250, y:50};
 let rect_body_center_offset = {x:rect_body_dims.x/2,y:rect_body_dims.y/2};
-
-
-
+ 
+let canvas_beauty;
+let canvas_glow;
 let shdr_bg = new shader_build();
 let shdr_bodyA = new shader_build();
 let shdr_bodyB = new shader_build();
@@ -257,28 +256,36 @@ function draw() {
   shdr_bg.as_image(canvas_beauty)
 
   // background - glow
-  shdr_bg.bg_typeA = 0.;
-  shdr_bg.bg_typeB = 0.;
-  shdr_bg.bg_typeC = 0.;
-  shdr_bg.bg_typeD = 0.;
-  shdr_bg.bg_type_discoTarget= 0.;
+  if(do_glow)
+  {
+    shdr_bg.bg_typeA = 0.;
+    shdr_bg.bg_typeB = 0.;
+    shdr_bg.bg_typeC = 0.;
+    shdr_bg.bg_typeD = 0.;
+    shdr_bg.bg_type_discoTarget= 0.;
+  
+    shdr_bg.bg_grain = 0.
+    shdr_bg.bg_grid_scale = 10.0
+    shdr_bg.bg_grid_line_scale =  0.0
+    shdr_bg.bg_grid_point_scale =  4.0
+  
+    shdr_bg.light_beam = 0.0
+  
+    shdr_bg.as_image(canvas_glow)
+  }
 
-  shdr_bg.bg_grain = 0.
-  shdr_bg.bg_grid_scale = 10.0
-  shdr_bg.bg_grid_line_scale =  0.0
-  shdr_bg.bg_grid_point_scale =  4.0
-
-  shdr_bg.light_beam = 0.0
-
-  shdr_bg.as_image(canvas_glow)
 
   
   // rectC - beauty
   canvas_beauty.fill(255)
   canvas_beauty.rect(-190/2,-90/2,50,50);
   // rectC - glow
-  canvas_glow.fill(255)
-  canvas_glow.rect(-190/2,-90/2,50,50);
+  if(do_glow)
+  {
+    canvas_glow.fill(255)
+    canvas_glow.rect(-190/2,-90/2,50,50);
+  }
+
 
   // rectA - beauty
   let tlc_pos = createVector(cos(draw_count/30)*100, -10)  
@@ -312,12 +319,15 @@ function draw() {
   canvas_beauty.pop();
 
   // rectA - glow
-  canvas_glow.fill(0)  
-  canvas_glow.push();
-  canvas_glow.translate(cos(draw_count/30)*100,-10)
-  canvas_glow.rotate(draw_count/50);  
-  canvas_glow.rect(-rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);    
-  canvas_glow.pop();
+  if(do_glow)
+  {
+    canvas_glow.fill(0)  
+    canvas_glow.push();
+    canvas_glow.translate(cos(draw_count/30)*100,-10)
+    canvas_glow.rotate(draw_count/50);  
+    canvas_glow.rect(-rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);    
+    canvas_glow.pop();
+  }
 
   
   
@@ -359,40 +369,49 @@ function draw() {
   canvas_beauty.pop(); 
 
   // rectB - glow
-  shdr_bodyA.text = canvas_glow;
-  shdr_bodyA.blur_background = 0.
-  shdr_bodyA.as_texture(canvas_glow)
-  canvas_glow.push();
-  canvas_glow.translate(center_pos.x,center_pos.y)
-  canvas_glow.rotate(rot_offset);
-  canvas_glow.rect( -rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
-  canvas_glow.pop(); 
+  if(do_glow)
+  {
+    shdr_bodyA.text = canvas_glow;
+    shdr_bodyA.blur_background = 0.
+    shdr_bodyA.as_texture(canvas_glow)
+    canvas_glow.push();
+    canvas_glow.translate(center_pos.x,center_pos.y)
+    canvas_glow.rotate(rot_offset);
+    canvas_glow.rect( -rect_body_center_offset.x,-rect_body_center_offset.y, rect_body_dims.x,rect_body_dims.y, 10);
+    canvas_glow.pop(); 
+  }
 
   
 
   // post process - glow
-  shdr_glow.iFrame = frameCount;
-  shdr_glow.iTime = millis() / 1000.0; 
-  shdr_glow.text = canvas_glow
-  shdr_glow.bg_transparency = 1.;
-  shdr_glow.blur_background = 1.1;
-  shdr_glow.blur_background_samples = 35;
-  shdr_glow.blur_background_samples_LOD = 2;
-  shdr_glow.glow_remove_white_original = 0;
+  if(do_glow)
+  {
+    shdr_glow.iFrame = frameCount;
+    shdr_glow.iTime = millis() / 1000.0; 
+    shdr_glow.text = canvas_glow
+    shdr_glow.bg_transparency = 1.;
+    shdr_glow.blur_background = 1.1;
+    shdr_glow.blur_background_samples = 35;
+    shdr_glow.blur_background_samples_LOD = 2;
+    shdr_glow.glow_remove_white_original = 0;
 
-  shdr_glow.as_image(canvas_glow)
+    shdr_glow.as_image(canvas_glow)
+  }
   
 
   // post process - beauty
   shdr_end.iFrame = frameCount;
   shdr_end.iTime = millis() / 1000.0; 
   shdr_end.text = canvas_beauty
-  shdr_end.text_glow = canvas_glow
-  shdr_end.glow_power = abs(cos(float(draw_count)*0.05))
   shdr_end.bg_transparency = 1.;
   shdr_end.blur_background = 0.;
   shdr_end.blur_background_samples = 35;
   shdr_end.blur_background_samples_LOD = 2;
+  if(do_glow)
+  {
+    shdr_end.text_glow = canvas_glow
+    shdr_end.glow_power = abs(cos(float(draw_count)*0.05))
+  }
 
   shdr_end.as_image(canvas_beauty)
   
