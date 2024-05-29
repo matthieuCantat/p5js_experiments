@@ -35,28 +35,60 @@ let height      = 400
 var ground_enable = false
 var Fs_sequence = null
 
-var nbr = 10
+var nbr = 5
 var debug = false
 
+var shdrs = [] 
+
+
+
+
+
+function preload()
+{
+  
+  console.log('preload : sketch')
+  for( let i =0; i < 2; i++)
+  {
+    shdrs.push(new shader_build());
+    shdrs[i].preload();
+  }
+}
+
 function setup() {
+  console.log('setup : sketch')
+
+
+  createCanvas(width, height,WEBGL);
+  drawingContext.getExtension("OES_standard_derivatives");
+  /*
+  canvas_beauty = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL);
+  canvas_beauty.clear();
+  canvas_beauty.noStroke();// turn off the cg layers stroke  
+
+  canvas_glow = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL); // create renderer 
+  canvas_glow.clear();
+  canvas_glow.noStroke();// turn off the cg layers stroke    
+  */
+
+  shdrs[0].setup({x:100,y:50})  
+  shdrs[1].setup({x:width/2,y:height}) 
 
   Matter.Composite.add(engine.world, create_boundary_wall_collision(width,height,ground_enable));
 
   var runner = Matter.Runner.create();
   Matter.Runner.run(runner, engine);
-
-  createCanvas(width, height);
-
+  
   engine.gravity.scale = 0.0
-
-
+  
   let m = new Matrix()
   m.setTranslation(width/2, height/2 )
   
-  
   let s = 2.2
-  F_sequence = new fidgets_sequence(nbr,m,s,debug)
+  F_sequence = new fidgets_sequence(nbr,m,s,shdrs,debug)
+  F_sequence.setup()
 
+ 
   
 }
 
@@ -106,8 +138,13 @@ function draw() {
   if( touches.lengh  == 0    )pM = null
   F_sequence.update()
   F_sequence.draw()
+
+
   if( pM != null )
     circle(pM.x,pM.y,10)
+
+
+
 
   
 

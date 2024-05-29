@@ -8,9 +8,10 @@ class fidget_windmill extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, debug=false,random_color=true)
+  constructor( m, s, shaders = [],debug=false,random_color=true)
   {
-    super(m, s, debug)
+    
+    super(m, s, shaders, debug)
 
     this.title = 'windmill'
 
@@ -64,6 +65,7 @@ class fidget_windmill extends fidget{
     this.color_background = [ (this.colors[0][0]+0.2)*0.3,(this.colors[0][1]+0.2)*0.3,(this.colors[0][2]+0.2)*0.3]
     this.show_step_helpers = [ 0, 0, 0 ]
 
+    
     this.bodies.inters.B = new body_build({  
                                     m:this.m,
                                     m_offset:new Matrix(),
@@ -72,6 +74,7 @@ class fidget_windmill extends fidget{
                                     w:400/2.4*s,
                                     type:utils.shape.circle,
                                     color: utils.color.grey,
+                                    shader: this.shaders[0],
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
                                     fix_rot:true,
@@ -87,6 +90,7 @@ class fidget_windmill extends fidget{
                                     w:230/2.4*s,
                                     type:utils.shape.circle,
                                     color: utils.color.grey,
+                                    shader: this.shaders[0],
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
                                     fix_rot:true,
@@ -104,6 +108,7 @@ class fidget_windmill extends fidget{
                                       h : 18*s, 
                                       type : utils.shape.circle,
                                       color : this.colors[1],
+                                      shader: this.shaders[0],
                                       collision_category : utils.collision_category.blue,
                                       collision_mask : utils.collision_category.default ,    
                                       fix_rot:true,
@@ -115,6 +120,7 @@ class fidget_windmill extends fidget{
       w : 7*s, 
       h : 30*s, 
       color: this.colors[0],
+      shader: this.shaders[0],
       collision_category: utils.collision_category.blue,
       collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
       type: utils.shape.rectangle,
@@ -168,6 +174,7 @@ class fidget_windmill extends fidget{
                                     w:230/2.4*s,
                                     type:utils.shape.circle,
                                     color: utils.color.grey,
+                                    shader: this.shaders[0],
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
                                     fix_rot:true,
@@ -185,6 +192,7 @@ class fidget_windmill extends fidget{
                                           w:40/2.4*3*s,
                                           type : utils.shape.circle,
                                           color:utils.color.grey,
+                                          shader: this.shaders[0],
                                           collision_category: utils.collision_category.inter,
                                           collision_mask: utils.collision_category.mouse,
                                           axe_constraint : {
@@ -207,6 +215,7 @@ class fidget_windmill extends fidget{
                                     w:300/2.4*s,
                                     type:utils.shape.circle,
                                     color: utils.color.grey,
+                                    shader: this.shaders[0],
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
                                     fix_rot:true,
@@ -225,6 +234,7 @@ class fidget_windmill extends fidget{
                                       w:100/2.4*s,
                                       type : utils.shape.circle,
                                       color:utils.color.grey,
+                                      shader: this.shaders[0],
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
                                       axe_constraint : {
@@ -244,6 +254,7 @@ class fidget_windmill extends fidget{
       h : 7*s, 
       slop : 45, 
       color: this.colors[2],
+      shader: this.shaders[0],
       collision_category: utils.collision_category.blue,
       collision_mask: utils.collision_category.default ,
       type:utils.shape.trapezoid,
@@ -294,7 +305,10 @@ class fidget_windmill extends fidget{
                                           rot:45+180,     
                                         })) 
   
-
+   
+   
+   
+                                  
   }
 
 
@@ -733,29 +747,66 @@ class fidget_windmill extends fidget{
     if(this.anim_mode)
       a = this.state.steps[3].resoluton_coef*200    
 
+      
+    push();
+    translate(this.webgl_draw_coords_offset.x-a,this.webgl_draw_coords_offset.y)
     fill(this.color_background[0],
       this.color_background[1],
       this.color_background[2])//fill(50,40,50)
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
       fill(50,140,50)
-    rect(0,0,width/2-a,height)
 
+
+    this.shaders[1].iFrame = this.draw_count;
+    this.shaders[1].iTime = millis() / 1000.0; 
+    this.shaders[1].iMouse = { x: 0, y: 0};
+  
+    this.shaders[1].bg_animation = 1.
+    this.shaders[1].bg_grain = 1.
+    this.shaders[1].bg_grain_scale = 5.
+    this.shaders[1].bg_grid = 1.0
+    this.shaders[1].bg_grid_scale = 15.0
+    this.shaders[1].bg_grid_line_scale =  2.0
+    this.shaders[1].bg_grid_point_scale =  2.0
+  
+    this.shaders[1].bg_colorA = [48.96, 0.2, 0.2];
+    this.shaders[1].bg_colorB = [117., 0.2, 80.];
+    this.shaders[1].bg_colorC = [80.,97.92,0.2];
+    this.shaders[1].bg_colorD = [0.2,48.96,48.96];
+
+    this.shaders[1].bg_typeA = 0.0;
+    this.shaders[1].bg_typeB = 1.0;
+    this.shaders[1].bg_typeC = 0.0;
+    this.shaders[1].bg_typeD = 0.0;
+    this.shaders[1].bg_type_discoTarget= 0.;
+  
+    this.shaders[1].light_beam = 0.0
+    this.shaders[1].debug = 0         
+    this.shaders[1].as_texture()      
+    rect(0,0,width/2,height)
+    
     fill(255);
     textSize(50);
     textAlign(CENTER);
-    text( this.fidget_sequence_i, width*0.2-a,height*0.95)
-
+    //text( this.fidget_sequence_i, width*0.2,height*0.95)
+    pop();
+    
+    push();
+    translate(this.webgl_draw_coords_offset.x+a,this.webgl_draw_coords_offset.y)
     fill(this.color_background[0],
       this.color_background[1],
       this.color_background[2])//fill(50,40,50)
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
       fill(50,140,50)
-    rect(width/2+a,0,width,height)
+      
+    this.shaders[1].as_texture()         
+    rect(width/2,0,width/2,height)
 
     fill(255);
     textSize(20);
     textAlign(CENTER);
-    text( this.title , width*0.8+a,height*0.95)
+    //text( this.title , width*0.8+a,height*0.95)
+    pop();
 
   }
 
@@ -766,6 +817,8 @@ class fidget_windmill extends fidget{
     if(this.show_step_helpers[0] )
     {
       let coef = this.show_step_helpers[0] / 100 *255
+      push();
+      translate(this.webgl_draw_coords_offset.x,this.webgl_draw_coords_offset.y)          
       fill(0,0,0,0)
       stroke(utils.color.yellow[0],
         utils.color.yellow[1],
@@ -780,6 +833,7 @@ class fidget_windmill extends fidget{
             w,
             20*h)
       stroke(0)
+      pop()
 
       this.show_step_helpers[0] -= 2
     }
@@ -787,6 +841,8 @@ class fidget_windmill extends fidget{
     if(this.show_step_helpers[1] )
     {
       let coef = this.show_step_helpers[1] / 100 *255
+      push();
+      translate(this.webgl_draw_coords_offset.x,this.webgl_draw_coords_offset.y)          
       fill(0,0,0,0)
       stroke(utils.color.yellow[0],
         utils.color.yellow[1],
@@ -798,6 +854,7 @@ class fidget_windmill extends fidget{
         this.bodies.inters.B.w*1.6,
         this.bodies.inters.B.w*1.6, HALF_PI, PI *2);
       stroke(0)
+      pop()
 
       this.show_step_helpers[1] -= 2
     }
@@ -805,6 +862,8 @@ class fidget_windmill extends fidget{
     if(this.show_step_helpers[2] )
     {
       let coef = this.show_step_helpers[2] / 100 *255
+      push();
+      translate(this.webgl_draw_coords_offset.x,this.webgl_draw_coords_offset.y)          
       fill(0,0,0,0)
       stroke(utils.color.yellow[0],
         utils.color.yellow[1],
@@ -820,6 +879,7 @@ class fidget_windmill extends fidget{
             (pB.x - p.x)*2.21,
             0)
       stroke(0)
+      pop()
 
       this.show_step_helpers[2] -= 2
     }

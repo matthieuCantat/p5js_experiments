@@ -18,7 +18,7 @@ class fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, debug=false)
+  constructor( m, s, shaders = [],debug=false)
   {
     this.m = m
     this.s = s
@@ -57,13 +57,25 @@ class fidget{
     this.end_step = 0
 
     this.color_background = utils.color.dark
-    this.show_step_helpers = [ 0, 0, 0 ]    
+    this.show_step_helpers = [ 0, 0, 0 ]  
+    
+    this.webgl_draw_coords_offset = null
+    this.shaders = shaders
+  }
+
+  preload()
+  {
+    console.log('preload : fidget')
+    this.bodies_preload()
   }
 
   setup()
-  {                              
+  {     
+    console.log('setup : fidget')   
+    this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
+    this.bodies_setup()                      
     this.bodies_set_debug( this.debug_mode )
-    this.bodies_set_visibility(this.debug_mode,true,false)    
+    this.bodies_set_visibility(this.debug_mode,true,false)   
   }
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -382,6 +394,48 @@ class fidget{
       } 
     }  
   }
+
+  bodies_setup( inters = true, geos = true)
+  {
+    for( let b_type in this.bodies)
+    {   
+      if(( (b_type == 'inters')&&(inters==true) )
+      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      {
+        for( let key of this.bodies_draw_order[b_type])
+        {      
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+              this.bodies[b_type][key][i].setup() 
+          }
+          else
+            this.bodies[b_type][key].setup()
+        }  
+      } 
+    }       
+  }
+
+  bodies_preload( inters = true, geos = true)
+  {
+    for( let b_type in this.bodies)
+    {   
+      if(( (b_type == 'inters')&&(inters==true) )
+      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      {
+        for( let key of this.bodies_draw_order[b_type])
+        {      
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+              this.bodies[b_type][key][i].preload() 
+          }
+          else
+            this.bodies[b_type][key].preload()
+        }  
+      } 
+    }       
+  }  
 
   bodies_set_debug( value, inters = true, geos = true)
   {

@@ -203,7 +203,7 @@ function setup() {
   // the canvas has to be created with WEBGL mode
   createCanvas(canvas_dims.x, canvas_dims.y, WEBGL);
   noStroke();
-  //drawingContext.getExtension("OES_standard_derivatives");//canvas.getContext('webgl') // ??????
+  drawingContext.getExtension("OES_standard_derivatives");//canvas.getContext('webgl') // ??????
   canvas_beauty = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL);
   canvas_beauty.clear();
   canvas_beauty.noStroke();// turn off the cg layers stroke  

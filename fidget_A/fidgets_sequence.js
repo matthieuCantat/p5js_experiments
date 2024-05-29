@@ -2,7 +2,7 @@
 
 class fidgets_sequence
 {
-    constructor( nbr, m, s, debug=false)
+    constructor( nbr, m, s, shaders = [], debug=false)
     {
         //option
         this.fidgets_nbr = nbr
@@ -21,18 +21,17 @@ class fidgets_sequence
 
         this.anim_mode = false
 
-
+        this.chrono = new Chrono()  
         this.chrono_end_time_show_start = 0
         this.chrono_end_time_show_end = 0       
-        // setup
-        this.chrono = new Chrono()
 
+        this.shaders = shaders
+        
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.debug_mode)
-            //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.debug_mode)
-            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.debug_mode)
-            fidget.setup()
+            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.shaders,this.debug_mode)
+            //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.shaders,this.debug_mode)
+            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
@@ -46,19 +45,35 @@ class fidgets_sequence
                 this.draw_debug.mouse_cns = mouseConstraint
             }
         }
-        
-
-     
-        
+      
     }
 
-    get_random_fidget(p,s,debug)
+    preload()
+    {
+      console.log('preload : fidgets_sequence')
+      for( let i = 0; i < this.fidgets_nbr; i++)
+        this.fidgets[i].preload();
+    }
+
+    setup()
+    {
+      console.log('setup : fidgets_sequence')
+      // setup
+          
+      for( let i = 0; i < this.fidgets_nbr; i++)
+        this.fidgets[i].setup();
+    }
+
+
+
+
+    get_random_fidget(p,s,shaders,debug)
     {
       let r = Math.random()
       if(  0.5 < r)
-        return new fidget_windmill(p,s,debug)
+        return new fidget_windmill(p,s,shaders,debug)
       else
-        return new fidget_daft_i(p,s,debug)   
+        return new fidget_daft_i(p,s,shaders,debug)   
     }
 
     draw_background()
@@ -99,7 +114,7 @@ class fidgets_sequence
         fill(0)
         textSize(100);
         textAlign(CENTER);
-        text( '?', width/2,height/2+cos(this.update_count/10)*20+30)        
+        //text( '?', width/2,height/2+cos(this.update_count/10)*20+30)        
       }
 
       var i_max = this.fidgets_nbr
