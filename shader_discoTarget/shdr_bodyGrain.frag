@@ -2,6 +2,7 @@
 precision mediump float;
 
 
+
 uniform vec2 iResolution; // For each instance, same value
 uniform float iTime;
 uniform int iFrame;
@@ -11,10 +12,8 @@ out vec4 fragColor;
 in  vec4 v_color;
 uniform sampler2D text;
 uniform sampler2D text_glow;
-uniform float uvOffsetX;
-uniform float uvOffsetY;
-uniform float objCanvasRatioW;
-uniform float objCanvasRatioH;
+uniform vec2 uvOffset;
+uniform vec2 objCanvasRatio;
 uniform vec2 uvRotatePivot;
 uniform float uvOffsetRotate;
 
@@ -42,6 +41,7 @@ uniform float background_typeA;
 uniform float background_typeB;
 uniform float background_typeC;
 uniform float background_typeD;
+uniform float background_type_discoTarget;
 
 uniform float boder_size;
 uniform float glow_power;
@@ -49,6 +49,8 @@ uniform int glow_remove_white_original;
 
 uniform float hatching_line;
 uniform float light_beam;
+
+uniform int debug;
 
 //---------------------------------------------------------- color
 //
@@ -316,6 +318,26 @@ vec4 draw_point(vec2 uv, vec2 p, float size,vec4 color)
 
 //---------------------------------------------------- beam light
 
+
+
+//---------------------------------------------------- disco target
+//PUT THE ORIGINE AT THE CENTER OF THE SCREEN & NORMALIZE
+vec2 map(vec2 pcoord) {
+  return (pcoord-0.5*iResolution.xy)/iResolution.y;
+}
+
+float sfract(float x) {
+  //WITHOUT ANTIALIASING
+  //return fract(x);
+  //WITH ANTIALIASING
+  float px = fwidth(x);
+  x -= round(x);
+  return mix( x+1.0 , x , smoothstep(-px,px,x));
+}
+//---------------------------------------------------- disco target
+
+
+
 mat2 rotate2d(float _angle){
     return mat2(cos(_angle),-sin(_angle),
                 sin(_angle),cos(_angle));
@@ -336,7 +358,8 @@ mat2 rotate2d(float _angle){
 void main()
 {
 	// SETUP
-	vec2 uv = gl_FragCoord.xy * vec2(iResolution.x / iResolution.y, 1) / iResolution.xy;
+    vec2 fragCoord_fixRez      =  gl_FragCoord.xy/2.;
+	vec2 uv = fragCoord_fixRez.xy * vec2(iResolution.x / iResolution.y, 1) / iResolution.xy;
 
     vec2 uv_move = v_color.xy;
     
@@ -346,8 +369,8 @@ void main()
     // scale
     uv_move -= uvRotatePivot; // from the pivot point of the rectang ( here the middle) 
     // scale down the canvas, to make the picture bigger 
-    uv_move.x = uv_move.x*objCanvasRatioW; 
-    uv_move.y = uv_move.y*objCanvasRatioH;  
+    uv_move = uv_move*objCanvasRatio; 
+
     uv_move += uvRotatePivot ;
 
     // rotation
@@ -361,16 +384,16 @@ void main()
     
 
     // translate
-    uv_move.x += uvOffsetX;
-    uv_move.y += uvOffsetY;
+    uv_move += uvOffset;
+
 
 
 
 	// Start
 	vec4 color = vec4(0.,0.,0.,1.);
     
-
-
+    
+    
 
     if( 0. < background_transparency )
     {
@@ -397,13 +420,13 @@ void main()
     
     vec4 background_color = vec4(0.,0.,0.,0.);
 
-
     if( 0.0 < background_typeA)
     {
         background_color = vec4(background_colorA/255.*background_typeA,0.);
     }
 
-  
+    
+    
 	if(0.0 < background_typeB)// 1 gradian radial
     {
         vec3 COLOR0 = SRGB(background_colorA.x, background_colorA.y, background_colorA.z);//SRGB(255, 0, 114);
@@ -421,7 +444,7 @@ void main()
         vec2 ba = b - a;
 
         
-        float t = dot(gl_FragCoord.xy - a, ba) / dot(ba, ba);
+        float t = dot(fragCoord_fixRez.xy - a, ba) / dot(ba, ba);
         //fragColor = vec4(t);
 
         // Saturate and apply smoothstep to the factor.
@@ -433,7 +456,7 @@ void main()
         b_color = LINEAR_TO_SRGB(b_color);
 
         // Add gradient noise to reduce banding.
-        b_color += (1.0/255.0) * gradientNoise(gl_FragCoord.xy) - (0.5/255.0);
+        b_color += (1.0/255.0) * gradientNoise(fragCoord_fixRez.xy) - (0.5/255.0);
         //--------
  
   
@@ -449,7 +472,7 @@ void main()
         vec3 colorC = background_colorA/255.;//vec3(.910, .510, .8);
         vec3 colorD = background_colorD/255.;//vec3(0.350, .71, .953);
 
-        vec2 mb_uv = uv*0.5;//gl_FragCoord.xy/iResolution.xy;
+        vec2 mb_uv = uv*0.5;//fragCoord_fixRez.xy/iResolution.xy;
         float ratio = iResolution.x / iResolution.y;
 
         vec2 tuv = mb_uv;
@@ -480,6 +503,7 @@ void main()
 
         background_color += vec4(finalComp*background_typeC,1.);
     }
+ 
     //----------------------------------------------------- moving_background
     
     //----------------------------------------------------- palettes_background
@@ -517,6 +541,7 @@ void main()
 
     }
     */
+    
     //----------------------------------------------------- palettes_background
     if( 0.0< background_typeD )// lines gradian
     {
@@ -540,12 +565,29 @@ void main()
         
         vec3 col = pal( p.y, colorA,colorB,colorC,colorD );
 
-       float env = background_typeD;
+       
         background_color += vec4(col*background_typeD,1.0);
 
     }
 
+    if( 0.0< background_type_discoTarget )// lines gradian
+    {
+        float t = iTime;
+        vec2 uv = map(gl_FragCoord.xy);                         
 
+        vec2 mouseN = iMouse.x <= 0.0 ? vec2(0): map(iMouse.xy);
+        uv -= mouseN;
+
+        vec3 col = vec3(0.);
+        col.r = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.1)));
+        col.g = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.2)));
+        col.b = sfract(length( uv.xy*10. )*float(1.0*sin(t*0.3))) ; 
+
+
+        background_color += vec4(col*background_type_discoTarget,1.0);
+    }
+
+    
     if( 0. < background_grain )
     {
         float background_noise_mask = clamp(noise( uv*50.*background_grain_scale )*10.5,0.5,1.8);
@@ -562,7 +604,7 @@ void main()
         color = background_color;
     }
 
-
+    
     if(( 0. < background_grid )&&( 0. < background_grid_scale))
     {
         float S = background_grid_scale; // Scale
@@ -613,7 +655,7 @@ void main()
     //----------------------------------------------------- palettes_background
     
 	//---------------------------------------------------- vignetage
-	vec2 _uv = gl_FragCoord.xy / iResolution.xy*0.5;
+	vec2 _uv = fragCoord_fixRez.xy / iResolution.xy*0.5;
     vec2 coord = (_uv - 0.5) * (iResolution.x/iResolution.y);
     float rf = sqrt(dot(coord, coord)) * Falloff;
 	rf = smoothstep(0.2,0.9,rf);
@@ -631,12 +673,19 @@ void main()
     vec4 rect_border_color = background_color;//vec4(1.0f, 1.0f, 0.75f, 1.0f);
     if( 0. < boder_size )
     {
-        vec2 size = iResolution.xy*1.99*(1.-boder_size);
-        vec2 location = iResolution.xy-size/2.0;
-        float radius = (smooth_corner + 1.) * 30.; 
-        float d 		= roundedBoxSDF(gl_FragCoord.xy - location - (size/2.), size / 2., radius);
+        vec2 p_center       = iResolution.xy/2.0;
+        vec2 center_to_frag = fragCoord_fixRez - p_center;
+
+        vec2 border_thickness = iResolution.xy/2.0*(1.-boder_size)*0.99;
+
+        float box_corner_smooth_radius = smooth_corner * 80.; 
+
+
+        float d = roundedBoxSDF(center_to_frag, border_thickness, box_corner_smooth_radius);
+
         float rect_border_mask =  smoothstep(0., edgeSoftness * 2.,d);
         color = mix( color , rect_border_color,rect_border_mask);
+        
     }
 	//--------------------------------- rectangle border
 
@@ -648,7 +697,7 @@ void main()
         float curThickness =  0.22 * line_thickness;
         float curRotation = 0.8 * rot_value;
         // get original coordinate, translate & rotate
-        vec2 uv_rot = (2. * gl_FragCoord.xy - iResolution.xy) / iResolution.y;
+        vec2 uv_rot = (2. * fragCoord_fixRez.xy - iResolution.xy) / iResolution.y;
         //uv += curCenter;
         uv_rot = rotateCoord(uv_rot, curRotation);
         // create grid coords
@@ -659,8 +708,8 @@ void main()
         if(invert == 1) hatching_line_alpha = 1. - hatching_line_alpha;			
         
         
-        color = mix( color , color*vec4(1.-hatching_line),hatching_line_alpha);
-        color = mix( color , rect_border_color,hatching_line_alpha);
+        //color = mix( color , color*vec4(1.-hatching_line),hatching_line_alpha);
+        //color = mix( color , rect_border_color,hatching_line_alpha);
     }
 
 	
@@ -673,7 +722,7 @@ void main()
 
     // Calculate interpolation factor with vector projection.
     vec2 ba = b - a;
-    float light_mask = dot(gl_FragCoord.xy - a, ba) / dot(ba, ba);
+    float light_mask = dot(fragCoord_fixRez.xy - a, ba) / dot(ba, ba);
 	vec4 rect_border_light_color = rect_border_color * 2.3;	
 	vec4 rect_border_shadow_color = rect_border_color * 0.5;
 
@@ -720,8 +769,30 @@ void main()
         color += texture(text_glow,uv_move)*glow_power;
     }
 
+    if(debug == 1)
+    {
+        vec2 _uv = fragCoord_fixRez.xy/iResolution.xy;
+        vec2 _uv_grid = vec2(0.);
+        _uv_grid.x = float(int(_uv.x*10.)%10)/10., 
+        _uv_grid.y = float(int(_uv.y*10.)%10)/10.;
+        color = vec4(_uv_grid.x, _uv_grid.y,0.,0.); 
+        if((int(_uv.x*10.) == 4)&&(int(_uv.y*10.) == 4))
+        {
+            color = vec4(1.);
+        }
+        if((int(_uv.x*10.) == 9)&&(int(_uv.y*10.) == 9))
+        {
+            color = vec4(1.);
+        }      
+          
+    }
+    
+
+
+
     //fragColor = vec4(background_color+vec3(background_noise_mask*0.05), 1.0)*vignetting+smoothedAlpha*t-hatching_line_alpha;	
 	fragColor = color; // ask for a value between 0 and 1
+    
     
 
 }
