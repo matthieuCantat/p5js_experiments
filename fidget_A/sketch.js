@@ -67,7 +67,7 @@ function setup() {
   {
     createCanvas(width, height);
   }
-
+  pixelDensity(1)
   
   /*
   canvas_beauty = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL);
