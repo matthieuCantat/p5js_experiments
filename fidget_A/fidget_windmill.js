@@ -818,7 +818,7 @@ class fidget_windmill extends fidget{
 
   draw_help()
   {
-    
+    /*
     /////////////////////////////////////////////////
     if(this.show_step_helpers[0] )
     {
@@ -889,6 +889,7 @@ class fidget_windmill extends fidget{
 
       this.show_step_helpers[2] -= 2
     }
+    */
 
   }  
 

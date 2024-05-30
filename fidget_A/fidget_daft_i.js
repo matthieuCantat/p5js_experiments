@@ -694,7 +694,7 @@ class fidget_daft_i extends fidget{
   draw_help()
   {
     /////////////////////////////////////////////////
-    
+    /*
     if( this.show_step_helpers[0] )
     {     
       let coef = this.show_step_helpers[0] / 100 *255
@@ -762,6 +762,7 @@ class fidget_daft_i extends fidget{
 
       this.show_step_helpers[2] -= 2
     }
+    */
 
   }  
 
@@ -773,7 +774,7 @@ class fidget_daft_i extends fidget{
   }
   
   
-  }
+}
   
   
   

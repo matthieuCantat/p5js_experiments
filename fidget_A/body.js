@@ -361,8 +361,8 @@ class body_build{
   
   
       fill(this.color)
-      strokeWeight(0);
-      stroke(this.colorStroke)
+      //strokeWeight(0);
+      //stroke(this.colorStroke)
       
       if( this.shader != null)
       {
@@ -490,7 +490,7 @@ class body_build{
       {
         let len = 10
         let wid = 2
-        strokeWeight(0);
+        //strokeWeight(0);
         fill([255,0,0])
         rect( len/2.0, 0, len, wid)
         fill([0,255,0])
