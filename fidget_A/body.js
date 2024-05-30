@@ -218,8 +218,10 @@ class body_build{
       this.draw_count = 0
 
 
-
+      
       this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
+      if( this.shader == null )
+        this.webgl_draw_coords_offset = createVector(0,0)
     }
 
     preload()

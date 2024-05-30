@@ -58,9 +58,17 @@ function preload()
 function setup() {
   console.log('setup : sketch')
 
+  if( shdrs.length != 0 )
+  {
+    createCanvas(width, height,WEBGL);
+    drawingContext.getExtension("OES_standard_derivatives");
+  }
+  else
+  {
+    createCanvas(width, height);
+  }
 
-  createCanvas(width, height,WEBGL);
-  drawingContext.getExtension("OES_standard_derivatives");
+  
   /*
   canvas_beauty = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL);
   canvas_beauty.clear();
@@ -70,7 +78,7 @@ function setup() {
   canvas_glow.clear();
   canvas_glow.noStroke();// turn off the cg layers stroke    
   */
-  if( 1 < shdrs.length )
+  if( shdrs.length != 0 )
   {
     shdrs[0].setup({x:100,y:50})  
     shdrs[1].setup({x:width/2,y:height})

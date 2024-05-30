@@ -59,8 +59,13 @@ class fidget{
     this.color_background = utils.color.dark
     this.show_step_helpers = [ 0, 0, 0 ]  
     
-    this.webgl_draw_coords_offset = null
+
     this.shaders = shaders
+
+    this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
+    if( this.shaders.length == 0 )
+      this.webgl_draw_coords_offset = createVector(0,0)   
+      
   }
 
   preload()
@@ -72,7 +77,7 @@ class fidget{
   setup()
   {     
     console.log('setup : fidget')   
-    this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
+
     this.bodies_setup()                      
     this.bodies_set_debug( this.debug_mode )
     this.bodies_set_visibility(this.debug_mode,true,false)   

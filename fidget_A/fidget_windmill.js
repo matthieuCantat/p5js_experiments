@@ -747,7 +747,6 @@ class fidget_windmill extends fidget{
     if(this.anim_mode)
       a = this.state.steps[3].resoluton_coef*200    
 
-      
     push();
     translate(this.webgl_draw_coords_offset.x-a,this.webgl_draw_coords_offset.y)
     fill(this.color_background[0],
