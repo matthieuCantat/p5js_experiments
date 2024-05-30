@@ -63,7 +63,7 @@ class fidget{
     this.shaders = shaders
 
     this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
-    if( this.shaders.length == 0 )
+    if( use_webgl == false )
       this.webgl_draw_coords_offset = createVector(0,0)   
       
   }

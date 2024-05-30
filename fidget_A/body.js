@@ -220,7 +220,7 @@ class body_build{
 
       
       this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
-      if( this.shader == null )
+      if( use_webgl == false )
         this.webgl_draw_coords_offset = createVector(0,0)
     }
 

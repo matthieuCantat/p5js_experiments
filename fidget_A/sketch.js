@@ -38,6 +38,9 @@ var Fs_sequence = null
 var nbr = 5
 var debug = false
 
+var use_webgl = true
+var shaders_nbr = 0
+
 var shdrs = [] 
 
 
@@ -48,7 +51,7 @@ function preload()
 {
   
   console.log('preload : sketch')
-  for( let i =0; i < 2; i++)
+  for( let i =0; i < shaders_nbr; i++)
   {
     shdrs.push(new shader_build());
     shdrs[i].preload();
@@ -58,7 +61,7 @@ function preload()
 function setup() {
   console.log('setup : sketch')
 
-  if( shdrs.length != 0 )
+  if(use_webgl)
   {
     createCanvas(width, height,WEBGL);
     drawingContext.getExtension("OES_standard_derivatives");
