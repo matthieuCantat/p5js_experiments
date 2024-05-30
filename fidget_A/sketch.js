@@ -39,7 +39,7 @@ var nbr = 5
 var debug = false
 
 var use_webgl = true
-var shaders_nbr = 0
+var shaders_nbr = 2
 
 var shdrs = [] 
 
