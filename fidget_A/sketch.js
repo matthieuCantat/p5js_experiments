@@ -66,6 +66,7 @@ function setup() {
     createCanvas(width, height,WEBGL);
     drawingContext.getExtension("OES_standard_derivatives");
     pixelDensity(1);
+    noStroke();
   }
   else
   {
