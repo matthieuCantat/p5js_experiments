@@ -48,7 +48,7 @@ function preload()
 {
   
   console.log('preload : sketch')
-  for( let i =0; i < 0; i++)
+  for( let i =0; i < 2; i++)
   {
     shdrs.push(new shader_build());
     shdrs[i].preload();
