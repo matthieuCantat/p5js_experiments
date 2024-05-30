@@ -65,12 +65,14 @@ function setup() {
   {
     createCanvas(width, height,WEBGL);
     drawingContext.getExtension("OES_standard_derivatives");
+    pixelDensity(1);
   }
   else
   {
     createCanvas(width, height);
+    pixelDensity(2);
   }
-  pixelDensity(1)
+  
   
   /*
   canvas_beauty = createGraphics(canvas_dims.x, canvas_dims.y, WEBGL);
