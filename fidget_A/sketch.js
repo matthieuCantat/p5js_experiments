@@ -48,7 +48,7 @@ function preload()
 {
   
   console.log('preload : sketch')
-  for( let i =0; i < 2; i++)
+  for( let i =0; i < 0; i++)
   {
     shdrs.push(new shader_build());
     shdrs[i].preload();
@@ -70,9 +70,12 @@ function setup() {
   canvas_glow.clear();
   canvas_glow.noStroke();// turn off the cg layers stroke    
   */
-
-  shdrs[0].setup({x:100,y:50})  
-  shdrs[1].setup({x:width/2,y:height}) 
+  if( 1 < shdrs.length )
+  {
+    shdrs[0].setup({x:100,y:50})  
+    shdrs[1].setup({x:width/2,y:height})
+  }
+ 
 
   Matter.Composite.add(engine.world, create_boundary_wall_collision(width,height,ground_enable));
 

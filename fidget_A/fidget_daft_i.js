@@ -69,7 +69,7 @@ class fidget_daft_i extends fidget{
                                       w:50*s,
                                       type:utils.shape.circle,
                                       color: this.colors[0],
-                                      shader: this.shaders[0],
+                                      shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category: utils.collision_category.blue,
                                       collision_mask: utils.collision_category.default ,    
                                       fix_rot:true,
@@ -85,7 +85,7 @@ class fidget_daft_i extends fidget{
                                         h : 18*s, 
                                         type : utils.shape.rectangle,
                                         color : this.colors[1],
-                                        shader: this.shaders[0],
+                                        shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                         collision_category : utils.collision_category.green,
                                         collision_mask : utils.collision_category.default,    
                                         axe_constraint : {
@@ -101,7 +101,7 @@ class fidget_daft_i extends fidget{
         w : 3.5*s, 
         h : 16.2*s, 
         color: this.colors[2],
-        shader: this.shaders[0],
+        shader: this.shaders.length != 0 ? this.shaders[0] : null,
         collision_category: utils.collision_category.blue,
         collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
         type: utils.shape.rectangle,
@@ -184,7 +184,7 @@ class fidget_daft_i extends fidget{
                                         w:400/2.4*s,
                                         type : utils.shape.circle,
                                         color:utils.color.grey,
-                                        shader: this.shaders[0],
+                                        shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                         collision_category: utils.collision_category.inter,
                                         collision_mask: utils.collision_category.mouse,
                                         fix_rot:true,
@@ -200,7 +200,7 @@ class fidget_daft_i extends fidget{
                                       w:200/2.4*s,
                                       type : utils.shape.circle,
                                       color:utils.color.grey,
-                                      shader: this.shaders[0],
+                                      shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
                                       axe_constraint : {
@@ -224,7 +224,7 @@ class fidget_daft_i extends fidget{
                                     w:100/2.4*s,
                                     type : utils.shape.circle,
                                     color:utils.color.grey,
-                                    shader: this.shaders[0],
+                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse,
                                     axe_constraint : {
@@ -628,32 +628,36 @@ class fidget_daft_i extends fidget{
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
       fill(50,140,50)
 
-    this.shaders[1].iFrame = this.draw_count;
-    this.shaders[1].iTime = millis() / 1000.0; 
-    this.shaders[1].iMouse = { x: 0, y: 0};
+    if(this.shaders.length != 0 )
+    {
+      this.shaders[1].iFrame = this.draw_count;
+      this.shaders[1].iTime = millis() / 1000.0; 
+      this.shaders[1].iMouse = { x: 0, y: 0};
+    
+      this.shaders[1].bg_animation = 1.
+      this.shaders[1].bg_grain = 1.
+      this.shaders[1].bg_grain_scale = 5.
+      this.shaders[1].bg_grid = 1.0
+      this.shaders[1].bg_grid_scale = 15.0
+      this.shaders[1].bg_grid_line_scale =  2.0
+      this.shaders[1].bg_grid_point_scale =  2.0
+    
+      this.shaders[1].bg_colorA = [48.96, 0.2, 0.2];
+      this.shaders[1].bg_colorB = [117., 0.2, 80.];
+      this.shaders[1].bg_colorC = [80.,97.92,0.2];
+      this.shaders[1].bg_colorD = [0.2,48.96,48.96];
   
-    this.shaders[1].bg_animation = 1.
-    this.shaders[1].bg_grain = 1.
-    this.shaders[1].bg_grain_scale = 5.
-    this.shaders[1].bg_grid = 1.0
-    this.shaders[1].bg_grid_scale = 15.0
-    this.shaders[1].bg_grid_line_scale =  2.0
-    this.shaders[1].bg_grid_point_scale =  2.0
-  
-    this.shaders[1].bg_colorA = [48.96, 0.2, 0.2];
-    this.shaders[1].bg_colorB = [117., 0.2, 80.];
-    this.shaders[1].bg_colorC = [80.,97.92,0.2];
-    this.shaders[1].bg_colorD = [0.2,48.96,48.96];
+      this.shaders[1].bg_typeA = 0.0;
+      this.shaders[1].bg_typeB = 1.0;
+      this.shaders[1].bg_typeC = 0.0;
+      this.shaders[1].bg_typeD = 0.0;
+      this.shaders[1].bg_type_discoTarget= 0.;
+    
+      this.shaders[1].light_beam = 0.0
+      this.shaders[1].debug = 0         
+      this.shaders[1].as_texture() 
+    }
 
-    this.shaders[1].bg_typeA = 0.0;
-    this.shaders[1].bg_typeB = 1.0;
-    this.shaders[1].bg_typeC = 0.0;
-    this.shaders[1].bg_typeD = 0.0;
-    this.shaders[1].bg_type_discoTarget= 0.;
-  
-    this.shaders[1].light_beam = 0.0
-    this.shaders[1].debug = 0         
-    this.shaders[1].as_texture() 
 
     rect(0,0,width/2,height)
 
@@ -671,8 +675,11 @@ class fidget_daft_i extends fidget{
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
       fill(50,140,50)
 
-        
-    this.shaders[1].as_texture()
+    if(this.shaders.length != 0 )
+    {
+      this.shaders[1].as_texture()
+    }    
+
 
     rect(width/2+a,0,width/2,height)
 
