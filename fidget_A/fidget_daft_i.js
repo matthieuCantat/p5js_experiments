@@ -658,8 +658,15 @@ class fidget_daft_i extends fidget{
       this.shaders[1].as_texture() 
     }
 
+    if(use_webgl)
+    {
+      plane(width/2,height);
+    }
+    else
+    {
+      rect(0,0,width/2,height)
+    }
 
-    rect(0,0,width/2,height)
 
     fill(255);
     textSize(50);
@@ -668,7 +675,7 @@ class fidget_daft_i extends fidget{
     pop();
 
     push();
-    translate(this.webgl_draw_coords_offset.x+a,this.webgl_draw_coords_offset.y)         
+    translate(this.webgl_draw_coords_offset.x+a+width/2,this.webgl_draw_coords_offset.y)         
     fill(this.color_background[0],
       this.color_background[1],
       this.color_background[2])//fill(50,40,50)
@@ -680,8 +687,15 @@ class fidget_daft_i extends fidget{
       this.shaders[1].as_texture()
     }    
 
+    if(use_webgl)
+    {
+      plane(width/2,height);
+    }
+    else
+    {
+      rect(0,0,width/2,height)
+    }
 
-    rect(width/2+a,0,width/2,height)
 
     fill(255);
     textSize(20);

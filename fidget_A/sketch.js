@@ -35,11 +35,11 @@ let height      = 400
 var ground_enable = false
 var Fs_sequence = null
 
-var nbr = 5
+var nbr = 10
 var debug = false
 
 var use_webgl = true
-var shaders_nbr = 2
+var shaders_nbr = 0
 
 var shdrs = [] 
 
@@ -65,13 +65,14 @@ function setup() {
   {
     createCanvas(width, height,WEBGL);
     drawingContext.getExtension("OES_standard_derivatives");
-    pixelDensity(1);
-    noStroke();
+    //pixelDensity(1);
+    //noStroke();
+    stroke(0);
   }
   else
   {
     createCanvas(width, height);
-    pixelDensity(2);
+    //pixelDensity(2);
   }
   
   

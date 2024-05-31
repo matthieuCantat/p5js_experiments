@@ -222,6 +222,9 @@ class body_build{
       this.webgl_draw_coords_offset = createVector(-width/2,-height/2)
       if( use_webgl == false )
         this.webgl_draw_coords_offset = createVector(0,0)
+
+
+      this.geo = null
     }
 
     preload()
@@ -232,8 +235,127 @@ class body_build{
     setup()
     {
         console.log('setup : body')
-        //if( this.shader != null)
-        //    this.shader.setup({x:this.w, y:this.h})
+
+
+        this.geo = new p5.Geometry();
+        let pA = createVector(0, 0, 0);
+        let pB = createVector(0, 0, 0);
+        let pC = createVector(0, 0, 0);
+        let pD = createVector(0, 0, 0);
+
+        var pi2 = Math.PI*2
+        switch(this.type) {
+          case 0:
+            // Create p5.Vector objects to position the vertices.
+            pA = createVector( 0.5*this.w,  -0.5*this.h, 0);
+            pB = createVector( 0.5*this.w, 0.5*this.h, 0);
+            pC = createVector( -0.5*this.w, 0.5*this.h, 0);
+            pD = createVector( -0.5*this.w,  -0.5*this.h, 0);
+          
+            // Add the vertices to the p5.Geometry object's vertices array.
+            this.geo.vertices.push(pA, pB, pC); 
+            this.geo.vertices.push(pA, pD, pC); 
+            this.geo.faces.push([0, 1, 2]);
+            this.geo.faces.push([3, 4, 5]);
+            //this.geo.computeFaces(); 
+            break
+          case 1:
+            // Create p5.Vector objects to position the vertices.
+            pA = createVector(  0.5*this.w*2*this.scale, -0.5*this.w*2*this.scale, 0);
+            pB = createVector(  0.5*this.w*2*this.scale,  0.5*this.w*2*this.scale, 0);
+            pC = createVector( -0.5*this.w*2*this.scale,  0.5*this.w*2*this.scale, 0);
+            pD = createVector( -0.5*this.w*2*this.scale, -0.5*this.w*2*this.scale, 0);
+          
+            // Add the vertices to the p5.Geometry object's vertices array.
+            this.geo.vertices.push(pA, pB, pC); 
+            this.geo.vertices.push(pA, pD, pC); 
+            this.geo.faces.push([0, 1, 2]);
+            this.geo.faces.push([3, 4, 5]);
+            //this.geo.computeFaces(); 
+            //circle(0,0,this.w*2*this.scale)
+            break
+          /*  
+          case 2:
+            pA = [cos(pi2*1/6)*this.w,sin(pi2*1/6)*this.w]
+            pB = [cos(pi2*3/6)*this.w,sin(pi2*3/6)*this.w]
+            pC = [cos(pi2*5/6)*this.w,sin(pi2*5/6)*this.w]
+            triangle(pA[0], pA[1], pB[0], pB[1], pC[0], pC[1]);
+            break
+          case 3:
+            beginShape(TESS);
+            vertex(cos(pi2*1/10)*this.w,sin(pi2*1/10)*this.w);
+            vertex(cos(pi2*3/10)*this.w,sin(pi2*3/10)*this.w);
+            vertex(cos(pi2*5/10)*this.w,sin(pi2*5/10)*this.w);
+            vertex(cos(pi2*7/10)*this.w,sin(pi2*7/10)*this.w);
+            vertex(cos(pi2*9/10)*this.w,sin(pi2*9/10)*this.w);
+            endShape(CLOSE);
+            break    
+          case 4:
+            beginShape(TESS);
+            vertex(cos(pi2*1/12)*this.w,sin(pi2*1/12)*this.w);
+            vertex(cos(pi2*3/12)*this.w,sin(pi2*3/12)*this.w);
+            vertex(cos(pi2*5/12)*this.w,sin(pi2*5/12)*this.w);
+            vertex(cos(pi2*7/12)*this.w,sin(pi2*7/12)*this.w);
+            vertex(cos(pi2*9/12)*this.w,sin(pi2*9/12)*this.w);
+            vertex(cos(pi2*11/12)*this.w,sin(pi2*11/12)*this.w);
+            endShape(CLOSE);
+            break    
+          case 5:     
+            beginShape(TESS);
+            for(let i = 0; i < this.shape_vertices.length;i++)
+              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
+            endShape(CLOSE);
+            break    
+          case 6:     
+            beginShape(TESS);
+            for(let i = 0; i < this.shape_vertices.length;i++)
+              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
+            endShape(CLOSE);
+            break          
+          case 7:        
+            beginShape(TESS);
+            for(let i = 0; i < this.shape_vertices.length;i++)
+              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
+            endShape(CLOSE);
+            break   
+          case 8:     
+            beginShape(TESS);
+            for(let i = 0; i < this.shape_vertices.length;i++)
+              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
+            endShape(CLOSE);
+            break     
+          case 9:       
+            rectMode(CENTER)
+            rect(0,0,this.w/3,this.h)
+            rect(0,0,this.w,this.h/3)
+            break;      
+          case 10:       
+            rectMode(CENTER)
+            let w = this.w/2
+            let h = this.h/2
+            let ptA = new Vector(-w,  h)
+            let ptB = new Vector(-w, -h)
+            let ptC = new Vector( w, -h)
+            let ptD = new Vector( w,  h)
+            let vAB = ptB.getSub(ptA)
+            let vDC = ptC.getSub(ptD)
+            let slop_rad = rad(this.slop)
+            vAB.rotate(slop_rad)
+            vDC.rotate(slop_rad*-1)
+            vAB.normalize()
+            vDC.normalize()
+            let new_length = this.h/cos(slop_rad)
+            vAB.mult(new_length)
+            vDC.mult(new_length)
+            ptB = ptA.getAdd(vAB)
+            ptC = ptD.getAdd(vDC)
+    
+            quad(ptA.x(), ptA.y(), ptB.x(), ptB.y(), ptC.x(), ptC.y(), ptD.x(), ptD.y());
+            break;  
+            */                                             
+          }         
+
+
     }
    
 
@@ -399,13 +521,27 @@ class body_build{
       var pi2 = Math.PI*2
       switch(this.type) {
         case 0:
-          rectMode(CENTER)
-          let corner_radius = 2
-          rect(0,0,this.w,this.h, corner_radius)
+          if(use_webgl)
+          {
+            //model(this.geo)
+            plane(this.w,this.h,);
+          }
+          else{
+            rectMode(CENTER)
+            let corner_radius = 2
+            rect(0,0,this.w,this.h, corner_radius)
+          }
           break
         case 1:
-          circle(0,0,this.w*2*this.scale)
-          break
+          if(use_webgl)
+          {
+            //model(this.geo)
+            sphere(this.w*2*this.scale/2.,10, 7)
+          }
+          else{
+            circle(0,0,this.w*2*this.scale)
+          }
+          break  
         case 2:
           let pA = [cos(pi2*1/6)*this.w,sin(pi2*1/6)*this.w]
           let pB = [cos(pi2*3/6)*this.w,sin(pi2*3/6)*this.w]
@@ -460,29 +596,37 @@ class body_build{
           rect(0,0,this.w/3,this.h)
           rect(0,0,this.w,this.h/3)
           break;      
-        case 10:       
-          rectMode(CENTER)
-          let w = this.w/2
-          let h = this.h/2
-          let ptA = new Vector(-w,  h)
-          let ptB = new Vector(-w, -h)
-          let ptC = new Vector( w, -h)
-          let ptD = new Vector( w,  h)
-          let vAB = ptB.getSub(ptA)
-          let vDC = ptC.getSub(ptD)
-          let slop_rad = rad(this.slop)
-          vAB.rotate(slop_rad)
-          vDC.rotate(slop_rad*-1)
-          vAB.normalize()
-          vDC.normalize()
-          let new_length = this.h/cos(slop_rad)
-          vAB.mult(new_length)
-          vDC.mult(new_length)
-          ptB = ptA.getAdd(vAB)
-          ptC = ptD.getAdd(vDC)
-  
-          quad(ptA.x(), ptA.y(), ptB.x(), ptB.y(), ptC.x(), ptC.y(), ptD.x(), ptD.y());
-          break;                                               
+        case 10: // trapezoid    
+          if(use_webgl)
+          {   
+            plane(this.w,this.h,);
+          }
+          else{
+            rectMode(CENTER)
+            let w = this.w/2
+            let h = this.h/2
+            let ptA = new Vector(-w,  h)
+            let ptB = new Vector(-w, -h)
+            let ptC = new Vector( w, -h)
+            let ptD = new Vector( w,  h)
+            let vAB = ptB.getSub(ptA)
+            let vDC = ptC.getSub(ptD)
+            let slop_rad = rad(this.slop)
+            vAB.rotate(slop_rad)
+            vDC.rotate(slop_rad*-1)
+            vAB.normalize()
+            vDC.normalize()
+            let new_length = this.h/cos(slop_rad)
+            vAB.mult(new_length)
+            vDC.mult(new_length)
+            ptB = ptA.getAdd(vAB)
+            ptC = ptD.getAdd(vDC)
+    
+            quad(ptA.x(), ptA.y(), ptB.x(), ptB.y(), ptC.x(), ptC.y(), ptD.x(), ptD.y());
+          }
+
+          break;  
+                                                     
         } 
         
   
@@ -504,3 +648,5 @@ class body_build{
     }
   }
   
+
+
