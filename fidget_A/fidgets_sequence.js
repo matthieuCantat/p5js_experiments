@@ -114,7 +114,8 @@ class fidgets_sequence
         fill(0)
         textSize(100);
         textAlign(CENTER);
-        //text( '?', width/2,height/2+cos(this.update_count/10)*20+30)        
+        if(use_webgl == false )
+          text( '?', width/2,height/2+cos(this.update_count/10)*20+30)        
       }
 
       var i_max = this.fidgets_nbr
@@ -197,7 +198,8 @@ class fidgets_sequence
         //this.chrono.p = p_chrono
         //this.chrono.s = s_chrono
         this.chrono.update()
-        this.chrono.draw()
+        if(use_webgl == false )
+          this.chrono.draw()
     }
 
     do_anim_override( anim = null )

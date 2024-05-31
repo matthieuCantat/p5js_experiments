@@ -672,7 +672,7 @@ class Chrono
     fill(255);
     textSize(this.s);
     textAlign(CENTER);
-    //text(this.time_str, this.p.x, this.p.y);
+    text(this.time_str, this.p.x, this.p.y);
   }
 
 }

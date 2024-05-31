@@ -665,13 +665,14 @@ class fidget_daft_i extends fidget{
     else
     {
       rect(0,0,width/2,height)
+      fill(255);
+      textSize(50);
+      textAlign(CENTER);
+      text( this.fidget_sequence_i, width*0.2-a,height*0.95)      
     }
 
 
-    fill(255);
-    textSize(50);
-    textAlign(CENTER);
-    //text( this.fidget_sequence_i, width*0.2-a,height*0.95)
+
     pop();
 
     push();
@@ -694,13 +695,13 @@ class fidget_daft_i extends fidget{
     else
     {
       rect(0,0,width/2,height)
+      fill(255);
+      textSize(20);
+      textAlign(CENTER);
+      text( this.title , width*0.8,height*0.95)      
     }
 
 
-    fill(255);
-    textSize(20);
-    textAlign(CENTER);
-    //text( this.title , width*0.8,height*0.95)
     pop();
 
   }
