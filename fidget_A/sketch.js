@@ -39,7 +39,7 @@ var nbr = 10
 var debug = false
 
 var use_webgl = true
-var shaders_nbr = 0
+var shaders_nbr = 2
 
 var shdrs = [] 
 
@@ -66,7 +66,7 @@ function setup() {
     createCanvas(width, height,WEBGL);
     drawingContext.getExtension("OES_standard_derivatives");
     //pixelDensity(1);
-    //noStroke();
+    noStroke();
     stroke(0);
   }
   else
