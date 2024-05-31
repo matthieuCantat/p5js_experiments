@@ -87,8 +87,8 @@ function setup() {
   */
   if( shdrs.length != 0 )
   {
-    shdrs[0].setup({x:100,y:50})  
-    shdrs[1].setup({x:width/2,y:height})
+    shdrs[0].setup({x:100/2,y:50/2})  
+    shdrs[1].setup({x:width/2/2,y:height/2})
   }
  
 
