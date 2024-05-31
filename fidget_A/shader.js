@@ -81,6 +81,10 @@ class shader_build
 
   update()
   {
+    //this.canvas.clear()
+    //this.canvas.background(0);
+    this.canvas.shader(this.shdr) // Use as background
+    
     
     this.shdr.setUniform("iFrame", this.iFrame);
     this.shdr.setUniform("iTime", this.iTime);
@@ -135,12 +139,12 @@ class shader_build
   
     this.shdr.setUniform('debug',this.debug)   
 
-    this.canvas.clear()
-    this.canvas.background(0);
-    this.canvas.shader(this.shdr) // Use as background
-    this.canvas.rect();// INIT     
+
+    this.canvas.rect(0,0,this.iResolution.x, this.iResolution.y);// INIT     
     
   }
+
+
 
   as_texture( out_canvas = null)
   {
