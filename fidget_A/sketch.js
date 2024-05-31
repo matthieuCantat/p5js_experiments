@@ -67,7 +67,7 @@ function setup() {
     drawingContext.getExtension("OES_standard_derivatives");
     //pixelDensity(1);
     noStroke();
-    stroke(0);
+    //stroke(0);
   }
   else
   {
