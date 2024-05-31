@@ -87,8 +87,9 @@ function setup() {
   */
   if( shdrs.length != 0 )
   {
-    shdrs[0].setup({x:100/2,y:50/2})  
-    shdrs[1].setup({x:width/2/2,y:height/2})
+    let shader_resolution_div = 2.;
+    shdrs[0].setup({x:100/shader_resolution_div,y:50/shader_resolution_div})  
+    shdrs[1].setup({x:width/2/shader_resolution_div,y:height/shader_resolution_div})
   }
  
 
