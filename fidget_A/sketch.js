@@ -38,11 +38,12 @@ var Fs_sequence = null
 var nbr = 10
 var debug = false
 
-var use_webgl = true
+var use_webgl = false
 var shaders_nbr = 0
 
 var shdrs = [] 
 
+var do_shdr_test = false
 var shdr_test = null
 
 
@@ -58,8 +59,12 @@ function preload()
     shdrs[i].preload();
   }
 
-  shdr_test = new shader_build()
-  shdr_test.preload()
+  if(do_shdr_test)
+  {
+    shdr_test = new shader_build()
+    shdr_test.preload()
+  }
+
 }
 
 function setup() {
@@ -96,7 +101,8 @@ function setup() {
     shdrs[1].setup({x:width/2/shader_resolution_div,y:height/shader_resolution_div})
   }
 
-  shdr_test.setup({x:width/shader_resolution_div,y:height/shader_resolution_div})
+  if(do_shdr_test)
+    shdr_test.setup({x:width/shader_resolution_div,y:height/shader_resolution_div})
  
 
   Matter.Composite.add(engine.world, create_boundary_wall_collision(width,height,ground_enable));
@@ -161,35 +167,42 @@ function draw() {
   
   if( mouseIsPressed == false)pM = null
   if( touches.lengh  == 0    )pM = null
-  //F_sequence.update()
-  //F_sequence.draw()
 
 
   //if( pM != null )
   //  circle(pM.x,pM.y,10)
-  shdr_test.iFrame = draw_count;
-  shdr_test.iTime = millis() / 1000.0; 
-  shdr_test.iMouse = { x: 0, y: 0};
 
-  shdr_test.bg_animation = 1.
-  shdr_test.bg_grain = 1.
-  shdr_test.bg_grain_scale = 14.
-  shdr_test.bg_grid = 0.0
-  shdr_test.bg_grid_scale = 10.0
-  shdr_test.bg_grid_line_scale =  2.0
-  shdr_test.bg_grid_point_scale =  2.0
+  if(do_shdr_test)
+  {
+    shdr_test.iFrame = draw_count;
+    shdr_test.iTime = millis() / 1000.0; 
+    shdr_test.iMouse = { x: 0, y: 0};
+  
+    shdr_test.bg_animation = 1.
+    shdr_test.bg_grain = 1.
+    shdr_test.bg_grain_scale = 14.
+    shdr_test.bg_grid = 0.0
+    shdr_test.bg_grid_scale = 10.0
+    shdr_test.bg_grid_line_scale =  2.0
+    shdr_test.bg_grid_point_scale =  2.0
+  
+    shdr_test.bg_typeA = 0.0;
+    shdr_test.bg_typeB = 0.0;
+    shdr_test.bg_typeC = 1.0;
+    shdr_test.bg_typeD = 0.;
+    shdr_test.bg_type_discoTarget= 0.;
+  
+    shdr_test.light_beam = 0.0
+    shdr_test.debug = 0    
+  
+    shdr_test.update()
+    shdr_test.as_image();
+  }
+  else{
+    F_sequence.update()
+    F_sequence.draw()
+  }
 
-  shdr_test.bg_typeA = 0.0;
-  shdr_test.bg_typeB = 0.0;
-  shdr_test.bg_typeC = 1.0;
-  shdr_test.bg_typeD = 0.;
-  shdr_test.bg_type_discoTarget= 0.;
-
-  shdr_test.light_beam = 0.0
-  shdr_test.debug = 0    
-
-  shdr_test.update()
-  shdr_test.as_image();
   
   
 
