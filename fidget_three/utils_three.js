@@ -39,7 +39,7 @@ export function roundedTrap( width, height, slop, radius ) {
 
     let vAB = ptA.getSub(ptB)
     let vDC = ptD.getSub(ptC)
-    let slop_rad = rad(slop)
+    let slop_rad = rad(slop*-1)
     vAB.rotate(slop_rad)
     vDC.rotate(slop_rad*-1)
     vAB.normalize()
@@ -110,6 +110,6 @@ export function get_texture_grid_checker_grey()
     const textureB = loader.load( 'textures/uv_grid_opengl_grey.jpg' );
     textureB.colorSpace = THREE.SRGBColorSpace;
     textureB.wrapS = textureB.wrapT = THREE.RepeatWrapping;
-    textureB.repeat.set( 0.002, 0.002 );
+    textureB.repeat.set( 0.0005, 0.0005 );
     return textureB
 }

@@ -63,7 +63,7 @@ var shaders_nbr = 0
 var ground_enable = false
 var do_shdr_test = false
 
-var draw_p5 = true
+var draw_p5 = false
 
 /////////////////////////////////////////// variables
 var F_sequence = null
