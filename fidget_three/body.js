@@ -13,6 +13,7 @@ export default class body_build{
         m_offset: new Matrix(),
         x: 0,
         y: 0,
+        z: 0,
         w: 1,
         h: 1,
         slop: 0,
@@ -40,6 +41,7 @@ export default class body_build{
       this.m_offset = args.m_offset
       this.x = args.x
       this.y = args.y
+      this.z = args.z
       this.w = args.w
       this.h = args.h
       this.slop = args.slop
@@ -692,6 +694,7 @@ export default class body_build{
       
       this.mesh_three.position.x = pos.x()-200
       this.mesh_three.position.y = pos.y()*-1+200
+      //this.mesh_three.position.z = this.z
       this.mesh_three.rotation.z = rot*-1
       this.mesh_three.visible = this.get_visibility() == 1   
       this.mesh_three.scale.x = scale  

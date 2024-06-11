@@ -71,13 +71,15 @@ export default class fidget_daft_i extends fidget{
 
 
     /////////////////////////////////////////////////////   
-    
+    let z_depth = 0
+    let z_depth_incr = 0.1
     
 
     let oBackground = {
       m:this.m,
       x:0,
-      y:0, 
+      y:0,
+      z:z_depth, 
       w : this.screen_dims.x/2, 
       h : this.screen_dims.y, 
       color: this.color_background,
@@ -89,6 +91,7 @@ export default class fidget_daft_i extends fidget{
       matter_engine: this.matter_engine,
       texture_three: text_checker_three_grey,
     } 
+    z_depth += z_depth_incr
 
 
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
@@ -100,6 +103,7 @@ export default class fidget_daft_i extends fidget{
                                                 rot:0, 
                                                 collision:false,                                               
                                               })) 
+                                            
 
     /////////////////////////////////////////////////////  
 
@@ -109,6 +113,7 @@ export default class fidget_daft_i extends fidget{
                                       m_offset:new Matrix(),
                                       x:0,
                                       y:0,
+                                      z:z_depth,
                                       w:50*s,
                                       type:utils.shape.circle,
                                       color: this.colors[0],
@@ -122,12 +127,14 @@ export default class fidget_daft_i extends fidget{
                                       matter_engine: this.matter_engine,
                                       texture_three: text_checker_three,                                      
                                       })
-  
+      z_depth += z_depth_incr  
+
       this.bodies.geos.rectangle = new body_build({ 
                                         m:this.m,
                                         m_offset:new Matrix(),
                                         x:0,
                                         y:0,
+                                        z:z_depth,
                                         w : 74*s, 
                                         h : 18*s, 
                                         type : utils.shape.rectangle,
@@ -149,8 +156,9 @@ export default class fidget_daft_i extends fidget{
         m:this.m,
         x:0,
         y:0, 
-        w : 3.5*s, 
-        h : 16.2*s, 
+        z:z_depth,
+        w : 3.51*s, 
+        h : 16.21*s, 
         color: this.colors[2],
         shader: this.shaders.length != 0 ? this.shaders[0] : null,
         collision_category: utils.collision_category.blue,
@@ -166,6 +174,7 @@ export default class fidget_daft_i extends fidget{
         matter_engine: this.matter_engine, 
         texture_three: text_checker_three,                         
       } 
+      z_depth += z_depth_incr
   
       let ray_tmp = 80
       let rot_tmp = 0 
@@ -236,6 +245,7 @@ export default class fidget_daft_i extends fidget{
                                         m_offset:new Matrix(),
                                         x:0,
                                         y:0,
+                                        z:z_depth,
                                         w:400/2.4*s,
                                         type : utils.shape.circle,
                                         color:utils.color.grey,
@@ -248,12 +258,14 @@ export default class fidget_daft_i extends fidget{
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,                                        
                                       })
-  
+      z_depth += z_depth_incr            
+
       this.bodies.inters.C = new body_build({  
                                       m:this.m,
                                       m_offset:new Matrix(),
                                       x:0,
                                       y:0,
+                                      z:z_depth,
                                       rot:0,
                                       w:200/2.4*s,
                                       type : utils.shape.circle,
@@ -273,7 +285,9 @@ export default class fidget_daft_i extends fidget{
       //this.inter3.c_axe.pos_override =1
       //this.inter3.c_axe.apply(0,createVector(0,0))
       //this.inter3.c_axe.pos_override =null  
-    
+    z_depth += z_depth_incr
+
+
     var om_iA = new Matrix()
     om_iA.setTranslation(-130,-50)
     this.bodies.inters.A = new body_build({  
@@ -281,6 +295,7 @@ export default class fidget_daft_i extends fidget{
                                     m_offset:om_iA,
                                     x:-130,
                                     y:-50,
+                                    z:z_depth,
                                     rot:0,
                                     w:100/2.4*s,
                                     type : utils.shape.circle,
@@ -297,6 +312,8 @@ export default class fidget_daft_i extends fidget{
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,                                    
                                   })
+
+    z_depth += z_depth_incr
                              
     }
   ////////////////////////////////////////////////////////////////////////////////////
