@@ -1,11 +1,10 @@
 
-
 import fidget from './fidget.js';
 import { utils,clamp,rad,deg } from './utils.js';
 import body_build from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-
+import * as ut from './utils_three.js';
 
 
 export default class fidget_daft_i extends fidget{
@@ -28,6 +27,7 @@ export default class fidget_daft_i extends fidget{
             C:null,
           },
           geos : {
+            backgrounds:[],
             circle:null,
             rectangle:null,
             rectangles:[],
@@ -40,6 +40,7 @@ export default class fidget_daft_i extends fidget{
             'A',
             ], 
           geos : [
+            'backgrounds',            
             'circle',
             'rectangle',      
             'rectangles',
@@ -64,8 +65,44 @@ export default class fidget_daft_i extends fidget{
       }
       this.color_background = [ (this.colors[0][0]+0.2)*0.3,(this.colors[0][1]+0.2)*0.3,(this.colors[0][2]+0.2)*0.3]
 
-    
+      var text_checker_three = ut.get_texture_grid_checker()
+      var text_checker_three_grey = ut.get_texture_grid_checker_grey()    
       
+
+
+    /////////////////////////////////////////////////////   
+    
+    
+
+    let oBackground = {
+      m:this.m,
+      x:0,
+      y:0, 
+      w : this.screen_dims.x/2, 
+      h : this.screen_dims.y, 
+      color: this.color_background,
+      collision_category: utils.collision_category.none,
+      collision_mask: utils.collision_category.none,
+      type: utils.shape.rectangle,
+      use_webgl: this.use_webgl,
+      screen_dims: this.screen_dims,
+      matter_engine: this.matter_engine,
+      texture_three: text_checker_three_grey,
+    } 
+
+
+    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
+                                                rot:0, 
+                                                collision:false,                                               
+                                              })) 
+
+    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
+                                                rot:0, 
+                                                collision:false,                                               
+                                              })) 
+
+    /////////////////////////////////////////////////////  
+
       // build
       this.bodies.geos.circle = new body_build({
                                       m:this.m,
@@ -82,7 +119,8 @@ export default class fidget_daft_i extends fidget{
                                       density:0.001,
                                       use_webgl: this.use_webgl,
                                       screen_dims: this.screen_dims,
-                                      matter_engine: this.matter_engine,                                      
+                                      matter_engine: this.matter_engine,
+                                      texture_three: text_checker_three,                                      
                                       })
   
       this.bodies.geos.rectangle = new body_build({ 
@@ -104,7 +142,8 @@ export default class fidget_daft_i extends fidget{
                                         },
                                         use_webgl: this.use_webgl,
                                         screen_dims: this.screen_dims,
-                                        matter_engine: this.matter_engine,                                        
+                                        matter_engine: this.matter_engine,  
+                                        texture_three: text_checker_three,                                      
                                       })
       let oRect = {
         m:this.m,
@@ -124,7 +163,8 @@ export default class fidget_daft_i extends fidget{
                           },
         use_webgl: this.use_webgl,
         screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,                          
+        matter_engine: this.matter_engine, 
+        texture_three: text_checker_three,                         
       } 
   
       let ray_tmp = 80
@@ -642,6 +682,27 @@ export default class fidget_daft_i extends fidget{
     a = Math.max(0,a)
     a *=15
     if(this.anim_mode)
+      a = this.state.steps[3].resoluton_coef*this.screen_dims.y/2    
+
+    // a 0-->200
+    let pA = new Vector(this.bodies.geos.backgrounds[0].w/2.,this.screen_dims.y/2)
+    pA.v.x -= a
+    this.bodies.geos.backgrounds[0].set_position(pA)
+    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+      this.bodies.geos.backgrounds[0].color = [50,140,50]
+
+
+    let pB = new Vector(this.bodies.geos.backgrounds[0].w/2.*3 ,this.screen_dims.y/2)
+    pB.v.x += a
+    this.bodies.geos.backgrounds[1].set_position(pB)  
+    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+      this.bodies.geos.backgrounds[1].color = [50,140,50]  
+    /*
+    let a = this.state.steps[3].update_count
+    a -=30
+    a = Math.max(0,a)
+    a *=15
+    if(this.anim_mode)
       a = this.state.steps[3].resoluton_coef*200    
 
     p5.push();
@@ -727,6 +788,7 @@ export default class fidget_daft_i extends fidget{
 
 
     p5.pop();
+    */
 
   }
 
@@ -812,7 +874,15 @@ export default class fidget_daft_i extends fidget{
     this.draw_help(p5)
   }
   
-  
+  setup_shapes_three()
+  {
+    this.bodies_setup_shapes_three()
+  }
+
+  animate_three()
+  {
+    this.bodies_animate_three()
+  }  
 }
   
   

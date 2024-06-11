@@ -39,9 +39,9 @@ export default class fidgets_sequence
         
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
+            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
             //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
-            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
+            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
@@ -139,25 +139,46 @@ export default class fidgets_sequence
           if((  i-1< coef  )&&(  coef <= i+1 ))
           {
             console.log(i)
+            this.fidgets[i].bodies_set_visibility_three(true)
           }
           else{
+            this.fidgets[i].bodies_set_visibility_three(false)
             continue
           }
 
         }
-
-
         this.fidgets[i].update(p5)
         this.fidgets[i].draw(p5)
         this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
-
-
-        
-
       }
-
-      
     }
+
+    setup_shapes_fidgets_three(scene_three)
+    {
+      var rez = this.get_resolution_coef_info()
+      var rez_step = rez*this.fidgets_nbr
+      var i_max = this.fidgets_nbr
+      var coef = i_max-rez_step
+      
+      for( let i = 0; i < this.fidgets.length; i++ )
+      {   
+
+        //this.fidgets[i].update(p5)
+        this.fidgets[i].setup_shapes_three()
+        
+        scene_three.add( this.fidgets[i].group_three )
+        //this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
+      }
+    }
+
+    animate_three()
+    {
+      for( let i = 0; i < this.fidgets.length; i++ )
+        this.fidgets[i].animate_three()
+
+    }
+
+
     draw_chrono(p5)
     {
 
@@ -295,8 +316,9 @@ export default class fidgets_sequence
 
         if(this.debug_mode)
             this.draw_debug.draw(p5)
-
       }
+
+
       
 }
 

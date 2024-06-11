@@ -1,6 +1,7 @@
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import { utils , rad, constraint_build, cns_axe} from './utils.js';
+import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 
 export default class body_build{
@@ -31,6 +32,7 @@ export default class body_build{
         use_webgl:false,
         screen_dims:null,
         matter_engine:null,
+        texture_three:null,
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -60,6 +62,7 @@ export default class body_build{
       this.use_webgl = args.use_webgl
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
+      this.texture_three = args.texture_three
   
       this.constraints = []
       this.c_axe = null
@@ -236,6 +239,8 @@ export default class body_build{
 
 
       this.geo = null
+      this.shape_three = null
+      this.mesh_three = null
     }
 
     preload()
@@ -661,6 +666,37 @@ export default class body_build{
       p5.pop(); // Restore original state
 
       this.draw_count += 1
+    }
+
+
+  
+    setup_shapes_three(){
+      switch(this.type) {
+        case 0:
+          this.shape_three = ut.rect( this.w, this.h );
+          break;
+        case 1:
+          this.shape_three = ut.circle(this.w);
+          break;
+        case 10:  
+          this.shape_three = ut.roundedTrap( this.w, this.h, this.slop, 0 )
+          break;        
+        }
+    }    
+
+    animate_three()
+    {
+      let pos = this.get_position()
+      let rot = this.get_rotation()
+      let scale = this.scale
+      
+      this.mesh_three.position.x = pos.x()-200
+      this.mesh_three.position.y = pos.y()*-1+200
+      this.mesh_three.rotation.z = rot*-1
+      this.mesh_three.visible = this.get_visibility() == 1   
+      this.mesh_three.scale.x = scale  
+      this.mesh_three.scale.y = scale  
+      this.mesh_three.scale.z = scale  
     }
   }
   

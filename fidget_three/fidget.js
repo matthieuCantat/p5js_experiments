@@ -2,8 +2,8 @@
 
 import Vector from './vector.js';
 import { utils, switch_selection } from './utils.js';
-
-
+import * as ut from './utils_three.js';
+import * as THREE from 'three';
 
 class state_step_tpl{
   constructor()
@@ -77,6 +77,7 @@ export default class fidget{
     if( this.use_webgl == false )
       this.webgl_draw_coords_offset = new Vector(0,0)   
       
+    this.group_three = null
   }
 
   preload()
@@ -299,6 +300,79 @@ export default class fidget{
       } 
     }
   }
+  bodies_setup_shapes_three( inters = false, geos = true )
+  {
+    console.log('bodies_setup_shapes_three')
+    this.group_three = new THREE.Group();
+
+    for( let b_type in this.bodies)
+    {   
+      if(( (b_type == 'inters')&&(inters==true) )
+      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      {
+        for( let key of this.bodies_draw_order[b_type])
+        {      
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            {
+              this.bodies[b_type][key][i].setup_shapes_three()
+              this.bodies[b_type][key][i].mesh_three = ut.addShape( this.group_three , this.bodies[b_type][key][i].shape_three , this.bodies[b_type][key][i].texture_three );
+            }
+              
+          }
+          else
+            this.bodies[b_type][key].setup_shapes_three()
+            this.bodies[b_type][key].mesh_three = ut.addShape( this.group_three , this.bodies[b_type][key].shape_three ,this.bodies[b_type][key].texture_three );
+        }  
+      } 
+    }
+  }  
+  bodies_animate_three( inters = false, geos = true )
+  {
+    this.group_three = new THREE.Group();
+
+    for( let b_type in this.bodies)
+    {   
+      if(( (b_type == 'inters')&&(inters==true) )
+      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      {
+        for( let key of this.bodies_draw_order[b_type])
+        {      
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            {
+              this.bodies[b_type][key][i].animate_three()
+            }
+              
+          }
+          else
+            this.bodies[b_type][key].animate_three()
+        }  
+      } 
+    }
+  }  
+  bodies_set_visibility_three( value, inters = false, geos = true )
+  {
+    for( let b_type in this.bodies)
+    {   
+      if(( (b_type == 'inters')&&(inters==true) )
+      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      {
+        for( let key of this.bodies_draw_order[b_type])
+        {      
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+              this.bodies[b_type][key][i].visibility_override = value
+          }
+          else
+            this.bodies[b_type][key].visibility_override = value
+        }  
+      } 
+    } 
+  }  
 
   bodies_override_color(new_color = null,inters = true, geos = true)
   {
