@@ -394,6 +394,16 @@ export default class body_build{
     {
       return new Vector( this.body.position.x, this.body.position.y)
     }
+    get_rotation()
+    {
+      return this.body.angle
+    }
+    get_visibility()
+    {
+      if( (this.visibility == 0 )||(this.visibility_override == false)) 
+        return 0
+      return 1
+    }
   
     get_velocity()
     {
@@ -476,7 +486,7 @@ export default class body_build{
   
     draw(p5){
       //
-      if( (this.visibility == 0 )||(this.visibility_override == false)) 
+      if( this.get_visibility() == 0 ) 
         return
       p5.push(); // Start a new drawing state
   

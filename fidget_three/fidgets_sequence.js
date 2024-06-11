@@ -39,9 +39,9 @@ export default class fidgets_sequence
         
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
+            var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
             //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
-            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
+            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
@@ -155,30 +155,7 @@ export default class fidgets_sequence
         
 
       }
-      /*
 
-        var _fidget_to_show_next = [this.fidgets_to_show[0],this.fidgets_to_show[1]]
-        for( let i = 0; i < this.fidgets_to_show.length; i++ )
-        {
-          let iF = this.fidgets_to_show[i]
-          if( iF == null )
-            continue
-          if( iF < 0 )
-            continue      
-          this.fidgets[iF].update()
-          this.fidgets[iF].draw()
-          this.fidgets[iF].mouse_select_highlight(this.mouseConstraint)
-          
-          
-          if((i==0)&&( this.fidgets[iF].state.resolution_coef == this.fidgets[iF].end_step-1 ))
-          {
-            _fidget_to_show_next[1] = iF
-            _fidget_to_show_next[0] = iF-1
-            this.fidgets[iF].desactivate_touch()
-          }
-        }
-        this.fidgets_to_show = _fidget_to_show_next
-        */
       
     }
     draw_chrono(p5)

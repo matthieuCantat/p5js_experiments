@@ -1,7 +1,5 @@
 
 
-//import * as p5 from 'p5';
-//import * as mt from 'mt';
 import './libraries/matter.js';
 import Matrix from './matrix.js'
 import { utils, 
