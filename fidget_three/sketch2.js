@@ -219,9 +219,7 @@ new p5(function(p5)
 
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
-import { cos, sin } from './libraries/jsm/nodes/Nodes.js';
-import * as ut from './utils_three.js';
-
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 let container, stats;
 
@@ -245,6 +243,7 @@ let uniforms;
 
 init();
 
+let text;
 
 function init() {
 
@@ -266,22 +265,11 @@ function init() {
 
 
     F_sequence.setup_shapes_fidgets_three(scene)
-    /*
-    addShape( group, rect( F_sequence.fidgets[0].bodies.geos.backgrounds[0].w, F_sequence.fidgets[0].bodies.geos.backgrounds[0].h ), textureB );
-    addShape( group, rect( F_sequence.fidgets[0].bodies.geos.backgrounds[1].w, F_sequence.fidgets[0].bodies.geos.backgrounds[1].h ), textureB );
+    F_sequence.setup_chrono_three(scene)
+   
 
-    addShape( group, roundedRect( F_sequence.fidgets[0].bodies.geos.rectangles[0].w, F_sequence.fidgets[0].bodies.geos.rectangles[0].h, 2 ), textureA );
-    addShape( group, roundedRect( F_sequence.fidgets[0].bodies.geos.rectangles[1].w, F_sequence.fidgets[0].bodies.geos.rectangles[1].h, 2 ), textureA );
-    addShape( group, roundedRect( F_sequence.fidgets[0].bodies.geos.rectangles[2].w, F_sequence.fidgets[0].bodies.geos.rectangles[2].h, 2 ), textureA );
-    addShape( group, roundedRect( F_sequence.fidgets[0].bodies.geos.rectangles[3].w, F_sequence.fidgets[0].bodies.geos.rectangles[3].h, 2 ), textureA );
 
-    addShape( group, roundedTrap( F_sequence.fidgets[0].bodies.geos.trapezoids[0].w, F_sequence.fidgets[0].bodies.geos.trapezoids[0].h, -45, 0 ), textureA );
-    addShape( group, roundedTrap( F_sequence.fidgets[0].bodies.geos.trapezoids[1].w, F_sequence.fidgets[0].bodies.geos.trapezoids[1].h, -45, 0 ), textureA );
-    addShape( group, roundedTrap( F_sequence.fidgets[0].bodies.geos.trapezoids[2].w, F_sequence.fidgets[0].bodies.geos.trapezoids[2].h, -45, 0 ), textureA );
-    addShape( group, roundedTrap( F_sequence.fidgets[0].bodies.geos.trapezoids[3].w, F_sequence.fidgets[0].bodies.geos.trapezoids[3].h, -45, 0 ), textureA );
 
-    addShape( group, circle(F_sequence.fidgets[0].bodies.geos.circle.w),textureA );
-    */
     
     
     ///////////////// Background shader
@@ -306,6 +294,8 @@ function init() {
     scene.add( mesh );	
     
     /////////////////
+
+    
 
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -375,93 +365,7 @@ function onPointerUp() {
 function animate() {
     anim_pos += 1;
 
-    let pos;
-    let rot;
-
     F_sequence.animate_three()
-    /*
-    pos = F_sequence.fidgets[0].bodies.geos.backgrounds[0].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.backgrounds[0].get_rotation()
-    group.children[0].position.x = pos.x()-200
-    group.children[0].position.y = pos.y()*-1+200
-    group.children[0].rotation.z = rot*-1
-    group.children[0].visible = F_sequence.fidgets[0].bodies.geos.backgrounds[0].get_visibility() == 1
-
-    pos = F_sequence.fidgets[0].bodies.geos.backgrounds[1].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.backgrounds[1].get_rotation()
-    group.children[1].position.x = pos.x()-200
-    group.children[1].position.y = pos.y()*-1+200
-    group.children[1].rotation.z = rot*-1
-    group.children[1].visible = F_sequence.fidgets[0].bodies.geos.backgrounds[1].get_visibility() == 1
-    
-    pos = F_sequence.fidgets[0].bodies.geos.rectangles[0].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.rectangles[0].get_rotation()
-    group.children[2].position.x = pos.x()-200
-    group.children[2].position.y = pos.y()*-1+200
-    group.children[2].rotation.z = rot*-1
-    group.children[2].visible = F_sequence.fidgets[0].bodies.geos.rectangles[0].get_visibility() == 1
-
-    pos = F_sequence.fidgets[0].bodies.geos.rectangles[1].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.rectangles[1].get_rotation()
-    group.children[3].position.x = pos.x()-200
-    group.children[3].position.y = pos.y()*-1+200
-    group.children[3].rotation.z = rot*-1
-    group.children[3].visible = F_sequence.fidgets[0].bodies.geos.rectangles[1].get_visibility() == 1
-
-    pos = F_sequence.fidgets[0].bodies.geos.rectangles[2].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.rectangles[2].get_rotation()
-    group.children[4].position.x = pos.x()-200
-    group.children[4].position.y = pos.y()*-1+200
-    group.children[4].rotation.z = rot*-1
-    group.children[4].visible = F_sequence.fidgets[0].bodies.geos.rectangles[2].get_visibility() == 1
-
-    
-    pos = F_sequence.fidgets[0].bodies.geos.rectangles[3].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.rectangles[3].get_rotation()
-    group.children[5].position.x = pos.x()-200
-    group.children[5].position.y = pos.y()*-1+200
-    group.children[5].rotation.z = rot*-1
-    group.children[5].visible = F_sequence.fidgets[0].bodies.geos.rectangles[3].get_visibility() == 1
-
-    ///////////////////////////////////////////////
-
-    pos = F_sequence.fidgets[0].bodies.geos.trapezoids[0].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.trapezoids[0].get_rotation()
-    group.children[6].position.x = pos.x()-200
-    group.children[6].position.y = pos.y()*-1+200
-    group.children[6].rotation.z = rot*-1
-    group.children[6].visible = F_sequence.fidgets[0].bodies.geos.trapezoids[0].get_visibility() == 1
-    
-    pos = F_sequence.fidgets[0].bodies.geos.trapezoids[1].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.trapezoids[1].get_rotation()
-    group.children[7].position.x = pos.x()-200
-    group.children[7].position.y = pos.y()*-1+200
-    group.children[7].rotation.z = rot*-1
-    group.children[7].visible = F_sequence.fidgets[0].bodies.geos.trapezoids[1].get_visibility() == 1
-
-    pos = F_sequence.fidgets[0].bodies.geos.trapezoids[2].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.trapezoids[2].get_rotation()
-    group.children[8].position.x = pos.x()-200
-    group.children[8].position.y = pos.y()*-1+200
-    group.children[8].rotation.z = rot*-1
-    group.children[8].visible = F_sequence.fidgets[0].bodies.geos.trapezoids[2].get_visibility() == 1
-
-    pos = F_sequence.fidgets[0].bodies.geos.trapezoids[3].get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.trapezoids[3].get_rotation()
-    group.children[9].position.x = pos.x()-200
-    group.children[9].position.y = pos.y()*-1+200
-    group.children[9].rotation.z = rot*-1
-    group.children[9].visible = F_sequence.fidgets[0].bodies.geos.trapezoids[3].get_visibility() == 1
-
-    ///////////////////////////////////////////////
-
-    pos = F_sequence.fidgets[0].bodies.geos.circle.get_position()
-    rot = F_sequence.fidgets[0].bodies.geos.circle.get_rotation()
-    group.children[10].position.x = pos.x()-200
-    group.children[10].position.y = pos.y()*-1+200
-    group.children[10].rotation.z = rot*-1+3.14/2
-    group.children[10].visible = F_sequence.fidgets[0].bodies.geos.circle.get_visibility() == 1
-    */
 
 
 

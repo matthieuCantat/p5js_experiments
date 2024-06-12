@@ -1,6 +1,8 @@
 
 import Vector from './vector.js';
-
+//import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import * as THREE from 'three';
 
 ////////////////////////////////////////////// utils
 export function rad(value)
@@ -626,6 +628,44 @@ export class Chrono
     this.startTime = null
     this.time_str = '00:00:00'
     this.v = true
+    this.three_shape = null
+    this.three_geometry = null
+    this.three_mesh = null
+  }
+
+  setup_three(scene_three)
+  {
+    let Chrono = this
+    const loader = new FontLoader();
+    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+      const color = 0xFFFFFF;
+
+      const matLite = new THREE.MeshBasicMaterial( {
+        color: color,
+        transparent: false,
+        opacity: 1.0,
+        side: THREE.DoubleSide
+      } );
+
+
+      Chrono.three_shape = font.generateShapes( Chrono.time_str, 50 );
+      Chrono.three_geometry = new THREE.ShapeGeometry( Chrono.three_shape );
+
+      // make shape ( N.B. edge view not visible )
+
+      Chrono.three_mesh = new THREE.Mesh( Chrono.three_geometry, matLite );
+      Chrono.three_mesh.position.z = 150;
+      Chrono.three_mesh.position.x = Chrono.p.x()-240
+      Chrono.three_mesh.position.y = Chrono.p.y()*-1+200
+      Chrono.three_mesh.visible = Chrono.v   
+      Chrono.three_mesh.scale.x = Chrono.s*0.015  
+      Chrono.three_mesh.scale.y = Chrono.s*0.015  
+      Chrono.three_mesh.scale.z = Chrono.s*0.015        
+      scene_three.add( Chrono.three_mesh );
+    } ); //end load function   
+    
+
   }
 
   start()
@@ -671,6 +711,29 @@ export class Chrono
     p5.textSize(this.s);
     p5.textAlign(p5.CENTER);
     p5.text(this.time_str, this.p.x(), this.p.y());
+  }
+
+  update_three()
+  {
+    let Chrono = this
+
+
+    const loader = new FontLoader();
+    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+      Chrono.three_shape = font.generateShapes( Chrono.time_str, 50 );
+      Chrono.three_geometry = new THREE.ShapeGeometry( Chrono.three_shape );
+      Chrono.three_mesh.geometry = Chrono.three_geometry;
+
+      Chrono.three_mesh.position.x = Chrono.p.x()-240
+      Chrono.three_mesh.position.y = Chrono.p.y()*-1+200
+      Chrono.three_mesh.visible = Chrono.v   
+      Chrono.three_mesh.scale.x = Chrono.s*0.015  
+      Chrono.three_mesh.scale.y = Chrono.s*0.015  
+      Chrono.three_mesh.scale.z = Chrono.s*0.015  
+    } ); //end load function 
+
+
   }
 
 }

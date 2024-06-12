@@ -176,8 +176,47 @@ export default class fidgets_sequence
       for( let i = 0; i < this.fidgets.length; i++ )
         this.fidgets[i].animate_three()
 
+      this.update_chrono_three()
+
     }
 
+
+    setup_chrono_three(scene_three)
+    {
+      this.chrono.setup_three(scene_three)
+
+    }
+
+    update_chrono_three()
+    {
+
+        var p_chrono = new Vector(0, 0)
+        var s_chrono = 0
+        
+      
+        if(this.fidgets_to_show[0] < 0 )
+        {
+          var a = Math.min(1,Math.max(0,this.end_update_count / 100))
+          this.chrono.stop()
+          let blendA = (0.1*(1-a)+0.5*a)
+          let blendB = (0.05*(1-a)+0.07*a)
+          p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
+          s_chrono = this.screen_dims.x * blendB
+      
+          this.end_update_count += 1
+        }
+        else
+        {
+          p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * 0.1)
+          s_chrono = this.screen_dims.x * 0.05
+          this.end_update_count = 0
+      
+        }
+        //this.chrono.p = p_chrono
+        //this.chrono.s = s_chrono
+        this.chrono.update()
+        this.chrono.update_three()
+    }
 
     draw_chrono(p5)
     {
