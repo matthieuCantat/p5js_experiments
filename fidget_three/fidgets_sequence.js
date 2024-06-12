@@ -139,10 +139,10 @@ export default class fidgets_sequence
           if((  i-1< coef  )&&(  coef <= i+1 ))
           {
             console.log(i)
-            this.fidgets[i].bodies_set_visibility_three(true)
+            this.fidgets[i].bodies_set_visibility(true)
           }
           else{
-            this.fidgets[i].bodies_set_visibility_three(false)
+            this.fidgets[i].bodies_set_visibility(false)
             continue
           }
 

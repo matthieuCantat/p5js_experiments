@@ -37,6 +37,7 @@ export default class fidget_windmill extends fidget{
         backgrounds:[],
       }
     }
+    /*
     this.bodies_draw_order = {
       inters : [
         'B',
@@ -53,6 +54,22 @@ export default class fidget_windmill extends fidget{
         'trapezoids',
         ]         
     }
+    */
+    this.bodies_draw_order = [
+        'geos','backgrounds',
+        'inters','B',
+        'inters','B_mask',
+        'inters','A_bg',
+        'inters','A',
+        'inters','C_bg',
+        'inters','C',
+        'geos','circle',
+        'geos','rectangles',      
+        'geos','trapezoids',
+        ]         
+    
+
+
     this.end_step = 4
 
     this.possible_colors = [[utils.color.green,utils.color.red,utils.color.yellow],
@@ -131,7 +148,7 @@ export default class fidget_windmill extends fidget{
                                       use_webgl: this.use_webgl,
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
-                                      texture_three: text_checker_three,
+                                      //texture_three: text_checker_three,
                                     })
     let oRect = {
       m:this.m,
@@ -152,7 +169,7 @@ export default class fidget_windmill extends fidget{
       use_webgl: this.use_webgl,
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
-      texture_three: text_checker_three,
+      //texture_three: text_checker_three,
     } 
 
     let mo_rA = new Matrix()
@@ -300,7 +317,7 @@ export default class fidget_windmill extends fidget{
       use_webgl: this.use_webgl,
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
-      texture_three: text_checker_three_grey,
+      //texture_three: text_checker_three_grey,
     } 
     
 
@@ -338,7 +355,7 @@ export default class fidget_windmill extends fidget{
       use_webgl: this.use_webgl,
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,  
-      texture_three: text_checker_three,      
+      //texture_three: text_checker_three,      
     } 
 
   let mo_tA = new Matrix()

@@ -55,7 +55,7 @@ let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
 var nbr = 10
-var debug = false
+var debug = true
 
 var use_webgl = false
 var shaders_nbr = 0

@@ -407,9 +407,9 @@ export default class body_build{
     }
     get_visibility()
     {
-      if( (this.visibility == 0 )||(this.visibility_override == false)) 
-        return 0
-      return 1
+      if( (this.visibility)&&(this.visibility_override)) 
+        return 1
+      return 0
     }
   
     get_velocity()
@@ -492,7 +492,7 @@ export default class body_build{
     }
   
     draw(p5){
-      //
+
       if( this.get_visibility() == 0 ) 
         return
       p5.push(); // Start a new drawing state

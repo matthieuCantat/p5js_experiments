@@ -33,19 +33,16 @@ export default class fidget_daft_i extends fidget{
             rectangles:[],
           }
         }
-        this.bodies_draw_order = {
-          inters : [
-            'B',
-            'C',
-            'A',
-            ], 
-          geos : [
-            'backgrounds',            
-            'circle',
-            'rectangle',      
-            'rectangles',
+        this.bodies_draw_order = [
+            'geos','backgrounds', 
+            'inters','B',
+            'inters','C',
+            'inters','A',     
+            'geos','circle',
+            'geos','rectangle',      
+            'geos','rectangles',
             ]         
-        }
+      
         this.end_step = 4
 
       this.possible_colors = [[utils.color.green,utils.color.red,utils.color.yellow],
@@ -89,7 +86,7 @@ export default class fidget_daft_i extends fidget{
       use_webgl: this.use_webgl,
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
-      texture_three: text_checker_three_grey,
+      //texture_three: text_checker_three_grey,
     } 
     z_depth += z_depth_incr
 
@@ -125,7 +122,7 @@ export default class fidget_daft_i extends fidget{
                                       use_webgl: this.use_webgl,
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
-                                      texture_three: text_checker_three,                                      
+                                      //texture_three: text_checker_three,                                      
                                       })
       z_depth += z_depth_incr  
 
@@ -150,7 +147,7 @@ export default class fidget_daft_i extends fidget{
                                         use_webgl: this.use_webgl,
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
-                                        texture_three: text_checker_three,                                      
+                                        //texture_three: text_checker_three,                                      
                                       })
       let oRect = {
         m:this.m,
@@ -172,7 +169,7 @@ export default class fidget_daft_i extends fidget{
         use_webgl: this.use_webgl,
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
-        texture_three: text_checker_three,                         
+        //texture_three: text_checker_three,                         
       } 
       z_depth += z_depth_incr
   

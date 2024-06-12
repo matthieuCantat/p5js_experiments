@@ -554,7 +554,7 @@ export class Draw_debug
     {
       p5.circle( this.hitHistory[j].x, this.hitHistory[j].y , this.hitHistory[j].z);  
       this.hitHistory[j].z -= 1.0;
-      this.hitHistory[j].z = max( this.hitHistory[j].z , 0 )
+      this.hitHistory[j].z = Math.max( this.hitHistory[j].z , 0 )
     }
       
   }
