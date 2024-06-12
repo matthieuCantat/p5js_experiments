@@ -769,7 +769,9 @@ export default class fidget_windmill extends fidget{
               (C == false))
           {
             this.bodies_override_color(utils.color.black,false,true)
-            this.color_background = utils.color.red
+            this.bodies.geos.backgrounds[0].color = utils.color.red
+            this.bodies.geos.backgrounds[1].color = utils.color.red            
+            //this.color_background = utils.color.red
           }
           else
           {
@@ -922,17 +924,17 @@ export default class fidget_windmill extends fidget{
 
   }
 
-  draw_help()
+  draw_help(p5)
   {
-    /*
+
     /////////////////////////////////////////////////
     if(this.show_step_helpers[0] )
     {
       let coef = this.show_step_helpers[0] / 100 *255
-      push();
-      translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      fill(0,0,0,0)
-      stroke(utils.color.yellow[0],
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
         utils.color.yellow[1],
         utils.color.yellow[2],
         coef)
@@ -940,12 +942,12 @@ export default class fidget_windmill extends fidget{
       let h = 4
       let p = this.bodies.inters.A.get_matrix().get_row(2).get_value()
       
-      rect( p.x-w/2,
+      p5.rect( p.x-w/2,
             p.y,
             w,
             20*h)
-      stroke(0)
-      pop()
+      p5.stroke(0)
+      p5.pop()
 
       this.show_step_helpers[0] -= 2
     }
@@ -953,20 +955,20 @@ export default class fidget_windmill extends fidget{
     if(this.show_step_helpers[1] )
     {
       let coef = this.show_step_helpers[1] / 100 *255
-      push();
-      translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      fill(0,0,0,0)
-      stroke(utils.color.yellow[0],
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
         utils.color.yellow[1],
         utils.color.yellow[2],
         coef)
       let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
-      arc(p.x,
+      p5.arc(p.x,
         p.y, 
         this.bodies.inters.B.w*1.6,
-        this.bodies.inters.B.w*1.6, HALF_PI, PI *2);
-      stroke(0)
-      pop()
+        this.bodies.inters.B.w*1.6, p5.HALF_PI, p5.PI *2);
+      p5.stroke(0)
+      p5.pop()
 
       this.show_step_helpers[1] -= 2
     }
@@ -974,10 +976,10 @@ export default class fidget_windmill extends fidget{
     if(this.show_step_helpers[2] )
     {
       let coef = this.show_step_helpers[2] / 100 *255
-      push();
-      translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      fill(0,0,0,0)
-      stroke(utils.color.yellow[0],
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
         utils.color.yellow[1],
         utils.color.yellow[2],
         coef)
@@ -986,16 +988,15 @@ export default class fidget_windmill extends fidget{
       
       let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
       let pB = this.bodies.inters.C.get_matrix().get_row(2).get_value()
-      rect( p.x,
+      p5.rect( p.x,
             p.y,
             (pB.x - p.x)*2.21,
             0)
-      stroke(0)
-      pop()
+      p5.stroke(0)
+      p5.pop()
 
       this.show_step_helpers[2] -= 2
     }
-    */
 
   }  
 

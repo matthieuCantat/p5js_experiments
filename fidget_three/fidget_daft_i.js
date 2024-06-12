@@ -648,7 +648,9 @@ export default class fidget_daft_i extends fidget{
               (C == false))
           {
             this.bodies_override_color(utils.color.black,false,true)
-            this.color_background = utils.color.red
+            this.bodies.geos.backgrounds[0].color = utils.color.red
+            this.bodies.geos.backgrounds[1].color = utils.color.red
+            //this.color_background = utils.color.red
           }
           else
           {
@@ -663,7 +665,7 @@ export default class fidget_daft_i extends fidget{
     else if( 0 < this.mouse_pressed_positions_at_update.length )
     {
       this.bodies_override_color(null,false,true)
-      this.color_background = utils.color.dark
+      //this.color_background = utils.color.dark
       this.mouse_pressed_positions_at_update = []
     }
     else
@@ -809,30 +811,30 @@ export default class fidget_daft_i extends fidget{
 
   }
 
-  draw_help()
+  draw_help(p5)
   {
     /////////////////////////////////////////////////
-    /*
+
     if( this.show_step_helpers[0] )
     {     
       let coef = this.show_step_helpers[0] / 100 *255
 
-      push();
-      translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())        
-      fill(0,0,0,0)
-      stroke(utils.color.yellow[0],
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())        
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
         utils.color.yellow[1],
         utils.color.yellow[2],
         coef)
       let w = 1
       let h = 4
       let p = this.bodies.inters.A.get_matrix().get_row(2).get_value()
-      rect( p.x-w/2-15,
+      p5.rect( p.x-w/2-15,
         p.y,
             w,
             13*h)
-      stroke(0)
-      pop();
+      p5.stroke(0)
+      p5.pop();
 
       this.show_step_helpers[0] -= 2
     }
@@ -841,46 +843,45 @@ export default class fidget_daft_i extends fidget{
     {
       let coef = this.show_step_helpers[1] / 100 *255
 
-      push();
-      translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      fill(0,0,0,0)
-      stroke(utils.color.yellow[0],
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
         utils.color.yellow[1],
         utils.color.yellow[2],
         coef)
       let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
-      arc(p.x,
+      p5.arc(p.x,
         p.y, 
         this.bodies.inters.B.w*1.6,
-        this.bodies.inters.B.w*1.6, PI, PI + HALF_PI);
-      stroke(0)
-      pop();
+        this.bodies.inters.B.w*1.6, p5.PI, p5.PI + p5.HALF_PI);
+      p5.stroke(0)
+      p5.pop();
       this.show_step_helpers[1] -= 2
     }
 
     if(this.show_step_helpers[2] )
     {
       let coef = this.show_step_helpers[2] / 100 *255
-      push();
-      translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      fill(0,0,0,0)
-      stroke(utils.color.yellow[0],
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
         utils.color.yellow[1],
         utils.color.yellow[2],
         coef)
       let w = 1
       let h = 4
       let p = this.bodies.inters.C.get_matrix().get_row(2).get_value()
-      rect( p.x-w/2,
+      p5.rect( p.x-w/2,
         p.y-120,
             w,
             20*h+120)
-      stroke(0)
-      pop();
+      p5.stroke(0)
+      p5.pop();
 
       this.show_step_helpers[2] -= 2
     }
-    */
 
   }  
 
