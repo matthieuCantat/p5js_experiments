@@ -316,14 +316,12 @@ export default class fidget{
           {
             for( let i = 0; i < this.bodies[b_type][key].length; i++)
             {
-              this.bodies[b_type][key][i].setup_shapes_three()
-              this.bodies[b_type][key][i].mesh_three = ut.addShape( this.group_three , this.bodies[b_type][key][i].shape_three , this.bodies[b_type][key][i].texture_three );
+              this.bodies[b_type][key][i].setup_shapes_three(this.group_three)
             }
               
           }
           else
-            this.bodies[b_type][key].setup_shapes_three()
-            this.bodies[b_type][key].mesh_three = ut.addShape( this.group_three , this.bodies[b_type][key].shape_three ,this.bodies[b_type][key].texture_three );
+            this.bodies[b_type][key].setup_shapes_three(this.group_three)
         }  
       } 
     }
@@ -394,7 +392,27 @@ export default class fidget{
       } 
     }
   }
-
+  bodies_override_color_three(new_color = null,inters = true, geos = true)
+  {
+    this.bodies_override_color(new_color, inters, geos)
+    for( let b_type in this.bodies)
+    {   
+      if(( (b_type == 'inters')&&(inters==true) )
+      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      {
+        for( let key of this.bodies_draw_order[b_type])
+        {      
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+              this.bodies[b_type][key][i].update_color_three()
+          }
+          else
+            this.bodies[b_type][key].update_color_three()
+        }  
+      } 
+    }
+  }
   bodies_axe_clean_override(inters = true, geos = true)
   {
     for( let b_type in this.bodies)

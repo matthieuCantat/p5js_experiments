@@ -212,15 +212,12 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 
 let container, stats;
-
 let camera, scene, renderer;
-
 let uniforms;
 
 
 init();
 
-let text;
 
 function init() {
 

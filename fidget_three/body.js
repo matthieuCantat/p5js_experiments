@@ -672,7 +672,7 @@ export default class body_build{
 
 
   
-    setup_shapes_three(){
+    setup_shapes_three(group_three){
       switch(this.type) {
         case 0:
           this.shape_three = ut.rect( this.w, this.h );
@@ -684,6 +684,9 @@ export default class body_build{
           this.shape_three = ut.roundedTrap( this.w, this.h, this.slop, 0 )
           break;        
         }
+
+      
+      this.mesh_three = ut.addShape( group_three, this.shape_three , this.texture_three, this.color,false );
     }    
 
     animate_three()
@@ -700,6 +703,15 @@ export default class body_build{
       this.mesh_three.scale.x = scale  
       this.mesh_three.scale.y = scale  
       this.mesh_three.scale.z = scale  
+
+      
+      //this.mesh_three.material.color = convert_to_three_color(this.color) 
+      //mesh.material.map = null
+    }
+
+    update_color_three()
+    {
+      this.mesh_three.material.color = ut.convert_to_three_color(this.color)
     }
   }
   

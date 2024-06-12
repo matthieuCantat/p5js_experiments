@@ -87,9 +87,28 @@ export function circle( radius ) {
     return ctx
 }
 
-export function addShape( group, shape, texture) {
-    let geometry = new THREE.ShapeGeometry( shape );
-    let mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { side: THREE.DoubleSide, map: texture } ) );
+export function addShape( group, shape, texture = null, color = null, do_line = false) {
+
+    let mesh = null
+    if(do_line)
+    {
+        shape.autoClose = true;
+        const points = shape.getPoints();
+        const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+        mesh = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color ,linewidth: 1 } ) );        
+    }
+    else{
+        let geometry = new THREE.ShapeGeometry( shape );
+
+        let mat_opt = { side: THREE.DoubleSide, color: null, map: null }
+        if( color != null )
+            mat_opt.color = convert_to_three_color(color)
+        if( texture != null )
+            mat_opt.map = texture
+        
+        mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+    }
+
     group.add( mesh );
     return mesh
 }
@@ -112,4 +131,10 @@ export function get_texture_grid_checker_grey()
     textureB.wrapS = textureB.wrapT = THREE.RepeatWrapping;
     textureB.repeat.set( 0.0005, 0.0005 );
     return textureB
+}
+
+
+export function convert_to_three_color(color_array)
+{
+    return new THREE.Color("rgb("+Math.floor(color_array[0])+", "+Math.floor(color_array[1])+", "+Math.floor(color_array[2])+")");
 }

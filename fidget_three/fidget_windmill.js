@@ -302,6 +302,7 @@ export default class fidget_windmill extends fidget{
       matter_engine: this.matter_engine,
       texture_three: text_checker_three_grey,
     } 
+    
 
 
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
@@ -660,6 +661,8 @@ export default class fidget_windmill extends fidget{
       utils.color.white[2])
 
     this.bodies_override_color(p5.lerpColor( c1,c2,a),false, true)
+    this.bodies_override_color_three(p5.lerpColor( c1,c2,a),false, true)
+    
    
   }
 
@@ -670,6 +673,7 @@ export default class fidget_windmill extends fidget{
     
     // custom color
     this.bodies_override_color(null,false, true)
+    this.bodies_override_color_three(null,false, true)
 
 
     //gravity
@@ -769,9 +773,12 @@ export default class fidget_windmill extends fidget{
               (C == false))
           {
             this.bodies_override_color(utils.color.black,false,true)
+            this.bodies_override_color_three(utils.color.black,false,true)
+
             this.bodies.geos.backgrounds[0].color = utils.color.red
-            this.bodies.geos.backgrounds[1].color = utils.color.red            
-            //this.color_background = utils.color.red
+            this.bodies.geos.backgrounds[1].color = utils.color.red
+            this.bodies.geos.backgrounds[0].update_color_three()
+            this.bodies.geos.backgrounds[1].update_color_three()
           }
           else
           {
@@ -786,6 +793,7 @@ export default class fidget_windmill extends fidget{
     else if( 0 < this.mouse_pressed_positions_at_update.length )
     {
       this.bodies_override_color(null,false,true)
+      this.bodies_override_color_three(null,false,true)
       this.color_background = utils.color.dark
       this.mouse_pressed_positions_at_update = []
     }
@@ -828,14 +836,22 @@ export default class fidget_windmill extends fidget{
     pA.v.x -= a
     this.bodies.geos.backgrounds[0].set_position(pA)
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+    {
       this.bodies.geos.backgrounds[0].color = [50,140,50]
+      this.bodies.geos.backgrounds[0].update_color_three()
+    }
+
 
 
     let pB = new Vector(this.bodies.geos.backgrounds[0].w/2.*3 ,this.screen_dims.y/2)
     pB.v.x += a
     this.bodies.geos.backgrounds[1].set_position(pB)  
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
-      this.bodies.geos.backgrounds[1].color = [50,140,50]  
+    {
+      this.bodies.geos.backgrounds[1].color = [50,140,50] 
+      this.bodies.geos.backgrounds[1].update_color_three()
+    }
+       
 
     /*
     p5.push();
