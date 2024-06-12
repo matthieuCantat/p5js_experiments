@@ -207,36 +207,13 @@ new p5(function(p5)
 
 
 
-
-
-
-
-
-
-
-
-
-
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+
 
 let container, stats;
 
 let camera, scene, renderer;
-
-let group;
-
-let targetRotation = 0;
-let targetRotationOnPointerDown = 0;
-
-let pointerX = 0;
-let pointerXOnPointerDown = 0;
-
-let windowHalfX = width/ 2;
-
-let anim_pos = 0;
-let anim_rot = 0;
 
 let uniforms;
 
@@ -251,9 +228,9 @@ function init() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
+    //////////////// scene setup
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xf0f0f0 );
-
 
     camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
     camera.position.set( 0, 0, 500 );
@@ -263,15 +240,10 @@ function init() {
     camera.add( light );
 
 
-
+    ///////////////// fidgets
     F_sequence.setup_shapes_fidgets_three(scene)
     F_sequence.setup_chrono_three(scene)
-   
 
-
-
-    
-    
     ///////////////// Background shader
     uniforms = {
         time: { value: 1.0 }
@@ -293,11 +265,7 @@ function init() {
     const mesh = new THREE.Mesh( geometry, material );
     scene.add( mesh );	
     
-    /////////////////
-
-    
-
-
+    ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( width, height );
@@ -307,10 +275,8 @@ function init() {
     stats = new Stats();
     container.appendChild( stats.dom );
 
+    ///////////////// action
     container.style.touchAction = 'none';
-    container.addEventListener( 'pointerdown', onPointerDown );
-
-    //
 
     window.addEventListener( 'resize', onWindowResize );
 
@@ -327,55 +293,13 @@ function onWindowResize() {
 
 }
 
-//
-
-function onPointerDown( event ) {
-
-    if ( event.isPrimary === false ) return;
-
-    pointerXOnPointerDown = event.clientX - windowHalfX;
-    targetRotationOnPointerDown = targetRotation;
-
-    document.addEventListener( 'pointermove', onPointerMove );
-    document.addEventListener( 'pointerup', onPointerUp );
-
-}
-
-function onPointerMove( event ) {
-
-    if ( event.isPrimary === false ) return;
-
-    pointerX = event.clientX - windowHalfX;
-
-    targetRotation = targetRotationOnPointerDown + ( pointerX - pointerXOnPointerDown ) * 0.02;
-
-}
-
-function onPointerUp() {
-
-    if ( event.isPrimary === false ) return;
-
-    document.removeEventListener( 'pointermove', onPointerMove );
-    document.removeEventListener( 'pointerup', onPointerUp );
-
-}
 
 //
 
 function animate() {
-    anim_pos += 1;
-
     F_sequence.animate_three()
-
-
-
     uniforms[ 'time' ].value = performance.now() / 1000;
-
     renderer.render( scene, camera );
-
-
     stats.update();
-
-
 
 }
