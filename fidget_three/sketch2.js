@@ -103,7 +103,7 @@ let s = 2.2
 F_sequence = new fidgets_sequence(nbr,m,s,screen_dims,matter_engine,mouseConstraint,shdrs,debug,use_webgl)
 F_sequence.setup()
 
-
+/*
 new p5(function(p5)
 {
   
@@ -146,9 +146,11 @@ new p5(function(p5)
     }
   }
   
+  
 
   p5.draw = function()
   {
+    
     if( p5.mouseIsPressed == false)pM = null
     if( p5.touches.lengh  == 0    )pM = null
   
@@ -183,14 +185,14 @@ new p5(function(p5)
       shdr_test.as_image();
     }
     else{
-      F_sequence.update()
+      
       F_sequence.draw(p5)
 
     }
     draw_count += 1
   }
 });
-
+*/
 
 
 
@@ -287,6 +289,7 @@ function onWindowResize() {
 //
 
 function animate() {
+    F_sequence.update()
     F_sequence.animate_three()
     uniforms[ 'time' ].value = performance.now() / 1000;
     renderer.render( scene, camera );
