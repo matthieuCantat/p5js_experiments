@@ -115,11 +115,46 @@ export default class fidgets_sequence
         */  
     }
 
+
+    draw_fidgets_updates_only()
+    {
+      var rez = this.get_resolution_coef_info()
+      
+      var rez_step = rez*this.fidgets_nbr
+      var i_max = this.fidgets_nbr
+      var coef = i_max-rez_step
+
+      for( let i = 0; i < this.fidgets.length; i++ )
+      {   
+        if(this.anim_mode == false)
+        {
+          if((  i-1< coef  )&&(  coef <= i+1 ))
+            this.fidgets[i].bodies_set_visibility(true)
+          else
+            this.fidgets[i].bodies_set_visibility(false)
+        }
+      }
+
+      for( let i = 0; i < this.fidgets.length; i++ )
+      {   
+        if(this.anim_mode == false)
+        {
+          if((  i-1< coef  )&&(  coef <= i+1 ))
+          {
+          }
+          else{
+            continue
+          }
+        }
+        this.fidgets[i].update()
+        this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
+      }
+    }
+
     draw_fidgets(p5)
     {
       var rez = this.get_resolution_coef_info()
-      var rez_step = rez*this.fidgets_nbr
-
+      
       if( 0.9< rez)
       {
         p5.fill(0)
@@ -129,27 +164,24 @@ export default class fidgets_sequence
           p5.text( '?', this.screen_dims.x/2,this.screen_dims.y/2+Math.cos(this.update_count/10)*20+30)        
       }
 
+      var rez_step = rez*this.fidgets_nbr
       var i_max = this.fidgets_nbr
       var coef = i_max-rez_step
-      
+
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
         if(this.anim_mode == false)
         {
           if((  i-1< coef  )&&(  coef <= i+1 ))
           {
-            console.log(i)
-            this.fidgets[i].bodies_set_visibility(true)
           }
           else{
-            this.fidgets[i].bodies_set_visibility(false)
             continue
           }
-
         }
-        this.fidgets[i].update(p5)
+        //this.fidgets[i].update(p5)
         this.fidgets[i].draw(p5)
-        this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
+        //this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
       }
     }
 
@@ -344,7 +376,7 @@ export default class fidgets_sequence
         this.chrono.s = this.screen_dims.x * blendB
       }
 
-
+      this.draw_fidgets_updates_only()
       this.update_count += 1
     }
 

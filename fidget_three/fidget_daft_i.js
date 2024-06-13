@@ -1,6 +1,6 @@
 
 import fidget from './fidget.js';
-import { utils,clamp,rad,deg } from './utils.js';
+import { utils,clamp,rad,deg,isMousePressed,mouseX, mouseY } from './utils.js';
 import body_build from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
@@ -462,7 +462,7 @@ export default class fidget_daft_i extends fidget{
   }
   
 
-  set_step_resolution(p5, resolution_coef, update_interaction = false)
+  set_step_resolution( resolution_coef, update_interaction = false)
   {
     // utils
     var selected_body = this.mouseConstraint.constraint.bodyB
@@ -610,7 +610,7 @@ export default class fidget_daft_i extends fidget{
         let t = this.state.steps[step].update_count
         if( t < wait_time )
         {
-          this.do_pre_explode_animation(p5,t,0,wait_time)
+          this.do_pre_explode_animation(t,0,wait_time)
         }
         else{
           this.do_explode(step)
@@ -627,26 +627,22 @@ export default class fidget_daft_i extends fidget{
 
   }
   
-  do_pre_explode_animation(p5,t,start_time,end_time)
+  do_pre_explode_animation(t,start_time,end_time)
   {
     let a = t - start_time
     a -= end_time/4
     a /= (end_time/4)
     a = Math.min(1,Math.max(0,a))
     
-    let c1 = p5.color(
-      utils.color.gold[0],
-      utils.color.gold[1],
-      utils.color.gold[2])          
-    
-    let c2 = p5.color(
-      utils.color.white[0],
-      utils.color.white[1],
-      utils.color.white[2])
-
-    this.bodies_override_color(p5.lerpColor( c1,c2,a), ['geos'])
-    this.bodies_override_color_three(p5.lerpColor( c1,c2,a), ['geos'])
-   
+    let c1 = utils.color.gold    
+    let c2 = utils.color.white
+    let cInterp = [
+      c1[0]*(1-a)+c2[0]*a,
+      c1[1]*(1-a)+c2[1]*a,
+      c1[2]*(1-a)+c2[2]*a]
+ 
+    this.bodies_override_color(cInterp ['geos'])
+    this.bodies_override_color_three(cInterp, ['geos'])   
   }
 
   do_explode(step)
@@ -723,7 +719,7 @@ export default class fidget_daft_i extends fidget{
   }
 
 
-  track_user_drag_error(p5)
+  track_user_drag_error()
   {
     //for( let i = 0; i < this.show_step_helpers.length; i++)
     //  this.show_step_helpers[i] = 0
@@ -732,10 +728,10 @@ export default class fidget_daft_i extends fidget{
     if ( this.touch_enable == false )
       return 
 
-    if( p5.mouseIsPressed )
+    if( isMousePressed )
     {
       
-      this.mouse_pressed_positions_at_update.push( new Vector( p5.pmouseX , p5.pmouseY ) )    
+      this.mouse_pressed_positions_at_update.push( new Vector( mouseX , mouseY ) )    
       let size = this.mouse_pressed_positions_at_update.length
       if( 1 < size )
       {
@@ -785,16 +781,17 @@ export default class fidget_daft_i extends fidget{
   }
 
 
-  update(p5)
+  update()
   {
     this.anim_mode =  this.resolution_coef_override != null
     this.set_across_steps()
     // resolution
     this.state.resolution_coef_last = this.state.resolution_coef
     this.get_resolution_coef_info( this.resolution_coef_override )
-    this.set_step_resolution(p5, this.state.resolution_coef, this.resolution_coef_override != null)
-    this.track_user_drag_error(p5)
+    this.set_step_resolution( this.state.resolution_coef, this.resolution_coef_override != null)
+    this.track_user_drag_error()
     this.bodies_update()
+    this.draw_background()
     this.state.update_count += 1
   }
 
@@ -804,7 +801,7 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// DRAW
   ////////////////////////////////////////////////////////////////////////////////////
 
-  draw_background(p5)
+  draw_background()
   {
     let a = this.state.steps[3].update_count
     a -=30
@@ -1036,7 +1033,6 @@ export default class fidget_daft_i extends fidget{
 
   draw(p5)
   {
-    this.draw_background(p5)
     this.bodies_draw(p5)
     this.draw_help(p5)
   }

@@ -744,3 +744,35 @@ export function clamp(value,min_value,max_value)
   return Math.min(max_value,Math.max(min_value,value))
 }
 
+
+////////////////////////////////////////////////// mouse pressed
+// Declare the boolean value as a global variable
+export var isMousePressed = false;
+export var mouseX = 0;
+export var mouseY = 0;
+// Function to handle the mousedown event
+function handleMouseDown(event) {
+    isMousePressed = true;
+    //console.log('Mouse is pressed:', isMousePressed);
+}
+
+// Function to handle the mouseup event
+function handleMouseUp(event) {
+    isMousePressed = false;
+    //console.log('Mouse is pressed:', isMousePressed);
+}
+
+// Function to handle the mousemove event
+function handleMouseMove(event) {
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+  //console.log('Mouse position:', mouseX, mouseY);
+}
+
+// Attach event listeners when the document is fully loaded
+window.onload = function() {
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+}
+////////////////////////////////////////////////// mouse pressed

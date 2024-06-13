@@ -46,6 +46,7 @@ var mouseConstraint = Matter.MouseConstraint.create(matter_engine, {
 Matter.Composite.add(matter_engine.world, mouseConstraint);
 
 
+
 /////////////////////////////////////////// setup screen
 let width       = 400
 let height      = 400
@@ -103,11 +104,9 @@ F_sequence = new fidgets_sequence(nbr,m,s,screen_dims,matter_engine,mouseConstra
 F_sequence.setup()
 
 
-
 new p5(function(p5)
 {
   
-
   p5.preload = function()
   {
     console.log('preload : sketch')
@@ -123,8 +122,7 @@ new p5(function(p5)
       shdr_test.preload(p5)
     }
   }
-
-
+  
 
   p5.setup = function()
   {
@@ -146,13 +144,11 @@ new p5(function(p5)
         //pixelDensity(2);
       }
     }
-
-  
   }
+  
 
   p5.draw = function()
   {
-
     if( p5.mouseIsPressed == false)pM = null
     if( p5.touches.lengh  == 0    )pM = null
   
@@ -192,10 +188,7 @@ new p5(function(p5)
 
     }
     draw_count += 1
-
   }
-
-
 });
 
 
