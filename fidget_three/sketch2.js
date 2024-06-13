@@ -54,7 +54,7 @@ let height      = 400
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 1
+var nbr = 10
 var debug = true
 
 var use_webgl = false
