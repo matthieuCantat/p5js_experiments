@@ -281,6 +281,7 @@ export default class fidget_daft_i extends fidget{
       z_depth += z_depth_incr            
 
       
+      
       let mo_iBh = new Matrix()                                    
       mo_iBh.setTranslation(0,0.)   
       this.bodies.helpers.stepB = new body_build({  m:this.m,
