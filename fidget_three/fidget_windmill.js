@@ -35,26 +35,14 @@ export default class fidget_windmill extends fidget{
         rectangles:[],
         trapezoids:[],
         backgrounds:[],
+      },
+      helpers:{
+        stepA:null,
+        stepB:null,
+        stepC:null,
       }
     }
-    /*
-    this.bodies_draw_order = {
-      inters : [
-        'B',
-        'B_mask',
-        'A_bg',
-        'A',
-        'C_bg',
-        'C',
-        ], 
-      geos : [
-        'backgrounds',
-        'circle',
-        'rectangles',      
-        'trapezoids',
-        ]         
-    }
-    */
+
     this.bodies_draw_order = [
         'geos','backgrounds',
         'inters','B',
@@ -66,6 +54,9 @@ export default class fidget_windmill extends fidget{
         'geos','circle',
         'geos','rectangles',      
         'geos','trapezoids',
+        'helpers','stepA',
+        'helpers','stepB',
+        'helpers','stepC',
         ]         
     
 
@@ -99,8 +90,11 @@ export default class fidget_windmill extends fidget{
                                     x:0,
                                     y:0,
                                     w:400/2.4*s,
-                                    type:utils.shape.circle,
+                                    type:utils.shape.circle, 
+                                    do_shape: true,
+                                    do_line:true,                                                                     
                                     color: utils.color.grey,
+                                    color_line: utils.color.black,
                                     shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
@@ -119,7 +113,10 @@ export default class fidget_windmill extends fidget{
                                     y:0,
                                     w:230/2.4*s,
                                     type:utils.shape.circle,
+                                    do_shape: true,
+                                    do_line:true,                                       
                                     color: utils.color.grey,
+                                    color_line: utils.color.black,
                                     shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
@@ -140,7 +137,10 @@ export default class fidget_windmill extends fidget{
                                       w : 20*s, 
                                       h : 18*s, 
                                       type : utils.shape.circle,
+                                      do_shape: true,
+                                      do_line:true,                                      
                                       color : this.colors[1],
+                                      color_line: utils.color.black,
                                       shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category : utils.collision_category.blue,
                                       collision_mask : utils.collision_category.default ,    
@@ -156,7 +156,10 @@ export default class fidget_windmill extends fidget{
       y:0, 
       w : 7*s, 
       h : 30*s, 
+      do_shape: true,
+      do_line:true,
       color: this.colors[0],
+      color_line: [0,0,0],
       shader: this.shaders.length != 0 ? this.shaders[0] : null,
       collision_category: utils.collision_category.blue,
       collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
@@ -213,7 +216,10 @@ export default class fidget_windmill extends fidget{
                                     y:0,
                                     w:230/2.4*s,
                                     type:utils.shape.circle,
+                                    do_shape: true,
+                                    do_line:true,                                       
                                     color: utils.color.grey,
+                                    color_line: utils.color.black,
                                     shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
@@ -234,7 +240,10 @@ export default class fidget_windmill extends fidget{
                                           y:oRect.h,
                                           w:40/2.4*3*s,
                                           type : utils.shape.circle,
+                                          do_shape: true,
+                                          do_line:true,                                             
                                           color:utils.color.grey,
+                                          color_line: utils.color.black,
                                           shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                           collision_category: utils.collision_category.inter,
                                           collision_mask: utils.collision_category.mouse,
@@ -247,6 +256,32 @@ export default class fidget_windmill extends fidget{
                                           screen_dims: this.screen_dims,
                                           matter_engine: this.matter_engine,
                                         })  
+       
+
+
+  let mo_iAh = new Matrix()                                    
+  mo_iAh.setTranslation(0,oRect.h+oRect.axe_constraint.distPos/2.)       
+  this.bodies.helpers.stepA = new body_build({  m:this.m,
+                                                m_offset:mo_iAh,
+                                                x:0,
+                                                y:0,                                                
+                                                w : 1, 
+                                                h : oRect.axe_constraint.distPos, 
+                                                do_shape: false,
+                                                do_line:true,         
+                                                color: utils.color.yellow,
+                                                color_line: utils.color.yellow,
+                                                transparency_activate: true,
+                                                transparency_line:1.0,
+                                                shader: this.shaders.length != 0 ? this.shaders[0] : null,
+                                                collision_category: utils.collision_category.none,
+                                                collision_mask: utils.collision_category.none ,
+                                                type:utils.shape.rectangle,
+                                                use_webgl: this.use_webgl,
+                                                screen_dims: this.screen_dims,
+                                                matter_engine: this.matter_engine,  
+                                                //texture_three: text_checker_three,     
+                                                }) 
 
 
 
@@ -260,7 +295,10 @@ export default class fidget_windmill extends fidget{
                                     y:0,
                                     w:300/2.4*s,
                                     type:utils.shape.circle,
+                                    do_shape: true,
+                                    do_line:true,                                       
                                     color: utils.color.grey,
+                                    color_line: utils.color.black,
                                     shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse ,    
@@ -282,7 +320,10 @@ export default class fidget_windmill extends fidget{
                                       rot:-90,
                                       w:100/2.4*s,
                                       type : utils.shape.circle,
+                                      do_shape: true,
+                                      do_line:true,                                         
                                       color:utils.color.grey,
+                                      color_line: utils.color.black,
                                       shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
@@ -300,6 +341,56 @@ export default class fidget_windmill extends fidget{
     this.bodies.inters.C.c_axe.pos_override =null
 
 
+    let mo_iCh = new Matrix()                                    
+    mo_iCh.setTranslation(oRect.h+oRect.axe_constraint.distPos/2.,0.)       
+    this.bodies.helpers.stepC = new body_build({  m:this.m,
+                                                  m_offset:mo_iCh,
+                                                  x:0,
+                                                  y:0,  
+                                                  rot:-90,                                              
+                                                  w : 1, 
+                                                  h : oRect.axe_constraint.distPos, 
+                                                  do_shape: false,
+                                                  do_line:true,         
+                                                  color: utils.color.yellow,
+                                                  color_line: utils.color.yellow,
+                                                  transparency_activate: true,
+                                                  transparency_line:1.0,                                                  
+                                                  shader: this.shaders.length != 0 ? this.shaders[0] : null,
+                                                  collision_category: utils.collision_category.none,
+                                                  collision_mask: utils.collision_category.none ,
+                                                  type:utils.shape.rectangle,
+                                                  use_webgl: this.use_webgl,
+                                                  screen_dims: this.screen_dims,
+                                                  matter_engine: this.matter_engine,  
+                                                  //texture_three: text_checker_three,     
+                                                  }) 
+    let mo_iBh = new Matrix()                                    
+    mo_iBh.setTranslation(0,0.)   
+    this.bodies.helpers.stepB = new body_build({  m:this.m,
+                                                  m_offset:mo_iBh,
+                                                  x:0,
+                                                  y:0,                                                
+                                                  w : oRect.h+oRect.axe_constraint.distPos, 
+                                                  h : oRect.axe_constraint.distPos, 
+                                                  rot:180,
+                                                  do_shape: false,
+                                                  do_line:true,         
+                                                  color: utils.color.yellow,
+                                                  color_line: utils.color.yellow,
+                                                  transparency_activate: true,
+                                                  transparency_line:1.0,                                                  
+                                                  shader: this.shaders.length != 0 ? this.shaders[0] : null,
+                                                  collision_category: utils.collision_category.none,
+                                                  collision_mask: utils.collision_category.none ,
+                                                  type:utils.shape.arc,
+                                                  use_webgl: this.use_webgl,
+                                                  screen_dims: this.screen_dims,
+                                                  matter_engine: this.matter_engine,  
+                                                  //texture_three: text_checker_three, 
+                                                  arc_limites : [0, 3.14*1.5],    
+                                                  }) 
+  
     /////////////////////////////////////////////////////   
     
     
@@ -310,7 +401,10 @@ export default class fidget_windmill extends fidget{
       y:0, 
       w : this.screen_dims.x/2, 
       h : this.screen_dims.y, 
+      do_shape: true,
+      do_line:true,         
       color: this.color_background,
+      color_line: utils.color.black,
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
       type: utils.shape.rectangle,
@@ -341,7 +435,10 @@ export default class fidget_windmill extends fidget{
       posCoef:0.7, 
       h : 7*s, 
       slop : 45, 
+      do_shape: true,
+      do_line:true,         
       color: this.colors[2],
+      color_line: utils.color.black,
       shader: this.shaders.length != 0 ? this.shaders[0] : null,
       collision_category: utils.collision_category.blue,
       collision_mask: utils.collision_category.default ,
@@ -398,8 +495,82 @@ export default class fidget_windmill extends fidget{
                                         })) 
   
    
-   
-   
+                                    
+    /*
+    if(this.show_step_helpers[0] )
+    {
+      let coef = this.show_step_helpers[0] / 100 *255
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
+        utils.color.yellow[1],
+        utils.color.yellow[2],
+        coef)
+      let w = 1
+      let h = 4
+      let p = this.bodies.inters.A.get_matrix().get_row(2).get_value()
+      
+      p5.rect( p.x-w/2,
+            p.y,
+            w,
+            20*h)
+      p5.stroke(0)
+      p5.pop()
+
+      this.show_step_helpers[0] -= 2
+    }
+
+    if(this.show_step_helpers[1] )
+    {
+      let coef = this.show_step_helpers[1] / 100 *255
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
+        utils.color.yellow[1],
+        utils.color.yellow[2],
+        coef)
+      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
+      p5.arc(p.x,
+        p.y, 
+        this.bodies.inters.B.w*1.6,
+        this.bodies.inters.B.w*1.6, 
+        p5.HALF_PI, 
+        p5.PI *2);
+      p5.stroke(0)
+      p5.pop()
+
+      this.show_step_helpers[1] -= 2
+    }
+
+    if(this.show_step_helpers[2] )
+    {
+      let coef = this.show_step_helpers[2] / 100 *255
+      p5.push();
+      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
+      p5.fill(0,0,0,0)
+      p5.stroke(utils.color.yellow[0],
+        utils.color.yellow[1],
+        utils.color.yellow[2],
+        coef)
+      let w = 1
+      let h = 4
+      
+      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
+      let pB = this.bodies.inters.C.get_matrix().get_row(2).get_value()
+      p5.rect( p.x,
+            p.y,
+            (pB.x - p.x)*2.21,
+            0)
+      p5.stroke(0)
+      p5.pop()
+
+      this.show_step_helpers[2] -= 2
+    }
+
+  }  
+  */   
                                   
   }
 
@@ -516,11 +687,11 @@ export default class fidget_windmill extends fidget{
     var selected_body = this.mouseConstraint.constraint.bodyB
     
     // clean
-    this.bodies_axe_enable(true)
+    this.bodies_axe_enable( ['inters'])
     this.bodies_axe_clean_override()
     this.bodies_cns_modif(1.0)
     this.bodies_rot_clean_override()
-    this.bodies_enable( 0, true, false )
+    this.bodies_enable( 0,  ['inters'] )
 
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -677,20 +848,20 @@ export default class fidget_windmill extends fidget{
       utils.color.white[1],
       utils.color.white[2])
 
-    this.bodies_override_color(p5.lerpColor( c1,c2,a),false, true)
-    this.bodies_override_color_three(p5.lerpColor( c1,c2,a),false, true)
+    this.bodies_override_color(p5.lerpColor( c1,c2,a), ['geos'])
+    this.bodies_override_color_three(p5.lerpColor( c1,c2,a), ['geos'])
     
    
   }
 
   do_explode(step)
   {
-    this.bodies_cns_modif(0.0001, false, true)
-    this.bodies_axe_enable(false, false, true)
+    this.bodies_cns_modif(0.0001, ['geos'])
+    this.bodies_axe_enable(false, ['geos'])
     
     // custom color
-    this.bodies_override_color(null,false, true)
-    this.bodies_override_color_three(null,false, true)
+    this.bodies_override_color(null, ['geos'])
+    this.bodies_override_color_three(null, ['geos'])
 
 
     //gravity
@@ -789,8 +960,8 @@ export default class fidget_windmill extends fidget{
               (B == false)&&
               (C == false))
           {
-            this.bodies_override_color(utils.color.black,false,true)
-            this.bodies_override_color_three(utils.color.black,false,true)
+            this.bodies_override_color(utils.color.black, ['geos'])
+            this.bodies_override_color_three(utils.color.black, ['geos'])
 
             this.bodies.geos.backgrounds[0].color = utils.color.red
             this.bodies.geos.backgrounds[1].color = utils.color.red
@@ -809,8 +980,8 @@ export default class fidget_windmill extends fidget{
     }
     else if( 0 < this.mouse_pressed_positions_at_update.length )
     {
-      this.bodies_override_color(null,false,true)
-      this.bodies_override_color_three(null,false,true)
+      this.bodies_override_color(null, ['geos'])
+      this.bodies_override_color_three(null, ['geos'])
       this.color_background = utils.color.dark
       this.mouse_pressed_positions_at_update = []
     }
@@ -957,6 +1128,37 @@ export default class fidget_windmill extends fidget{
 
   }
 
+  draw_help_three()
+  {
+
+    /////////////////////////////////////////////////
+    if(this.show_step_helpers[0] )
+    {
+      let coef = this.show_step_helpers[0] / 100 
+      this.bodies.helpers.stepA.transparency_line = 1.-coef
+      this.show_step_helpers[0] -= 2
+      this.bodies.helpers.stepA.update_color_three()
+    }
+
+    if(this.show_step_helpers[1] )
+    {
+      let coef = this.show_step_helpers[1] / 100 
+      this.bodies.helpers.stepB.transparency_line = 1.-coef
+      this.show_step_helpers[1] -= 2
+      this.bodies.helpers.stepB.update_color_three()
+    }
+
+    if(this.show_step_helpers[2] )
+    {
+      let coef = this.show_step_helpers[2] / 100 
+      this.bodies.helpers.stepC.transparency_line = 1.-coef
+      this.show_step_helpers[2] -= 2
+      this.bodies.helpers.stepC.update_color_three()
+    }
+    
+
+  }  
+
   draw_help(p5)
   {
 
@@ -982,7 +1184,7 @@ export default class fidget_windmill extends fidget{
       p5.stroke(0)
       p5.pop()
 
-      this.show_step_helpers[0] -= 2
+      //this.show_step_helpers[0] -= 2
     }
 
     if(this.show_step_helpers[1] )
@@ -1003,7 +1205,7 @@ export default class fidget_windmill extends fidget{
       p5.stroke(0)
       p5.pop()
 
-      this.show_step_helpers[1] -= 2
+      //this.show_step_helpers[1] -= 2
     }
 
     if(this.show_step_helpers[2] )
@@ -1028,7 +1230,7 @@ export default class fidget_windmill extends fidget{
       p5.stroke(0)
       p5.pop()
 
-      this.show_step_helpers[2] -= 2
+      //this.show_step_helpers[2] -= 2
     }
 
   }  
@@ -1048,6 +1250,7 @@ export default class fidget_windmill extends fidget{
   animate_three()
   {
     this.bodies_animate_three()
+    this.draw_help_three()
   }
 
 

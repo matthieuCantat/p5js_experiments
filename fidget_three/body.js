@@ -25,7 +25,13 @@ export default class body_build{
         collision_category: utils.collision_category.default,
         collision_mask: utils.collision_category.default,
         fix_rot:false,
+        do_shape:true,
+        do_line:false,
         color:utils.color.grey,
+        color_line:utils.color.black,
+        transparency_activate:false,
+        transparency:255,
+        transparency_line:255,        
         shader:null,
         axe_constraint: null,
         density:0.001,
@@ -34,6 +40,7 @@ export default class body_build{
         screen_dims:null,
         matter_engine:null,
         texture_three:null,
+        arc_limites:[0,3.14*2],
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -51,8 +58,14 @@ export default class body_build{
       this.limit_rot = args.limit_rot
       this.scale = 1.0
       this.fix_rot = args.fix_rot
+      this.do_shape= args.do_shape
+      this.do_line= args.do_line      
       this.color = args.color
+      this.color_line = args.color_line
       this.color_base = args.color
+      this.transparency_activate = args.transparency_activate,
+      this.transparency = args.transparency,
+      this.transparency_line = args.transparency_line,     
       this.shader = args.shader
       this.collision = args.collision
       this.collision_category = args.collision_category
@@ -65,6 +78,7 @@ export default class body_build{
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
       this.texture_three = args.texture_three
+      this.arc_limites = args.arc_limites
   
       this.constraints = []
       this.c_axe = null
@@ -186,7 +200,11 @@ export default class body_build{
         case 10:  
           this.body = Matter.Bodies.trapezoid(p.x, p.y, this.w, this.h , rad(this.slop*2))
           Matter.Body.rotate(this.body, this.rot)
-          break;        
+          break;      
+        case 11:  
+          this.body = Matter.Bodies.circle(p.x, p.y, this.w);//tmp
+          Matter.Body.rotate(this.body, this.rot)
+          break;             
         }
   
       Matter.Body.setDensity(this.body, this.density)
@@ -682,11 +700,14 @@ export default class body_build{
           break;
         case 10:  
           this.shape_three = ut.roundedTrap( this.w, this.h, this.slop, 0 )
-          break;        
+          break; 
+        case 11: 
+          this.shape_three = ut.arc( this.w, this.arc_limites[0], this.arc_limites[1])
+          break;      
         }
 
-      
-      this.mesh_three = ut.addShape( group_three, this.shape_three , this.texture_three, this.color,false );
+      this.mesh_three = ut.addShape( group_three, this.shape_three , this.texture_three, this.color, this.color_line, this.do_shape, this.do_line,
+        this.transparency_activate, this.transparency, this.transparency_line );
     }    
 
     animate_three()
@@ -695,23 +716,34 @@ export default class body_build{
       let rot = this.get_rotation()
       let scale = this.scale
       
-      this.mesh_three.position.x = pos.x()-200
-      this.mesh_three.position.y = pos.y()*-1+200
-      //this.mesh_three.position.z = this.z
-      this.mesh_three.rotation.z = rot*-1
-      this.mesh_three.visible = this.get_visibility() == 1   
-      this.mesh_three.scale.x = scale  
-      this.mesh_three.scale.y = scale  
-      this.mesh_three.scale.z = scale  
-
-      
-      //this.mesh_three.material.color = convert_to_three_color(this.color) 
-      //mesh.material.map = null
+      this.mesh_three.group.position.x = pos.x()-200
+      this.mesh_three.group.position.y = pos.y()*-1+200
+      //this.mesh_three.group.position.z = this.z
+      this.mesh_three.group.rotation.z = rot*-1
+      this.mesh_three.group.visible = this.get_visibility() == 1   
+      this.mesh_three.group.scale.x = scale  
+      this.mesh_three.group.scale.y = scale  
+      this.mesh_three.group.scale.z = scale  
+    
     }
 
     update_color_three()
     {
-      this.mesh_three.material.color = ut.convert_to_three_color(this.color)
+      if(this.mesh_three.shape != null)
+      {
+        this.mesh_three.shape.material.color = ut.convert_to_three_color(this.color)
+        if(this.transparency_activate)
+          this.mesh_three.shape.material.opacity = 1. - this.transparency
+      }
+        
+      
+      if(this.mesh_three.line != null)
+      {
+        this.mesh_three.line.material.color = ut.convert_to_three_color(this.color_line)
+        if(this.transparency_activate)
+          this.mesh_three.line.material.opacity = 1. - this.transparency_line        
+      }
+
     }
   }
   

@@ -65,6 +65,7 @@ export var utils = {
     circle:1,
     rectangle:0,
     trapezoid:10,
+    arc:11,
   }
 }
 

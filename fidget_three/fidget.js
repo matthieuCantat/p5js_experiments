@@ -92,7 +92,7 @@ export default class fidget{
 
     this.bodies_setup()                      
     this.bodies_set_debug( this.debug_mode )
-    this.bodies_set_visibility(this.debug_mode,true,false)   
+    this.bodies_set_visibility(this.debug_mode, ['inters'])   
   }
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -111,11 +111,11 @@ export default class fidget{
     var selected_body = this.mouseConstraint.constraint.bodyB
 
     // clean
-    this.bodies_axe_enable(true)
+    this.bodies_axe_enable(['inters'])
     this.bodies_axe_clean_override()
     this.bodies_cns_modif(1.0)
     this.bodies_rot_clean_override()
-    this.bodies_enable( 0, true, false )
+    this.bodies_enable( 0, ['inters'] )
 
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -179,7 +179,7 @@ export default class fidget{
 
   desactivate_touch()
   {
-    this.bodies_enable(false,true,false)
+    this.bodies_enable(false, ['inters'])
     this.touch_enable = false
 
   }
@@ -235,15 +235,14 @@ export default class fidget{
     }
   }
 
-  bodies_log_body_ids(inters = true, geos = true)
+  bodies_log_body_ids( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
 
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
         if( this.bodies[b_type][key].constructor === Array)
         {
@@ -258,15 +257,14 @@ export default class fidget{
     }
   }
 
-  bodies_update( inters = true, geos = true)
+  bodies_update( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
  
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -281,7 +279,7 @@ export default class fidget{
     }
   }
 
-  bodies_draw( p5,inters = true, geos = true )
+  bodies_draw( p5, body_type_filter = [] )
   {
     
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
@@ -289,8 +287,7 @@ export default class fidget{
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
  
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
       
         if( this.bodies[b_type][key].constructor === Array)
@@ -304,8 +301,9 @@ export default class fidget{
       } 
     }
   }
-  bodies_setup_shapes_three( inters = true, geos = true )
+  bodies_setup_shapes_three( body_type_filter = [] )
   {
+  
     console.log('bodies_setup_shapes_three')
     this.group_three = new THREE.Group();
 
@@ -313,9 +311,7 @@ export default class fidget{
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
- 
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
     
         if( this.bodies[b_type][key].constructor === Array)
@@ -332,7 +328,7 @@ export default class fidget{
       } 
     }
   }  
-  bodies_animate_three( inters = true, geos = true )
+  bodies_animate_three( body_type_filter = [] )
   {
     this.group_three = new THREE.Group();
 
@@ -341,8 +337,7 @@ export default class fidget{
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
    
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
     
         if( this.bodies[b_type][key].constructor === Array)
@@ -360,12 +355,11 @@ export default class fidget{
     }
   }  
   /*
-  bodies_set_visibility_three( value, inters = true, geos = true )
+  bodies_set_visibility_three( value,body_type_filter = [] )
   {
     for( let b_type in this.bodies)
     {   
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
         for( let key of this.bodies_draw_order[b_type])
         {      
@@ -382,7 +376,7 @@ export default class fidget{
   }  
   */
 
-  bodies_override_color(new_color = null,inters = true, geos = true)
+  bodies_override_color(new_color = null,body_type_filter = [] )
   {
 
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
@@ -390,8 +384,7 @@ export default class fidget{
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
    
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -405,21 +398,20 @@ export default class fidget{
       } 
     }
   }
-  bodies_override_color_three(new_color = null,inters = true, geos = true)
+  bodies_override_color_three(new_color = null,body_type_filter = [] )
   {
-    this.bodies_override_color(new_color, inters, geos)
-    this.bodies_color_update_three(inters, geos)
+    this.bodies_override_color(new_color, body_type_filter)
+    this.bodies_color_update_three(body_type_filter)
 
   }
-  bodies_color_update_three(inters = true, geos = true)
+  bodies_color_update_three( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
      
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
     
         if( this.bodies[b_type][key].constructor === Array)
@@ -434,15 +426,14 @@ export default class fidget{
     }
   }
 
-  bodies_axe_clean_override(inters = true, geos = true)
+  bodies_axe_clean_override( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
      
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -459,15 +450,14 @@ export default class fidget{
     }  
   }
 
-  bodies_axe_enable(value, inters = true, geos = true)
+  bodies_axe_enable(value,body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
      
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -484,15 +474,14 @@ export default class fidget{
     }     
   }
 
-  bodies_cns_modif(value, inters = true, geos = true)
+  bodies_cns_modif(value,body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
      
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -509,15 +498,14 @@ export default class fidget{
     }   
   }
 
-  bodies_rot_clean_override(inters = true, geos = true)
+  bodies_rot_clean_override( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
      
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -532,15 +520,14 @@ export default class fidget{
     }  
   }
 
-  bodies_setup( inters = true, geos = true)
+  bodies_setup( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
       
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
    
         if( this.bodies[b_type][key].constructor === Array)
@@ -555,15 +542,14 @@ export default class fidget{
     }       
   }
 
-  bodies_preload( inters = true, geos = true)
+  bodies_preload( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
       
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
   
         if( this.bodies[b_type][key].constructor === Array)
@@ -578,15 +564,14 @@ export default class fidget{
     }       
   }  
 
-  bodies_set_debug( value, inters = true, geos = true)
+  bodies_set_debug( value,body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
       
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {   
         if( this.bodies[b_type][key].constructor === Array)
         {
@@ -600,15 +585,15 @@ export default class fidget{
     }       
   }
 
-  bodies_set_visibility( value, inters = true, geos = true )
+  bodies_set_visibility( value,body_type_filter = [] )
   {
+    
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
        
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -623,15 +608,15 @@ export default class fidget{
     } 
   }  
 
-  bodies_enable( value, inters = true, geos = true )
+  bodies_enable( value,body_type_filter = [] )
   {
+    
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
       let key = this.bodies_draw_order[i+1]
        
-      if(( (b_type == 'inters')&&(inters==true) )
-      || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -654,7 +639,7 @@ export default class fidget{
     return false
   }
 
-  mouse_select_highlight(mouse_cns, inters = true, geos = true )
+  mouse_select_highlight(mouse_cns,body_type_filter = [] )
   {
     if( mouse_cns.constraint.bodyB != null )
     {
@@ -663,8 +648,7 @@ export default class fidget{
         let b_type = this.bodies_draw_order[i+0]
         let key = this.bodies_draw_order[i+1]
          
-        if(( (b_type == 'inters')&&(inters==true) )
-        || ( (b_type == 'geos'  )&&(geos  ==true) ) )
+        if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
         {
 
           if( this.bodies[b_type][key].constructor === Array)
@@ -691,7 +675,7 @@ export default class fidget{
  
     } 
     
-    this.bodies_color_update_three(inters, geos)
+    this.bodies_color_update_three(body_type_filter)
   }
 
 

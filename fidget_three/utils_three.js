@@ -66,7 +66,7 @@ export function roundedTrap( width, height, slop, radius ) {
 
 
 
-export function circle( radius ) {
+export function circle( radius) {
 
     let ctx = new THREE.Shape()
     ctx.moveTo( 0, radius )
@@ -87,30 +87,74 @@ export function circle( radius ) {
     return ctx
 }
 
-export function addShape( group, shape, texture = null, color = null, do_line = false) {
 
-    let mesh = null
-    if(do_line)
+export function arc( radius,min_angle,max_angle ) {
+
+    let ctx = new THREE.Shape()
+    let pStart = { x:Math.sin(min_angle)*radius, y:Math.cos(min_angle)*radius}
+    ctx.moveTo( pStart.x, pStart.y )   
+
+    let nbr_sample = 8*4
+    let step = 3.14*2/nbr_sample
+    let current = 0
+    for( let i = 0; i < nbr_sample+1; i+=2)
     {
-        shape.autoClose = true;
-        const points = shape.getPoints();
-        const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-        mesh = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color ,linewidth: 1 } ) );        
+        
+        let pA = { x:Math.sin(current)*radius, y:Math.cos(current)*radius}
+        current += step
+        let pB = { x:Math.sin(current)*radius, y:Math.cos(current)*radius}
+        current += step
+        if(current < min_angle)
+            continue
+        if(max_angle < current)
+            break
+
+        ctx.quadraticCurveTo( pA.x, pA.y, pB.x, pB.y )
     }
-    else{
+    let pEnd = { x:Math.sin(max_angle)*radius, y:Math.cos(max_angle)*radius}
+    ctx.quadraticCurveTo( pEnd.x, pEnd.y, pEnd.x, pEnd.y )
+
+    
+    return ctx
+}
+
+export function addShape( group, shape, texture = null, color = null, color_line = null, do_shape = true, do_line = false,
+    transparency_activate = false, transparency = 0., transparency_line = 0.) {
+
+    let mesh_shape = null
+    let mesh_line = null
+    
+    let group_three = new THREE.Group();
+
+    if(do_shape)
+    {
         let geometry = new THREE.ShapeGeometry( shape );
 
-        let mat_opt = { side: THREE.DoubleSide, color: null, map: null }
+        let mat_opt = { side: THREE.DoubleSide, color: null, map: null, transparent:transparency_activate, opacity: 1.-transparency }
         if( color != null )
             mat_opt.color = convert_to_three_color(color)
         if( texture != null )
             mat_opt.map = texture
         
-        mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+        mesh_shape = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+        group_three.add( mesh_shape );
+    }    
+    if(do_line)
+    {
+        shape.autoClose = false;
+        const points = shape.getPoints();
+        const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+
+        let mat_opt_line = { color: null ,linewidth: 1, transparent:transparency_activate, opacity: 1.-transparency_line  }
+        if( color_line != null )
+            mat_opt_line.color = convert_to_three_color(color_line)
+
+        mesh_line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( mat_opt_line ) );    
+        group_three.add( mesh_line )    
     }
 
-    group.add( mesh );
-    return mesh
+    group.add(group_three)
+    return { group : group_three, shape : mesh_shape, line : mesh_line}
 }
 
 const loader = new THREE.TextureLoader();

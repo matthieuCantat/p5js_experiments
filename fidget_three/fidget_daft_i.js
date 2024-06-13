@@ -31,7 +31,12 @@ export default class fidget_daft_i extends fidget{
             circle:null,
             rectangle:null,
             rectangles:[],
-          }
+          },
+          helpers : {
+            stepA:null,
+            stepB:null,
+            stepC:null,
+          },          
         }
         this.bodies_draw_order = [
             'geos','backgrounds', 
@@ -41,6 +46,9 @@ export default class fidget_daft_i extends fidget{
             'geos','circle',
             'geos','rectangle',      
             'geos','rectangles',
+            'helpers','stepA',
+            'helpers','stepB',
+            'helpers','stepC',             
             ]         
       
         this.end_step = 4
@@ -79,7 +87,10 @@ export default class fidget_daft_i extends fidget{
       z:z_depth, 
       w : this.screen_dims.x/2, 
       h : this.screen_dims.y, 
+      do_shape: true,
+      do_line:true,         
       color: this.color_background,
+      color_line: utils.color.black,
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
       type: utils.shape.rectangle,
@@ -113,7 +124,10 @@ export default class fidget_daft_i extends fidget{
                                       z:z_depth,
                                       w:50*s,
                                       type:utils.shape.circle,
+                                      do_shape: true,
+                                      do_line:true,                                         
                                       color: this.colors[0],
+                                      color_line: utils.color.black,
                                       shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category: utils.collision_category.blue,
                                       collision_mask: utils.collision_category.default ,    
@@ -135,7 +149,10 @@ export default class fidget_daft_i extends fidget{
                                         w : 74*s, 
                                         h : 18*s, 
                                         type : utils.shape.rectangle,
+                                        do_shape: true,
+                                        do_line:true,                                           
                                         color : this.colors[1],
+                                        color_line: utils.color.black,
                                         shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                         collision_category : utils.collision_category.green,
                                         collision_mask : utils.collision_category.default,    
@@ -156,7 +173,10 @@ export default class fidget_daft_i extends fidget{
         z:z_depth,
         w : 3.51*s, 
         h : 16.21*s, 
+        do_shape: true,
+        do_line:true,           
         color: this.colors[2],
+        color_line: utils.color.black,
         shader: this.shaders.length != 0 ? this.shaders[0] : null,
         collision_category: utils.collision_category.blue,
         collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
@@ -245,7 +265,10 @@ export default class fidget_daft_i extends fidget{
                                         z:z_depth,
                                         w:400/2.4*s,
                                         type : utils.shape.circle,
+                                        do_shape: true,
+                                        do_line:true,                                           
                                         color:utils.color.grey,
+                                        color_line: utils.color.black,
                                         shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                         collision_category: utils.collision_category.inter,
                                         collision_mask: utils.collision_category.mouse,
@@ -257,6 +280,36 @@ export default class fidget_daft_i extends fidget{
                                       })
       z_depth += z_depth_incr            
 
+      
+      let mo_iBh = new Matrix()                                    
+      mo_iBh.setTranslation(0,0.)   
+      this.bodies.helpers.stepB = new body_build({  m:this.m,
+                                                    m_offset:mo_iBh,
+                                                    x:0,
+                                                    y:0,                                                
+                                                    w : 400/2.4*s*0.355, 
+                                                    h : 1, 
+                                                    rot:-90,
+                                                    do_shape: false,
+                                                    do_line:true,         
+                                                    color: utils.color.yellow,
+                                                    color_line: utils.color.yellow,
+                                                    transparency_activate: true,
+                                                    transparency_line:1.0,                                                  
+                                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
+                                                    collision_category: utils.collision_category.none,
+                                                    collision_mask: utils.collision_category.none ,
+                                                    type:utils.shape.arc,
+                                                    use_webgl: this.use_webgl,
+                                                    screen_dims: this.screen_dims,
+                                                    matter_engine: this.matter_engine,  
+                                                    //texture_three: text_checker_three, 
+                                                    arc_limites : [0, 3.14*0.5],    
+                                                    }) 
+
+
+
+
       this.bodies.inters.C = new body_build({  
                                       m:this.m,
                                       m_offset:new Matrix(),
@@ -266,7 +319,10 @@ export default class fidget_daft_i extends fidget{
                                       rot:0,
                                       w:200/2.4*s,
                                       type : utils.shape.circle,
+                                      do_shape: true,
+                                      do_line:true,                                         
                                       color:utils.color.grey,
+                                      color_line: utils.color.black,
                                       shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
@@ -285,6 +341,30 @@ export default class fidget_daft_i extends fidget{
     z_depth += z_depth_incr
 
 
+    let mo_iCh = new Matrix()                                    
+    mo_iCh.setTranslation(0.,-59*s/2.)       
+    this.bodies.helpers.stepC = new body_build({  m:this.m,
+                                                  m_offset:mo_iCh,
+                                                  x:0,
+                                                  y:0,  
+                                                  rot:0,                                              
+                                                  w : 1, 
+                                                  h : 59*s, 
+                                                  do_shape: false,
+                                                  do_line:true,         
+                                                  color: utils.color.yellow,
+                                                  color_line: utils.color.yellow,
+                                                  transparency_activate: true,
+                                                  transparency_line:1.0,                                                  
+                                                  shader: this.shaders.length != 0 ? this.shaders[0] : null,
+                                                  collision_category: utils.collision_category.none,
+                                                  collision_mask: utils.collision_category.none ,
+                                                  type:utils.shape.rectangle,
+                                                  use_webgl: this.use_webgl,
+                                                  screen_dims: this.screen_dims,
+                                                  matter_engine: this.matter_engine,  
+                                                  //texture_three: text_checker_three,     
+                                                  }) 
     var om_iA = new Matrix()
     om_iA.setTranslation(-130,-50)
     this.bodies.inters.A = new body_build({  
@@ -296,7 +376,10 @@ export default class fidget_daft_i extends fidget{
                                     rot:0,
                                     w:100/2.4*s,
                                     type : utils.shape.circle,
+                                    do_shape: true,
+                                    do_line:true,                                       
                                     color:utils.color.grey,
+                                    color_line: utils.color.black,
                                     shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse,
@@ -311,7 +394,30 @@ export default class fidget_daft_i extends fidget{
                                   })
 
     z_depth += z_depth_incr
-                             
+
+    let mo_iAh = new Matrix()                                    
+    mo_iAh.setTranslation(-130,-50+25*s/2.)     
+    this.bodies.helpers.stepA = new body_build({  m:this.m,
+                                                  m_offset:mo_iAh,
+                                                  x:0,
+                                                  y:0,                                                
+                                                  w : 1, 
+                                                  h : 25*s, 
+                                                  do_shape: false,
+                                                  do_line:true,         
+                                                  color: utils.color.yellow,
+                                                  color_line: utils.color.yellow,
+                                                  transparency_activate: true,
+                                                  transparency_line:1.0,
+                                                  shader: this.shaders.length != 0 ? this.shaders[0] : null,
+                                                  collision_category: utils.collision_category.none,
+                                                  collision_mask: utils.collision_category.none ,
+                                                  type:utils.shape.rectangle,
+                                                  use_webgl: this.use_webgl,
+                                                  screen_dims: this.screen_dims,
+                                                  matter_engine: this.matter_engine,  
+                                                  //texture_three: text_checker_three,     
+                                                  })                              
     }
   ////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
@@ -361,11 +467,11 @@ export default class fidget_daft_i extends fidget{
     var selected_body = this.mouseConstraint.constraint.bodyB
 
     // clean
-    this.bodies_axe_enable(true)
+    this.bodies_axe_enable( ['inters'])
     this.bodies_axe_clean_override()
     this.bodies_cns_modif(1.0)
     this.bodies_rot_clean_override()
-    this.bodies_enable( 0, true, false )
+    this.bodies_enable( 0,  ['inters'] )
 
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -537,19 +643,19 @@ export default class fidget_daft_i extends fidget{
       utils.color.white[1],
       utils.color.white[2])
 
-    this.bodies_override_color(p5.lerpColor( c1,c2,a),false, true)
-    this.bodies_override_color_three(p5.lerpColor( c1,c2,a),false, true)
+    this.bodies_override_color(p5.lerpColor( c1,c2,a), ['geos'])
+    this.bodies_override_color_three(p5.lerpColor( c1,c2,a), ['geos'])
    
   }
 
   do_explode(step)
   {
-    this.bodies_cns_modif(0.0001, false, true)
-    this.bodies_axe_enable(false, false, true)
+    this.bodies_cns_modif(0.0001, ['geos'])
+    this.bodies_axe_enable(false, ['geos'])
     
     // custom color
-    this.bodies_override_color(null,false, true)
-    this.bodies_override_color_three(null,false, true)
+    this.bodies_override_color(null, ['geos'])
+    this.bodies_override_color_three(null, ['geos'])
 
     this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_position(),
                                         new Vector(0,0.05*1.9))
@@ -646,8 +752,8 @@ export default class fidget_daft_i extends fidget{
               (B == false)&&
               (C == false))
           {
-            this.bodies_override_color(utils.color.black,false,true)
-            this.bodies_override_color_three(utils.color.black,false,true)
+            this.bodies_override_color(utils.color.black, ['geos'])
+            this.bodies_override_color_three(utils.color.black, ['geos'])
             this.bodies.geos.backgrounds[0].color = utils.color.red
             this.bodies.geos.backgrounds[1].color = utils.color.red
             this.bodies.geos.backgrounds[0].update_color_three()
@@ -666,8 +772,8 @@ export default class fidget_daft_i extends fidget{
     }
     else if( 0 < this.mouse_pressed_positions_at_update.length )
     {
-      this.bodies_override_color(null,false,true)
-      this.bodies_override_color_three(null,false,true)
+      this.bodies_override_color(null, ['geos'])
+      this.bodies_override_color_three(null, ['geos'])
       //this.color_background = utils.color.dark
       this.mouse_pressed_positions_at_update = []
     }
@@ -822,6 +928,37 @@ export default class fidget_daft_i extends fidget{
 
   }
 
+  draw_help_three()
+  {
+
+    /////////////////////////////////////////////////
+    if(this.show_step_helpers[0] )
+    {
+      let coef = this.show_step_helpers[0] / 100 
+      this.bodies.helpers.stepA.transparency_line = 1.-coef
+      this.show_step_helpers[0] -= 2
+      this.bodies.helpers.stepA.update_color_three()
+    }
+
+    if(this.show_step_helpers[1] )
+    {
+      let coef = this.show_step_helpers[1] / 100 
+      this.bodies.helpers.stepB.transparency_line = 1.-coef
+      this.show_step_helpers[1] -= 2
+      this.bodies.helpers.stepB.update_color_three()
+    }
+
+    if(this.show_step_helpers[2] )
+    {
+      let coef = this.show_step_helpers[2] / 100 
+      this.bodies.helpers.stepC.transparency_line = 1.-coef
+      this.show_step_helpers[2] -= 2
+      this.bodies.helpers.stepC.update_color_three()
+    }
+    
+
+  }  
+
   draw_help(p5)
   {
     /////////////////////////////////////////////////
@@ -911,6 +1048,7 @@ export default class fidget_daft_i extends fidget{
   animate_three()
   {
     this.bodies_animate_three()
+    this.draw_help_three()
   }  
 }
   
