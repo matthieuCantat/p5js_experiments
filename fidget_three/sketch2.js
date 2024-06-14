@@ -49,9 +49,9 @@ Matter.Composite.add(matter_engine.world, mouseConstraint);
 
 /////////////////////////////////////////// setup screen
 let width       = 400
-let height      = 400
-//width = window.innerWidth;
-//height = window.innerHeight;
+let height      = 700
+width = window.innerWidth;
+height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
@@ -276,7 +276,7 @@ function init() {
 
 function onWindowResize() {
 
-    windowHalfX = width / 2;
+
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();

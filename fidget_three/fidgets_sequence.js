@@ -27,7 +27,7 @@ export default class fidgets_sequence
 
         this.anim_mode = false
 
-        this.chrono = new Chrono()  
+        this.chrono = new Chrono(screen_dims)  
         this.chrono_end_time_show_start = 0
         this.chrono_end_time_show_end = 0       
 
@@ -230,8 +230,8 @@ export default class fidgets_sequence
         {
           var a = Math.min(1,Math.max(0,this.end_update_count / 100))
           this.chrono.stop()
-          let blendA = (0.1*(1-a)+0.5*a)
-          let blendB = (0.05*(1-a)+0.07*a)
+          let blendA = 0.5 *a + 0.1 *(1-a)
+          let blendB = 0.07*a + 0.05*(1-a)
           p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
           s_chrono = this.screen_dims.x * blendB
       
@@ -249,7 +249,7 @@ export default class fidgets_sequence
         this.chrono.update()
         this.chrono.update_three()
     }
-
+    
     draw_chrono(p5)
     {
 
@@ -281,6 +281,7 @@ export default class fidgets_sequence
         if(this.use_webgl == false )
           this.chrono.draw(p5)
     }
+    
 
     do_anim_override( anim = null )
     {

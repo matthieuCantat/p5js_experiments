@@ -15,7 +15,6 @@ export default class fidget_daft_i extends fidget{
 
     constructor(m,s,screen_dims,matter_engine,mouseConstraint,shaders = [],debug=false,use_webgl = false,random_color = true)
     {
-        console.log('fidget_daft_i',use_webgl)
         super(m, s, screen_dims,matter_engine,mouseConstraint,shaders, debug,use_webgl)
 
         this.title = 'dafti'
@@ -79,9 +78,8 @@ export default class fidget_daft_i extends fidget{
     let z_depth = 0
     let z_depth_incr = 0.1
     
-
     let oBackground = {
-      m:this.m,
+      //m:this.m,
       x:0,
       y:0,
       z:z_depth, 
@@ -101,13 +99,19 @@ export default class fidget_daft_i extends fidget{
     } 
     z_depth += z_depth_incr
 
+    let mo_background_L = new Matrix()                                    
+    mo_background_L.setTranslation(this.screen_dims.x/4,this.screen_dims.y/2)   
 
-    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
+    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
+                                                m_offset:mo_background_L, 
                                                 rot:0, 
                                                 collision:false,                                               
                                               })) 
+    let mo_background_R = new Matrix()                                    
+    mo_background_R.setTranslation(this.screen_dims.x/4*3,this.screen_dims.y/2)    
 
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
+                                                m_offset:mo_background_R,
                                                 rot:0, 
                                                 collision:false,                                               
                                               })) 
@@ -618,8 +622,8 @@ export default class fidget_daft_i extends fidget{
       }
       else{
 
-        let y_offset = res_coef * 230 
-        this.m.setTranslation(200,200+y_offset)
+        let y_offset = res_coef * this.screen_dims.y/2.*1.1 
+        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2+y_offset)
       }
 
     } 
@@ -801,130 +805,6 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// DRAW
   ////////////////////////////////////////////////////////////////////////////////////
 
-  draw_background()
-  {
-    let a = this.state.steps[3].update_count
-    a -=30
-    a = Math.max(0,a)
-    a *=15
-    if(this.anim_mode)
-      a = this.state.steps[3].resoluton_coef*this.screen_dims.y/2    
-
-    // a 0-->200
-    let pA = new Vector(this.bodies.geos.backgrounds[0].w/2.,this.screen_dims.y/2)
-    pA.v.x -= a
-    this.bodies.geos.backgrounds[0].set_position(pA)
-    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
-    {
-      this.bodies.geos.backgrounds[0].color = [50,140,50]
-      this.bodies.geos.backgrounds[0].update_color_three()
-    }
-      
-
-
-    let pB = new Vector(this.bodies.geos.backgrounds[0].w/2.*3 ,this.screen_dims.y/2)
-    pB.v.x += a
-    this.bodies.geos.backgrounds[1].set_position(pB)  
-    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
-    {
-      this.bodies.geos.backgrounds[1].color = [50,140,50] 
-      this.bodies.geos.backgrounds[1].update_color_three()      
-    }
- 
-    /*
-    let a = this.state.steps[3].update_count
-    a -=30
-    a = Math.max(0,a)
-    a *=15
-    if(this.anim_mode)
-      a = this.state.steps[3].resoluton_coef*200    
-
-    p5.push();
-    p5.translate(this.webgl_draw_coords_offset.x()-a,this.webgl_draw_coords_offset.y())      
-    p5.fill(this.color_background[0],
-      this.color_background[1],
-      this.color_background[2])//fill(50,40,50)
-    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
-      p5.fill(50,140,50)
-
-    if(this.shaders.length != 0 )
-    {
-      this.shaders[1].iFrame = this.draw_count;
-      this.shaders[1].iTime = p5.millis() / 1000.0; 
-      this.shaders[1].iMouse = { x: 0, y: 0};
-    
-      this.shaders[1].bg_animation = 1.
-      this.shaders[1].bg_grain = 1.
-      this.shaders[1].bg_grain_scale = 5.
-      this.shaders[1].bg_grid = 1.0
-      this.shaders[1].bg_grid_scale = 15.0
-      this.shaders[1].bg_grid_line_scale =  2.0
-      this.shaders[1].bg_grid_point_scale =  2.0
-    
-      this.shaders[1].bg_colorA = [48.96, 0.2, 0.2];
-      this.shaders[1].bg_colorB = [117., 0.2, 80.];
-      this.shaders[1].bg_colorC = [80.,97.92,0.2];
-      this.shaders[1].bg_colorD = [0.2,48.96,48.96];
-  
-      this.shaders[1].bg_typeA = 0.0;
-      this.shaders[1].bg_typeB = 1.0;
-      this.shaders[1].bg_typeC = 0.0;
-      this.shaders[1].bg_typeD = 0.0;
-      this.shaders[1].bg_type_discoTarget= 0.;
-    
-      this.shaders[1].light_beam = 0.0
-      this.shaders[1].debug = 0         
-      this.shaders[1].as_texture(p5) 
-    }
-
-    if(this.use_webgl)
-    {
-      p5.plane(this.screen_dims.x/2,this.screen_dims.y);
-    }
-    else
-    {
-      p5.rect(0,0,this.screen_dims.x/2,this.screen_dims.y)
-      p5.fill(255);
-      p5.textSize(50);
-      p5.textAlign(p5.CENTER);
-      p5.text( this.fidget_sequence_i, this.screen_dims.x*0.2-a,this.screen_dims.y*0.95)      
-    }
-
-
-
-    p5.pop();
-
-    p5.push();
-    p5.translate(this.webgl_draw_coords_offset.x()+a+this.screen_dims.x/2,this.webgl_draw_coords_offset.y())         
-    p5.fill(this.color_background[0],
-      this.color_background[1],
-      this.color_background[2])//fill(50,40,50)
-    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
-    p5.fill(50,140,50)
-
-    if(this.shaders.length != 0 )
-    {
-      this.shaders[1].as_texture(p5)
-    }    
-
-    if(this.use_webgl)
-    {
-      p5.plane(this.screen_dims.x/2,this.screen_dims.y);
-    }
-    else
-    {
-      p5.rect(0,0,this.screen_dims.x/2,this.screen_dims.y)
-      p5.fill(255);
-      p5.textSize(20);
-      p5.textAlign(p5.CENTER);
-      p5.text( this.title , this.screen_dims.x*0.8,this.screen_dims.y*0.95)      
-    }
-
-
-    p5.pop();
-    */
-
-  }
 
   draw_help_three()
   {

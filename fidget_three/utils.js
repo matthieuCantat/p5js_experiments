@@ -70,6 +70,21 @@ export var utils = {
 }
 
 
+export function convert_coords_matter_to_three(pos,screen_dims)
+{
+  let x = pos.x()
+  let y = pos.y()
+  // move origin from up and right corner screen to middle 
+  x -= screen_dims.x/2 
+  y -= screen_dims.y/2
+
+  //inverse axe y
+  y *= -1
+
+  return new Vector(x,y)
+}
+
+
 export class constraint_build{
   
   constructor( in_options ){
@@ -622,7 +637,7 @@ export function pad(num, size) {
 
 export class Chrono
 {
-  constructor()
+  constructor(screen_dims)
   {
     this.p = new Vector(0,0)
     this.s = 1
@@ -632,11 +647,13 @@ export class Chrono
     this.three_shape = null
     this.three_geometry = null
     this.three_mesh = null
+    this.screen_dims = screen_dims
 
     this.font = null
     let Chrono = this
     const loader = new FontLoader();
     loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {Chrono.font = font})
+    this.x_offset_to_center = -40
   }
 
   setup_three(scene_three)
@@ -660,10 +677,11 @@ export class Chrono
 
       // make shape ( N.B. edge view not visible )
 
+      let converted_pos = convert_coords_matter_to_three(Chrono.p, Chrono.screen_dims)
       Chrono.three_mesh = new THREE.Mesh( Chrono.three_geometry, matLite );
       Chrono.three_mesh.position.z = 150;
-      Chrono.three_mesh.position.x = Chrono.p.x()-240
-      Chrono.three_mesh.position.y = Chrono.p.y()*-1+200
+      Chrono.three_mesh.position.x = converted_pos.x()+Chrono.x_offset_to_center
+      Chrono.three_mesh.position.y = converted_pos.y()
       Chrono.three_mesh.visible = Chrono.v   
       Chrono.three_mesh.scale.x = Chrono.s*0.015  
       Chrono.three_mesh.scale.y = Chrono.s*0.015  
@@ -760,8 +778,11 @@ export class Chrono
     this.three_geometry = new THREE.ShapeGeometry( this.three_shape );
     this.three_mesh.geometry = this.three_geometry;
 
-    this.three_mesh.position.x = this.p.x()-240
-    this.three_mesh.position.y = this.p.y()*-1+200
+    let converted_pos = convert_coords_matter_to_three(this.p, this.screen_dims)
+    this.three_mesh.position.x = converted_pos.x()+this.x_offset_to_center
+    this.three_mesh.position.y = converted_pos.y()
+    //this.three_mesh.position.x = 0//this.p.x()-this.screen_dims.x/2 + this.x_offset_to_center
+    //this.three_mesh.position.y = 0//this.p.y()*-1+this.screen_dims.y/2
     this.three_mesh.visible = this.v   
     this.three_mesh.scale.x = this.s*0.015  
     this.three_mesh.scale.y = this.s*0.015  
@@ -777,6 +798,7 @@ export function clamp(value,min_value,max_value)
 {
   return Math.min(max_value,Math.max(min_value,value))
 }
+
 
 
 ////////////////////////////////////////////////// mouse pressed
@@ -810,6 +832,8 @@ window.onload = function() {
     document.addEventListener('mousemove', handleMouseMove);
 }
 ////////////////////////////////////////////////// mouse pressed
+
+
 
 
 

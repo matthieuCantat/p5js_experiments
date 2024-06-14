@@ -158,6 +158,36 @@ export default class fidget{
     this.bodies_draw(p5)
   }  
 
+  draw_background()
+  {
+    let a = this.state.steps[3].update_count
+    a -=30
+    a = Math.max(0,a)
+    a *=15
+    if(this.anim_mode)
+      a = this.state.steps[3].resoluton_coef*this.screen_dims.x/2    
+
+    // a 0-->200
+    let pA = new Vector(this.screen_dims.x/4,this.screen_dims.y/2)
+    pA.v.x -= a
+    this.bodies.geos.backgrounds[0].set_position(pA)
+    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+    {
+      this.bodies.geos.backgrounds[0].color = [50,140,50]
+      this.bodies.geos.backgrounds[0].update_color_three()
+    }
+      
+
+
+    let pB = new Vector(this.screen_dims.x/4*3,this.screen_dims.y/2)
+    pB.v.x += a
+    this.bodies.geos.backgrounds[1].set_position(pB)  
+    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+    {
+      this.bodies.geos.backgrounds[1].color = [50,140,50] 
+      this.bodies.geos.backgrounds[1].update_color_three()      
+    }
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////////////

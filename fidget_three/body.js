@@ -1,6 +1,6 @@
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { utils , rad, constraint_build, cns_axe} from './utils.js';
+import { utils , rad, constraint_build, cns_axe,convert_coords_matter_to_three} from './utils.js';
 import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 
@@ -716,8 +716,9 @@ export default class body_build{
       let rot = this.get_rotation()
       let scale = this.scale
       
-      this.mesh_three.group.position.x = pos.x()-200
-      this.mesh_three.group.position.y = pos.y()*-1+200
+      let converted_pos = convert_coords_matter_to_three(pos,this.screen_dims)
+      this.mesh_three.group.position.x = converted_pos.x()
+      this.mesh_three.group.position.y = converted_pos.y()
       //this.mesh_three.group.position.z = this.z
       this.mesh_three.group.rotation.z = rot*-1
       this.mesh_three.group.visible = this.get_visibility() == 1   
