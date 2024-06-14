@@ -754,7 +754,8 @@ export class Chrono
     group.add( textMesh1 );
     */
 
-
+    if(this.font == null)
+      return false
     this.three_shape = this.font.generateShapes( this.time_str, 50 );
     this.three_geometry = new THREE.ShapeGeometry( this.three_shape );
     this.three_mesh.geometry = this.three_geometry;
@@ -767,7 +768,7 @@ export class Chrono
     this.three_mesh.scale.z = this.s*0.015  
 
 
-
+    return true
   }
 
 }
