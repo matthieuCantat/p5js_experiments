@@ -129,9 +129,9 @@ export default class fidgets_sequence
         if(this.anim_mode == false)
         {
           if((  i-1< coef  )&&(  coef <= i+1 ))
-            this.fidgets[i].bodies_set_visibility(true)
+            this.fidgets[i].bodies_enable(true)
           else
-            this.fidgets[i].bodies_set_visibility(false)
+            this.fidgets[i].bodies_enable(false)
         }
       }
 
@@ -287,6 +287,7 @@ export default class fidgets_sequence
     {
       if( anim != null )
       {
+        
         let anim_global = anim * this.fidgets_nbr
       
         let i_max = this.fidgets_nbr-1
@@ -294,12 +295,19 @@ export default class fidgets_sequence
         {
           let anim_local = clamp(anim_global-i,0,1)
           this.fidgets[i_max-i].do_anim_override(anim_local*0.999)
+
+          
+          if( anim_local <1)
+            this.fidgets[i_max-i].bodies_enable(true)
+          else
+            this.fidgets[i_max-i].bodies_enable(false)
   
         }
         this.anim_mode = true
       }
       else
       {
+        
         this.anim_mode = false
         for( let i = 0; i < this.fidgets_nbr; i++ )
           this.fidgets[i].do_anim_override(null)
