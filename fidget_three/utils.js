@@ -632,6 +632,11 @@ export class Chrono
     this.three_shape = null
     this.three_geometry = null
     this.three_mesh = null
+
+    this.font = null
+    let Chrono = this
+    const loader = new FontLoader();
+    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {Chrono.font = font})
   }
 
   setup_three(scene_three)
@@ -714,25 +719,53 @@ export class Chrono
     p5.text(this.time_str, this.p.x(), this.p.y());
   }
 
-  update_three()
+  update_three(group)
   {
-    let Chrono = this
+    /*
+    group.remove( textMesh1 );
+   
+    textGeo = new TextGeometry( text, {
+
+      font: font,
+
+      size: size,
+      depth: depth,
+      curveSegments: curveSegments,
+
+      bevelThickness: bevelThickness,
+      bevelSize: bevelSize,
+      bevelEnabled: bevelEnabled
+
+    } );
+
+    textGeo.computeBoundingBox();
+
+    const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+
+    textMesh1 = new THREE.Mesh( textGeo, materials );
+
+    textMesh1.position.x = centerOffset;
+    textMesh1.position.y = hover;
+    textMesh1.position.z = 0;
+
+    textMesh1.rotation.x = 0;
+    textMesh1.rotation.y = Math.PI * 2;
+
+    group.add( textMesh1 );
+    */
 
 
-    const loader = new FontLoader();
-    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+    this.three_shape = this.font.generateShapes( this.time_str, 50 );
+    this.three_geometry = new THREE.ShapeGeometry( this.three_shape );
+    this.three_mesh.geometry = this.three_geometry;
 
-      Chrono.three_shape = font.generateShapes( Chrono.time_str, 50 );
-      Chrono.three_geometry = new THREE.ShapeGeometry( Chrono.three_shape );
-      Chrono.three_mesh.geometry = Chrono.three_geometry;
+    this.three_mesh.position.x = this.p.x()-240
+    this.three_mesh.position.y = this.p.y()*-1+200
+    this.three_mesh.visible = this.v   
+    this.three_mesh.scale.x = this.s*0.015  
+    this.three_mesh.scale.y = this.s*0.015  
+    this.three_mesh.scale.z = this.s*0.015  
 
-      Chrono.three_mesh.position.x = Chrono.p.x()-240
-      Chrono.three_mesh.position.y = Chrono.p.y()*-1+200
-      Chrono.three_mesh.visible = Chrono.v   
-      Chrono.three_mesh.scale.x = Chrono.s*0.015  
-      Chrono.three_mesh.scale.y = Chrono.s*0.015  
-      Chrono.three_mesh.scale.z = Chrono.s*0.015  
-    } ); //end load function 
 
 
   }
@@ -776,3 +809,25 @@ window.onload = function() {
     document.addEventListener('mousemove', handleMouseMove);
 }
 ////////////////////////////////////////////////// mouse pressed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
