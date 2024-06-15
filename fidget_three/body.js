@@ -72,6 +72,7 @@ export default class body_build{
       this.collision_mask = args.collision_mask
       this.visibility = 1
       this.visibility_override = true
+      this.do_update = true
       this.density = args.density
       this.mass = args.mass
       this.use_webgl = args.use_webgl
@@ -409,6 +410,7 @@ export default class body_build{
     enable(value)
     {
       this.visibility = value
+      //this.do_update = value
       if(this.visibility)
         this.body.collisionFilter.category = this.collision_category
       else
@@ -474,6 +476,8 @@ export default class body_build{
   
     update()
     {
+      if( !this.do_update )
+        return false
       //let p = this.get_matrix().get_row(2)
       
   
@@ -505,7 +509,9 @@ export default class body_build{
         this.constraints[i].pB = p
         this.constraints[i].update()
       }
-        
+      
+
+      return true
      
     }
   

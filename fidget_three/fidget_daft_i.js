@@ -5,6 +5,7 @@ import body_build from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import * as ut from './utils_three.js';
+import { and } from './libraries/jsm/nodes/Nodes.js';
 
 
 export default class fidget_daft_i extends fidget{
@@ -299,7 +300,7 @@ export default class fidget_daft_i extends fidget{
                                                     do_line:true,         
                                                     color: utils.color.yellow,
                                                     color_line: utils.color.yellow,
-                                                    transparency_activate: true,
+                                                    transparency_activate: false,
                                                     transparency_line:1.0,                                                  
                                                     shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                                     collision_category: utils.collision_category.none,
@@ -359,7 +360,7 @@ export default class fidget_daft_i extends fidget{
                                                   do_line:true,         
                                                   color: utils.color.yellow,
                                                   color_line: utils.color.yellow,
-                                                  transparency_activate: true,
+                                                  transparency_activate: false,
                                                   transparency_line:1.0,                                                  
                                                   shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                                   collision_category: utils.collision_category.none,
@@ -412,7 +413,7 @@ export default class fidget_daft_i extends fidget{
                                                   do_line:true,         
                                                   color: utils.color.yellow,
                                                   color_line: utils.color.yellow,
-                                                  transparency_activate: true,
+                                                  transparency_activate: false,
                                                   transparency_line:1.0,
                                                   shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                                   collision_category: utils.collision_category.none,
@@ -428,7 +429,7 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
   //////////////////////////////////////////////////////////////////////////////////// 
 
-  get_resolution_coef_info( resolution_coef_override = null)
+  get_resolution_coef_info( )
   {   
 
     let A = clamp(this.bodies.inters.A.c_axe.current_pos ,0,1)//clamp(deg(this.bodies.inters.A.body.angle)*-1/35.0     ,0,1)
@@ -439,13 +440,14 @@ export default class fidget_daft_i extends fidget{
     if ( this.anim_mode )
     {
       let s = [0,1,2,3]   
-      A = clamp(resolution_coef_override ,s[0],s[0]+1)
-      B = clamp(resolution_coef_override ,s[1],s[1]+1)-s[1]
-      C = clamp(resolution_coef_override ,s[2],s[2]+1)-s[2]
+      A = clamp(this.resolution_coef_override ,s[0],s[0]+1)
+      B = clamp(this.resolution_coef_override ,s[1],s[1]+1)-s[1]
+      C = clamp(this.resolution_coef_override ,s[2],s[2]+1)-s[2]
       D = clamp(this.resolution_coef_override ,s[3],s[3]+1)-s[3]
 
     }
     let coef = A + B + C+ D
+    
 
     // fill resolution coef info
     this.state.resolution_coef = coef
@@ -461,7 +463,7 @@ export default class fidget_daft_i extends fidget{
       this.state.current_step = 2   
     if(C==1)
       this.state.current_step = 3 
-    if(D==1)
+    if((D==1)&&(!this.anim_mode))
       this.state.current_step = 4             
   }
   
@@ -572,7 +574,10 @@ export default class fidget_daft_i extends fidget{
       this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
-      this.update_step_count(step)           
+      this.update_step_count(step)   
+      
+      if(this.anim_mode)
+        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2)
     } 
     ////////////////////////////////////////////////////////////////////////////////////
     step = 3
@@ -621,7 +626,8 @@ export default class fidget_daft_i extends fidget{
         }  
       }
       else{
-
+        
+        
         let y_offset = res_coef * this.screen_dims.y/2.*1.1 
         this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2+y_offset)
       }

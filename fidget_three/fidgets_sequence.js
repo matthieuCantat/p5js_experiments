@@ -287,20 +287,26 @@ export default class fidgets_sequence
     {
       if( anim != null )
       {
-        
+        for( let i = 0; i < this.fidgets_nbr; i++ )
+          this.fidgets[i].bodies_enable(false)
+
         let anim_global = anim * this.fidgets_nbr
       
         let i_max = this.fidgets_nbr-1
         for( let i = 0; i < this.fidgets_nbr; i++ )
         {
           let anim_local = clamp(anim_global-i,0,1)
-          this.fidgets[i_max-i].do_anim_override(anim_local*0.999)
+          
+          this.fidgets[i_max-i].do_anim_override(anim_local)
 
           
-          if( anim_local <1)
+          if( anim_local <=1)
+          {
             this.fidgets[i_max-i].bodies_enable(true)
-          else
-            this.fidgets[i_max-i].bodies_enable(false)
+            if( i_max-i+1 < this.fidgets.length)
+              this.fidgets[i_max-i+1].bodies_enable(true)
+          }
+            
   
         }
         this.anim_mode = true

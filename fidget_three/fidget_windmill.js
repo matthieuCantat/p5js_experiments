@@ -270,7 +270,7 @@ export default class fidget_windmill extends fidget{
                                                 do_line:true,         
                                                 color: utils.color.yellow,
                                                 color_line: utils.color.yellow,
-                                                transparency_activate: true,
+                                                transparency_activate: false,
                                                 transparency_line:1.0,
                                                 shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                                 collision_category: utils.collision_category.none,
@@ -353,7 +353,7 @@ export default class fidget_windmill extends fidget{
                                                   do_line:true,         
                                                   color: utils.color.yellow,
                                                   color_line: utils.color.yellow,
-                                                  transparency_activate: true,
+                                                  transparency_activate: false,
                                                   transparency_line:1.0,                                                  
                                                   shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                                   collision_category: utils.collision_category.none,
@@ -377,7 +377,7 @@ export default class fidget_windmill extends fidget{
                                                   do_line:true,         
                                                   color: utils.color.yellow,
                                                   color_line: utils.color.yellow,
-                                                  transparency_activate: true,
+                                                  transparency_activate: false,
                                                   transparency_line:1.0,                                                  
                                                   shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                                   collision_category: utils.collision_category.none,
@@ -616,7 +616,7 @@ export default class fidget_windmill extends fidget{
       this.state.current_step = 2   
     if(C==1)
       this.state.current_step = 3      
-    if(D==1)
+    if((D==1)&&(!this.anim_mode))
       this.state.current_step = 4        
   }
 
@@ -768,7 +768,10 @@ export default class fidget_windmill extends fidget{
       this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
-      this.update_step_count(step)           
+      this.update_step_count(step)        
+      
+      if( this.anim_mode )
+        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2)
     } 
     ////////////////////////////////////////////////////////////////////////////////////
     step = 3
@@ -812,10 +815,11 @@ export default class fidget_windmill extends fidget{
       }
       else
       {
-        this.set_phase_resolution_control_4( 0.95)
+        //this.set_phase_resolution_control_4( 0.95)
 
         //this.bodies_cns_modif(0.0001, false, true)
         //this.bodies_axe_enable(false, false, true)   
+        
         let y_offset = res_coef * this.screen_dims.y/2.*1.3 
         this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2+y_offset)
 
@@ -829,6 +833,8 @@ export default class fidget_windmill extends fidget{
       
         }
     } 
+   
+
    
 
 
