@@ -288,7 +288,7 @@ export default class fidgets_sequence
       if( anim != null )
       {
         for( let i = 0; i < this.fidgets_nbr; i++ )
-          this.fidgets[i].bodies_enable(false)
+          this.fidgets[i].bodies_enable(true)
 
         let anim_global = anim * this.fidgets_nbr
       

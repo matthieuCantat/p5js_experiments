@@ -652,10 +652,17 @@ export default class fidget{
         if( this.bodies[b_type][key].constructor === Array)
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
             this.bodies[b_type][key][i].enable(value)
+            if(body_type_filter.length == 0)
+              this.bodies[b_type][key][i].do_update = value            
+          }
+            
         }
         else
           this.bodies[b_type][key].enable(value)
+          if(body_type_filter.length == 0)
+            this.bodies[b_type][key].do_update = value
         
       } 
     } 
