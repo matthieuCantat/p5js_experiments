@@ -2,6 +2,18 @@
 import * as THREE from 'three';
 import Vector from './vector.js'
 import { rad} from './utils.js';
+
+
+
+
+export function line( pA, pB ) {
+    let ctx = new THREE.Shape()
+    ctx.moveTo( pA.x(), pA.y() );
+    ctx.lineTo( pA.x(), pA.y() );
+    ctx.lineTo( pB.x(), pB.y() );
+    return ctx
+}
+
 export function rect( width, height ) {
 
     return roundedRect( width, height, 0 )
@@ -118,43 +130,51 @@ export function arc( radius,min_angle,max_angle ) {
     return ctx
 }
 
-export function addShape( group, shape, texture = null, color = null, color_line = null, do_shape = true, do_line = false,
-    transparency_activate = false, transparency = 0., transparency_line = 0.) {
 
-    let mesh_shape = null
-    let mesh_line = null
+export function addShape_polygon( 
+    group, 
+    shape, 
+    texture = null, 
+    color = null, 
+    transparency_activate = false, 
+    transparency = 0.) {
+
+
+    let geometry = new THREE.ShapeGeometry( shape );
+
+    let mat_opt = { side: THREE.DoubleSide, color: null, map: null, transparent:transparency_activate, opacity: 1.-transparency }
+    if( color != null )
+        mat_opt.color = convert_to_three_color(color)
+    if( texture != null )
+        mat_opt.map = texture
     
-    let group_three = new THREE.Group();
+    let mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+    group.add( mesh );
 
-    if(do_shape)
-    {
-        let geometry = new THREE.ShapeGeometry( shape );
+    return mesh
+}
 
-        let mat_opt = { side: THREE.DoubleSide, color: null, map: null, transparent:transparency_activate, opacity: 1.-transparency }
-        if( color != null )
-            mat_opt.color = convert_to_three_color(color)
-        if( texture != null )
-            mat_opt.map = texture
-        
-        mesh_shape = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
-        group_three.add( mesh_shape );
-    }    
-    if(do_line)
-    {
-        shape.autoClose = false;
-        const points = shape.getPoints();
-        const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 
-        let mat_opt_line = { color: null ,linewidth: 1, transparent:transparency_activate, opacity: 1.-transparency_line  }
-        if( color_line != null )
-            mat_opt_line.color = convert_to_three_color(color_line)
+export function addShape_line( 
+    group, 
+    shape, 
+    color = null, 
+    transparency_activate = false, 
+    transparency = 0.) {
 
-        mesh_line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( mat_opt_line ) );    
-        group_three.add( mesh_line )    
-    }
+    shape.autoClose = false;
+    const points = shape.getPoints();
+    const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 
-    group.add(group_three)
-    return { group : group_three, shape : mesh_shape, line : mesh_line}
+    let mat_opt_line = { color: null ,linewidth: 1, transparent:transparency_activate, opacity: 1.-transparency  }
+    if( color != null )
+        mat_opt_line.color = convert_to_three_color(color)
+
+    let mesh = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( mat_opt_line ) );    
+    group.add( mesh )    
+
+
+    return mesh
 }
 
 const loader = new THREE.TextureLoader();

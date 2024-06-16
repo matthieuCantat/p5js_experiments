@@ -49,14 +49,14 @@ Matter.Composite.add(matter_engine.world, mouseConstraint);
 
 /////////////////////////////////////////// setup screen
 let width       = 400
-let height      = 700
-width = window.innerWidth;
-height = window.innerHeight;
+let height      = 400//700
+//width = window.innerWidth;
+//height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 10
-var debug = false
+var nbr = 1
+var debug = true
 
 var use_webgl = false
 var shaders_nbr = 0
@@ -103,7 +103,7 @@ let s = 2.2
 F_sequence = new fidgets_sequence(nbr,m,s,screen_dims,matter_engine,mouseConstraint,shdrs,debug,use_webgl)
 F_sequence.setup()
 
-/*
+
 new p5(function(p5)
 {
   
@@ -192,7 +192,7 @@ new p5(function(p5)
     draw_count += 1
   }
 });
-*/
+
 
 
 

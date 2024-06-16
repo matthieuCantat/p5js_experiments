@@ -232,6 +232,43 @@ export class cns_axe{
       this.pLineBase = this.Follower.get_matrix().get_row(2)
   }
 
+  update_debug()
+  {
+    let rot = this.axe_rotation 
+    let rot_center = this.axe_rotation_center 
+    let vLine = new Vector(this.vLineBase)
+    let pLine = new Vector(this.pLineBase)
+
+    // Update axe postion rotation
+    vLine.rotate(rad(rot))
+    let vTmp = pLine.getSub(rot_center)
+    vTmp.rotate(rad(rot))
+    pLine = rot_center.getAdd(vTmp)
+
+   // Set limit
+   var pLimitPos = new Vector()
+   if( this.distPos != null )
+   {
+     let vToLimit = new Vector(vLine)
+     vToLimit.normalize().mult(this.distPos)
+     pLimitPos = vToLimit.getAdd(pLine)
+   }
+
+   var pLimitNeg = new Vector()
+   if( this.distNeg != null )
+   {
+     let vToLimit = new Vector(vLine)
+     vToLimit.normalize().mult(this.distNeg*-1)
+     pLimitNeg = vToLimit.getAdd(pLine)
+   }
+
+    // Debug
+    if( this.distPos != null )this.debug_pts[0] = pLimitPos
+    else                      this.debug_pts[0] = vLine.getMult(width*2).add(pLine)
+
+    if( this.distNeg != null )this.debug_pts[1] = pLimitNeg
+    else                      this.debug_pts[1] = vLine.getMult(width*-2).add(pLine)
+  }
 
   apply()
   {
@@ -321,13 +358,6 @@ export class cns_axe{
       this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
     }
 
-
-    // Debug
-    if( this.distPos != null )this.debug_pts[0] = pLimitPos
-    else                      this.debug_pts[0] = vLine.getMult(width*2).add(pLine)
-
-    if( this.distNeg != null )this.debug_pts[1] = pLimitNeg
-    else                      this.debug_pts[1] = vLine.getMult(width*-2).add(pLine)
 
 
   

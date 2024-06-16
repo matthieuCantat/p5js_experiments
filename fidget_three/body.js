@@ -3,6 +3,7 @@ import Matrix from './matrix.js';
 import { utils , rad, constraint_build, cns_axe,convert_coords_matter_to_three} from './utils.js';
 import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
+import * as THREE from 'three';
 
 export default class body_build{
   
@@ -476,6 +477,7 @@ export default class body_build{
   
     update()
     {
+        
       if( !this.do_update )
         return false
       //let p = this.get_matrix().get_row(2)
@@ -697,7 +699,9 @@ export default class body_build{
 
 
   
-    setup_shapes_three(group_three){
+    setup_shapes_three(group_fidget){
+      this.mesh_three = { group : null, shape : null, line : null}
+
       switch(this.type) {
         case 0:
           this.shape_three = ut.rect( this.w, this.h );
@@ -713,8 +717,85 @@ export default class body_build{
           break;      
         }
 
-      this.mesh_three = ut.addShape( group_three, this.shape_three , this.texture_three, this.color, this.color_line, this.do_shape, this.do_line,
-        this.transparency_activate, this.transparency, this.transparency_line );
+      this.mesh_three.group = new THREE.Group();
+      group_fidget.add(this.mesh_three.group)
+
+      if(this.do_shape)
+      {
+          this.mesh_three.shape = ut.addShape_polygon( 
+              this.mesh_three.group, 
+              this.shape_three, 
+              this.texture_three, 
+              this.color, 
+              this.transparency_activate, 
+              this.transparency)        
+      }   
+  
+      if(this.do_line)
+      {
+          this.mesh_three.line = ut.addShape_line( 
+              this.mesh_three.group, 
+              this.shape_three, 
+              this.color_line, 
+              this.transparency_activate, 
+              this.transparency_line)       
+      }
+
+      if(this.debug)
+      {
+        let len = 10
+        let wid = 2
+
+        let shape = null
+        let mesh = null
+
+        
+        if(( this.c_axe != null)&&(this.c_axe.enable == true ))
+        {
+          this.c_axe.update_debug()
+          let shape = ut.line( 
+            convert_coords_matter_to_three(this.c_axe.debug_pts[0],this.screen_dims), 
+            convert_coords_matter_to_three(this.c_axe.debug_pts[1],this.screen_dims) );
+            
+          //let axes_grp = new THREE.Group();
+          //group_fidget.add(axes_grp)
+
+          ut.addShape_line(  
+            group_fidget, 
+            shape, 
+            [255,0,255])
+        }
+
+        
+        shape = ut.rect( len, wid )
+        mesh = ut.addShape_polygon(  
+          this.mesh_three.group, 
+          shape, 
+          null,
+          [255,0,0])
+        mesh.position.x =  len/2.0
+
+        mesh = ut.addShape_line(  
+          this.mesh_three.group, 
+          shape, 
+          [0,0,0])
+        mesh.position.x =  len/2.0
+
+        shape = ut.rect( wid, len )
+        mesh = ut.addShape_polygon(  
+          this.mesh_three.group, 
+          shape, 
+          null,
+          [0,255,0])
+        mesh.position.y =  len/2.0
+
+        mesh = ut.addShape_line(  
+          this.mesh_three.group, 
+          shape, 
+          [0,0,0])
+        mesh.position.y =  len/2.0
+        
+      }
     }    
 
     animate_three()
