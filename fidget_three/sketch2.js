@@ -56,7 +56,7 @@ let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
 var nbr = 10
-var debug = true
+var debug = false
 var ground_enable = false
 
 
