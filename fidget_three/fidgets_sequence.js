@@ -8,7 +8,7 @@ import fidget_windmill from './fidget_windmill.js';
 
 export default class fidgets_sequence
 {
-    constructor( nbr, m, s, screen_dims, matter_engine,mouseConstraint, shaders = [], debug=false, use_webgl = false)
+    constructor( nbr, m, s, screen_dims, matter_engine,mouseConstraint, shaders = [], debug=false)
     {
         //option
         this.fidgets_nbr = nbr
@@ -33,15 +33,14 @@ export default class fidgets_sequence
 
         this.shaders = shaders
         this.screen_dims = screen_dims
-        this.use_webgl = use_webgl
         this.matter_engine = matter_engine
         this.mouseConstraint = mouseConstraint
         
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
-            //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
-            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode,this.use_webgl)
+            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
+            //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
+            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
@@ -58,12 +57,6 @@ export default class fidgets_sequence
       
     }
 
-    preload()
-    {
-      console.log('preload : fidgets_sequence')
-      for( let i = 0; i < this.fidgets_nbr; i++)
-        this.fidgets[i].preload();
-    }
 
     setup()
     {
@@ -77,42 +70,14 @@ export default class fidgets_sequence
 
 
 
-    get_random_fidget(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug,use_webgl)
+    get_random_fidget(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug)
     {
       
       let r = Math.random()
       if(  0.5 < r)
-        return new fidget_windmill(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug,use_webgl)
+        return new fidget_windmill(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug)
       else
-        return new fidget_daft_i(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug,use_webgl)   
-    }
-
-    draw_background()
-    {
-      // too slow
-      /*
-        
-        
-        let c1 = color(10,10,10);
-        let c2 = color(10,10,10);
-        let c3 = color(80,80,100);
-        let middle_height = this.screen_dims.y/2
-        
-        for(let y=0; y<middle_height; y++)
-        {
-            let n = map(y ,0,middle_height,0,1);
-          let newc = lerpColor(c1,c2,n);
-          stroke(newc);
-          line(0,y,this.screen_dims.x, y);
-        }
-        for(let y=middle_height; y<this.screen_dims.y; y++)
-        {
-            let n = map(y,middle_height,this.screen_dims.y,0,1);
-          let newc = lerpColor(c2,c3,n);
-          stroke(newc);
-          line(0,y,this.screen_dims.x, y);
-        }      
-        */  
+        return new fidget_daft_i(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug)   
     }
 
 
@@ -148,40 +113,6 @@ export default class fidgets_sequence
         }
         this.fidgets[i].update()
         this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
-      }
-    }
-
-    draw_fidgets(p5)
-    {
-      var rez = this.get_resolution_coef_info()
-      
-      if( 0.9< rez)
-      {
-        p5.fill(0)
-        p5.textSize(100);
-        p5.textAlign(p5.CENTER);
-        if(this.use_webgl == false )
-          p5.text( '?', this.screen_dims.x/2,this.screen_dims.y/2+Math.cos(this.update_count/10)*20+30)        
-      }
-
-      var rez_step = rez*this.fidgets_nbr
-      var i_max = this.fidgets_nbr
-      var coef = i_max-rez_step
-
-      for( let i = 0; i < this.fidgets.length; i++ )
-      {   
-        if(this.anim_mode == false)
-        {
-          if((  i-1< coef  )&&(  coef <= i+1 ))
-          {
-          }
-          else{
-            continue
-          }
-        }
-        //this.fidgets[i].update(p5)
-        this.fidgets[i].draw(p5)
-        //this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
       }
     }
 
@@ -258,38 +189,6 @@ export default class fidgets_sequence
         //this.chrono.s = s_chrono
         this.chrono.update()
         this.chrono.update_three()
-    }
-    
-    draw_chrono(p5)
-    {
-
-        var p_chrono = new Vector(0, 0)
-        var s_chrono = 0
-        
-      
-        if(this.fidgets_to_show[0] < 0 )
-        {
-          var a = Math.min(1,Math.max(0,this.end_update_count / 100))
-          this.chrono.stop()
-          let blendA = (0.1*(1-a)+0.5*a)
-          let blendB = (0.05*(1-a)+0.07*a)
-          p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
-          s_chrono = this.screen_dims.x * blendB
-      
-          this.end_update_count += 1
-        }
-        else
-        {
-          p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * 0.1)
-          s_chrono = this.screen_dims.x * 0.05
-          this.end_update_count = 0
-      
-        }
-        //this.chrono.p = p_chrono
-        //this.chrono.s = s_chrono
-        this.chrono.update()
-        if(this.use_webgl == false )
-          this.chrono.draw(p5)
     }
     
 
@@ -405,14 +304,6 @@ export default class fidgets_sequence
       this.update_count += 1
     }
 
-    draw(p5) {
-        p5.background(50);
-        this.draw_fidgets(p5)
-        this.draw_chrono(p5)
-
-        if(this.debug_mode)
-            this.draw_debug.draw(p5)
-      }
 
 
       

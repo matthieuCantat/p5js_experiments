@@ -14,9 +14,9 @@ export default class fidget_windmill extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, matter_engine,mouseConstraint, shaders = [],debug=false,use_webgl = false,random_color=true)
+  constructor( m, s, screen_dims, matter_engine,mouseConstraint, shaders = [],debug=false,random_color=true)
   {
-    super(m, s, screen_dims, matter_engine,mouseConstraint,shaders, debug,use_webgl)
+    super(m, s, screen_dims, matter_engine,mouseConstraint,shaders, debug)
 
     this.title = 'windmill'
 
@@ -100,7 +100,6 @@ export default class fidget_windmill extends fidget{
                                     fix_rot:true,
                                     density:0.001,
                                     limit_rot: [ 0, rad(270)],
-                                    use_webgl: this.use_webgl,
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
                                     })
@@ -122,7 +121,6 @@ export default class fidget_windmill extends fidget{
                                     fix_rot:true,
                                     density:0.001,
                                     limit_rot: [ 0, rad(270)],
-                                    use_webgl: this.use_webgl,
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
                                     })                                    
@@ -144,7 +142,6 @@ export default class fidget_windmill extends fidget{
                                       collision_category : utils.collision_category.blue,
                                       collision_mask : utils.collision_category.default ,    
                                       fix_rot:true,
-                                      use_webgl: this.use_webgl,
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
                                       //texture_three: text_checker_three,
@@ -168,7 +165,6 @@ export default class fidget_windmill extends fidget{
                           distPos: 35*s,
                           distNeg: 0.001,  
                         },
-      use_webgl: this.use_webgl,
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
       //texture_three: text_checker_three,
@@ -225,7 +221,6 @@ export default class fidget_windmill extends fidget{
                                     fix_rot:true,
                                     density:0.001,
                                     limit_rot: [ 0, rad(270)],
-                                    use_webgl: this.use_webgl,
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
                                     })    
@@ -251,7 +246,7 @@ export default class fidget_windmill extends fidget{
                                             distPos: 35/4*s,
                                             distNeg: 0.001,  
                                           },
-                                          use_webgl: this.use_webgl,
+                                          
                                           screen_dims: this.screen_dims,
                                           matter_engine: this.matter_engine,
                                         })  
@@ -276,7 +271,7 @@ export default class fidget_windmill extends fidget{
                                                 collision_category: utils.collision_category.none,
                                                 collision_mask: utils.collision_category.none ,
                                                 type:utils.shape.rectangle,
-                                                use_webgl: this.use_webgl,
+                                                
                                                 screen_dims: this.screen_dims,
                                                 matter_engine: this.matter_engine,  
                                                 //texture_three: text_checker_three,     
@@ -304,7 +299,7 @@ export default class fidget_windmill extends fidget{
                                     fix_rot:true,
                                     density:0.001,
                                     limit_rot: [ 0, rad(270)],
-                                    use_webgl: this.use_webgl,
+                                    
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
                                     })    
@@ -331,7 +326,7 @@ export default class fidget_windmill extends fidget{
                                         distPos: 35*s,
                                         distNeg: 0.001, 
                                       },
-                                      use_webgl: this.use_webgl,
+                                      
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
                                     })
@@ -359,7 +354,7 @@ export default class fidget_windmill extends fidget{
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
                                                   type:utils.shape.rectangle,
-                                                  use_webgl: this.use_webgl,
+                                                  
                                                   screen_dims: this.screen_dims,
                                                   matter_engine: this.matter_engine,  
                                                   //texture_three: text_checker_three,     
@@ -383,7 +378,7 @@ export default class fidget_windmill extends fidget{
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
                                                   type:utils.shape.arc,
-                                                  use_webgl: this.use_webgl,
+                                                  
                                                   screen_dims: this.screen_dims,
                                                   matter_engine: this.matter_engine,  
                                                   //texture_three: text_checker_three, 
@@ -406,7 +401,7 @@ export default class fidget_windmill extends fidget{
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
       type: utils.shape.rectangle,
-      use_webgl: this.use_webgl,
+      
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
       //texture_three: text_checker_three_grey,
@@ -453,7 +448,7 @@ export default class fidget_windmill extends fidget{
         distPos: 5*s,
         distNeg: 10*s,  
       },
-      use_webgl: this.use_webgl,
+      
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,  
       //texture_three: text_checker_three,      
@@ -499,83 +494,7 @@ export default class fidget_windmill extends fidget{
                                         })) 
   
    
-                                    
-    /*
-    if(this.show_step_helpers[0] )
-    {
-      let coef = this.show_step_helpers[0] / 100 *255
-      p5.push();
-      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      p5.fill(0,0,0,0)
-      p5.stroke(utils.color.yellow[0],
-        utils.color.yellow[1],
-        utils.color.yellow[2],
-        coef)
-      let w = 1
-      let h = 4
-      let p = this.bodies.inters.A.get_matrix().get_row(2).get_value()
-      
-      p5.rect( p.x-w/2,
-            p.y,
-            w,
-            20*h)
-      p5.stroke(0)
-      p5.pop()
-
-      this.show_step_helpers[0] -= 2
-    }
-
-    if(this.show_step_helpers[1] )
-    {
-      let coef = this.show_step_helpers[1] / 100 *255
-      p5.push();
-      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      p5.fill(0,0,0,0)
-      p5.stroke(utils.color.yellow[0],
-        utils.color.yellow[1],
-        utils.color.yellow[2],
-        coef)
-      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
-      p5.arc(p.x,
-        p.y, 
-        this.bodies.inters.B.w*1.6,
-        this.bodies.inters.B.w*1.6, 
-        p5.HALF_PI, 
-        p5.PI *2);
-      p5.stroke(0)
-      p5.pop()
-
-      this.show_step_helpers[1] -= 2
-    }
-
-    if(this.show_step_helpers[2] )
-    {
-      let coef = this.show_step_helpers[2] / 100 *255
-      p5.push();
-      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      p5.fill(0,0,0,0)
-      p5.stroke(utils.color.yellow[0],
-        utils.color.yellow[1],
-        utils.color.yellow[2],
-        coef)
-      let w = 1
-      let h = 4
-      
-      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
-      let pB = this.bodies.inters.C.get_matrix().get_row(2).get_value()
-      p5.rect( p.x,
-            p.y,
-            (pB.x - p.x)*2.21,
-            0)
-      p5.stroke(0)
-      p5.pop()
-
-      this.show_step_helpers[2] -= 2
-    }
-
-  }  
-  */   
-                                  
+                                
   }
 
 
@@ -1048,88 +967,6 @@ export default class fidget_windmill extends fidget{
     
 
   }  
-
-  draw_help(p5)
-  {
-
-    /////////////////////////////////////////////////
-    if(this.show_step_helpers[0] )
-    {
-      let coef = this.show_step_helpers[0] / 100 *255
-      p5.push();
-      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      p5.fill(0,0,0,0)
-      p5.stroke(utils.color.yellow[0],
-        utils.color.yellow[1],
-        utils.color.yellow[2],
-        coef)
-      let w = 1
-      let h = 4
-      let p = this.bodies.inters.A.get_matrix().get_row(2).get_value()
-      
-      p5.rect( p.x-w/2,
-            p.y,
-            w,
-            20*h)
-      p5.stroke(0)
-      p5.pop()
-
-      //this.show_step_helpers[0] -= 2
-    }
-
-    if(this.show_step_helpers[1] )
-    {
-      let coef = this.show_step_helpers[1] / 100 *255
-      p5.push();
-      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      p5.fill(0,0,0,0)
-      p5.stroke(utils.color.yellow[0],
-        utils.color.yellow[1],
-        utils.color.yellow[2],
-        coef)
-      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
-      p5.arc(p.x,
-        p.y, 
-        this.bodies.inters.B.w*1.6,
-        this.bodies.inters.B.w*1.6, p5.HALF_PI, p5.PI *2);
-      p5.stroke(0)
-      p5.pop()
-
-      //this.show_step_helpers[1] -= 2
-    }
-
-    if(this.show_step_helpers[2] )
-    {
-      let coef = this.show_step_helpers[2] / 100 *255
-      p5.push();
-      p5.translate(this.webgl_draw_coords_offset.x(),this.webgl_draw_coords_offset.y())          
-      p5.fill(0,0,0,0)
-      p5.stroke(utils.color.yellow[0],
-        utils.color.yellow[1],
-        utils.color.yellow[2],
-        coef)
-      let w = 1
-      let h = 4
-      
-      let p = this.bodies.inters.B.get_matrix().get_row(2).get_value()
-      let pB = this.bodies.inters.C.get_matrix().get_row(2).get_value()
-      p5.rect( p.x,
-            p.y,
-            (pB.x - p.x)*2.21,
-            0)
-      p5.stroke(0)
-      p5.pop()
-
-      //this.show_step_helpers[2] -= 2
-    }
-
-  }  
-
-  draw(p5)
-  {
-    this.bodies_draw(p5)
-    this.draw_help(p5)
-  }
 
   setup_shapes_three()
   {

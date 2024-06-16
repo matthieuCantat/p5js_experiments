@@ -24,9 +24,8 @@ export default class fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, matter_engine, mouseConstraint,shaders = [],debug=false,use_webgl = false)
+  constructor( m, s, screen_dims, matter_engine, mouseConstraint,shaders = [],debug=false)
   {
-    console.log('fidget',use_webgl)
     this.m = m
     this.s = s
     this.screen_dims = screen_dims
@@ -52,7 +51,6 @@ export default class fidget{
     this.mouse_pressed_positions_at_update = []
     this.touch_enable = true
     this.anim_mode = false
-    this.use_webgl = use_webgl
     this.matter_engine = matter_engine
     this.mouseConstraint = mouseConstraint
     /////////////////////////////////////////////////////////////////// build
@@ -73,24 +71,15 @@ export default class fidget{
 
     this.shaders = shaders
 
-    this.webgl_draw_coords_offset = new Vector(-screen_dims.x/4,0)
-    if( this.use_webgl == false )
-      this.webgl_draw_coords_offset = new Vector(0,0)   
+     
       
     this.group_three = null
   }
 
-  preload()
-  {
-    console.log('preload : fidget')
-    this.bodies_preload()
-  }
 
   setup()
   {     
-    console.log('setup : fidget')   
-
-    this.bodies_setup()                      
+    console.log('setup : fidget')                      
     this.bodies_set_debug( this.debug_mode )
     this.bodies_set_visibility(this.debug_mode, ['inters'])   
   }
@@ -153,11 +142,7 @@ export default class fidget{
   //////////////////////////////////////////////////////////////////////////////////// DRAW
   ////////////////////////////////////////////////////////////////////////////////////
 
-  draw(p5)
-  {
-    this.bodies_draw(p5)
-  }  
-
+  
   draw_background()
   {
     let a = this.state.steps[3].update_count
@@ -309,28 +294,6 @@ export default class fidget{
     }
   }
 
-  bodies_draw( p5, body_type_filter = [] )
-  {
-    
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
-    {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
- 
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
-      {
-      
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].draw(p5)
-        }
-        else
-          this.bodies[b_type][key].draw(p5)
-  
-      } 
-    }
-  }
   bodies_setup_shapes_three( body_type_filter = [] )
   {
   
@@ -550,49 +513,7 @@ export default class fidget{
     }  
   }
 
-  bodies_setup( body_type_filter = [] )
-  {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
-    {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
-      
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
-      {
-   
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].setup() 
-        }
-        else
-          this.bodies[b_type][key].setup()
-        
-      } 
-    }       
-  }
-
-  bodies_preload( body_type_filter = [] )
-  {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
-    {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
-      
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
-      {
   
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].preload() 
-        }
-        else
-          this.bodies[b_type][key].preload()
-        
-      } 
-    }       
-  }  
 
   bodies_set_debug( value,body_type_filter = [] )
   {

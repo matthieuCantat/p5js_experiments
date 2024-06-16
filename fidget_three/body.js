@@ -37,7 +37,6 @@ export default class body_build{
         axe_constraint: null,
         density:0.001,
         mass:null,
-        use_webgl:false,
         screen_dims:null,
         matter_engine:null,
         texture_three:null,
@@ -76,7 +75,6 @@ export default class body_build{
       this.do_update = true
       this.density = args.density
       this.mass = args.mass
-      this.use_webgl = args.use_webgl
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
       this.texture_three = args.texture_three
@@ -255,9 +253,6 @@ export default class body_build{
 
 
       
-      this.webgl_draw_coords_offset = new Vector(-this.screen_dims.x/2,-this.screen_dims.y/2)
-      if( this.use_webgl == false )
-        this.webgl_draw_coords_offset = new Vector(0,0)
 
 
       this.geo = null
@@ -265,142 +260,7 @@ export default class body_build{
       this.mesh_three = null
     }
 
-    preload()
-    {
-        console.log('preload : body')
-    }
-
-    setup()
-    {
-        console.log('setup : body')
-
-
-        this.geo = new p5.Geometry();
-        let pA = new Vector(0, 0, 0);
-        let pB = new Vector(0, 0, 0);
-        let pC = new Vector(0, 0, 0);
-        let pD = new Vector(0, 0, 0);
-
-        var pi2 = Math.PI*2
-        switch(this.type) {
-          case 0:
-            // Create p5.Vector objects to position the vertices.
-            pA = new Vector( 0.5*this.w,  -0.5*this.h, 0);
-            pB = new Vector( 0.5*this.w, 0.5*this.h, 0);
-            pC = new Vector( -0.5*this.w, 0.5*this.h, 0);
-            pD = new Vector( -0.5*this.w,  -0.5*this.h, 0);
-          
-            // Add the vertices to the p5.Geometry object's vertices array.
-            this.geo.vertices.push(pA, pB, pC); 
-            this.geo.vertices.push(pA, pD, pC); 
-            this.geo.faces.push([0, 1, 2]);
-            this.geo.faces.push([3, 4, 5]);
-            //this.geo.computeFaces(); 
-            break
-          case 1:
-            // Create p5.Vector objects to position the vertices.
-            pA = new Vector(  0.5*this.w*2*this.scale, -0.5*this.w*2*this.scale, 0);
-            pB = new Vector(  0.5*this.w*2*this.scale,  0.5*this.w*2*this.scale, 0);
-            pC = new Vector( -0.5*this.w*2*this.scale,  0.5*this.w*2*this.scale, 0);
-            pD = new Vector( -0.5*this.w*2*this.scale, -0.5*this.w*2*this.scale, 0);
-          
-            // Add the vertices to the p5.Geometry object's vertices array.
-            this.geo.vertices.push(pA, pB, pC); 
-            this.geo.vertices.push(pA, pD, pC); 
-            this.geo.faces.push([0, 1, 2]);
-            this.geo.faces.push([3, 4, 5]);
-            //this.geo.computeFaces(); 
-            //circle(0,0,this.w*2*this.scale)
-            break
-          /*  
-          case 2:
-            pA = [Math.cos(pi2*1/6)*this.w,Math.sin(pi2*1/6)*this.w]
-            pB = [Math.cos(pi2*3/6)*this.w,Math.sin(pi2*3/6)*this.w]
-            pC = [Math.cos(pi2*5/6)*this.w,Math.sin(pi2*5/6)*this.w]
-            triangle(pA[0], pA[1], pB[0], pB[1], pC[0], pC[1]);
-            break
-          case 3:
-            beginShape(TESS);
-            vertex(Math.cos(pi2*1/10)*this.w,Math.sin(pi2*1/10)*this.w);
-            vertex(Math.cos(pi2*3/10)*this.w,Math.sin(pi2*3/10)*this.w);
-            vertex(Math.cos(pi2*5/10)*this.w,Math.sin(pi2*5/10)*this.w);
-            vertex(Math.cos(pi2*7/10)*this.w,Math.sin(pi2*7/10)*this.w);
-            vertex(Math.cos(pi2*9/10)*this.w,Math.sin(pi2*9/10)*this.w);
-            endShape(CLOSE);
-            break    
-          case 4:
-            beginShape(TESS);
-            vertex(Math.cos(pi2*1/12)*this.w,Math.sin(pi2*1/12)*this.w);
-            vertex(Math.cos(pi2*3/12)*this.w,Math.sin(pi2*3/12)*this.w);
-            vertex(Math.cos(pi2*5/12)*this.w,Math.sin(pi2*5/12)*this.w);
-            vertex(Math.cos(pi2*7/12)*this.w,Math.sin(pi2*7/12)*this.w);
-            vertex(Math.cos(pi2*9/12)*this.w,Math.sin(pi2*9/12)*this.w);
-            vertex(Math.cos(pi2*11/12)*this.w,Math.sin(pi2*11/12)*this.w);
-            endShape(CLOSE);
-            break    
-          case 5:     
-            beginShape(TESS);
-            for(let i = 0; i < this.shape_vertices.length;i++)
-              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-            endShape(CLOSE);
-            break    
-          case 6:     
-            beginShape(TESS);
-            for(let i = 0; i < this.shape_vertices.length;i++)
-              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-            endShape(CLOSE);
-            break          
-          case 7:        
-            beginShape(TESS);
-            for(let i = 0; i < this.shape_vertices.length;i++)
-              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-            endShape(CLOSE);
-            break   
-          case 8:     
-            beginShape(TESS);
-            for(let i = 0; i < this.shape_vertices.length;i++)
-              vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-            endShape(CLOSE);
-            break     
-          case 9:       
-            rectMode(p5.CENTER)
-            rect(0,0,this.w/3,this.h)
-            rect(0,0,this.w,this.h/3)
-            break;      
-          case 10:       
-            rectMode(p5.CENTER)
-            let w = this.w/2
-            let h = this.h/2
-            let ptA = new Vector(-w,  h)
-            let ptB = new Vector(-w, -h)
-            let ptC = new Vector( w, -h)
-            let ptD = new Vector( w,  h)
-            let vAB = ptB.getSub(ptA)
-            let vDC = ptC.getSub(ptD)
-            let slop_rad = rad(this.slop)
-            vAB.rotate(slop_rad)
-            vDC.rotate(slop_rad*-1)
-            vAB.normalize()
-            vDC.normalize()
-            let new_length = this.h/Math.cos(slop_rad)
-            vAB.mult(new_length)
-            vDC.mult(new_length)
-            ptB = ptA.getAdd(vAB)
-            ptC = ptD.getAdd(vDC)
     
-            quad(ptA.x(), ptA.y(), ptB.x(), ptB.y(), ptC.x(), ptC.y(), ptD.x(), ptD.y());
-            break;  
-            */                                             
-          }         
-
-
-    }
-   
-
-
-
-  
-  
     apply_scale( value )
     {
       this.scale = this.scale*value
@@ -518,185 +378,6 @@ export default class body_build{
     }
     
   
-    draw(p5){
-
-      if( this.get_visibility() == 0 ) 
-        return
-      p5.push(); // Start a new drawing state
-  
-      
-      if(this.debug)
-      {
-        if(( this.c_axe != null)&&(this.c_axe.debug_pts[0]!=null)&&(this.c_axe.enable == true ))
-          p5.line(this.c_axe.debug_pts[0].x(), this.c_axe.debug_pts[0].y(), this.c_axe.debug_pts[1].x(), this.c_axe.debug_pts[1].y());
-      }
-  
-  
-      p5.fill(this.color)
-      //p5.strokeWeight(0);
-      //p5.stroke(this.colorStroke)
-      
-      if( this.shader != null)
-      {
-        this.shader.iFrame = this.draw_count;
-        this.shader.iTime = p5.millis() / 1000.0; 
-        this.shader.iMouse = { x: 0, y: 0};
-      
-        this.shader.bg_animation = 1.
-        this.shader.bg_grain = 1.
-        this.shader.bg_grain_scale = 14.
-        this.shader.bg_grid = 0.0
-        this.shader.bg_grid_scale = 10.0
-        this.shader.bg_grid_line_scale =  2.0
-        this.shader.bg_grid_point_scale =  2.0
-      
-        this.shader.bg_typeA = 0.0;
-        this.shader.bg_typeB = 0.0;
-        this.shader.bg_typeC = 1.0;
-        this.shader.bg_typeD = 0.;
-        this.shader.bg_type_discoTarget= 0.;
-      
-        this.shader.light_beam = 0.0
-        this.shader.debug = 0    
-  
-        this.shader.as_texture(p5)
-      }
-
-      
-      
-      
-      p5.translate(this.webgl_draw_coords_offset.x()+this.body.position.x,this.webgl_draw_coords_offset.y()+this.body.position.y)
-      p5.rotate(this.body.angle);
-  
-      var pi2 = Math.PI*2
-      switch(this.type) {
-        case 0:
-          if(this.use_webgl)
-          {
-            //model(this.geo)
-            p5.plane(this.w,this.h,);
-          }
-          else{
-            p5.rectMode(p5.CENTER)
-            let corner_radius = 2
-            p5.rect(0,0,this.w,this.h, corner_radius)
-          }
-          break
-        case 1:
-          if(this.use_webgl)
-          {
-            //model(this.geo)
-            p5.sphere(this.w*2*this.scale/2.,10, 7)
-          }
-          else{
-            p5.circle(0,0,this.w*2*this.scale)
-          }
-          break  
-        case 2:
-          let pA = [Math.cos(pi2*1/6)*this.w,Math.sin(pi2*1/6)*this.w]
-          let pB = [Math.cos(pi2*3/6)*this.w,Math.sin(pi2*3/6)*this.w]
-          let pC = [Math.cos(pi2*5/6)*this.w,Math.sin(pi2*5/6)*this.w]
-          p5.triangle(pA[0], pA[1], pB[0], pB[1], pC[0], pC[1]);
-          break
-        case 3:
-          p5.beginShape(TESS);
-          p5.vertex(Math.cos(pi2*1/10)*this.w,Math.sin(pi2*1/10)*this.w);
-          p5.vertex(Math.cos(pi2*3/10)*this.w,Math.sin(pi2*3/10)*this.w);
-          p5.vertex(Math.cos(pi2*5/10)*this.w,Math.sin(pi2*5/10)*this.w);
-          p5.vertex(Math.cos(pi2*7/10)*this.w,Math.sin(pi2*7/10)*this.w);
-          p5.vertex(Math.cos(pi2*9/10)*this.w,Math.sin(pi2*9/10)*this.w);
-          p5.endShape(CLOSE);
-          break    
-        case 4:
-          p5.beginShape(TESS);
-          p5.vertex(Math.cos(pi2*1/12)*this.w,Math.sin(pi2*1/12)*this.w);
-          p5.vertex(Math.cos(pi2*3/12)*this.w,Math.sin(pi2*3/12)*this.w);
-          p5.vertex(Math.cos(pi2*5/12)*this.w,Math.sin(pi2*5/12)*this.w);
-          p5.vertex(Math.cos(pi2*7/12)*this.w,Math.sin(pi2*7/12)*this.w);
-          p5.vertex(Math.cos(pi2*9/12)*this.w,Math.sin(pi2*9/12)*this.w);
-          p5.vertex(Math.cos(pi2*11/12)*this.w,Math.sin(pi2*11/12)*this.w);
-          p5.endShape(CLOSE);
-          break    
-        case 5:     
-          p5.beginShape(TESS);
-          for(let i = 0; i < this.shape_vertices.length;i++)
-            p5.vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-          p5.endShape(CLOSE);
-          break    
-        case 6:     
-          p5.beginShape(TESS);
-          for(let i = 0; i < this.shape_vertices.length;i++)
-            p5.vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-          p5.endShape(CLOSE);
-          break          
-        case 7:        
-          p5.beginShape(TESS);
-          for(let i = 0; i < this.shape_vertices.length;i++)
-            p5.vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-          p5.endShape(CLOSE);
-          break   
-        case 8:     
-          p5.beginShape(TESS);
-          for(let i = 0; i < this.shape_vertices.length;i++)
-            p5.vertex(this.shape_vertices[i].x, this.shape_vertices[i].y);
-          p5.endShape(CLOSE);
-          break     
-        case 9:       
-          p5.rectMode(p5.CENTER)
-          p5.rect(0,0,this.w/3,this.h)
-          p5.rect(0,0,this.w,this.h/3)
-          break;      
-        case 10: // trapezoid    
-          if(this.use_webgl)
-          {   
-            p5.plane(this.w,this.h,);
-          }
-          else{
-            p5.rectMode(p5.CENTER)
-            let w = this.w/2
-            let h = this.h/2
-            let ptA = new Vector(-w,  h)
-            let ptB = new Vector(-w, -h)
-            let ptC = new Vector( w, -h)
-            let ptD = new Vector( w,  h)
-            let vAB = ptB.getSub(ptA)
-            let vDC = ptC.getSub(ptD)
-            let slop_rad = rad(this.slop)
-            vAB.rotate(slop_rad)
-            vDC.rotate(slop_rad*-1)
-            vAB.normalize()
-            vDC.normalize()
-            let new_length = this.h/Math.cos(slop_rad)
-            vAB.mult(new_length)
-            vDC.mult(new_length)
-            ptB = ptA.getAdd(vAB)
-            ptC = ptD.getAdd(vDC)
-    
-            p5.quad(ptA.x(), ptA.y(), ptB.x(), ptB.y(), ptC.x(), ptC.y(), ptD.x(), ptD.y());
-          }
-
-          break;  
-                                                     
-        } 
-        
-  
-      if (this.debug)
-      {
-        let len = 10
-        let wid = 2
-        //strokeWeight(0);
-        p5.fill([255,0,0])
-        p5.rect( len/2.0, 0, len, wid)
-        p5.fill([0,255,0])
-        p5.rect( 0, len/2.0, wid, len)  
-      }
-  
-  
-      p5.pop(); // Restore original state
-
-      this.draw_count += 1
-    }
-
 
   
     setup_shapes_three(group_fidget){

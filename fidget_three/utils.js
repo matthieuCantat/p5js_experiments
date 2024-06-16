@@ -141,31 +141,6 @@ export class constraint_build{
     this.cns.pointB = this.pB
   }
 
-  draw(p5){
-    //
-    p5.push(); // Start a new drawing state
-    p5.fill(this.color)
-    p5.strokeWeight(4);
-    //p5.stroke(this.colorStroke)
-
-    //p5.translate(this.body.position.x,this.body.position.y)
-    //p5.rotate(this.body.angle);
-
-    switch(this.type) {
-      case 0:
-        var pA = {x:this.cns.pointA.x, y:this.cns.pointA.y}
-        if(this.cns.bodyA != null)
-          pA = {x:this.cns.bodyA.position.x+this.cns.pointA.x, y:this.cns.bodyA.position.y+this.cns.pointA.y}
-        var pB = {x:this.cns.pointB.x,y:this.cns.pointB.y}
-        if(this.cns.bodyB != null)
-          pB = {x:this.cns.bodyB.position.x+this.cns.pointB.x, y:this.cns.bodyB.position.y+this.cns.pointB.y}
-
-          p5.line( pA.x, pA.y,pB.x, pB.y)
-        break                                       
-      }    
-      p5.pop(); // Restore original state
-
-  }
 
 }
 
@@ -626,148 +601,7 @@ export class Draw_debug
 
     return true
   }
-
-
-  draw(p5)
-  {
-    // text
-    let sText = 10;
-    let hText = 30;
-    p5.strokeWeight(0);   
-    p5.textSize(sText);
-    p5.fill(255, 255, 255);
-    p5.text('frameRate : ' + Math.round( p5.frameRate(), 2 ) , sText , hText );   
-    p5.text(' '  , sText , hText+=sText );   
-    p5.text('count : ' + this.fidget.state.update_count , sText , hText+=sText); 
-    p5.text('res : ' + Math.round( this.fidget.state.resolution_coef, 2 ) + ' / 4' , sText , hText+=sText); 
-    p5.text('last selection switch step : ' + this.fidget.state.switch_selection_happened_step , sText , hText+=sText); 
-    p5.text(' '  , sText , hText+=sText );  
-
-    p5.fill(255, 255, 255);
-    if( this.fidget.state.steps[0].in_use )
-      p5.fill(255, 255, 0);
-    p5.text('0 - count: ' + this.fidget.state.steps[0].update_count , sText , hText+=sText); 
-    p5.text('0 - res: ' + Math.round( this.fidget.state.steps[0].resoluton_coef, 2) + ' / 1' , sText , hText+=sText); 
-    p5.text(' '  , sText , hText+=sText );   
-
-    p5.fill(255, 255, 255);
-    if( this.fidget.state.steps[1].in_use )
-      p5.fill(255, 255, 0)
-
-    p5.text('1 - count: ' + this.fidget.state.steps[1].update_count , sText , hText+=sText); 
-    p5.text('1 - res Coef: ' + Math.round( this.fidget.state.steps[1].resoluton_coef, 2) + ' / 1' , sText , hText+=sText);        
-    p5.text(' '  , sText , hText+=sText );   
-
-    p5.fill(255, 255, 255);
-    if( this.fidget.state.steps[2].in_use )
-      p5.fill(255, 255, 0)
-
-    p5.text('2 - count: ' + this.fidget.state.steps[2].update_count , sText , hText+=sText); 
-    p5.text('2 - res Coef: ' + Math.round( this.fidget.state.steps[2].resoluton_coef, 2) + ' / 1' , sText , hText+=sText);    
-    p5.text(' '  , sText , hText+=sText );   
-
-    p5.fill(255, 255, 255);
-    if( this.fidget.state.steps[3].in_use )
-      p5.fill(255, 255, 0)
-
-    p5.text('3 - count: ' + this.fidget.state.steps[3].update_count , sText , hText+=sText); 
-    p5.text('3 - res Coef: ' + Math.round( this.fidget.state.steps[3].resoluton_coef, 2) + ' / 1' , sText , hText+=sText); 
-    p5.text(' '  , sText , hText+=sText );   
-
-    p5.fill(255, 255, 255);
-    if( this.fidget.state.steps[4].in_use )
-      p5.fill(255, 255, 0)
-
-    p5.text('4 - count: ' + this.fidget.state.steps[4].update_count , sText , hText+=sText); 
-    p5.text('4 - res Coef: ' + Math.round( this.fidget.state.steps[4].resoluton_coef, 2) + ' / 1' , sText , hText+=sText); 
-    p5.text(' '  , sText , hText+=sText );   
-
-    p5.fill(255, 255, 255);
-    if( this.fidget.state.steps[5].in_use )
-      p5.fill(255, 255, 0)    
-
-    p5.text('5 - count: ' + this.fidget.state.steps[5].update_count , sText , hText+=sText); 
-    p5.text('5 - res Coef: ' + Math.round( this.fidget.state.steps[5].resoluton_coef, 2) + ' / 1' , sText , hText+=sText);
-    
-    p5.fill(255, 255, 255);
-
-    // mouse
-    p5.strokeWeight(10)
-    p5.circle(this.mouse_cns.constraint.pointA.x,this.mouse_cns.constraint.pointA.y,10)
-    p5.strokeWeight(1)
-    
-    // mouse B
-    let c = p5.color(255, 204, 0);
-    p5.fill(c);  
-    
-    var mouseVector = new Vector(0,0)
-    if( p5.mouseIsPressed )
-    {
-      this.history.push( new Vector( p5.pmouseX , p5.pmouseY , 20 ) )    
-    }
-    else if( 0 < this.history.length )
-    {
-      if(  this.history.length < this.traceFrameCount )
-      {
-        this.hitHistory.push( this.history[0] )
-      }
-      else
-      {
-        var pA = this.history[0]
-        var pB = this.history[this.history.length-1]
-
-        mouseVector = pB.getSub(pA)
-        var vSide = new Vector( mouseVector.y, -mouseVector.x)
-        vSide.setScale(10)
-        p5.triangle( pA.x()+vSide.x(), pA.y()+vSide.y(), pA.x()-vSide.x(), pA.y()-vSide.y(), pB.x(), pB.y())
-      }
-      this.history = []
-    }
-  
-    if( 2 < this.history.length )
-    {
-      for( var i = 0 ; i < this.history.length - 1 ;i++)
-      p5.line(this.history[i].x, this.history[i].y, this.history[i+1].x, this.history[i+1].y)    
-    }
-  
-    for(  var j = 0 ; j < this.hitHistory.length ;j++)
-    {
-      p5.circle( this.hitHistory[j].x, this.hitHistory[j].y , this.hitHistory[j].z);  
-      this.hitHistory[j].z -= 1.0;
-      this.hitHistory[j].z = Math.max( this.hitHistory[j].z , 0 )
-    }
-      
-  }
 }
-
-/*
-export function arrowHead(start, vector, s = 1) {
-
-
-
-  var norm = new Vector(vector.x, vector.y);
-  norm.normalize();
-  norm.mult(12)
-  norm.mult(s)
-
-  triangle(start.x-norm.y/2   , start.y+norm.x/2, 
-           start.x+norm.x   , start.y+norm.y, 
-           start.x+norm.y/2   , start.y-norm.x/2);
-
-
-}
-
-export function arrowHeads(start, vector, s = 1) {
-
-  
-  arrowHead(start, vector, s)
-  let v_offset = p5.Vector.mult(vector,15*s)
-  let p = p5.Vector.add( start,v_offset)
-  arrowHead(p,vector, s)  
-  p = p5.Vector.add( start,p5.Vector.mult(v_offset,2))
-  arrowHead(p, vector, s)  
-}
-*/
 
 
 export function switch_selection( mouse_cns, next_elem = null , hack = false)
@@ -889,16 +723,6 @@ export class Chrono
     const [ml,sec, min, hr] = this.getHMS(deltaTime);
     const time = `${pad(min,2)}:${pad(sec,2)}:${pad(ml,2)}`;
     this.time_str = time
-  }
-
-  draw(p5)
-  {
-    if(this.v == false)
-      return
-    p5.fill(255);
-    p5.textSize(this.s);
-    p5.textAlign(p5.CENTER);
-    p5.text(this.time_str, this.p.x(), this.p.y());
   }
 
   update_three(group)
