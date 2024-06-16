@@ -48,9 +48,9 @@ export default class fidgets_sequence
 
             
         
-            if( this.draw_debug == null)
+            if( (this.debug_mode)&&(this.draw_debug == null) )
             {
-                this.draw_debug = new Draw_debug()
+                this.draw_debug = new Draw_debug(this.screen_dims)
                 this.draw_debug.fidget = fidget
                 this.draw_debug.mouse_cns = this.mouseConstraint
             }
@@ -209,6 +209,9 @@ export default class fidgets_sequence
         this.fidgets[i].animate_three()
 
       this.update_chrono_three()
+      if(this.debug_mode)
+        this.draw_debug.update_three()
+      
 
     }
 
@@ -216,8 +219,15 @@ export default class fidgets_sequence
     setup_chrono_three(scene_three)
     {
       this.chrono.setup_three(scene_three)
-
     }
+    
+    setup_debug_three(scene_three)
+    {
+      if(this.debug_mode)
+        this.draw_debug.setup_three(scene_three)
+    }
+
+    
 
     update_chrono_three()
     {

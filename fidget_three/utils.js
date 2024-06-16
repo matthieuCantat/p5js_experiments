@@ -483,7 +483,7 @@ export function change_selected_obj(mouse_cns,obj)
 
 export class Draw_debug
 {
-  constructor()
+  constructor(screen_dims)
   {
     this.firstPos = null
     this.history =  []
@@ -492,7 +492,141 @@ export class Draw_debug
 
     this.fidget = null
     this.mouse_cns = null
+
+    this.screen_dims = screen_dims
+    this.font = null
+    let Chrono = this
+    const loader = new FontLoader();
+    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {Chrono.font = font})    
+  
+    this.color = 0xFFFFFF;
+
+    this.matLite = new THREE.MeshBasicMaterial( {
+      color: this.color,
+      transparent: false,
+      opacity: 1.0,
+      side: THREE.DoubleSide
+    } );
+
+    this.sText = 10;
+
+    this.three_meshs = [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null]
+    
+
   }
+
+  setup_three(scene_three)
+  {
+    let Debug_inst = this
+    const loader = new FontLoader();
+    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {    
+    
+      let pos_x = Debug_inst.screen_dims.x/2*-1
+      let hText = 100;
+      
+      
+      for( let i = 0; i < Debug_inst.three_meshs.length ; i++)
+      {
+        let three_geometry = new THREE.ShapeGeometry( font.generateShapes('') );
+        Debug_inst.three_meshs[i] = new THREE.Mesh( three_geometry, Debug_inst.matLite );
+        Debug_inst.three_meshs[i].position.x = pos_x
+        Debug_inst.three_meshs[i].position.y = hText     
+        Debug_inst.three_meshs[i].position.z = 100   
+        scene_three.add( Debug_inst.three_meshs[i] );
+
+        hText -= Debug_inst.sText*1.6
+      }
+
+    })
+    
+  }
+
+  update_three()
+  {
+    if( (this.font == null)||(this.three_meshs == null) )
+      return false
+
+    let txt = ''
+    let i = 0
+    
+    txt = 'count : ' + this.fidget.state.update_count
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = 'res : ' + Math.round( this.fidget.state.resolution_coef, 2 ) + ' / 4'
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = 'last selection switch step : ' + this.fidget.state.switch_selection_happened_step
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '0 - count: ' + this.fidget.state.steps[0].update_count
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '0 - res: ' + Math.round( this.fidget.state.steps[0].resoluton_coef, 2) + ' / 1'
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '1 - count: ' + this.fidget.state.steps[1].update_count
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '1 - res Coef: ' + Math.round( this.fidget.state.steps[1].resoluton_coef, 2) + ' / 1'
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '2 - count: ' + this.fidget.state.steps[2].update_count 
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '2 - res Coef: ' + Math.round( this.fidget.state.steps[2].resoluton_coef, 2) + ' / 1'
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '3 - count: ' + this.fidget.state.steps[3].update_count 
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '3 - res Coef: ' + Math.round( this.fidget.state.steps[3].resoluton_coef, 2) + ' / 1' 
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '4 - count: ' + this.fidget.state.steps[4].update_count
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '4 - res Coef: ' + Math.round( this.fidget.state.steps[4].resoluton_coef, 2) + ' / 1'
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '5 - count: ' + this.fidget.state.steps[5].update_count
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    txt = '5 - res Coef: ' + Math.round( this.fidget.state.steps[5].resoluton_coef, 2) + ' / 1'
+    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
+    i += 1
+
+    return true
+  }
+
 
   draw(p5)
   {
