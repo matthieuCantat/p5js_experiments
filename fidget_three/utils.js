@@ -824,7 +824,32 @@ window.onload = function() {
 }
 ////////////////////////////////////////////////// mouse pressed
 
+// Get the status div
+const statusDiv = document.getElementById('status');
 
+// Function to update status
+function updateStatus(message) {
+    statusDiv.textContent = message;
+}
+
+// Add touch event listeners to the document
+document.addEventListener('touchstart', function(event) {
+    updateStatus('Screen touched');
+    console.log('Touch start:', event.touches);
+    isMousePressed = true;
+}, false);
+
+document.addEventListener('touchmove', function(event) {
+    updateStatus('Touch moving');
+    console.log('Touch move:', event.touches);
+    isMousePressed = true;
+}, false);
+
+document.addEventListener('touchend', function(event) {
+    updateStatus('Touch ended');
+    console.log('Touch end:', event.changedTouches);
+    isMousePressed = false;
+}, false);
 
 
 
