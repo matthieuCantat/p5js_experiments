@@ -818,9 +818,9 @@ window.onload = function() {
     document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('touchstart', handleMouseDown,false);
-    document.addEventListener('touchend', handleMouseUp,false);
-    document.addEventListener('touchmove', handleMouseMove,false);    
+    //document.addEventListener('touchstart', handleMouseDown,false);
+    //document.addEventListener('touchend', handleMouseUp,false);
+    //document.addEventListener('touchmove', handleMouseMove,false);    
 }
 ////////////////////////////////////////////////// mouse pressed
 
