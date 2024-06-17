@@ -824,6 +824,7 @@ window.onload = function() {
 }
 ////////////////////////////////////////////////// mouse pressed
 
+
 // Get the status div
 const statusDiv = document.getElementById('status');
 
