@@ -47,7 +47,7 @@ export default class fidgets_sequence
 
             
         
-            if( (this.debug_mode)&&(this.draw_debug == null) )
+            if( (this.debug_mode.info)&&(this.draw_debug == null) )
             {
                 this.draw_debug = new Draw_debug(this.screen_dims)
                 this.draw_debug.fidget = fidget
@@ -140,7 +140,7 @@ export default class fidgets_sequence
         this.fidgets[i].animate_three()
 
       this.update_chrono_three()
-      if(this.debug_mode)
+      if(this.debug_mode.info)
         this.draw_debug.update_three()
       
 
@@ -154,7 +154,7 @@ export default class fidgets_sequence
     
     setup_debug_three(scene_three)
     {
-      if(this.debug_mode)
+      if(this.debug_mode.info)
         this.draw_debug.setup_three(scene_three)
     }
 

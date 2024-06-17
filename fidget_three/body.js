@@ -422,13 +422,9 @@ export default class body_build{
               this.transparency_line)       
       }
 
-      if(this.debug)
+      if(this.debug.cns_axes)
       {
-        let len = 10
-        let wid = 2
 
-        let shape = null
-        let mesh = null
 
         
         if(( this.c_axe != null)&&(this.c_axe.enable == true ))
@@ -446,8 +442,15 @@ export default class body_build{
             shape, 
             [255,0,255])
         }
+      }
 
-        
+      if(this.debug.matrix_axes)
+      {        
+        let len = 10
+        let wid = 2
+  
+        let shape = null
+        let mesh = null        
         shape = ut.rect( len, wid )
         mesh = ut.addShape_polygon(  
           this.mesh_three.group, 
@@ -477,7 +480,7 @@ export default class body_build{
         mesh.position.y =  len/2.0
         
       }
-    }    
+    }  
 
     animate_three()
     {
