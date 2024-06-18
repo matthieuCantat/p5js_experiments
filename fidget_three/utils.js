@@ -138,7 +138,7 @@ export class constraint_build{
 
   update()
   {
-    this.cns.pointB = this.pB
+    //this.cns.pointB = this.pB
   }
 
 
@@ -162,6 +162,7 @@ export class cns_axe{
     const defaultOptions = {
       axe:null,
       Follower:null,
+      cns_to_drive:null,
       enable:true,
       vLineBase : null,
       pLineBase : null,
@@ -177,6 +178,7 @@ export class cns_axe{
     const args = { ...defaultOptions, ...in_options };
 
     this.Follower      = args.Follower
+    this.cns_to_drive  = args.cns_to_drive
     this.enable        = args.enable
     this.vLineBase     = args.vLineBase 
     this.pLineBase     = args.pLineBase 
@@ -185,16 +187,17 @@ export class cns_axe{
     this.fix_angle     = args.fix_angle
     this.extra_rotation= args.extra_rotation
     this.pos_override  = args.pos_override 
+    this.Follower_axe      = args.axe
     this.axe_rotation  = args.axe_rotation 
     this.axe_rotation_center  = args.axe_rotation_center 
     this.debug = true  
     this.debug_pts = [null,null]
     this.current_pos = 0
     
-    if( ( this.vLine == null )&&( args.axe != null) )
+    if( ( this.vLine == null )&&( this.Follower_axe != null) )
     {
       this.vLineBase = null
-      if( args.axe == 0 )
+      if( this.Follower_axe == 0 )
         this.vLineBase = new Vector(1,0)
       else
         this.vLineBase = new Vector(0,1)
@@ -204,7 +207,7 @@ export class cns_axe{
     }
 
     if( ( this.pLineBase == null )&&( this.Follower != null) )
-      this.pLineBase = this.Follower.get_matrix().get_row(2)
+      this.pLineBase = this.Follower.get_in_matrix().get_row(2)
   }
 
   update_debug()
@@ -247,47 +250,79 @@ export class cns_axe{
 
   apply()
   {
+    if(( this.Follower == null)||( this.enable == false))
+      return false
 
-    if( this.Follower != null)
-      this.pLineBase = this.Follower.get_matrix().get_row(2)
+    let m_init       = this.Follower.get_in_matrix()
+    let p_init        = m_init.get_row(2)
+    let m_out        = this.Follower.get_out_matrix()
+    let p_out        = m_out.get_row(2)
+    let vel_current  = this.Follower.get_velocity();
+    let p_rotCenter  = this.axe_rotation_center
 
-    
-
-    let rot = this.axe_rotation 
-    let rot_center = this.axe_rotation_center 
-
-    //let extra_rotation_center = new Vector(200,200)
-    if( this.enable == false)
-      return
-
-    let vLine = new Vector(this.vLineBase)
-    let pLine = new Vector(this.pLineBase)
-
-    // Update axe postion rotation
-    vLine.rotate(rad(rot))
-    let vTmp = pLine.getSub(rot_center)
-    vTmp.rotate(rad(rot))
-    pLine = rot_center.getAdd(vTmp)
-
-
-    
-    // Set Follower on the line
-    
-    let pCurrent = this.Follower.get_position();
-    let vDelta = pCurrent.getSub(pLine);
-    let vToClosestPoint = vLine.getMult( vDelta.dot(vLine) );
-    let pClosest = pLine.getAdd(vToClosestPoint);
-
-    let velCurrent = this.Follower.get_velocity();
-    let vVelProj = vLine.getMult( velCurrent.dot(vLine) );
-
-    if( pClosest != pCurrent)
+    if(this.Follower.compute_physics_in)
     {
-      this.Follower.set_velocity(vVelProj)
-      this.Follower.set_position(pClosest)
-      pCurrent = pClosest
+      let m_init_inv = m_init.getInverse()
+      p_init = new Vector(0,0);
+      m_out.mult(m_init_inv)
+      p_out.mult(m_init_inv)
+      vel_current.mult(m_init_inv)
+      p_rotCenter.mult(m_init_inv)
     }
 
+    // local
+    let pLine = p_init;
+    let vTmp = pLine.getSub(p_rotCenter)
+    vTmp.rotate(rad(this.axe_rotation))
+    pLine = p_rotCenter.getAdd(vTmp)
+
+    let vLine = new Vector(1,0)
+    if( this.Follower_axe == 1 )
+      vLine = new Vector(0,1)
+    vLine.rotate(rad(this.axe_rotation ))
+  
+    // Set Follower on the line
+    let vDelta_from_line = p_out.getSub(pLine);
+    let vToClosestPoint = vLine.getMult( vDelta_from_line.dot(vLine) );
+    let p_out_clst = pLine.getAdd(vToClosestPoint);
+
+    if(this.cns_to_drive == null)
+      return false
+    console.log(this.Follower.name,'apply_axe')
+    this.cns_to_drive[0].pointA = {x:-100,y:100}//p_out_clst.getMult(this.Follower.parent.get_out_matrix()).get_value()
+    this.cns_to_drive[1].pointA = {x:-100,y:100}//p_out_clst.getMult(this.Follower.parent.get_out_matrix()).get_value() 
+    
+    return false
+    //let vel_current_proj = vLine.getMult( vel_current.dot(vLine) );
+    //let vel_parent_proj = vLine.getMult( vel_parent.dot(vLine) );
+
+    if( p_out_clst != p_out)
+    {
+      //if( this.Follower.parent != null)
+      //{
+      //  let vel_parent = this.Follower.parent.get_velocity()
+      //  //vel_current_proj.add(vel_parent)
+      //}
+      
+      //this.Follower.set_velocity(vel_current_proj)
+      if(this.Follower.compute_physics_in)
+        this.Follower.set_position(p_out.getMult(m_init))
+      else
+        this.Follower.set_position(p_out)
+
+      p_out = p_out_clst
+    }
+    
+    // Angle
+    if( this.fix_angle == true )
+    {
+      this.Follower.set_angle(rad(this.axe_rotation))
+      //this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
+    }
+
+
+    
+    
     
     // Set limit
     var pLimitPos = new Vector()
@@ -306,32 +341,26 @@ export class cns_axe{
       pLimitNeg = vToLimit.getAdd(pLine)
     }
 
-    vDelta = pCurrent.getSub(pLine);
-    let dot = vDelta.getNormalized().dot(vLine.getNormalized())
+    vDelta_from_line = p_out.getSub(pLine);
+    let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
     if(0<dot)
     {
-      if( ( this.distPos != null )&&(this.distPos<= vDelta.mag()) )
+      if( ( this.distPos != null )&&(this.distPos<= vDelta_from_line.mag()) )
       {
-        this.Follower.set_position(pLimitPos)
-        pCurrent = pLimitPos
+        this.Follower.set_position(pLimitPos.getMult(m_init_world))
+        p_out = pLimitPos
       }
     }
     else
     {
-      if( ( this.distNeg != null )&&(this.distNeg<= vDelta.mag()) )
+      if( ( this.distNeg != null )&&(this.distNeg<= vDelta_from_line.mag()) )
       {
-        this.Follower.set_position(pLimitNeg)
-        pCurrent = pLimitNeg
+        this.Follower.set_position(pLimitNeg.getMult(m_init_world))
+        p_out = pLimitNeg
       }
     }
     
 
-    // Angle
-    if( this.fix_angle == true )
-    {
-      this.Follower.set_angle(rad(rot))
-      this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
-    }
 
 
 
@@ -354,7 +383,7 @@ export class cns_axe{
         let v_tmp = pLimitNeg.getSub(pLine).mult(this.pos_override*-1)
         p_override.add(v_tmp)
       }
-      this.Follower.set_position(p_override)
+      this.Follower.set_position(p_override.getMult(m_init_world))
       this.Follower.set_velocity(new Vector())
     }
     else{
@@ -364,7 +393,7 @@ export class cns_axe{
         let vRef = pLimitPos.getSub(pLine)
         if( 0 < vRef.mag() )
         {
-          let vCurrent = pCurrent.getSub(pLine)
+          let vCurrent = p_out.getSub(pLine)
           this.current_pos = vCurrent.mag() / vRef.mag() 
         }
         else
@@ -376,7 +405,7 @@ export class cns_axe{
         let vRef = pLimitNeg.getSub(pLine)
         if( 0 < vRef.mag() )
         {
-          let vCurrent = pCurrent.getSub(pLine)
+          let vCurrent = p_out.getSub(pLine)
           this.current_pos = vCurrent.mag() / vRef.mag() *-1
         }
         else
@@ -384,9 +413,10 @@ export class cns_axe{
       } 
       
     }
-
-
+    
+    return true
   }
+
 
 
 }
@@ -448,15 +478,15 @@ export function change_selected_obj(mouse_cns,obj)
   let p_mouse = new Vector( 
     mouse_cns.constraint.pointA.x,
     mouse_cns.constraint.pointA.y)
-  let p_local = p_mouse.getSub(p_body)
+  let p = p_mouse.getSub(p_body)
 
   mouse_cns.constraint.bodyB = obj.body
-  mouse_cns.constraint.pointB = p_local.get_value() 
+  mouse_cns.constraint.pointB = p.get_value() 
   mouse_cns.constraint.angleB = 0
 }
 
 
-export class Draw_debug
+export class Draw_text_debug
 {
   constructor(screen_dims)
   {
@@ -465,7 +495,6 @@ export class Draw_debug
     this.hitHistory = []
     this.traceFrameCount = 6
 
-    this.fidget = null
     this.mouse_cns = null
 
     this.screen_dims = screen_dims
@@ -531,73 +560,13 @@ export class Draw_debug
     
   }
 
-  update_three()
+  update_three(texts_to_draw)
   {
     if( (this.font == null)||(this.three_meshs == null) )
       return false
 
-    let txt = ''
-    let i = 0
-    
-    txt = 'count : ' + this.fidget.state.update_count
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = 'res : ' + Math.round( this.fidget.state.resolution_coef, 2 ) + ' / 4'
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = 'last selection switch step : ' + this.fidget.state.switch_selection_happened_step
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '0 - count: ' + this.fidget.state.steps[0].update_count
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '0 - res: ' + Math.round( this.fidget.state.steps[0].resoluton_coef, 2) + ' / 1'
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '1 - count: ' + this.fidget.state.steps[1].update_count
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '1 - res Coef: ' + Math.round( this.fidget.state.steps[1].resoluton_coef, 2) + ' / 1'
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '2 - count: ' + this.fidget.state.steps[2].update_count 
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '2 - res Coef: ' + Math.round( this.fidget.state.steps[2].resoluton_coef, 2) + ' / 1'
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '3 - count: ' + this.fidget.state.steps[3].update_count 
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '3 - res Coef: ' + Math.round( this.fidget.state.steps[3].resoluton_coef, 2) + ' / 1' 
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '4 - count: ' + this.fidget.state.steps[4].update_count
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '4 - res Coef: ' + Math.round( this.fidget.state.steps[4].resoluton_coef, 2) + ' / 1'
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '5 - count: ' + this.fidget.state.steps[5].update_count
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
-
-    txt = '5 - res Coef: ' + Math.round( this.fidget.state.steps[5].resoluton_coef, 2) + ' / 1'
-    this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( txt, this.sText ) );
-    i += 1
+    for( let i = 0; i < texts_to_draw.length; i++)
+      this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( texts_to_draw[i], this.sText ) );
 
     return true
   }
@@ -613,14 +582,14 @@ export function switch_selection( mouse_cns, next_elem = null , hack = false)
     return; 
   }
   
-  let p_local = new Vector( 
+  let p = new Vector( 
     mouse_cns.constraint.pointA.x - next_elem.body.position.x,
     mouse_cns.constraint.pointA.y - next_elem.body.position.y)
   
   mouse_cns.constraint.bodyB = next_elem.body
-  mouse_cns.constraint.pointB = {x: p_local.x() , y: p_local.y()}
+  mouse_cns.constraint.pointB = {x: p.x() , y: p.y()}
   if(hack)
-    mouse_cns.constraint.pointB = {x: - p_local.y(), y: p_local.x()}
+    mouse_cns.constraint.pointB = {x: - p.y(), y: p.x()}
   mouse_cns.constraint.angleB = 0
   
 

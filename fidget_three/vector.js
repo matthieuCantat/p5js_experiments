@@ -123,7 +123,12 @@ export default class Vector
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////new
-	rotate(angle) {
+	getRotation(v)
+    {
+        return this.v.angleBetween(v.v)
+    }
+    
+    rotate(angle) {
         this.v.rotate(angle) 
 		return this;
 	}

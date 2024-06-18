@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { Chrono, Draw_debug, clamp } from './utils.js';
+import { Chrono, Draw_text_debug, clamp } from './utils.js';
 import fidget_daft_i from './fidget_daft_i.js';
 import fidget_windmill from './fidget_windmill.js';
 
@@ -19,7 +19,7 @@ export default class fidgets_sequence
 
         //utils    
         this.fidgets = []
-        this.draw_debug = null
+        
         this.fidgets_to_show = [0,null]
         this.end_update_count = 0 
 
@@ -39,22 +39,20 @@ export default class fidgets_sequence
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
             //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
-            //var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
-            var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
+            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
+            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
-
-            
-        
-            if( (this.debug_mode.info)&&(this.draw_debug == null) )
-            {
-                this.draw_debug = new Draw_debug(this.screen_dims)
-                this.draw_debug.fidget = fidget
-                this.draw_debug.mouse_cns = this.mouseConstraint
-            }
         }
-      
+    
+        this.draw_text_debug = null
+        if(this.debug_mode.info)
+        {
+            this.draw_text_debug = new Draw_text_debug(this.screen_dims)
+            this.draw_text_debug.mouse_cns = this.mouseConstraint
+        }        
+
     }
 
 
@@ -141,7 +139,27 @@ export default class fidgets_sequence
 
       this.update_chrono_three()
       if(this.debug_mode.info)
-        this.draw_debug.update_three()
+      {
+        let texts_to_draw = [
+          'count : ' + this.fidgets[0].state.update_count,
+          'res : ' + Math.round( this.fidgets[0].state.resolution_coef, 2 ) + ' / 4',
+          'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,
+          '0 - count: ' + this.fidgets[0].state.steps[0].update_count,
+          '0 - res: ' + Math.round( this.fidgets[0].state.steps[0].resoluton_coef, 2) + ' / 1',
+          '1 - count: ' + this.fidgets[0].state.steps[1].update_count,
+          '1 - res Coef: ' + Math.round( this.fidgets[0].state.steps[1].resoluton_coef, 2) + ' / 1',
+          '2 - count: ' + this.fidgets[0].state.steps[2].update_count ,
+          '2 - res Coef: ' + Math.round( this.fidgets[0].state.steps[2].resoluton_coef, 2) + ' / 1',
+          '3 - count: ' + this.fidgets[0].state.steps[3].update_count ,
+          '3 - res Coef: ' + Math.round( this.fidgets[0].state.steps[3].resoluton_coef, 2) + ' / 1' ,
+          '4 - count: ' + this.fidgets[0].state.steps[4].update_count,
+          '4 - res Coef: ' + Math.round( this.fidgets[0].state.steps[4].resoluton_coef, 2) + ' / 1',
+          '5 - count: ' + this.fidgets[0].state.steps[5].update_count,
+          '5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef, 2) + ' / 1',
+        ]
+        this.draw_text_debug.update_three(texts_to_draw)
+      }
+        
       
 
     }
@@ -155,7 +173,7 @@ export default class fidgets_sequence
     setup_debug_three(scene_three)
     {
       if(this.debug_mode.info)
-        this.draw_debug.setup_three(scene_three)
+        this.draw_text_debug.setup_three(scene_three)
     }
 
     

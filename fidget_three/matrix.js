@@ -190,6 +190,10 @@ Matrix.prototype = {
 		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
 		return this;
 	},
+	getRotation: function() {
+		let vX = new Vector(1,0)
+		return vX.getRotation(this.get_row(0));
+	},	
 	setRotationDeg: function(angle) {
 		this.setRotation(angle/180*PI)
 		return this;

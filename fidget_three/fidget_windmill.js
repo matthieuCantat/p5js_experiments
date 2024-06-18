@@ -612,7 +612,7 @@ export default class fidget_windmill extends fidget{
     // clean
     this.bodies_axe_enable( ['inters'])
     this.bodies_axe_clean_override()
-    this.bodies_cns_modif(1.0)
+    //this.bodies_cns_modif(1.0)
     this.bodies_rot_clean_override()
     this.bodies_enable( 0,  ['inters'] )
 
