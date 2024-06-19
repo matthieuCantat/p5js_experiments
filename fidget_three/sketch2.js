@@ -56,7 +56,7 @@ let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
 var nbr = 1
-var debug = { show_inter:true,
+var debug = { show_inter:false,
               matrix_axes:false,
               cns_axes:false,
               info:false,

@@ -38,6 +38,7 @@ export default class body_build{
         shader:null,
         axe_constraint: null,
         density:0.001,
+        frictionAir:0.01,
         mass:null,
         screen_dims:null,
         matter_engine:null,
@@ -82,6 +83,7 @@ export default class body_build{
       this.visibility_override = true
       this.do_update = true
       this.density = args.density
+      this.frictionAir = args.frictionAir
       this.mass = args.mass
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
@@ -99,8 +101,8 @@ export default class body_build{
 
       this.physics_constraints = []
       this.c_axe = null
-      if(args.axe_constraint != null)
-        this.c_axe = new cns_axe({ Follower: this, ...args.axe_constraint })
+      //if(args.axe_constraint != null)
+      //  this.c_axe = new cns_axe({ Follower: this, ...args.axe_constraint })
   
       var max_choice = 10
       if(args.type != -1)
@@ -246,6 +248,8 @@ export default class body_build{
       Matter.Body.setDensity(this.body, this.density)
       if( this.mass != null )
         Matter.Body.setMass(this.body, this.mass)
+
+      this.body.frictionAir = this.frictionAir
   
       for( let i = 0; i < this.constraints.length; i++)
       {
@@ -324,12 +328,12 @@ export default class body_build{
         /////////////////// axe
         if(this.constraints[i].type == 'axe')
         {
-          let offset = 300
-          let parent_cns = [ build_constraint(this,this.constraints[i]), build_constraint(this,this.constraints[i],offset) ]
-          this.c_axe = new cns_axe({ Follower: this, cns_to_drive: parent_cns, ...this.constraints[i] })   
+          //let offset = 300
+          //let parent_cns = [ build_constraint(this,this.constraints[i]), build_constraint(this,this.constraints[i],offset) ]
+          this.c_axe = new cns_axe({ Follower: this, ...this.constraints[i] })   
           
-          this.physics_constraints.push(parent_cns[0])
-          this.physics_constraints.push(parent_cns[1])
+          //this.physics_constraints.push(parent_cns[0])
+          //this.physics_constraints.push(parent_cns[1])
         }
 
 
@@ -743,28 +747,27 @@ function build_constraint(body,cns_opts,offset = 0)
 {
   var options = {
     bodyA: body.body,
-    pA: { x: offset, y: offset },
-    pB: { x: offset, y: offset },
+    pA: { x: 0, y: offset },
+    pB: { x: 0, y: offset },
     stiffness: cns_opts.stiffness,
     damping : cns_opts.damping,
     length : cns_opts.length,
     matter_engine: body.matter_engine,
   }
   if(cns_opts.p_offset!= null)
-    options.pA = cns_opts.p_offset
+    options.pA = cns_opts.p_offset.get_value()
 
   if(cns_opts.target != null)
     options.bodyB = cns_opts.target.body
   else
   {
     options.pB = body.m.get_row(2).get_value()
-    options.pB.x +=offset
     options.pB.y +=offset
 
   }
 
   if(cns_opts.p_target_offset != null)  
-    options.pB = cns_opts.p_target_offset
+    options.pB = cns_opts.p_target_offset.get_value()
 
 
   if(options.stiffness == 0)

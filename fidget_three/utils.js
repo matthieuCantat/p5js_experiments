@@ -84,6 +84,23 @@ export function convert_coords_matter_to_three(pos,screen_dims)
   return new Vector(x,y)
 }
 
+export function convert_three_to_matter(pos,screen_dims)
+{
+  let x = pos.x()
+  let y = pos.y()
+  //inverse axe y
+  y *= -1
+
+  // move origin from up and right corner screen to middle 
+  x += screen_dims.x/2 
+  y += screen_dims.y/2
+
+
+
+  return new Vector(x,y)
+}
+
+
 
 export class constraint_build{
   
@@ -162,7 +179,7 @@ export class cns_axe{
     const defaultOptions = {
       axe:null,
       Follower:null,
-      cns_to_drive:null,
+      target:null,
       enable:true,
       vLineBase : null,
       pLineBase : null,
@@ -171,14 +188,14 @@ export class cns_axe{
       fix_angle : true, 
       extra_rotation : 0, 
       pos_override : null, 
-      axe_rotation: 0,
-      axe_rotation_center:new Vector(0,0),     
+      extra_rotation: 0,
+      extra_rotation_center:new Vector(0,0),     
     }   
     
     const args = { ...defaultOptions, ...in_options };
 
     this.Follower      = args.Follower
-    this.cns_to_drive  = args.cns_to_drive
+    this.target         = args.target
     this.enable        = args.enable
     this.vLineBase     = args.vLineBase 
     this.pLineBase     = args.pLineBase 
@@ -188,8 +205,8 @@ export class cns_axe{
     this.extra_rotation= args.extra_rotation
     this.pos_override  = args.pos_override 
     this.Follower_axe      = args.axe
-    this.axe_rotation  = args.axe_rotation 
-    this.axe_rotation_center  = args.axe_rotation_center 
+    this.extra_rotation  = args.extra_rotation 
+    this.extra_rotation_center  = args.extra_rotation_center 
     this.debug = true  
     this.debug_pts = [null,null]
     this.current_pos = 0
@@ -208,12 +225,13 @@ export class cns_axe{
 
     if( ( this.pLineBase == null )&&( this.Follower != null) )
       this.pLineBase = this.Follower.get_in_matrix().get_row(2)
+
   }
 
   update_debug()
   {
-    let rot = this.axe_rotation 
-    let rot_center = this.axe_rotation_center 
+    let rot = this.extra_rotation 
+    let rot_center = this.extra_rotation_center 
     let vLine = new Vector(this.vLineBase)
     let pLine = new Vector(this.pLineBase)
 
@@ -250,81 +268,55 @@ export class cns_axe{
 
   apply()
   {
+
     if(( this.Follower == null)||( this.enable == false))
       return false
 
+
+    let m_parent       = this.Follower.get_parent_matrix()
+
     let m_init       = this.Follower.get_in_matrix()
-    let p_init        = m_init.get_row(2)
+    let p_init       = m_init.get_row(2)
+
     let m_out        = this.Follower.get_out_matrix()
     let p_out        = m_out.get_row(2)
-    let vel_current  = this.Follower.get_velocity();
-    let p_rotCenter  = this.axe_rotation_center
 
-    if(this.Follower.compute_physics_in)
-    {
-      let m_init_inv = m_init.getInverse()
-      p_init = new Vector(0,0);
-      m_out.mult(m_init_inv)
-      p_out.mult(m_init_inv)
-      vel_current.mult(m_init_inv)
-      p_rotCenter.mult(m_init_inv)
-    }
+    
+    let p_rotCenter  = this.extra_rotation_center.getMult(m_parent)
 
     // local
     let pLine = p_init;
     let vTmp = pLine.getSub(p_rotCenter)
-    vTmp.rotate(rad(this.axe_rotation))
+    vTmp.rotate(rad(this.extra_rotation))
     pLine = p_rotCenter.getAdd(vTmp)
 
-    let vLine = new Vector(1,0)
+    let vLine = m_init.get_row(0)
     if( this.Follower_axe == 1 )
-      vLine = new Vector(0,1)
-    vLine.rotate(rad(this.axe_rotation ))
+      vLine = m_init.get_row(1)
+    vLine.rotate(rad(this.extra_rotation))
   
     // Set Follower on the line
-    let vDelta_from_line = p_out.getSub(pLine);
-    let vToClosestPoint = vLine.getMult( vDelta_from_line.dot(vLine) );
-    let p_out_clst = pLine.getAdd(vToClosestPoint);
+    let p_out_clst = snap_point_on_line(pLine, vLine, p_out)
 
-    if(this.cns_to_drive == null)
-      return false
-    console.log(this.Follower.name,'apply_axe')
-    this.cns_to_drive[0].pointA = {x:-100,y:100}//p_out_clst.getMult(this.Follower.parent.get_out_matrix()).get_value()
-    this.cns_to_drive[1].pointA = {x:-100,y:100}//p_out_clst.getMult(this.Follower.parent.get_out_matrix()).get_value() 
-    
-    return false
-    //let vel_current_proj = vLine.getMult( vel_current.dot(vLine) );
-    //let vel_parent_proj = vLine.getMult( vel_parent.dot(vLine) );
-
-    if( p_out_clst != p_out)
+    if( p_out_clst.is_equal_to( p_out) == false )
     {
-      //if( this.Follower.parent != null)
-      //{
-      //  let vel_parent = this.Follower.parent.get_velocity()
-      //  //vel_current_proj.add(vel_parent)
-      //}
-      
-      //this.Follower.set_velocity(vel_current_proj)
-      if(this.Follower.compute_physics_in)
-        this.Follower.set_position(p_out.getMult(m_init))
-      else
-        this.Follower.set_position(p_out)
-
+      this.Follower.set_position(p_out_clst)
       p_out = p_out_clst
     }
+
+    let vel_current  = this.Follower.get_velocity();
+    if( ( 0 < vel_current.length )&&( Math.abs(vel_current.dot(vLine)) < 1 ))
+      this.Follower.set_velocity(proj_vector_on_line(vLine, vel_current))
+
     
     // Angle
     if( this.fix_angle == true )
     {
-      this.Follower.set_angle(rad(this.axe_rotation))
-      //this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
+      this.Follower.set_angle(rad(this.extra_rotation)+m_init.getRotation())
+      this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
     }
 
-
-    
-    
-    
-    // Set limit
+    // get limit
     var pLimitPos = new Vector()
     if( this.distPos != null )
     {
@@ -341,13 +333,14 @@ export class cns_axe{
       pLimitNeg = vToLimit.getAdd(pLine)
     }
 
-    vDelta_from_line = p_out.getSub(pLine);
+    // apply limit
+    let vDelta_from_line = p_out.getSub(pLine);
     let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
     if(0<dot)
     {
       if( ( this.distPos != null )&&(this.distPos<= vDelta_from_line.mag()) )
       {
-        this.Follower.set_position(pLimitPos.getMult(m_init_world))
+        this.Follower.set_position(pLimitPos)
         p_out = pLimitPos
       }
     }
@@ -355,16 +348,11 @@ export class cns_axe{
     {
       if( ( this.distNeg != null )&&(this.distNeg<= vDelta_from_line.mag()) )
       {
-        this.Follower.set_position(pLimitNeg.getMult(m_init_world))
+        this.Follower.set_position(pLimitNeg)
         p_out = pLimitNeg
       }
     }
     
-
-
-
-
-  
 
     // Position override
     
@@ -383,7 +371,7 @@ export class cns_axe{
         let v_tmp = pLimitNeg.getSub(pLine).mult(this.pos_override*-1)
         p_override.add(v_tmp)
       }
-      this.Follower.set_position(p_override.getMult(m_init_world))
+      this.Follower.set_position(p_override)
       this.Follower.set_velocity(new Vector())
     }
     else{
@@ -756,6 +744,20 @@ export function clamp(value,min_value,max_value)
   return Math.min(max_value,Math.max(min_value,value))
 }
 
+export function snap_point_on_line(p_line, v_line,p)
+{
+  let vDelta = p.getSub(p_line);
+  let vDelta_on_line = proj_vector_on_line(v_line, vDelta)//v_line.getMult( vDelta_from_line.dot(v_line) );
+  let p_on_line = p_line.getAdd(vDelta_on_line);
+  return p_on_line
+}
+
+export function proj_vector_on_line(v_line, v)
+{
+  v_line.normalize()
+  let v_proj = v_line.getMult( v.dot(v_line) );
+  return v_proj
+}
 
 
 ////////////////////////////////////////////////// mouse pressed

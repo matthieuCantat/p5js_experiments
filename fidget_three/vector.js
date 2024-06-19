@@ -195,6 +195,14 @@ export default class Vector
         }
 
     }
+    
+    is_equal_to(v)
+    {
+        if(this.v.x == v.v.x )
+            if(this.v.y == v.v.y )
+                return true
+        return false
+    }
 	
 	draw(p5,p=null,c=[255,0,0]) {
         let _w = 5

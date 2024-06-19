@@ -106,7 +106,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
                                                 name:'geo_background_L',
                                                 m_offset:mo_background_L, 
-                                                rot:0, 
+                                                //rot:0, 
                                                 collision:false, 
                                                 debug_matrix_info: false,
                                                 debug_matrix_axes: debug.matrix_axes,  
@@ -118,7 +118,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
                                                 name:'geo_background_R', 
                                                 m_offset:mo_background_R,
-                                                rot:0, 
+                                                //rot:0, 
                                                 collision:false,  
                                                 debug_matrix_info: false,
                                                 debug_matrix_axes: debug.matrix_axes,  
@@ -143,9 +143,10 @@ export default class fidget_daft_i extends fidget{
         collision_category: utils.collision_category.inter,
         collision_mask: utils.collision_category.mouse,
         constraints:[
-          { type:'parent', p_offset:null,p_target_offset:null,stiffness: 0.005,damping:0.01,length:0.01},
+          { type:'parent', p_offset:null,p_target_offset:null,stiffness: 0.02,damping:0.9,length:0.01},
         ],         
         density:0.1, 
+        frictionAir:0.9,  
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
         texture_three: text_checker_three_grey, 
@@ -174,9 +175,9 @@ export default class fidget_daft_i extends fidget{
                                       collision_category: utils.collision_category.blue,
                                       collision_mask: utils.collision_category.default ,    
                                       constraints:[
-                                        { type:'parent',target:this.bodies.inters.background, p_offset:null,p_target_offset:null,stiffness: 0.05,damping:0.01,length:0.01},
+                                        { type:'parent',target:this.bodies.inters.background, p_offset:null,p_target_offset:null,stiffness: 0.1,damping:0.1,length:0.01},
                                       ],                                      
-                                      density:0.1,     
+                                      density:0.001,     
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
                                       texture_three: text_checker_three,
@@ -201,13 +202,11 @@ export default class fidget_daft_i extends fidget{
                                         color_line: utils.color.black,
                                         shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                         collision_category : utils.collision_category.green,
-                                        collision_mask : utils.collision_category.default,    
-                                        axe_constraint : {
-                                          axe:1,
-                                          distPos: 50*s,
-                                          distNeg: 0.001,  
-                                        },
-                                        density:0.1, 
+                                        collision_mask : utils.collision_category.default, 
+                                        constraints:[
+                                          { type:'axe', axe:1, distPos: 50.0*s, distNeg: 0.001 },
+                                        ],                                               
+                                        density:0.001, 
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
                                         //texture_three: text_checker_three, 
@@ -219,8 +218,8 @@ export default class fidget_daft_i extends fidget{
         m:this.m,
         parent:this.bodies.inters.background,
         z:z_depth,
-        w : 3.51*s, 
-        h : 16.21*s, 
+        w : 16.21*s,
+        h : 3.51*s,  
         do_shape: true,
         do_line:true,           
         color: this.colors[2],
@@ -229,12 +228,15 @@ export default class fidget_daft_i extends fidget{
         collision_category: utils.collision_category.blue,
         collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
         type: utils.shape.rectangle,
-        axe_constraint : {
-                            axe:1,
-                            distPos: 66.1*s,
-                            distNeg: 0.001,  
-                          },
-        density:0.1, 
+        constraints:[
+          { type:'axe', axe:0, distPos: 66.1*s, distNeg: 0.001 },
+        ],         
+        //axe_constraint : {
+        //                    axe:1,
+        //                    distPos: 66.1*s,
+        //                    distNeg: 0.001,  
+        //                  },
+        density:0.001, 
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
         //texture_three: text_checker_three,                         
@@ -253,11 +255,12 @@ export default class fidget_daft_i extends fidget{
       var om_rA = new Matrix()
       om_rA.setTranslation(
         offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)                                          
+        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
+      om_rA.setRotation(rad(rot_tmp+180))                                       
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_A',        
+                                              name:'geo_rectangle_TR',        
                                               m_offset:om_rA,
-                                              rot:rot_tmp+90, 
+                                              //rot:rot_tmp+90, 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,  
                                               debug_cns_axes: debug.cns_axes,                                                   
@@ -270,13 +273,14 @@ export default class fidget_daft_i extends fidget{
       var om_rB = new Matrix()
       om_rB.setTranslation(
         offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)           
+        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp) 
+      om_rB.setRotation(rad(rot_tmp+180))            
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_B',          
+                                              name:'geo_rectangle_BR',          
                                               m_offset:om_rB,
-                                              rot:rot_tmp+90,  
+                                              //rot:rot_tmp+90,  
                                               debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_matrix_axes: debug.matrix_axes,
                                               debug_cns_axes: debug.cns_axes,                                                
                                             })) 
   
@@ -288,24 +292,26 @@ export default class fidget_daft_i extends fidget{
       var om_rC = new Matrix()
       om_rC.setTranslation(
         offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)           
+        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)  
+      om_rC.setRotation(rad(rot_tmp+180))             
       this.bodies.geos.rectangles.push(new body_build({ ...oRect,
-                                              name:'geo_rectangle_C',         
+                                              name:'geo_rectangle_BL',         
                                               m_offset:om_rC, 
-                                              rot:rot_tmp+90,
+                                              //rot:rot_tmp+90,
                                               debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_matrix_axes: debug.matrix_axes,
                                               debug_cns_axes: debug.cns_axes,                                                
                                             }))  
       rot_tmp = 180+35    
       var om_rD = new Matrix()
       om_rD.setTranslation(
         offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)                                             
+        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
+      om_rD.setRotation(rad(rot_tmp+180))                                          
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_D',           
+                                              name:'geo_rectangle_TL',           
                                               m_offset:om_rD,
-                                              rot:rot_tmp+90,
+                                              //rot:rot_tmp+90,
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,  
                                               debug_cns_axes: debug.cns_axes,                                                       
@@ -380,7 +386,7 @@ export default class fidget_daft_i extends fidget{
                                       m_offset:new Matrix(),
                                       parent:this.bodies.inters.background,
                                       z:z_depth,
-                                      rot:0,
+                                      //rot:0,
                                       w:200/2.4*s,
                                       type : utils.shape.circle,
                                       do_shape: true,
@@ -390,11 +396,10 @@ export default class fidget_daft_i extends fidget{
                                       shader: this.shaders.length != 0 ? this.shaders[0] : null,
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
-                                      axe_constraint : {
-                                        axe:1,
-                                        distPos: 50*s,
-                                        distNeg: 0.001,  
-                                      },
+                                      constraints:[
+                                        { type:'parent',target:this.bodies.inters.background, p_offset:null,p_target_offset:null,stiffness: 0.01,damping:0.01,length:0.01},
+                                        { type:'axe', axe:1, distPos: 50*s, distNeg: 0.001 },
+                                      ],                                          
                                       density:0.1, 
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,  
@@ -453,14 +458,9 @@ export default class fidget_daft_i extends fidget{
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse,
                                     constraints:[
-                                      { type:'axe', axe:1, distPos: 25*s, distNeg: 0.001, 
-                                        target:this.bodies.inters.background, p_offset:{x:0,y:0},p_target_offset:{x:100,y:100},stiffness: 0.05,damping:0.01,length:0.01},
+                                      { type:'parent',target:this.bodies.inters.background, p_offset:null,p_target_offset:om_iA.get_row(2),stiffness: 0.01,damping:0.01,length:0.01},
+                                      { type:'axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ],                                           
-                                    axe_constraint : {
-                                      axe:1,
-                                      distPos: 25*s,
-                                      distNeg: 0.001,  
-                                    },
                                     density:0.1, 
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
@@ -553,7 +553,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies_rot_clean_override()
     this.bodies_enable( 0,  ['inters'] )
      
-
+    
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
     let res_coef = this.state.steps[step].resoluton_coef
@@ -717,7 +717,7 @@ export default class fidget_daft_i extends fidget{
       }
 
     } 
-
+    
 
   }
   
@@ -790,26 +790,23 @@ export default class fidget_daft_i extends fidget{
   set_across_steps()
   {
   
-  
-    let center_tmp = this.m.get_row(2)
     let offset_from_center = new Vector(65,0)
     let _value = this.state.steps[0].resoluton_coef*35 //Math.min( Math.max( 0, -a_inter1),35)
   
   
+    this.bodies.geos.rectangles[0].c_axe.extra_rotation        = Math.min( Math.max( 0, _value),35)
+    this.bodies.geos.rectangles[0].c_axe.extra_rotation_center = offset_from_center
   
-    this.bodies.geos.rectangles[0].c_axe.axe_rotation        = Math.min( Math.max( 0, _value),35)
-    this.bodies.geos.rectangles[0].c_axe.axe_rotation_center = center_tmp.getAdd( offset_from_center)
-  
-    this.bodies.geos.rectangles[1].c_axe.axe_rotation        = Math.min( Math.max( 0, _value),35)*-1
-    this.bodies.geos.rectangles[1].c_axe.axe_rotation_center = center_tmp.getAdd( offset_from_center)
+    this.bodies.geos.rectangles[1].c_axe.extra_rotation        = Math.min( Math.max( 0, _value),35)*-1
+    this.bodies.geos.rectangles[1].c_axe.extra_rotation_center = offset_from_center
   
     offset_from_center = new Vector(-65,0) 
   
-    this.bodies.geos.rectangles[2].c_axe.axe_rotation        = Math.min( Math.max( 0, _value),35)
-    this.bodies.geos.rectangles[2].c_axe.axe_rotation_center = center_tmp.getAdd( offset_from_center)
+    this.bodies.geos.rectangles[2].c_axe.extra_rotation        = Math.min( Math.max( 0, _value),35)
+    this.bodies.geos.rectangles[2].c_axe.extra_rotation_center = offset_from_center
   
-    this.bodies.geos.rectangles[3].c_axe.axe_rotation        = Math.min( Math.max( 0, _value),35)*-1
-    this.bodies.geos.rectangles[3].c_axe.axe_rotation_center = center_tmp.getAdd( offset_from_center)
+    this.bodies.geos.rectangles[3].c_axe.extra_rotation        = Math.min( Math.max( 0, _value),35)*-1
+    this.bodies.geos.rectangles[3].c_axe.extra_rotation_center = offset_from_center
   }
 
 

@@ -81,7 +81,7 @@ export default class fidget{
   {     
     console.log('setup : fidget')                      
     this.bodies_set_debug( this.debug_mode )
-    this.bodies_set_visibility(this.debug_mode, ['inters'])   
+    this.bodies_set_visibility(this.debug_mode.show_inter, ['inters'])   
   }
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -503,12 +503,21 @@ export default class fidget{
         if( this.bodies[b_type][key].constructor === Array)
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            for( let j = 0; j < this.bodies[b_type][key][i].constraints.length; j++)
+          {
+            for( let j = 0; j < this.bodies[b_type][key][i].physics_constraints.length; j++)
+            {
               this.bodies[b_type][key][i].physics_constraints[j].cns.stiffness = value
+            }
+
+          }
+
         }
         else      
-          for( let j = 0; j < this.bodies[b_type][key].constraints.length; j++)
-            this.bodies[b_type][key].physics_constraints[j].cns.stiffness = value   
+          for( let j = 0; j < this.bodies[b_type][key].physics_constraints.length; j++)
+          {
+            this.bodies[b_type][key].physics_constraints[j].cns.stiffness = value           
+          }
+  
       }  
        
     }   
