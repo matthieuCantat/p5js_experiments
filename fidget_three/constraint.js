@@ -1,515 +1,477 @@
-/**
-* The `Matter.Constraint` module contains methods for creating and manipulating constraints.
-* Constraints are used for specifying that a fixed distance must be maintained between two bodies (or a body and a fixed world-space position).
-* The stiffness of constraints can be modified to create springs or elastic.
-*
-* See the included usage [examples](https://github.com/liabru/matter-js/tree/master/examples).
-*
-* @class Constraint
-*/
 
-var Constraint = {};
+import Vector from './vector.js';
+import Matrix from './matrix.js';
+import { rad, deg, snap_point_on_line, proj_vector_on_line} from './utils.js';
 
-module.exports = Constraint;
 
-var Vertices = require('../geometry/Vertices');
-var Vector = require('../geometry/Vector');
-var Sleeping = require('../core/Sleeping');
-var Bounds = require('../geometry/Bounds');
-var Axes = require('../geometry/Axes');
-var Common = require('../core/Common');
 
-(function() {
 
-    Constraint._warming = 0.4;
-    Constraint._torqueDampen = 1;
-    Constraint._minLength = 0.000001;
 
-    /**
-     * Creates a new constraint.
-     * All properties have default values, and many are pre-calculated automatically based on other properties.
-     * To simulate a revolute constraint (or pin joint) set `length: 0` and a high `stiffness` value (e.g. `0.7` or above).
-     * If the constraint is unstable, try lowering the `stiffness` value and / or increasing `engine.constraintIterations`.
-     * For compound bodies, constraints must be applied to the parent body (not one of its parts).
-     * See the properties section below for detailed information on what you can pass via the `options` object.
-     * @method create
-     * @param {} options
-     * @return {constraint} constraint
-     */
-    Constraint.create = function(options) {
-        var constraint = options;
-
-        // if bodies defined but no points, use body centre
-        if (constraint.bodyA && !constraint.pointA)
-            constraint.pointA = { x: 0, y: 0 };
-        if (constraint.bodyB && !constraint.pointB)
-            constraint.pointB = { x: 0, y: 0 };
-
-        // calculate static length using initial world space points
-        var initialPointA = constraint.bodyA ? Vector.add(constraint.bodyA.position, constraint.pointA) : constraint.pointA,
-            initialPointB = constraint.bodyB ? Vector.add(constraint.bodyB.position, constraint.pointB) : constraint.pointB,
-            length = Vector.magnitude(Vector.sub(initialPointA, initialPointB));
-    
-        constraint.length = typeof constraint.length !== 'undefined' ? constraint.length : length;
-
-        // option defaults
-        constraint.id = constraint.id || Common.nextId();
-        constraint.label = constraint.label || 'Constraint';
-        constraint.type = 'constraint';
-        constraint.stiffness = constraint.stiffness || (constraint.length > 0 ? 1 : 0.7);
-        constraint.damping = constraint.damping || 0;
-        constraint.angularStiffness = constraint.angularStiffness || 0;
-        constraint.angleA = constraint.bodyA ? constraint.bodyA.angle : constraint.angleA;
-        constraint.angleB = constraint.bodyB ? constraint.bodyB.angle : constraint.angleB;
-        constraint.plugin = {};
-
-        // render
-        var render = {
-            visible: true,
-            lineWidth: 2,
-            strokeStyle: '#ffffff',
-            type: 'line',
-            anchors: true
-        };
-
-        if (constraint.length === 0 && constraint.stiffness > 0.1) {
-            render.type = 'pin';
-            render.anchors = false;
-        } else if (constraint.stiffness < 0.9) {
-            render.type = 'spring';
-        }
-
-        constraint.render = Common.extend(render, constraint.render);
-
-        return constraint;
-    };
-
-    /**
-     * Prepares for solving by constraint warming.
-     * @private
-     * @method preSolveAll
-     * @param {body[]} bodies
-     */
-    Constraint.preSolveAll = function(bodies) {
-        for (var i = 0; i < bodies.length; i += 1) {
-            var body = bodies[i],
-                impulse = body.constraintImpulse;
-
-            if (body.isStatic || (impulse.x === 0 && impulse.y === 0 && impulse.angle === 0)) {
-                continue;
-            }
-
-            body.position.x += impulse.x;
-            body.position.y += impulse.y;
-            body.angle += impulse.angle;
-        }
-    };
-
-    /**
-     * Solves all constraints in a list of collisions.
-     * @private
-     * @method solveAll
-     * @param {constraint[]} constraints
-     * @param {number} delta
-     */
-    Constraint.solveAll = function(constraints, delta) {
-        var timeScale = Common.clamp(delta / Common._baseDelta, 0, 1);
-
-        // Solve fixed constraints first.
-        for (var i = 0; i < constraints.length; i += 1) {
-            var constraint = constraints[i],
-                fixedA = !constraint.bodyA || (constraint.bodyA && constraint.bodyA.isStatic),
-                fixedB = !constraint.bodyB || (constraint.bodyB && constraint.bodyB.isStatic);
-
-            if (fixedA || fixedB) {
-                Constraint.solve(constraints[i], timeScale);
-            }
-        }
-
-        // Solve free constraints last.
-        for (i = 0; i < constraints.length; i += 1) {
-            constraint = constraints[i];
-            fixedA = !constraint.bodyA || (constraint.bodyA && constraint.bodyA.isStatic);
-            fixedB = !constraint.bodyB || (constraint.bodyB && constraint.bodyB.isStatic);
-
-            if (!fixedA && !fixedB) {
-                Constraint.solve(constraints[i], timeScale);
-            }
-        }
-    };
-
-    /**
-     * Solves a distance constraint with Gauss-Siedel method.
-     * @private
-     * @method solve
-     * @param {constraint} constraint
-     * @param {number} timeScale
-     */
-    Constraint.solve = function(constraint, timeScale) {
-        var bodyA = constraint.bodyA,
-            bodyB = constraint.bodyB,
-            pointA = constraint.pointA,
-            pointB = constraint.pointB;
-
-        if (!bodyA && !bodyB)
-            return;
-
-        // update reference angle
-        if (bodyA && !bodyA.isStatic) {
-            Vector.rotate(pointA, bodyA.angle - constraint.angleA, pointA);
-            constraint.angleA = bodyA.angle;
-        }
+export class dyn_constraint_build{
+  
+    constructor( in_options ){
         
-        // update reference angle
-        if (bodyB && !bodyB.isStatic) {
-            Vector.rotate(pointB, bodyB.angle - constraint.angleB, pointB);
-            constraint.angleB = bodyB.angle;
-        }
 
-        var pointAWorld = pointA,
-            pointBWorld = pointB;
+        // args
+        const defaultOptions = {
+            obj: null,
+            obj_pos_offset: new Vector(),
+            target: null,
+            target_pos_offset: new Vector(),
+            
+            stiffness: 0.001,
+            damping: 0.05,
+            length: null,
+            y_offset:0,
+        };
+        const args = { ...defaultOptions, ...in_options };
 
-        if (bodyA) pointAWorld = Vector.add(bodyA.position, pointA);
-        if (bodyB) pointBWorld = Vector.add(bodyB.position, pointB);
+        this.matter_engine = args.obj.matter_engine
 
-        if (!pointAWorld || !pointBWorld)
-            return;
+        this.obj = args.obj
+        this.obj_pos_offset = args.obj_pos_offset
+        this.target = args.target
+        this.target_pos_offset = args.target_pos_offset
+        
+        this.stiffness = args.stiffness
+        this.damping = args.damping
+        this.length = args.length
+        this.y_offset = args.y_offset
+        
+        //build
 
-        var delta = Vector.sub(pointAWorld, pointBWorld),
-            currentLength = Vector.magnitude(delta);
-
-        // prevent singularity
-        if (currentLength < Constraint._minLength) {
-            currentLength = Constraint._minLength;
-        }
-
-        // solve distance constraint with Gauss-Siedel method
-        var difference = (currentLength - constraint.length) / currentLength,
-            isRigid = constraint.stiffness >= 1 || constraint.length === 0,
-            stiffness = isRigid ? constraint.stiffness * timeScale 
-                : constraint.stiffness * timeScale * timeScale,
-            damping = constraint.damping * timeScale,
-            force = Vector.mult(delta, difference * stiffness),
-            massTotal = (bodyA ? bodyA.inverseMass : 0) + (bodyB ? bodyB.inverseMass : 0),
-            inertiaTotal = (bodyA ? bodyA.inverseInertia : 0) + (bodyB ? bodyB.inverseInertia : 0),
-            resistanceTotal = massTotal + inertiaTotal,
-            torque,
-            share,
-            normal,
-            normalVelocity,
-            relativeVelocity;
     
-        if (damping > 0) {
-            var zero = Vector.create();
-            normal = Vector.div(delta, currentLength);
-
-            relativeVelocity = Vector.sub(
-                bodyB && Vector.sub(bodyB.position, bodyB.positionPrev) || zero,
-                bodyA && Vector.sub(bodyA.position, bodyA.positionPrev) || zero
-            );
-
-            normalVelocity = Vector.dot(normal, relativeVelocity);
-        }
-
-        if (bodyA && !bodyA.isStatic) {
-            share = bodyA.inverseMass / massTotal;
-
-            // keep track of applied impulses for post solving
-            bodyA.constraintImpulse.x -= force.x * share;
-            bodyA.constraintImpulse.y -= force.y * share;
-
-            // apply forces
-            bodyA.position.x -= force.x * share;
-            bodyA.position.y -= force.y * share;
-
-            // apply damping
-            if (damping > 0) {
-                bodyA.positionPrev.x -= damping * normal.x * normalVelocity * share;
-                bodyA.positionPrev.y -= damping * normal.y * normalVelocity * share;
-            }
-
-            // apply torque
-            torque = (Vector.cross(pointA, force) / resistanceTotal) * Constraint._torqueDampen * bodyA.inverseInertia * (1 - constraint.angularStiffness);
-            bodyA.constraintImpulse.angle -= torque;
-            bodyA.angle -= torque;
-        }
-
-        if (bodyB && !bodyB.isStatic) {
-            share = bodyB.inverseMass / massTotal;
-
-            // keep track of applied impulses for post solving
-            bodyB.constraintImpulse.x += force.x * share;
-            bodyB.constraintImpulse.y += force.y * share;
-            
-            // apply forces
-            bodyB.position.x += force.x * share;
-            bodyB.position.y += force.y * share;
-
-            // apply damping
-            if (damping > 0) {
-                bodyB.positionPrev.x += damping * normal.x * normalVelocity * share;
-                bodyB.positionPrev.y += damping * normal.y * normalVelocity * share;
-            }
-
-            // apply torque
-            torque = (Vector.cross(pointB, force) / resistanceTotal) * Constraint._torqueDampen * bodyB.inverseInertia * (1 - constraint.angularStiffness);
-            bodyB.constraintImpulse.angle += torque;
-            bodyB.angle += torque;
-        }
-
-    };
-
-    /**
-     * Performs body updates required after solving constraints.
-     * @private
-     * @method postSolveAll
-     * @param {body[]} bodies
-     */
-    Constraint.postSolveAll = function(bodies) {
-        for (var i = 0; i < bodies.length; i++) {
-            var body = bodies[i],
-                impulse = body.constraintImpulse;
-
-            if (body.isStatic || (impulse.x === 0 && impulse.y === 0 && impulse.angle === 0)) {
-                continue;
-            }
-
-            Sleeping.set(body, false);
-
-            // update geometry and reset
-            for (var j = 0; j < body.parts.length; j++) {
-                var part = body.parts[j];
-                
-                Vertices.translate(part.vertices, impulse);
-
-                if (j > 0) {
-                    part.position.x += impulse.x;
-                    part.position.y += impulse.y;
-                }
-
-                if (impulse.angle !== 0) {
-                    Vertices.rotate(part.vertices, impulse.angle, body.position);
-                    Axes.rotate(part.axes, impulse.angle);
-                    if (j > 0) {
-                        Vector.rotateAbout(part.position, impulse.angle, body.position, part.position);
-                    }
-                }
-
-                Bounds.update(part.bounds, part.vertices, body.velocity);
-            }
-
-            // dampen the cached impulse for warming next step
-            impulse.angle *= Constraint._warming;
-            impulse.x *= Constraint._warming;
-            impulse.y *= Constraint._warming;
-        }
-    };
-
-    /**
-     * Returns the world-space position of `constraint.pointA`, accounting for `constraint.bodyA`.
-     * @method pointAWorld
-     * @param {constraint} constraint
-     * @returns {vector} the world-space position
-     */
-    Constraint.pointAWorld = function(constraint) {
-        return {
-            x: (constraint.bodyA ? constraint.bodyA.position.x : 0) 
-                + (constraint.pointA ? constraint.pointA.x : 0),
-            y: (constraint.bodyA ? constraint.bodyA.position.y : 0) 
-                + (constraint.pointA ? constraint.pointA.y : 0)
+        var opt = {
+            bodyA: this.obj.body,
+            pointA: this.obj_pos_offset.get_value(),
+            bodyB: null,
+            pointB: this.target_pos_offset.get_value(),
+            stiffness : this.stiffness,
+            damping : this.damping,
         };
-    };
+        
+        if(this.length!=null)
+            opt.length = this.length
 
-    /**
-     * Returns the world-space position of `constraint.pointB`, accounting for `constraint.bodyB`.
-     * @method pointBWorld
-     * @param {constraint} constraint
-     * @returns {vector} the world-space position
-     */
-    Constraint.pointBWorld = function(constraint) {
-        return {
-            x: (constraint.bodyB ? constraint.bodyB.position.x : 0) 
-                + (constraint.pointB ? constraint.pointB.x : 0),
-            y: (constraint.bodyB ? constraint.bodyB.position.y : 0) 
-                + (constraint.pointB ? constraint.pointB.y : 0)
+        if(this.target!=null)
+            opt.bodyB = this.target.body
+        else
+            opt.pointB = this.obj.m.get_row(2).get_value()
+
+        opt.pointA.y += this.y_offset
+        opt.pointB.y += this.y_offset
+        
+        if(opt.stiffness == 0)
+        {
+            opt.stiffness = 0.000001
+            opt.damping = 0
+        }
+
+        this.cns = Matter.Constraint.create(opt);
+        Matter.Composite.add( this.matter_engine.world, [ this.cns ])
+    
+    }
+
+    apply()
+    {
+        //this.cns.pointB = this.pB
+    }
+    enable(value)
+    {
+      if( value == false)
+        this.cns.stiffness = 0.00001
+      else
+        this.cns.stiffness = this.stiffness
+    }
+  
+}
+
+  
+  
+export class cns_axe{
+
+    constructor(in_options)
+    {
+      const defaultOptions = {
+        axe:null,
+        Follower:null,
+        target:null,
+        enable:true,
+        vLineBase : null,
+        pLineBase : null,
+        distPos:null, 
+        distNeg:null, 
+        fix_angle : true, 
+        extra_rotation : 0, 
+        pos_override : null, 
+        extra_rotation: 0,
+        extra_rotation_center:new Vector(0,0),     
+      }   
+      
+      const args = { ...defaultOptions, ...in_options };
+  
+      this.Follower      = args.Follower
+      this.target         = args.target
+      this.is_enable        = args.enable
+      this.vLineBase     = args.vLineBase 
+      this.pLineBase     = args.pLineBase 
+      this.distPos       = args.distPos
+      this.distNeg       = args.distNeg
+      this.fix_angle     = args.fix_angle
+      this.extra_rotation= args.extra_rotation
+      this.pos_override  = args.pos_override 
+      this.Follower_axe      = args.axe
+      this.extra_rotation  = args.extra_rotation 
+      this.extra_rotation_center  = args.extra_rotation_center 
+      this.debug = true  
+      this.debug_pts = [null,null]
+      this.current_pos = 0
+      
+      if( ( this.vLine == null )&&( this.Follower_axe != null) )
+      {
+        this.vLineBase = null
+        if( this.Follower_axe == 0 )
+          this.vLineBase = new Vector(1,0)
+        else
+          this.vLineBase = new Vector(0,1)
+  
+        if( this.Follower.rot != null)
+          this.vLineBase.rotate(this.Follower.rot)
+      }
+  
+      if( ( this.pLineBase == null )&&( this.Follower != null) )
+        this.pLineBase = this.Follower.get_in_matrix().get_row(2)
+  
+    }
+  
+    update_debug()
+    {
+      let rot = this.extra_rotation 
+      let rot_center = this.extra_rotation_center 
+      let vLine = new Vector(this.vLineBase)
+      let pLine = new Vector(this.pLineBase)
+  
+      // Update axe postion rotation
+      vLine.rotate(rad(rot))
+      let vTmp = pLine.getSub(rot_center)
+      vTmp.rotate(rad(rot))
+      pLine = rot_center.getAdd(vTmp)
+  
+     // Set limit
+     var pLimitPos = new Vector()
+     if( this.distPos != null )
+     {
+       let vToLimit = new Vector(vLine)
+       vToLimit.normalize().mult(this.distPos)
+       pLimitPos = vToLimit.getAdd(pLine)
+     }
+  
+     var pLimitNeg = new Vector()
+     if( this.distNeg != null )
+     {
+       let vToLimit = new Vector(vLine)
+       vToLimit.normalize().mult(this.distNeg*-1)
+       pLimitNeg = vToLimit.getAdd(pLine)
+     }
+  
+      // Debug
+      if( this.distPos != null )this.debug_pts[0] = pLimitPos
+      else                      this.debug_pts[0] = vLine.getMult(width*2).add(pLine)
+  
+      if( this.distNeg != null )this.debug_pts[1] = pLimitNeg
+      else                      this.debug_pts[1] = vLine.getMult(width*-2).add(pLine)
+    }
+  
+    enable(value)
+    {
+      this.is_enable = value
+    }
+  
+    apply()
+    {
+  
+      if(( this.Follower == null)||( this.is_enable == false))
+        return false
+  
+  
+      let m_parent       = this.Follower.get_parent_matrix()
+  
+      let m_init       = this.Follower.get_in_matrix()
+      let p_init       = m_init.get_row(2)
+  
+      let m_out        = this.Follower.get_out_matrix()
+      let p_out        = m_out.get_row(2)
+  
+      
+      let p_rotCenter  = this.extra_rotation_center.getMult(m_parent)
+  
+      // local
+      let pLine = p_init;
+      let vTmp = pLine.getSub(p_rotCenter)
+      vTmp.rotate(rad(this.extra_rotation))
+      pLine = p_rotCenter.getAdd(vTmp)
+  
+      let vLine = m_init.get_row(0)
+      if( this.Follower_axe == 1 )
+        vLine = m_init.get_row(1)
+      vLine.rotate(rad(this.extra_rotation))
+    
+      // Set Follower on the line
+      let p_out_clst = snap_point_on_line(pLine, vLine, p_out)
+  
+      if( p_out_clst.is_equal_to( p_out) == false )
+      {
+        this.Follower.set_position(p_out_clst)
+        p_out = p_out_clst
+      }
+  
+      let vel_current  = this.Follower.get_velocity();
+      if( ( 0 < vel_current.length )&&( Math.abs(vel_current.dot(vLine)) < 1 ))
+        this.Follower.set_velocity(proj_vector_on_line(vLine, vel_current))
+  
+      
+      // Angle
+      if( this.fix_angle == true )
+      {
+        this.Follower.set_angle(rad(this.extra_rotation)+m_init.getRotation())
+        this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
+      }
+  
+      // get limit
+      var pLimitPos = new Vector()
+      if( this.distPos != null )
+      {
+        let vToLimit = new Vector(vLine)
+        vToLimit.normalize().mult(this.distPos)
+        pLimitPos = vToLimit.getAdd(pLine)
+      }
+  
+      var pLimitNeg = new Vector()
+      if( this.distNeg != null )
+      {
+        let vToLimit = new Vector(vLine)
+        vToLimit.normalize().mult(this.distNeg*-1)
+        pLimitNeg = vToLimit.getAdd(pLine)
+      }
+  
+      // apply limit
+      let vDelta_from_line = p_out.getSub(pLine);
+      let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
+      if(0<dot)
+      {
+        if( ( this.distPos != null )&&(this.distPos<= vDelta_from_line.mag()) )
+        {
+          this.Follower.set_position(pLimitPos)
+          p_out = pLimitPos
+        }
+      }
+      else
+      {
+        if( ( this.distNeg != null )&&(this.distNeg<= vDelta_from_line.mag()) )
+        {
+          this.Follower.set_position(pLimitNeg)
+          p_out = pLimitNeg
+        }
+      }
+      
+  
+      // Position override
+      
+      if( this.pos_override != null )
+      {
+        this.current_pos = this.pos_override
+        
+        let p_override = pLine;
+        if( 0 < this.pos_override )
+        {
+          let v_tmp = pLimitPos.getSub(pLine).mult(this.pos_override)
+          p_override.add(v_tmp)
+        }
+        else
+        {
+          let v_tmp = pLimitNeg.getSub(pLine).mult(this.pos_override*-1)
+          p_override.add(v_tmp)
+        }
+        this.Follower.set_position(p_override)
+        this.Follower.set_velocity(new Vector())
+      }
+      else{
+  
+        if(0<dot)
+        {
+          let vRef = pLimitPos.getSub(pLine)
+          if( 0 < vRef.mag() )
+          {
+            let vCurrent = p_out.getSub(pLine)
+            this.current_pos = vCurrent.mag() / vRef.mag() 
+          }
+          else
+            this.current_pos = 0
+        
+        }
+        else
+        {
+          let vRef = pLimitNeg.getSub(pLine)
+          if( 0 < vRef.mag() )
+          {
+            let vCurrent = p_out.getSub(pLine)
+            this.current_pos = vCurrent.mag() / vRef.mag() *-1
+          }
+          else
+            this.current_pos = 0
+        } 
+        
+      }
+      
+      return true
+    }
+  
+  
+  
+}
+
+
+export class limit{
+  
+    constructor( in_options ){
+    // Default options
+      const defaultOptions = {
+        obj:null,
+        x_min: null,
+        x_max: null, 
+        y_min: null,
+        y_max: null,                 
+        rot_min: null,
+        rot_max: null,
+      };
+      const args = { ...defaultOptions, ...in_options };
+      
+      this.obj = args.obj
+      this.x_min   = args.x_min
+      this.x_max   = args.x_max
+      this.y_min   = args.y_min
+      this.y_max   = args.y_max      
+      this.rot_min = args.rot_min
+      this.rot_max = args.rot_max
+  
+
+  
+    }
+
+    apply()
+    {
+        if(this.is_enable == false)
+            return false
+        
+        let p_parent = this.obj.get_parent_matrix().get_row(2)
+        let p = this.obj.get_position()
+        let v = this.obj.get_velocity()
+        let a = this.obj.get_rotation()
+        if((this.x_min!=null)&&( p.x() < p_parent.x()+this.x_min ))
+        {
+            p.v.x = p_parent.x()+this.x_min
+            v.v.x = 0
+            this.obj.set_position(p)
+            this.obj.set_velocity(v) 
+        }  
+        if((this.x_max!=null)&&( p_parent.x()+this.x_max < p.x() ))
+        {
+            p.v.x = p_parent.x()+this.x_max
+            v.v.x = 0
+            this.obj.set_position(p)
+            this.obj.set_velocity(v) 
+        }  
+        if((this.y_min!=null)&&( p.y() < p_parent.y()+this.y_min ))
+        {
+            p.v.y = p_parent.y()+this.y_min
+            v.v.y = 0
+            this.obj.set_position(p)
+            this.obj.set_velocity(v) 
+        } 
+        if((this.y_max!=null)&&( p_parent.y()+this.y_max < p.y() ))
+        {
+            p.v.y = p_parent.y()+this.y_max
+            v.v.y = 0
+            this.obj.set_position(p)
+            this.obj.set_velocity(v) 
+        } 
+
+        if((this.rot_min!=null)&&( a < this.rot_min ))
+        {
+            a = this.rot_min
+            this.obj.set_angle(a)
+            this.obj.set_anglular_velocity(0)
+
+        }    
+        if((this.rot_max!=null)&&( this.rot_max < a ))
+        {
+            a = this.rot_max
+            this.obj.set_angle(a)
+            this.obj.set_anglular_velocity(0)     
+        }    
+        return true
+    }
+    enable(value)
+    {
+        this.is_enable = value
+    }
+  
+}
+
+
+
+
+export class constraint_build{
+  
+    constructor( in_options ){
+        
+
+        // args
+        const defaultOptions = {
+            obj: null,
+            target: null,
+            do_position: true,
+            do_orientation: true,
         };
-    };
+        const args = { ...defaultOptions, ...in_options };
 
-    /**
-     * Returns the current length of the constraint. 
-     * This is the distance between both of the constraint's end points.
-     * See `constraint.length` for the target rest length.
-     * @method currentLength
-     * @param {constraint} constraint
-     * @returns {number} the current length
-     */
-    Constraint.currentLength = function(constraint) {
-        var pointAX = (constraint.bodyA ? constraint.bodyA.position.x : 0) 
-            + (constraint.pointA ? constraint.pointA.x : 0);
+        this.matter_engine = args.obj.matter_engine
 
-        var pointAY = (constraint.bodyA ? constraint.bodyA.position.y : 0) 
-            + (constraint.pointA ? constraint.pointA.y : 0);
+        this.obj = args.obj
+        this.target = args.target
+        let m_target = this.target.get_init_matrix()
+        let m_obj = this.obj.get_init_matrix()
+        //m_target.log()
 
-        var pointBX = (constraint.bodyB ? constraint.bodyB.position.x : 0) 
-            + (constraint.pointB ? constraint.pointB.x : 0);
-            
-        var pointBY = (constraint.bodyB ? constraint.bodyB.position.y : 0) 
-            + (constraint.pointB ? constraint.pointB.y : 0);
 
-        var deltaX = pointAX - pointBX;
-        var deltaY = pointAY - pointBY;
+        this.target_pos_offset = m_obj.getMult(m_target.getInverse())
+        
+        this.do_position = args.do_position
+        this.do_orientation = args.do_orientation
 
-        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    };
+        this.is_enable = true
+        
+    
+    }
 
-    /*
-    *
-    *  Properties Documentation
-    *
-    */
+    apply()
+    {
+        if(this.is_enable == false)
+            return false
 
-    /**
-     * An integer `Number` uniquely identifying number generated in `Composite.create` by `Common.nextId`.
-     *
-     * @property id
-     * @type number
-     */
+        
+        let m_target = this.target.get_out_matrix()
+        let m = this.target_pos_offset.getMult(m_target)
+        if(this.do_position)
+            this.obj.set_position(m.get_row(2))
+        if(this.do_orientation)
+            this.obj.set_angle(m.getRotation())
 
-    /**
-     * A `String` denoting the type of object.
-     *
-     * @property type
-     * @type string
-     * @default "constraint"
-     * @readOnly
-     */
-
-    /**
-     * An arbitrary `String` name to help the user identify and manage bodies.
-     *
-     * @property label
-     * @type string
-     * @default "Constraint"
-     */
-
-    /**
-     * An `Object` that defines the rendering properties to be consumed by the module `Matter.Render`.
-     *
-     * @property render
-     * @type object
-     */
-
-    /**
-     * A flag that indicates if the constraint should be rendered.
-     *
-     * @property render.visible
-     * @type boolean
-     * @default true
-     */
-
-    /**
-     * A `Number` that defines the line width to use when rendering the constraint outline.
-     * A value of `0` means no outline will be rendered.
-     *
-     * @property render.lineWidth
-     * @type number
-     * @default 2
-     */
-
-    /**
-     * A `String` that defines the stroke style to use when rendering the constraint outline.
-     * It is the same as when using a canvas, so it accepts CSS style property values.
-     *
-     * @property render.strokeStyle
-     * @type string
-     * @default a random colour
-     */
-
-    /**
-     * A `String` that defines the constraint rendering type. 
-     * The possible values are 'line', 'pin', 'spring'.
-     * An appropriate render type will be automatically chosen unless one is given in options.
-     *
-     * @property render.type
-     * @type string
-     * @default 'line'
-     */
-
-    /**
-     * A `Boolean` that defines if the constraint's anchor points should be rendered.
-     *
-     * @property render.anchors
-     * @type boolean
-     * @default true
-     */
-
-    /**
-     * The first possible `Body` that this constraint is attached to.
-     *
-     * @property bodyA
-     * @type body
-     * @default null
-     */
-
-    /**
-     * The second possible `Body` that this constraint is attached to.
-     *
-     * @property bodyB
-     * @type body
-     * @default null
-     */
-
-    /**
-     * A `Vector` that specifies the offset of the constraint from center of the `constraint.bodyA` if defined, otherwise a world-space position.
-     *
-     * @property pointA
-     * @type vector
-     * @default { x: 0, y: 0 }
-     */
-
-    /**
-     * A `Vector` that specifies the offset of the constraint from center of the `constraint.bodyB` if defined, otherwise a world-space position.
-     *
-     * @property pointB
-     * @type vector
-     * @default { x: 0, y: 0 }
-     */
-
-    /**
-     * A `Number` that specifies the stiffness of the constraint, i.e. the rate at which it returns to its resting `constraint.length`.
-     * A value of `1` means the constraint should be very stiff.
-     * A value of `0.2` means the constraint acts like a soft spring.
-     *
-     * @property stiffness
-     * @type number
-     * @default 1
-     */
-
-    /**
-     * A `Number` that specifies the damping of the constraint, 
-     * i.e. the amount of resistance applied to each body based on their velocities to limit the amount of oscillation.
-     * Damping will only be apparent when the constraint also has a very low `stiffness`.
-     * A value of `0.1` means the constraint will apply heavy damping, resulting in little to no oscillation.
-     * A value of `0` means the constraint will apply no damping.
-     *
-     * @property damping
-     * @type number
-     * @default 0
-     */
-
-    /**
-     * A `Number` that specifies the target resting length of the constraint. 
-     * It is calculated automatically in `Constraint.create` from initial positions of the `constraint.bodyA` and `constraint.bodyB`.
-     *
-     * @property length
-     * @type number
-     */
-
-    /**
-     * An object reserved for storing plugin-specific properties.
-     *
-     * @property plugin
-     * @type {}
-     */
-
-})();
+        return true
+    }
+    enable(value)
+    {
+        this.is_enable = value
+    }
+  
+}

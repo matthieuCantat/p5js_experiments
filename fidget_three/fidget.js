@@ -100,9 +100,7 @@ export default class fidget{
     var selected_body = this.mouseConstraint.constraint.bodyB
 
     // clean
-    this.bodies_axe_enable(['inters'])
     this.bodies_axe_clean_override()
-    //this.bodies_cns_modif(1.0)
     this.bodies_rot_clean_override()
     this.bodies_enable( 0, ['inters'] )
 
@@ -455,42 +453,18 @@ export default class fidget{
         if( this.bodies[b_type][key].constructor === Array)
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            if(this.bodies[b_type][key][i].c_axe != null)
-              this.bodies[b_type][key][i].c_axe.pos_override = null
+            if(this.bodies[b_type][key][i].constraints.axe != null)
+              this.bodies[b_type][key][i].constraints.axe.pos_override = null
         }
         else
-          if(this.bodies[b_type][key].c_axe != null)
-            this.bodies[b_type][key].c_axe.pos_override = null
+          if(this.bodies[b_type][key].constraints.axe != null)
+            this.bodies[b_type][key].constraints.axe.pos_override = null
         
       } 
     }  
   }
 
-  bodies_axe_enable(value,body_type_filter = [] )
-  {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
-    {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
-     
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            if(this.bodies[b_type][key][i].c_axe != null)
-              this.bodies[b_type][key][i].c_axe.enable = value
-        }
-        else
-          if(this.bodies[b_type][key].c_axe != null)
-            this.bodies[b_type][key].c_axe.enable = value
-        
-      } 
-    }     
-  }
-
-  bodies_cns_modif(value,body_type_filter = [] )
+  bodies_cns_enable(value,body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
@@ -504,18 +478,18 @@ export default class fidget{
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            for( let j = 0; j < this.bodies[b_type][key][i].physics_constraints.length; j++)
+            for( let j = 0; j < this.bodies[b_type][key][i].constraints.length; j++)
             {
-              this.bodies[b_type][key][i].physics_constraints[j].cns.stiffness = value
+              this.bodies[b_type][key][i].constraints[j].enable(value)
             }
 
           }
 
         }
         else      
-          for( let j = 0; j < this.bodies[b_type][key].physics_constraints.length; j++)
+          for( let j = 0; j < this.bodies[b_type][key].constraints.length; j++)
           {
-            this.bodies[b_type][key].physics_constraints[j].cns.stiffness = value           
+            this.bodies[b_type][key].constraints[j].enable(value)          
           }
   
       }  

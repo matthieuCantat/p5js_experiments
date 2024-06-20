@@ -1,6 +1,7 @@
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { utils , rad, deg,constraint_build, Draw_text_debug, cns_axe,convert_coords_matter_to_three} from './utils.js';
+import { utils , rad, deg, Draw_text_debug,convert_coords_matter_to_three} from './utils.js';
+import {dyn_constraint_build, constraint_build, cns_axe,limit} from './constraint.js';
 import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 import * as THREE from 'three';
@@ -15,7 +16,6 @@ export default class body_build{
         m: new Matrix(),
         m_offset: new Matrix(),
         parent:null,
-        compute_physics_in_local:false,
         z: 0,
         w: 1,
         h: 1,
@@ -23,7 +23,6 @@ export default class body_build{
         box: null,
         type: -1,
         rot: 0,
-        limit_rot: null,
         collision: true,
         collision_category: utils.collision_category.default,
         collision_mask: utils.collision_category.default,
@@ -56,7 +55,6 @@ export default class body_build{
       this.m = args.m
       this.m_offset = args.m_offset
       this.parent = args.parent
-      this.compute_physics_in_local = args.compute_physics_in_local
       this.z = args.z
       this.w = args.w
       this.h = args.h
@@ -64,9 +62,8 @@ export default class body_build{
       this.rot = rad(args.rot)
       this.extra_rotation = 0
       this.rot_override = null
-      this.limit_rot = args.limit_rot
       this.scale = 1.0
-      this.constraints = args.constraints
+      this.constraints_args = args.constraints
       this.do_shape= args.do_shape
       this.do_line= args.do_line      
       this.color = args.color
@@ -99,7 +96,9 @@ export default class body_build{
         this.draw_text_debug = new Draw_text_debug(this.screen_dims)
 
 
-      this.physics_constraints = []
+      this.constraints = {}
+      this.constraints_order = []
+      //this.physics_constraints = []
       this.c_axe = null
       //if(args.axe_constraint != null)
       //  this.c_axe = new cns_axe({ Follower: this, ...args.axe_constraint })
@@ -186,11 +185,6 @@ export default class body_build{
     init_physics()
     {
       let p = {x:0,y:0}
-      if(this.compute_physics_in_local == false)
-      {
-        let m_world = this.get_in_matrix()
-        p = m_world.get_row(2).get_value()
-      }
 
       switch(this.type) {
         case 0:
@@ -251,91 +245,43 @@ export default class body_build{
 
       this.body.frictionAir = this.frictionAir
   
-      for( let i = 0; i < this.constraints.length; i++)
+
+      for( let i = 0; i < this.constraints_args.length; i++)
       {
-        if((this.constraints[i].type == 'point')||(this.constraints[i].type == 'parent'))
-        { /*
-          var options = {
-            bodyA: this.body,
-            pA: { x: 0, y: 0 },
-            pB: { x: 0, y: 0 },
-            stiffness: this.constraints[i].stiffness,
-            damping : this.constraints[i].damping,
-            length : this.constraints[i].length,
-            matter_engine: this.matter_engine,
-          }
-          if(this.constraints[i].p_offset!= null)
-            options.pA = this.constraints[i].p_offset
+        this.constraints_order.push(this.constraints_args[i].name)
 
-          if(this.constraints[i].target != null)
-            options.bodyB = this.constraints[i].target.body
-          else
-            options.pB = this.m.get_row(2).get_value()
-
-          if(this.constraints[i].p_target_offset != null)  
-            options.pB = this.constraints[i].p_target_offset
-
-
-          if(options.stiffness == 0)
-          {
-            options.stiffness = 0.000001
-            options.damping = 0
-          }
-          */
-          
-          this.physics_constraints.push( build_constraint(this,this.constraints[i]) )          
+        if(this.constraints_args[i].type == 'dyn_point')
+        { 
+          this.constraints[this.constraints_args[i].name] = new dyn_constraint_build({obj: this, ...this.constraints_args[i]})//build_constraint(this,this.constraints_args[i])          
         }
 
-        if(this.constraints[i].type == 'parent')
+        if(this.constraints_args[i].type == 'dyn_orient')
         {
           let offset = 300
-          /*
-          var options = {
-            bodyA: this.body,
-            pA: { x: offset, y: offset },
-            pB: { x: offset, y: offset },
-            stiffness: this.constraints[i].stiffness,
-            damping : this.constraints[i].damping,
-            length : this.constraints[i].length,
-            matter_engine: this.matter_engine,
-          }
-          if(this.constraints[i].p_offset!= null)
-            options.pA = this.constraints[i].p_offset
+          this.constraints[this.constraints_args[i].name] = new dyn_constraint_build({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
+        }
 
-          if(this.constraints[i].target != null)
-            options.bodyB = this.constraints[i].target.body
-          else
-          {
-            options.pB = this.m.get_row(2).get_value()
-            options.pB.x +=offset
-            options.pB.y +=offset
+        if(this.constraints_args[i].type == 'kin_point')
+        { 
+          this.constraints[this.constraints_args[i].name] = new constraint_build({obj: this, ...this.constraints_args[i],do_position:true,do_orientation:false})//build_constraint(this,this.constraints_args[i])          
+        }
 
-          }
-
-          if(this.constraints[i].p_target_offset != null)  
-            options.pB = this.constraints[i].p_target_offset
-
-
-          if(options.stiffness == 0)
-          {
-            options.stiffness = 0.000001
-            options.damping = 0
-          }
-          */
-          this.physics_constraints.push( build_constraint(this,this.constraints[i],offset) )                  
+        if(this.constraints_args[i].type == 'kin_orient')
+        {
+          let offset = 300
+          this.constraints[this.constraints_args[i].name] = new constraint_build({obj: this, ...this.constraints_args[i],do_position:false,do_orientation:true})//build_constraint(this,this.constraints_args[i],offset)                 
         }
 
         /////////////////// axe
-        if(this.constraints[i].type == 'axe')
+        if(this.constraints_args[i].type == 'kin_axe')
         {
-          //let offset = 300
-          //let parent_cns = [ build_constraint(this,this.constraints[i]), build_constraint(this,this.constraints[i],offset) ]
-          this.c_axe = new cns_axe({ Follower: this, ...this.constraints[i] })   
-          
-          //this.physics_constraints.push(parent_cns[0])
-          //this.physics_constraints.push(parent_cns[1])
+          this.constraints[this.constraints_args[i].name] =  new cns_axe({ Follower: this, ...this.constraints_args[i] })   
         }
 
+        if(this.constraints_args[i].type == 'kin_limit')
+        {
+          this.constraints[this.constraints_args[i].name] =  new limit({ Follower: this, ...this.constraints_args[i], obj:this })   
+        }
 
       }
 
@@ -394,6 +340,27 @@ export default class body_build{
       return m_parent
     }  
 
+    get_parent_in_matrix()
+    {
+      /*
+      m_parent_world
+      */
+      let m_parent = null
+      if(this.parent != null)
+      {
+        m_parent = this.parent.get_in_matrix()
+      }
+      else{
+        m_parent = this.m
+      }
+      return m_parent
+    } 
+    get_init_matrix( )
+    {
+      let m = this.m_offset.getMult(this.get_parent_in_matrix())
+      return m
+    }
+
     get_in_matrix( )
     {
       let m = this.m_offset.getMult(this.get_parent_matrix())
@@ -402,22 +369,11 @@ export default class body_build{
 
     get_out_matrix()
     {
-      /*        
-      m_out_world = m_dyn_local*(m_offset_local*m_parent_world)
-      */
-     
       let pos = new Vector( this.body.position.x, this.body.position.y)
       let rot = this.body.angle
       let m = new Matrix()
       m.setTranslation(pos)
       m.setRotation(rot)
-
-      if( this.compute_physics_in_local )
-      {
-        m = m.getMult(this.get_in_matrix())
-      }
-
-
       return m
     }
 
@@ -437,11 +393,7 @@ export default class body_build{
 
     get_velocity()
     {
-      let v = new Vector( this.body.velocity.x, this.body.velocity.y)
-      if( this.compute_physics_in_local )
-      {
-        v = v.getMult(this.get_in_matrix())
-      }      
+      let v = new Vector( this.body.velocity.x, this.body.velocity.y)     
       return v
     }  
 
@@ -454,29 +406,16 @@ export default class body_build{
     
     set_position(v)
     {
-      if( this.compute_physics_in_local )
-      {
-        v = v.getMult(this.get_in_matrix().getInverse())
-      }
       Matter.Body.setPosition(this.body, v.get_value())
     }
   
     set_velocity(v)
     {
-      if( this.compute_physics_in_local )
-      {
-        v = v.getMult(this.get_in_matrix().getInverse())
-      }      
       Matter.Body.setVelocity(this.body, v.get_value())
     }  
 
     apply_force(p,v)
-    {
-      if( this.compute_physics_in_local )
-      {
-        v = v.getMult(this.get_in_matrix().getInverse())
-        p = p.getMult(this.get_in_matrix().getInverse())
-      }           
+    {          
       Matter.Body.applyForce(this.body, p.get_value(), v.get_value())
     }
     
@@ -485,20 +424,19 @@ export default class body_build{
       let angle = this.rot+a
       if(override)
         angle = a
-
-      if( this.compute_physics_in_local )
-      {
-        let m_current = new Matrix()
-        m_current.setRotation(angle)
-        m_current = m_current.getMult(this.get_in_matrix().getInverse())
-        angle = m_current.getRotation()
-      }        
+       
       Matter.Body.setAngle(this.body, angle)
     }
   
     set_anglular_velocity(a)
     {
       Matter.Body.setAngularVelocity(this.body, a)
+    }
+
+    set_out_matrix(m)
+    {
+      this.set_position(m.get_row(2))
+      this.set_angle(m.getRotation())
     }
   
 
@@ -514,39 +452,15 @@ export default class body_build{
         
       if( !this.do_update )
         return false
-      //let p = this.get_in_matrix().get_row(2)
-      
   
-      if(this.limit_rot!=null)
+
+      for( let i = 0; i < this.constraints_order.length; i++)
       {
-        if( this.body.angle < this.limit_rot[0] )
-        {
-          Matter.Body.setAngle(this.body, this.limit_rot[0])
-          Matter.Body.setAngularVelocity(this.body, 0)    
-      
-        }    
-        if( this.limit_rot[1] < this.body.angle )
-        {
-          Matter.Body.setAngle(this.body, this.limit_rot[1])
-          Matter.Body.setAngularVelocity(this.body, 0)      
-        }    
+        this.constraints[this.constraints_order[i]].apply()
       }
-  
-      if( this.c_axe != null )
-        this.c_axe.apply()
-   
-  
+      
       if(this.rot_override!=null)
         this.set_angle(this.rot_override,true)
-        
-  
-      for( let i = 0; i < this.physics_constraints.length; i++)
-      {
-        //let p = this.get_in_matrix().get_row(2).get_value()
-        //this.physics_constraints[i].pB = p
-        this.physics_constraints[i].update()
-      }
-      
 
       return true
      
@@ -602,12 +516,12 @@ export default class body_build{
 
      
         
-        if(( this.c_axe != null)&&(this.c_axe.enable == true ))
+        if(( this.constraints.axe != null)&&(this.constraints.axe.enable == true ))
         {
-          this.c_axe.update_debug()
+          this.constraints.axe.update_debug()
           let shape = ut.line( 
-            convert_coords_matter_to_three(this.c_axe.debug_pts[0],this.screen_dims), 
-            convert_coords_matter_to_three(this.c_axe.debug_pts[1],this.screen_dims) );
+            convert_coords_matter_to_three(this.constraints.axe.debug_pts[0],this.screen_dims), 
+            convert_coords_matter_to_three(this.constraints.axe.debug_pts[1],this.screen_dims) );
             
           //let axes_grp = new THREE.Group();
           //group_fidget.add(axes_grp)
@@ -681,7 +595,6 @@ export default class body_build{
       if(this.debug_matrix_info)
       {
         console.log('debug_matrix_info')
-        let local_mode = this.compute_physics_in_local
         let parent_name = 'null'
         if(this.parent != null)
           parent_name = this.parent.name
@@ -695,7 +608,6 @@ export default class body_build{
 
 
         let texts_to_draw = [
-          'physics in local : ' + local_mode,
           'parent name : ' + parent_name,
           'm_parent: '+Math.round(m_parent.a)+' '+Math.round(m_parent.b)+' | '+Math.round(m_parent.c)+' '+Math.round(m_parent.d)+' | '+Math.round(m_parent.e)+' '+Math.round(m_parent.f)+'' ,
           'm_offset: '+Math.round(m_offset.a)+' '+Math.round(m_offset.b)+' | '+Math.round(m_offset.c)+' '+Math.round(m_offset.d)+' | '+Math.round(m_offset.e)+' '+Math.round(m_offset.f)+'' ,
@@ -742,7 +654,7 @@ export default class body_build{
   }
   
 
-
+/*
 function build_constraint(body,cns_opts,offset = 0)
 {
   var options = {
@@ -778,3 +690,4 @@ function build_constraint(body,cns_opts,offset = 0)
 
   return new constraint_build(options)  
 }
+*/
