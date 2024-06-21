@@ -59,11 +59,11 @@ let screen_dims = {x:width,y:height}
 /////////////////////////////////////////// setup game
 var nbr = 1
 var debug = { disable_animation:true,
-              force_visibility:false,
+              force_visibility:true,
               show_inter:true,
               matrix_axes:false,
               cns_axes:false,
-              info:false,
+              fidget_steps_info:false,
                 }
 
 var ground_enable = false
@@ -87,7 +87,7 @@ let m = new Matrix()
 m.setTranslation(width/2, height/2 )
 
 let s = 2.2
-F_sequence = new fidgets_sequence(nbr,m,s,screen_dims,matter_engine,mouseConstraint,shdrs,debug)
+F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, matter_engine, mouseConstraint, shdrs,debug)
 F_sequence.setup()
 
 
@@ -186,6 +186,7 @@ function onWindowResize() {
 //
 
 function animate() {
+
     F_sequence.update()
     F_sequence.animate_three()
     uniforms[ 'time' ].value = performance.now() / 1000;

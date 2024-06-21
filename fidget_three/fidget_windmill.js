@@ -878,9 +878,9 @@ export default class fidget_windmill extends fidget{
         if( 0.01 < v_delta.mag() )
         {
           
-          let A = this.bodies.inters.A.is_selected()
-          let B = this.bodies.inters.B.is_selected()
-          let C = this.bodies.inters.C.is_selected()
+          let A = this.bodies.inters.A.is_selected
+          let B = this.bodies.inters.B.is_selected
+          let C = this.bodies.inters.C.is_selected
           if( (A == false)&&
               (B == false)&&
               (C == false))

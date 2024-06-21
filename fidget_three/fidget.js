@@ -620,13 +620,6 @@ export default class fidget{
     } 
   }
 
-  obj_is_selected(mouse_cns,obj)
-  {
-    if( mouse_cns.constraint.bodyB != null )
-      if( obj.body == mouse_cns.constraint.bodyB )
-        return true
-    return false
-  }
 
   mouse_select_highlight(mouse_cns,body_type_filter = [] )
   {
@@ -645,17 +638,31 @@ export default class fidget{
             for( let i = 0; i < this.bodies[b_type][key].length; i++)
             {
               if( this.bodies[b_type][key][i].body == mouse_cns.constraint.bodyB )
+              {
                 this.bodies[b_type][key][i].color = utils.color.redLight
+                this.bodies[b_type][key][i].is_selected = true
+              }
               else
-                this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base           
+              {
+                this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
+                this.bodies[b_type][key][i].is_selected = false
+              }
+          
             }
           }
           else
           {
             if( this.bodies[b_type][key].body == mouse_cns.constraint.bodyB )
+            {
               this.bodies[b_type][key].color = utils.color.redLight
+              this.bodies[b_type][key].is_selected = true
+            }
             else
-            this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
+            {
+              this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
+              this.bodies[b_type][key].is_selected = false
+            }
+
           }
 
            

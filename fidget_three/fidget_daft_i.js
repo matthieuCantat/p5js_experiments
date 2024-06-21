@@ -156,7 +156,7 @@ export default class fidget_daft_i extends fidget{
         collision_mask: utils.collision_category.mouse,
         constraints:[
           { name:'point'    ,type:'dyn_point', stiffness: 0.05,damping:0.01,length:0.01},
-          { name:'orient'   ,type:'dyn_orient',stiffness: 0.02,damping:0.01,length:0.01},
+          { name:'orient'   ,type:'dyn_orient',stiffness: 0.2,damping:0.01,length:0.01},
           //{ name:'rot_limit',type:'kin_limit', x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
         ],    
 
@@ -386,8 +386,9 @@ export default class fidget_daft_i extends fidget{
                                         constraints:[
                                           //{ name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.99,length:0.1},
                                           { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 0.9,stiffness_at_selection:0,damping:0.1,length:0.01},                 
-                                          //{ name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(90)},
+                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.01,length:0.01},  
+                                          //{ name:'orient' ,type:'kin_orient' ,target:this.bodies.inters.background},                 
+                                          { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
                                         ],      
 
                                         density:0.1, 
@@ -462,7 +463,7 @@ export default class fidget_daft_i extends fidget{
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
                                       constraints:[
-                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.01,stiffness_at_selection:0.1,damping:0.01,length:0.01},
+                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
                                         //{ name:'orient',type:'dyn_orient',target:this.bodies.inters.background, stiffness: 0.01,damping:0.01,length:0.01},
                                         //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
@@ -538,10 +539,10 @@ export default class fidget_daft_i extends fidget{
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse,
                                     constraints:[
-                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 1.0,stiffness_at_selection:0.1,damping:0.1,length:0.01},
-                                      { name:'orient',type:'dyn_orient',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 0.1,damping:0.01,length:0.01},
+                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
+                                      //{ name:'orient',type:'dyn_orient',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 0.1,damping:0.01,length:0.01},
                                       //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                      //{ name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
+                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ], 
 
@@ -595,7 +596,7 @@ export default class fidget_daft_i extends fidget{
 
     let A = 0
     A = clamp(this.bodies.inters.A.constraints.axe.current_pos ,0,1)//clamp(deg(this.bodies.inters.A.body.angle)*-1/35.0     ,0,1)
-    let B = clamp(deg(this.bodies.inters.B.body.angle)/90.0     ,0,1)
+    let B = clamp(deg(this.bodies.inters.B.get_local_rotation())/90.0     ,0,1)
     let C = clamp(this.bodies.inters.C.constraints.axe.current_pos ,0,1) 
     let D = 0
 
@@ -695,7 +696,6 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangle.pos_override = 0
 
       //_________________________________________________________________Control
-      //this.bodies.geos.rectangle.rot_override = rad(res_coef*90)
       this.bodies.geos.rectangle.m_transform.setRotation(rad(res_coef*90))
 
       var pos_override = (res_coef )*1.63
@@ -722,13 +722,12 @@ export default class fidget_daft_i extends fidget{
     {
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-      this.bodies.inters.B.rot_override = rad(270)
+      //this.bodies.inters.B.m_transform.setRotation(rad(270))
       this.bodies.inters.C.enable(1) 
       this.bodies.inters.background.enable(1)
       //_________________________________________________________________Clean Other
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
-      //this.bodies.geos.rectangle.rot_override = rad(90)
       //_________________________________________________________________Control
        
       this.bodies.geos.rectangle.constraints.axe.pos_override = res_coef
@@ -760,13 +759,12 @@ export default class fidget_daft_i extends fidget{
       
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1
-      this.bodies.inters.B.rot_override = rad(270)
+      //this.bodies.inters.B.m_transform.setRotation(rad(270))
       this.bodies.inters.C.constraints.axe.pos_override = 1
       //_________________________________________________________________Clean Other
 
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
-      //this.bodies.geos.rectangle.rot_override = rad(90)
 
       // Keep position safe
       this.bodies.geos.circle.scale = 1.85 - 1.42
@@ -922,9 +920,9 @@ export default class fidget_daft_i extends fidget{
         if( 0.01 < v_delta.mag() )
         {
 
-          let A = this.bodies.inters.A.is_selected()
-          let B = this.bodies.inters.B.is_selected()
-          let C = this.bodies.inters.C.is_selected()
+          let A = this.bodies.inters.A.is_selected
+          let B = this.bodies.inters.B.is_selected
+          let C = this.bodies.inters.C.is_selected
           if( (A == false)&&
               (B == false)&&
               (C == false))

@@ -6,6 +6,103 @@ import { rad, deg, snap_point_on_line, proj_vector_on_line} from './utils.js';
 
 
 
+export class dyn_constraint_build_custom_orient{
+  
+  constructor( in_options ){
+      
+
+      // args
+      const defaultOptions = {
+          obj: null,
+          target: null,
+          stiffness: 0.001,
+          stiffness_at_selection: null,
+          damping: 0.05,
+      };
+      const args = { ...defaultOptions, ...in_options };
+
+      this.matter_engine = args.obj.matter_engine
+
+      this.obj = args.obj
+      this.target = args.target
+      this.stiffness = args.stiffness
+      this.stiffness_at_selection = args.stiffness_at_selection
+      this.damping = args.damping
+
+      let m_target = null
+      if(this.target != null)
+        m_target = this.target.get_init_matrix()
+      else
+        m_target = this.obj.m
+
+      let m_obj = this.obj.get_init_matrix()
+      //m_target.log()
+
+
+      this.target_pos_offset = m_obj.getMult(m_target.getInverse())
+      
+
+      this.is_enable = true
+      
+  
+  }
+
+  apply()
+  {
+      if(this.is_enable == false)
+          return false
+
+      let m_target_out = null
+      if(this.target != null)
+        m_target_out = this.target.get_out_matrix()
+      else
+        m_target_out = this.obj.m          
+      
+      let m_target  = this.target_pos_offset.getMult(m_target_out)
+      let m_current = this.obj.get_out_matrix()
+      let m_delta = m_target.getMult(m_current.getInverse())
+      //let a_delta = m_delta.getRotation()
+
+      let stiffness = this.stiffness
+      if(this.stiffness_at_selection != null)
+      {
+        if(this.obj.is_selected)
+        {
+          stiffness = this.stiffness_at_selection
+        }
+      }
+      if( stiffness == 1.0)
+      {
+        this.obj.set_angle(m_target.getRotation())
+      }
+      else if( 0.0 < stiffness )
+      {
+        this.obj.set_anglular_velocity(m_delta.getRotation()*stiffness)
+      }
+      else
+      {
+        let m_target = null
+        if(this.target != null)
+          m_target = this.target.get_init_matrix()
+        else
+          m_target = this.obj.m
+  
+        let m_obj = this.obj.get_out_matrix()
+        //m_target.log()
+  
+  
+        this.target_pos_offset = m_obj.getMult(m_target.getInverse())        
+      }
+
+      return true
+  }
+  enable(value)
+  {
+      this.is_enable = value
+  }
+
+}
+
 
 export class dyn_constraint_build{
   
@@ -78,14 +175,16 @@ export class dyn_constraint_build{
     {
       if(this.stiffness_at_selection != null)
       {
-        if(this.obj.is_selected())
+        if(this.obj.is_selected)
         {
+          //console.log(this.obj.name, 'is selected')
           this.cns.stiffness = this.stiffness_at_selection
           if(this.stiffness_at_selection == 0 )
             this.enable(false)
         }
         else
         {
+          //console.log(this.obj.name, 'is not selected')
           this.cns.stiffness = this.stiffness
           if(this.stiffness_at_selection == 0 )
             this.enable(true)          
@@ -388,10 +487,13 @@ export class limit{
         if(this.is_enable == false)
             return false
         
-        let p_parent = this.obj.get_parent_matrix().get_row(2)
-        let p = this.obj.get_position()
+        let m_parent = this.obj.get_parent_matrix()
+        let m        = this.obj.get_out_matrix()
+        let m_local = m.getMult(m_parent.getInverse())
+        let p = m_local.get_row(2)
         let v = this.obj.get_velocity()
-        let a = this.obj.get_rotation()
+        let a = m_local.getRotation()
+        /*
         if((this.x_min!=null)&&( p.x() < p_parent.x()+this.x_min ))
         {
             p.v.x = p_parent.x()+this.x_min
@@ -420,18 +522,25 @@ export class limit{
             this.obj.set_position(p)
             this.obj.set_velocity(v) 
         } 
+        */
 
         if((this.rot_min!=null)&&( a < this.rot_min ))
         {
             a = this.rot_min
-            this.obj.set_angle(a)
+            let m_limit_local = new Matrix()
+            m_limit_local.setRotation(a)
+            let m_limit = m_limit_local.getMult(m_parent)
+            this.obj.set_angle(m_limit.getRotation())
             this.obj.set_anglular_velocity(0)
 
         }    
         if((this.rot_max!=null)&&( this.rot_max < a ))
         {
             a = this.rot_max
-            this.obj.set_angle(a)
+            let m_limit_local = new Matrix()
+            m_limit_local.setRotation(a)
+            let m_limit = m_limit_local.getMult(m_parent)            
+            this.obj.set_angle(m_limit.getRotation())
             this.obj.set_anglular_velocity(0)     
         }    
         return true
@@ -457,6 +566,7 @@ export class constraint_build{
             target: null,
             do_position: true,
             do_orientation: true,
+            apply_on_input: false,
         };
         const args = { ...defaultOptions, ...in_options };
 
@@ -473,6 +583,7 @@ export class constraint_build{
         
         this.do_position = args.do_position
         this.do_orientation = args.do_orientation
+        this.apply_on_input = args.apply_on_input
 
         this.is_enable = true
         
@@ -487,10 +598,28 @@ export class constraint_build{
         
         let m_target = this.target.get_out_matrix()
         let m = this.target_pos_offset.getMult(m_target)
-        if(this.do_position)
+
+        if(this.apply_on_input)
+        {
+          if(this.do_position)
+              this.obj.set_position_input(m.get_row(2))
+          if(this.do_orientation)
+              this.obj.set_angle_input(m.getRotation())
+        }
+        else
+        {
+          if(this.do_position)
+          {
             this.obj.set_position(m.get_row(2))
-        if(this.do_orientation)
+          }
+
+          if(this.do_orientation)
+          {
             this.obj.set_angle(m.getRotation())
+          }
+
+        }
+
 
         return true
     }
@@ -500,3 +629,5 @@ export class constraint_build{
     }
   
 }
+
+

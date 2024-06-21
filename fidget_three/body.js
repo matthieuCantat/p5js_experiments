@@ -1,7 +1,7 @@
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import { utils , rad, deg, Draw_text_debug,convert_coords_matter_to_three} from './utils.js';
-import {dyn_constraint_build, constraint_build, cns_axe,limit} from './constraint.js';
+import {dyn_constraint_build, constraint_build, cns_axe,limit,dyn_constraint_build_custom_orient} from './constraint.js';
 import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 import * as THREE from 'three';
@@ -95,6 +95,8 @@ export default class body_build{
       this.debug_matrix_axes = args.debug_matrix_axes
       this.debug_cns_axes = args.debug_cns_axes  
       this.debug_force_visibility = args.debug_force_visibility
+
+      this.is_selected = false
       
 
       this.draw_text_debug = null
@@ -263,8 +265,7 @@ export default class body_build{
 
         if(this.constraints_args[i].type == 'dyn_orient')
         {
-          let offset = 300
-          this.constraints[this.constraints_args[i].name] = new dyn_constraint_build({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
+          this.constraints[this.constraints_args[i].name] = new dyn_constraint_build_custom_orient({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
         }
 
         if(this.constraints_args[i].type == 'kin_point')
@@ -274,7 +275,6 @@ export default class body_build{
 
         if(this.constraints_args[i].type == 'kin_orient')
         {
-          let offset = 300
           this.constraints[this.constraints_args[i].name] = new constraint_build({obj: this, ...this.constraints_args[i],do_position:false,do_orientation:true})//build_constraint(this,this.constraints_args[i],offset)                 
         }
 
@@ -312,7 +312,7 @@ export default class body_build{
   
       Matter.Composite.add( this.matter_engine.world, this.body)      
     }
-
+    /*
     is_selected()
     {
       if( this.mouse_constraint.constraint.bodyB != null )
@@ -320,6 +320,8 @@ export default class body_build{
           return true
       return false
     }
+    */
+
 
     apply_scale( value )
     {
@@ -404,6 +406,15 @@ export default class body_build{
       return p
     }
 
+    get_local_rotation()
+    {
+      let m = this.get_out_matrix()
+      let m_in = this.get_in_matrix()
+      let m_local = m.getMult(m_in.getInverse())
+      let r = m_local.getRotation()
+      return r
+    }
+
     get_rotation()
     {
       let m = this.get_out_matrix()
@@ -425,13 +436,20 @@ export default class body_build{
         return 1
       return 0
     }
-    
+   
+    set_position_input(v)
+    {
+      let m_in = this.m_offset.getMult(this.get_parent_matrix())
+      let p_transform_target = v.mult(m_in.getInverse())
+      this.m_transform.set_row(2,p_transform_target)
+    }
+
     set_position(v)
     {
       Matter.Body.setPosition(this.body, v.get_value())
     }
   
-    set_velocity(v)
+    set_velocity(v,update_input = false)
     {
       Matter.Body.setVelocity(this.body, v.get_value())
     }  
@@ -449,7 +467,16 @@ export default class body_build{
        
       Matter.Body.setAngle(this.body, angle)
     }
-  
+
+    set_angle_input(a)
+    {
+      let m_in = this.m_offset.getMult(this.get_parent_matrix())
+      let m_current = new Matrix()
+      m_current.setRotation(a)
+      let m_delta = m_current.getMult(m_in.getInverse())
+      this.m_transform.setRotation(m_delta.getRotation())
+    }
+
     set_anglular_velocity(a)
     {
       Matter.Body.setAngularVelocity(this.body, a)

@@ -517,6 +517,24 @@ Matrix.prototype = {
 		if(row == 2)return new Vector(this.e,this.f)//P
 	},
 
+	set_row(row,v){
+		if(row == 0)
+		{
+			this.a = v.x()
+			this.b = v.y()
+		}
+		if(row == 1)
+		{
+			this.c = v.x()
+			this.d = v.y()
+		}
+		if(row == 2)
+		{
+			this.e = v.x()
+			this.f = v.y()
+		}
+	},
+
 	log: function(title=null) {
 
 		if(title!=null)

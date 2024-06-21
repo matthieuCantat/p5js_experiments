@@ -8,7 +8,7 @@ import fidget_windmill from './fidget_windmill.js';
 
 export default class fidgets_sequence
 {
-    constructor( nbr, m, s, screen_dims, matter_engine,mouseConstraint, shaders = [], debug=false)
+    constructor( nbr, m, s, screen_dims, matter_engine,mouse_constraint, shaders = [], debug=false)
     {
         //option
         this.fidgets_nbr = nbr
@@ -34,23 +34,23 @@ export default class fidgets_sequence
         this.shaders = shaders
         this.screen_dims = screen_dims
         this.matter_engine = matter_engine
-        this.mouseConstraint = mouseConstraint
+        this.mouse_constraint = mouse_constraint
         
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
-            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
-            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouseConstraint,this.shaders,this.debug_mode)
+            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouse_constraint,this.shaders,this.debug_mode)
+            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouse_constraint,this.shaders,this.debug_mode)
+            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouse_constraint,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
         }
     
         this.draw_text_debug = null
-        if(this.debug_mode.info)
+        if(this.debug_mode.fidget_steps_info)
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
-            this.draw_text_debug.mouse_cns = this.mouseConstraint
+            this.draw_text_debug.mouse_cns = this.mouse_constraint
         }        
 
     }
@@ -71,14 +71,14 @@ export default class fidgets_sequence
 
 
 
-    get_random_fidget(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug)
+    get_random_fidget(p,s,sceen_dims,matter_engine,mouse_constraint,shaders,debug)
     {
       
       let r = Math.random()
       if(  0.5 < r)
-        return new fidget_windmill(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug)
+        return new fidget_windmill(p,s,sceen_dims,matter_engine,mouse_constraint,shaders,debug)
       else
-        return new fidget_daft_i(p,s,sceen_dims,matter_engine,mouseConstraint,shaders,debug)   
+        return new fidget_daft_i(p,s,sceen_dims,matter_engine,mouse_constraint,shaders,debug)   
     }
 
 
@@ -113,7 +113,7 @@ export default class fidgets_sequence
           }
         }
         this.fidgets[i].update()
-        this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
+        this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
       }
     }
 
@@ -131,7 +131,7 @@ export default class fidgets_sequence
         this.fidgets[i].setup_shapes_three()
         
         scene_three.add( this.fidgets[i].group_three )
-        //this.fidgets[i].mouse_select_highlight(this.mouseConstraint)
+        //this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
       }
     }
 
@@ -141,7 +141,7 @@ export default class fidgets_sequence
         this.fidgets[i].animate_three()
 
       this.update_chrono_three()
-      if(this.debug_mode.info)
+      if(this.debug_mode.fidget_steps_info)
       {
         let texts_to_draw = [
           'count : ' + this.fidgets[0].state.update_count,
@@ -175,7 +175,7 @@ export default class fidgets_sequence
     
     setup_debug_three(scene_three)
     {
-      if(this.debug_mode.info)
+      if(this.debug_mode.fidget_steps_info)
         this.draw_text_debug.setup_three(scene_three)
     }
 
