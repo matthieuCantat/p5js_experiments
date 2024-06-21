@@ -381,6 +381,12 @@ export default class body_build{
       return m
     }
 
+    init_out_matrix()
+    {
+      let m_init = this.get_init_matrix()
+      this.set_out_matrix(m_init)
+    }
+
     get_out_matrix()
     {
       let pos = new Vector( this.body.position.x, this.body.position.y)
@@ -590,6 +596,8 @@ export default class body_build{
         this.draw_text_debug.setup_three(this.mesh_three.group)
 
     }  
+
+    
 
     animate_three()
     {

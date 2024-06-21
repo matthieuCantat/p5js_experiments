@@ -81,20 +81,32 @@ export class dyn_constraint_build{
         if(this.obj.is_selected())
         {
           this.cns.stiffness = this.stiffness_at_selection
+          if(this.stiffness_at_selection == 0 )
+            this.enable(false)
         }
         else
         {
           this.cns.stiffness = this.stiffness
+          if(this.stiffness_at_selection == 0 )
+            this.enable(true)          
         }
       }
         //this.cns.pointB = this.pB
     }
+
     enable(value)
     {
       if( value == false)
-        this.cns.stiffness = 0.00001
+      {
+        this.cns.stiffness = 0.000001
+        this.cns.damping = 0
+      }   
       else
+      {
         this.cns.stiffness = this.stiffness
+        this.cns.damping = this.damping
+      }
+
     }
   
 }

@@ -62,7 +62,10 @@ export default class fidgets_sequence
       // setup
           
       for( let i = 0; i < this.fidgets_nbr; i++)
+      {
         this.fidgets[i].setup();
+      }
+
     }
 
 

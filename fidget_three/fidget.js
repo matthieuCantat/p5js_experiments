@@ -82,6 +82,7 @@ export default class fidget{
     console.log('setup : fidget')                      
     this.bodies_set_debug( this.debug_mode )
     this.bodies_set_visibility(this.debug_mode.show_inter, ['inters'])   
+    this.bodies_init_out_matrix()
   }
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -560,6 +561,30 @@ export default class fidget{
         }
         else
           this.bodies[b_type][key].visibility_override = value
+        
+      } 
+    } 
+  }  
+
+
+  bodies_init_out_matrix( body_type_filter = [] )
+  {
+    
+    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    {   
+      let b_type = this.bodies_draw_order[i+0]
+      let key = this.bodies_draw_order[i+1]
+       
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      {
+     
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            this.bodies[b_type][key][i].init_out_matrix()
+        }
+        else
+          this.bodies[b_type][key].init_out_matrix()
         
       } 
     } 

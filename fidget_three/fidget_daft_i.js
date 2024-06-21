@@ -385,8 +385,9 @@ export default class fidget_daft_i extends fidget{
                                         collision_mask: utils.collision_category.mouse,
                                         constraints:[
                                           //{ name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.99,length:0.1},
-                                          { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},                                         
-                                          { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(90)},
+                                          { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
+                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 0.9,stiffness_at_selection:0,damping:0.1,length:0.01},                 
+                                          //{ name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(90)},
                                         ],      
 
                                         density:0.1, 
@@ -429,7 +430,7 @@ export default class fidget_daft_i extends fidget{
 
                                                     collision_category: utils.collision_category.none,
                                                     collision_mask: utils.collision_category.none ,
-                                                    
+                                                 
                                                     density:0.1,    
                                                     }) 
 
