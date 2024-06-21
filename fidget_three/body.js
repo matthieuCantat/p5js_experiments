@@ -15,6 +15,7 @@ export default class body_build{
         name:'default name',
         m: new Matrix(),
         m_offset: new Matrix(),
+        m_transform: new Matrix(),
         parent:null,
         z: 0,
         w: 1,
@@ -55,8 +56,9 @@ export default class body_build{
       this.type = args.type
       this.name = args.name    
       this.m = args.m
-      this.m_offset = args.m_offset
       this.parent = args.parent
+      this.m_offset = args.m_offset
+      this.m_transform = args.m_transform
       this.z = args.z
       this.w = args.w
       this.h = args.h
@@ -369,13 +371,13 @@ export default class body_build{
     } 
     get_init_matrix( )
     {
-      let m = this.m_offset.getMult(this.get_parent_in_matrix())
+      let m = this.m_transform.getMult(this.m_offset.getMult(this.get_parent_in_matrix()))
       return m
     }
 
     get_in_matrix( )
     {
-      let m = this.m_offset.getMult(this.get_parent_matrix())
+      let m = this.m_transform.getMult(this.m_offset.getMult(this.get_parent_matrix()))
       return m
     }
 
@@ -614,6 +616,7 @@ export default class body_build{
           parent_name = this.parent.name
         let m_parent = this.get_parent_matrix()
         let m_offset = this.m_offset
+        let m_transform = this.m_transform
         let m_in = this.get_in_matrix( )
         let m_out = this.get_out_matrix()    
         let p_out = this.get_position()
@@ -625,6 +628,7 @@ export default class body_build{
           'parent name : ' + parent_name,
           'm_parent: '+Math.round(m_parent.a)+' '+Math.round(m_parent.b)+' | '+Math.round(m_parent.c)+' '+Math.round(m_parent.d)+' | '+Math.round(m_parent.e)+' '+Math.round(m_parent.f)+'' ,
           'm_offset: '+Math.round(m_offset.a)+' '+Math.round(m_offset.b)+' | '+Math.round(m_offset.c)+' '+Math.round(m_offset.d)+' | '+Math.round(m_offset.e)+' '+Math.round(m_offset.f)+'' ,
+          'm_transform: '+Math.round(m_transform.a)+' '+Math.round(m_transform.b)+' | '+Math.round(m_transform.c)+' '+Math.round(m_transform.d)+' | '+Math.round(m_transform.e)+' '+Math.round(m_transform.f)+'' ,
           'm_in    : '+Math.round(m_in.a)+' '+Math.round(m_in.b)+' | '+Math.round(m_in.c)+' '+Math.round(m_in.d)+' | '+Math.round(m_in.e)+' '+Math.round(m_in.f)+'' ,
           'm_out   : '+Math.round(m_out.a)+' '+Math.round(m_out.b)+' | '+Math.round(m_out.c)+' '+Math.round(m_out.d)+' | '+Math.round(m_out.e)+' '+Math.round(m_out.f)+'' ,
           'p_out   : '+Math.round(p_out.x())+' '+Math.round(p_out.y()) ,

@@ -240,7 +240,7 @@ export default class fidget_daft_i extends fidget{
                                           //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},  
                                           { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                           { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
-                                          {  name:'axe'   ,type:'kin_axe', axe:1, distPos: 50.0*s, distNeg: 0.001 },
+                                          {  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
                                         ], 
 
                                         density:0.001, 
@@ -694,7 +694,8 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangle.pos_override = 0
 
       //_________________________________________________________________Control
-      this.bodies.geos.rectangle.rot_override = rad(res_coef*90)
+      //this.bodies.geos.rectangle.rot_override = rad(res_coef*90)
+      this.bodies.geos.rectangle.m_transform.setRotation(rad(res_coef*90))
 
       var pos_override = (res_coef )*1.63
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
@@ -726,7 +727,7 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Clean Other
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
-      this.bodies.geos.rectangle.rot_override = rad(90)
+      //this.bodies.geos.rectangle.rot_override = rad(90)
       //_________________________________________________________________Control
        
       this.bodies.geos.rectangle.constraints.axe.pos_override = res_coef
@@ -764,7 +765,7 @@ export default class fidget_daft_i extends fidget{
 
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
-      this.bodies.geos.rectangle.rot_override = rad(90)
+      //this.bodies.geos.rectangle.rot_override = rad(90)
 
       // Keep position safe
       this.bodies.geos.circle.scale = 1.85 - 1.42
