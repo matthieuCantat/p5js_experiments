@@ -20,6 +20,7 @@ export class dyn_constraint_build{
             target_pos_offset: new Vector(),
             
             stiffness: 0.001,
+            stiffness_at_selection: null,
             damping: 0.05,
             length: null,
             y_offset:0,
@@ -34,6 +35,7 @@ export class dyn_constraint_build{
         this.target_pos_offset = args.target_pos_offset
         
         this.stiffness = args.stiffness
+        this.stiffness_at_selection = args.stiffness_at_selection
         this.damping = args.damping
         this.length = args.length
         this.y_offset = args.y_offset
@@ -74,6 +76,17 @@ export class dyn_constraint_build{
 
     apply()
     {
+      if(this.stiffness_at_selection != null)
+      {
+        if(this.obj.is_selected())
+        {
+          this.cns.stiffness = this.stiffness_at_selection
+        }
+        else
+        {
+          this.cns.stiffness = this.stiffness
+        }
+      }
         //this.cns.pointB = this.pB
     }
     enable(value)

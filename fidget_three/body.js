@@ -41,11 +41,13 @@ export default class body_build{
         mass:null,
         screen_dims:null,
         matter_engine:null,
+        mouse_constraint:null,
         texture_three:null,
         arc_limites:[0,3.14*2],
         debug_matrix_info: false,
         debug_matrix_axes: false,  
-        debug_cns_axes: false,            
+        debug_cns_axes: false,     
+        debug_force_visibility: false,               
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -84,11 +86,13 @@ export default class body_build{
       this.mass = args.mass
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
+      this.mouse_constraint = args.mouse_constraint
       this.texture_three = args.texture_three
       this.arc_limites = args.arc_limites
       this.debug_matrix_info = args.debug_matrix_info
       this.debug_matrix_axes = args.debug_matrix_axes
       this.debug_cns_axes = args.debug_cns_axes  
+      this.debug_force_visibility = args.debug_force_visibility
       
 
       this.draw_text_debug = null
@@ -306,7 +310,15 @@ export default class body_build{
   
       Matter.Composite.add( this.matter_engine.world, this.body)      
     }
-    
+
+    is_selected()
+    {
+      if( this.mouse_constraint.constraint.bodyB != null )
+        if( this.body == this.mouse_constraint.constraint.bodyB )
+          return true
+      return false
+    }
+
     apply_scale( value )
     {
       this.scale = this.scale*value
@@ -399,6 +411,8 @@ export default class body_build{
 
     get_visibility()
     {
+      if(this.debug_force_visibility)
+        return 1
       if( (this.visibility)&&(this.visibility_override)) 
         return 1
       return 0

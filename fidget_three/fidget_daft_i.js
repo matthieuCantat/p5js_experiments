@@ -14,9 +14,9 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-    constructor(m,s,screen_dims,matter_engine,mouseConstraint,shaders = [],debug=false,random_color = true)
+    constructor(m,s,screen_dims,matter_engine,mouse_constraint,shaders = [],debug=false,random_color = true)
     {
-        super(m, s, screen_dims,matter_engine,mouseConstraint,shaders, debug)
+        super(m, s, screen_dims,matter_engine,mouse_constraint,shaders, debug)
 
         this.title = 'dafti'
 
@@ -96,6 +96,7 @@ export default class fidget_daft_i extends fidget{
       density:0.1, 
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
+      mouse_constraint: this.mouse_constraint,
       //texture_three: text_checker_three_grey,
     } 
     z_depth += z_depth_incr
@@ -110,7 +111,8 @@ export default class fidget_daft_i extends fidget{
                                                 collision:false, 
                                                 debug_matrix_info: false,
                                                 debug_matrix_axes: debug.matrix_axes,  
-                                                debug_cns_axes: debug.cns_axes,                                           
+                                                debug_cns_axes: debug.cns_axes,  
+                                                debug_force_visibility: debug.force_visibility,                                          
                                               })) 
     let mo_background_R = new Matrix()                                    
     mo_background_R.setTranslation(this.screen_dims.x/4*3,this.screen_dims.y/2)    
@@ -122,7 +124,8 @@ export default class fidget_daft_i extends fidget{
                                                 collision:false,  
                                                 debug_matrix_info: false,
                                                 debug_matrix_axes: debug.matrix_axes,  
-                                                debug_cns_axes: debug.cns_axes,                                                                                               
+                                                debug_cns_axes: debug.cns_axes,  
+                                                debug_force_visibility: debug.force_visibility,                                                                                                     
                                               })) 
                                             
 
@@ -131,6 +134,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.background = new body_build({
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
+        mouse_constraint: this.mouse_constraint,
 
         name:'inter_background',
         
@@ -151,17 +155,18 @@ export default class fidget_daft_i extends fidget{
         collision_category: utils.collision_category.inter,
         collision_mask: utils.collision_category.mouse,
         constraints:[
-          { name:'point'    ,type:'dyn_point', stiffness: 0.04,damping:0.9,length:0.01},
-          { name:'orient'   ,type:'dyn_orient',stiffness: 0.02,damping:0.5,length:0.01},
-          { name:'rot_limit',type:'kin_limit', x_min:-100,x_max:100,y_min:-100,y_max:100,rot_min:rad(-25),rot_max:rad(25)},
+          { name:'point'    ,type:'dyn_point', stiffness: 0.05,damping:0.01,length:0.01},
+          { name:'orient'   ,type:'dyn_orient',stiffness: 0.02,damping:0.01,length:0.01},
+          //{ name:'rot_limit',type:'kin_limit', x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
         ],    
 
         density:0.1, 
-        frictionAir:0.1,  
+        frictionAir:0.3,  
         
         debug_matrix_info: false,
         debug_matrix_axes: debug.matrix_axes,  
-        debug_cns_axes: debug.cns_axes,                                                
+        debug_cns_axes: debug.cns_axes,   
+        debug_force_visibility: debug.force_visibility,                                                     
       })
 
 
@@ -171,6 +176,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.circle = new body_build({
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
+                                      mouse_constraint: this.mouse_constraint,
 
                                       name:'geo_circle',
 
@@ -200,13 +206,15 @@ export default class fidget_daft_i extends fidget{
                                       
                                       debug_matrix_info: false,
                                       debug_matrix_axes: debug.matrix_axes,  
-                                      debug_cns_axes: debug.cns_axes,                                                                             
+                                      debug_cns_axes: debug.cns_axes,    
+                                      debug_force_visibility: debug.force_visibility,                                                                                 
                                       })
       z_depth += z_depth_incr  
 
       this.bodies.geos.rectangle = new body_build({ 
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
+                                        mouse_constraint: this.mouse_constraint,
 
                                         name:'geo_rectangle',
 
@@ -239,11 +247,13 @@ export default class fidget_daft_i extends fidget{
 
                                         debug_matrix_info: false,
                                         debug_matrix_axes: debug.matrix_axes,  
-                                        debug_cns_axes: debug.cns_axes,                                                                               
+                                        debug_cns_axes: debug.cns_axes,      
+                                        debug_force_visibility: debug.force_visibility,                                                                                 
                                       })
       let oRect = {
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
+        mouse_constraint: this.mouse_constraint,
 
         m:this.m,
         parent:this.bodies.inters.background,
@@ -290,7 +300,8 @@ export default class fidget_daft_i extends fidget{
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,                                                   
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
   
   
@@ -308,7 +319,8 @@ export default class fidget_daft_i extends fidget{
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,
-                                              debug_cns_axes: debug.cns_axes,                                                
+                                              debug_cns_axes: debug.cns_axes,    
+                                              debug_force_visibility: debug.force_visibility,                                                    
                                             })) 
   
       // left
@@ -327,7 +339,8 @@ export default class fidget_daft_i extends fidget{
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,
-                                              debug_cns_axes: debug.cns_axes,                                                
+                                              debug_cns_axes: debug.cns_axes,    
+                                              debug_force_visibility: debug.force_visibility,                                                    
                                             }))  
       rot_tmp = 180+35    
       var om_rD = new Matrix()
@@ -341,7 +354,8 @@ export default class fidget_daft_i extends fidget{
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,                                                       
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
                                             })) 
       
       // other
@@ -349,6 +363,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.B = new body_build({
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
+                                        mouse_constraint: this.mouse_constraint,
 
                                         name:'inter_B',   
 
@@ -378,7 +393,8 @@ export default class fidget_daft_i extends fidget{
 
                                         debug_matrix_info: false,
                                         debug_matrix_axes: debug.matrix_axes,  
-                                        debug_cns_axes: debug.cns_axes,                                                                                 
+                                        debug_cns_axes: debug.cns_axes,    
+                                        debug_force_visibility: debug.force_visibility,                                                                                     
                                       })
       z_depth += z_depth_incr            
 
@@ -389,6 +405,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.helpers.stepB = new body_build({ 
                                                     screen_dims: this.screen_dims,
                                                     matter_engine: this.matter_engine,  
+                                                    mouse_constraint: this.mouse_constraint,
 
                                                     name:'helper_B', 
 
@@ -422,6 +439,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.C = new body_build({ 
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,  
+                                      mouse_constraint: this.mouse_constraint,
 
                                       name:'inter_C', 
 
@@ -443,7 +461,7 @@ export default class fidget_daft_i extends fidget{
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
                                       constraints:[
-                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.01,damping:0.01,length:0.01},
+                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.01,stiffness_at_selection:0.1,damping:0.01,length:0.01},
                                         //{ name:'orient',type:'dyn_orient',target:this.bodies.inters.background, stiffness: 0.01,damping:0.01,length:0.01},
                                         //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
@@ -454,7 +472,8 @@ export default class fidget_daft_i extends fidget{
 
                                       debug_matrix_info: false,
                                       debug_matrix_axes: debug.matrix_axes,  
-                                      debug_cns_axes: debug.cns_axes,                                                                            
+                                      debug_cns_axes: debug.cns_axes,   
+                                      debug_force_visibility: debug.force_visibility,                                                                                 
                                     })
  
     z_depth += z_depth_incr
@@ -465,6 +484,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies.helpers.stepC = new body_build({  
                                                   screen_dims: this.screen_dims,
                                                   matter_engine: this.matter_engine, 
+                                                  mouse_constraint: this.mouse_constraint,
 
                                                   name:'helper_C',   
 
@@ -495,6 +515,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies.inters.A = new body_build({  
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
+                                    mouse_constraint: this.mouse_constraint,
 
                                     name:'inter_A',      
 
@@ -516,8 +537,8 @@ export default class fidget_daft_i extends fidget{
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse,
                                     constraints:[
-                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 0.01,damping:0.01,length:0.01},
-                                      { name:'orient',type:'dyn_orient',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 0.01,damping:0.01,length:0.01},
+                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 1.0,stiffness_at_selection:0.1,damping:0.1,length:0.01},
+                                      { name:'orient',type:'dyn_orient',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 0.1,damping:0.01,length:0.01},
                                       //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                       //{ name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
@@ -527,7 +548,8 @@ export default class fidget_daft_i extends fidget{
              
                                     debug_matrix_info: false,
                                     debug_matrix_axes: debug.matrix_axes,  
-                                    debug_cns_axes: debug.cns_axes,                                                                         
+                                    debug_cns_axes: debug.cns_axes, 
+                                    debug_force_visibility: debug.force_visibility,                                                                                
                                   })
 
     z_depth += z_depth_incr
@@ -537,6 +559,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies.helpers.stepA = new body_build({  
                                                   screen_dims: this.screen_dims,
                                                   matter_engine: this.matter_engine,
+                                                  mouse_constraint: this.mouse_constraint,
 
                                                   name:'helper_A',  
 
@@ -609,7 +632,7 @@ export default class fidget_daft_i extends fidget{
   set_step_resolution( resolution_coef, update_interaction = false)
   {
     // utils
-    var selected_body = this.mouseConstraint.constraint.bodyB
+    var selected_body = this.mouse_constraint.constraint.bodyB
 
     // clean
     this.bodies_axe_clean_override()
@@ -897,9 +920,9 @@ export default class fidget_daft_i extends fidget{
         if( 0.01 < v_delta.mag() )
         {
 
-          let A = this.obj_is_selected(this.mouseConstraint,this.bodies.inters.A)
-          let B = this.obj_is_selected(this.mouseConstraint,this.bodies.inters.B)
-          let C = this.obj_is_selected(this.mouseConstraint,this.bodies.inters.C)
+          let A = this.bodies.inters.A.is_selected()
+          let B = this.bodies.inters.B.is_selected()
+          let C = this.bodies.inters.C.is_selected()
           if( (A == false)&&
               (B == false)&&
               (C == false))

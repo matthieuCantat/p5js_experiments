@@ -14,9 +14,9 @@ export default class fidget_windmill extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, matter_engine,mouseConstraint, shaders = [],debug=false,random_color=true)
+  constructor( m, s, screen_dims, matter_engine,mouse_constraint, shaders = [],debug=false,random_color=true)
   {
-    super(m, s, screen_dims, matter_engine,mouseConstraint,shaders, debug)
+    super(m, s, screen_dims, matter_engine,mouse_constraint,shaders, debug)
 
     this.title = 'windmill'
 
@@ -607,7 +607,7 @@ export default class fidget_windmill extends fidget{
   set_step_resolution()
   {
     // utils
-    var selected_body = this.mouseConstraint.constraint.bodyB
+    var selected_body = this.mouse_constraint.constraint.bodyB
     
     // clean
     this.bodies_axe_enable( ['inters'])
@@ -878,9 +878,9 @@ export default class fidget_windmill extends fidget{
         if( 0.01 < v_delta.mag() )
         {
           
-          let A = this.obj_is_selected(this.mouseConstraint,this.bodies.inters.A)
-          let B = this.obj_is_selected(this.mouseConstraint,this.bodies.inters.B)
-          let C = this.obj_is_selected(this.mouseConstraint,this.bodies.inters.C)
+          let A = this.bodies.inters.A.is_selected()
+          let B = this.bodies.inters.B.is_selected()
+          let C = this.bodies.inters.C.is_selected()
           if( (A == false)&&
               (B == false)&&
               (C == false))

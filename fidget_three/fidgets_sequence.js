@@ -262,14 +262,27 @@ export default class fidgets_sequence
 
     update()
     {
-      //////////////////////////////////////////////////// INTRO
-      var intro_reverse_anim_start = 50
-      var intro_reverse_anim_end   = 300
-      var _delta = intro_reverse_anim_end-intro_reverse_anim_start
-      var _count = Math.max( 0, this.update_count-intro_reverse_anim_start)
-      var _anim = smoothstep( 1 - _count/_delta )
-      this.do_anim_override(_anim )  
-      //////////////////////////////////////////////////// INTRO
+      var user_interaction_start = 290
+      if(this.debug_mode.disable_animation==false)
+      {
+        //////////////////////////////////////////////////// INTRO
+        var intro_reverse_anim_start = 50
+        var intro_reverse_anim_end   = 300
+        var _delta = intro_reverse_anim_end-intro_reverse_anim_start
+        var _count = Math.max( 0, this.update_count-intro_reverse_anim_start)
+        var _anim = smoothstep( 1 - _count/_delta )
+        this.do_anim_override(_anim )  
+        //////////////////////////////////////////////////// INTRO
+      }
+      else
+      {
+        this.do_anim_override(0 )
+        if(this.update_count < user_interaction_start)
+        {
+          this.update_count = user_interaction_start
+        }
+      }
+
       var chrono_appears_start = 250
       var chrono_appears_end   = 290  
       _delta = chrono_appears_end-chrono_appears_start
@@ -288,7 +301,7 @@ export default class fidgets_sequence
       this.chrono.s = this.screen_dims.x * blendB
       
       //////////////////////////////////////////////////// INTRO
-      var user_interaction_start = 290
+      
       if( 0 < this.update_count-user_interaction_start )
       {
         if((this.chrono.is_at_start())&&(this.get_resolution_coef_info() < 0.99 ))

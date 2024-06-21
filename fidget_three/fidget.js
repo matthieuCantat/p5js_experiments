@@ -24,7 +24,7 @@ export default class fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, matter_engine, mouseConstraint,shaders = [],debug=false)
+  constructor( m, s, screen_dims, matter_engine, mouse_constraint,shaders = [],debug=false)
   {
     this.m = m
     this.s = s
@@ -52,7 +52,7 @@ export default class fidget{
     this.touch_enable = true
     this.anim_mode = false
     this.matter_engine = matter_engine
-    this.mouseConstraint = mouseConstraint
+    this.mouse_constraint = mouse_constraint
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
@@ -97,7 +97,7 @@ export default class fidget{
   set_step_resolution( resolution_coef, update_interaction = false)
   {
     // utils
-    var selected_body = this.mouseConstraint.constraint.bodyB
+    var selected_body = this.mouse_constraint.constraint.bodyB
 
     // clean
     this.bodies_axe_clean_override()
@@ -225,23 +225,23 @@ export default class fidget{
           if(current_way == 1)
           {
             if(selected_body != obj_next.body)
-              switch_selection( this.mouseConstraint, obj_next)
+              switch_selection( this.mouse_constraint, obj_next)
           }
           else
           {
             if(selected_body != obj_last.body)
-              switch_selection(this.mouseConstraint, obj_last)     
+              switch_selection(this.mouse_constraint, obj_last)     
           }
         }
         else if(this.force_way == 1)
         {
           if(selected_body != obj_next.body)
-            switch_selection( this.mouseConstraint, obj_next)
+            switch_selection( this.mouse_constraint, obj_next)
         }
         else if(this.force_way == -1)
         {
           if(selected_body != obj_last.body)
-            switch_selection(this.mouseConstraint, obj_last) 
+            switch_selection(this.mouse_constraint, obj_last) 
         }
       }
       this.state.switch_selection_happened_step = current_step  

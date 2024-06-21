@@ -35,6 +35,8 @@ var mouseConstraint = Matter.MouseConstraint.create(matter_engine, {
   collisionFilter: {category: utils.collision_category.mouse, mask: utils.collision_category.inter}, // <---
   constraint: {
       // allow bodies on mouse to rotate
+      //stiffness:0.01,
+      damping:0.01,
       angularStiffness: 0,
       render: {
           visible: false
@@ -56,7 +58,9 @@ let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
 var nbr = 1
-var debug = { show_inter:false,
+var debug = { disable_animation:true,
+              force_visibility:false,
+              show_inter:true,
               matrix_axes:false,
               cns_axes:false,
               info:false,
