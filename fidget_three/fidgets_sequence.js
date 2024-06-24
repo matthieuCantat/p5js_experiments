@@ -144,6 +144,7 @@ export default class fidgets_sequence
       if(this.debug_mode.fidget_steps_info)
       {
         let texts_to_draw = [
+          'mouse is pressed : ' + isMousePressed,
           'count : ' + this.fidgets[0].state.update_count,
           'res : ' + Math.round( this.fidgets[0].state.resolution_coef, 2 ) + ' / 4',
           'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,

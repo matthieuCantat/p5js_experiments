@@ -940,7 +940,7 @@ export default class fidget_daft_i extends fidget{
       om_EA1.setTranslation(15,-80)
       om_EA1.setRotation(rad(45))                                       
       this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_B1',
+                                              name:'effect_B2',
 
                                               m_offset:om_EA1,
 
@@ -953,7 +953,7 @@ export default class fidget_daft_i extends fidget{
       om_EA1.setTranslation(15,-80)
       om_EA1.setRotation(rad(-45))                                       
       this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_B1',
+                                              name:'effect_B3',
 
                                               m_offset:om_EA1,
 
