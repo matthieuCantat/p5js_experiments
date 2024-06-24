@@ -36,6 +36,11 @@ export default class fidget_daft_i extends fidget{
             rectangle:null,
             rectangles:[],
           },
+          effects : {
+            A:[],
+            B:[],
+            C:[],
+          },
           helpers : {
             stepA:null,
             stepB:null,
@@ -56,8 +61,10 @@ export default class fidget_daft_i extends fidget{
             'geos','rectangles',
             'helpers','stepA',
             'helpers','stepB',
-            'helpers','stepC',      
-                   
+            'helpers','stepC', 
+            'effects','A',                  
+            'effects','B', 
+            'effects','C',                               
             ]         
       
         this.end_step = 4
@@ -814,6 +821,220 @@ export default class fidget_daft_i extends fidget{
                                     debug_force_visibility: debug.force_visibility,                                                                                
                                   })
 
+
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(2*s))
+
+      let oEffectsA = {
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine, 
+        mouse_constraint: this.mouse_constraint,
+
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_shape: m_shape,
+        z:z_depth, 
+        type: utils.shape.rectangle,
+
+        do_shape: true,
+        do_line:false,           
+        color: utils.color.white,
+        color_line: utils.color.white,
+        //texture_three: text_checker_three,
+        shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
+        collision_category: utils.collision_category.none,
+        collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
+
+        density:0.001, 
+                        
+      } 
+      var om_EA1 = new Matrix()
+      om_EA1.setTranslation(-145,15)
+      om_EA1.setRotation(rad(90))                                       
+      this.bodies.effects.A.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_A1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(-145,15)
+      om_EA1.setRotation(rad(45))                                       
+      this.bodies.effects.A.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_A1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(-145,15)
+      om_EA1.setRotation(rad(135))                                       
+      this.bodies.effects.A.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_A1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+
+
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(2*s))
+
+      let oEffectsB = {
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine, 
+        mouse_constraint: this.mouse_constraint,
+
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_shape: m_shape,
+        z:z_depth, 
+        type: utils.shape.rectangle,
+
+        do_shape: true,
+        do_line:false,           
+        color: utils.color.white,
+        color_line: utils.color.white,
+        //texture_three: text_checker_three,
+        shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
+        collision_category: utils.collision_category.none,
+        collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
+
+        density:0.001, 
+                        
+      } 
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(15,-80)
+      om_EA1.setRotation(rad(0))                                       
+      this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
+                                              name:'effect_B1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(15,-80)
+      om_EA1.setRotation(rad(45))                                       
+      this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
+                                              name:'effect_B1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(15,-80)
+      om_EA1.setRotation(rad(-45))                                       
+      this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
+                                              name:'effect_B1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+
+
+
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(2*s))
+
+      let oEffectsC = {
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine, 
+        mouse_constraint: this.mouse_constraint,
+
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_shape: m_shape,
+        z:z_depth, 
+        type: utils.shape.rectangle,
+
+        do_shape: true,
+        do_line:false,           
+        color: utils.color.white,
+        color_line: utils.color.white,
+        //texture_three: text_checker_three,
+        shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
+        collision_category: utils.collision_category.none,
+        collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
+
+        density:0.001, 
+                        
+      } 
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(0,0)
+      om_EA1.setRotation(rad(-90))                                       
+      this.bodies.effects.C.push(new body_build({ ...oEffectsC, 
+                                              name:'effect_C1',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(0,0)
+      om_EA1.setRotation(rad(-135))                                       
+      this.bodies.effects.C.push(new body_build({ ...oEffectsC, 
+                                              name:'effect_C2',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(0,0)
+      om_EA1.setRotation(rad(-45))                                       
+      this.bodies.effects.C.push(new body_build({ ...oEffectsC, 
+                                              name:'effect_C3',
+
+                                              m_offset:om_EA1,
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            })) 
+
     z_depth += z_depth_incr
 
     let mo_iAh = new Matrix()                                    
@@ -909,6 +1130,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies_axe_clean_override()
     this.bodies_rot_clean_override()
     this.bodies_enable( 0,  ['inters'] )
+    this.bodies_enable( 0,  ['effects'] )
      
     
     ////////////////////////////////////////////////////////////////////////////////////
@@ -988,7 +1210,21 @@ export default class fidget_daft_i extends fidget{
       {
         this.bodies.inters.B.rot_override = res_coef*rad(90)
       }      
-   
+      //_________________________________________________________________effects
+      for( let i=0; i < this.bodies.effects.A.length; i++)
+      {
+        if( this.state.steps[step].update_count < 20) 
+          this.bodies.effects.A[i].enable(1)
+
+        if(this.state.steps[step].update_count == 0)  
+        {
+          let force = new Vector(0.001, 0)
+          force = force.rotate(this.bodies.effects.A[i].get_rotation())
+          this.bodies.effects.A[i].apply_force( this.bodies.effects.A[i].get_position(), force )
+        }
+
+      }
+         
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
       {
@@ -1037,8 +1273,22 @@ export default class fidget_daft_i extends fidget{
       if(  this.anim_mode )   
       {
         this.bodies.inters.C.constraints.axe.pos_override = res_coef
-      }  
-            
+      } 
+
+      //_________________________________________________________________effects
+      for( let i=0; i < this.bodies.effects.B.length; i++)
+      {
+        if( this.state.steps[step].update_count < 20) 
+          this.bodies.effects.B[i].enable(1)
+
+        if(this.state.steps[step].update_count == 0)  
+        {
+          let force = new Vector(0.001, 0)
+          force = force.rotate(this.bodies.effects.B[i].get_rotation())
+          this.bodies.effects.B[i].apply_force( this.bodies.effects.B[i].get_position(), force )
+        }
+
+      }            
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
       {      
@@ -1088,6 +1338,20 @@ export default class fidget_daft_i extends fidget{
 
       //_________________________________________________________________Control
 
+      //_________________________________________________________________effects
+      for( let i=0; i < this.bodies.effects.C.length; i++)
+      {
+        if( this.state.steps[step].update_count < 20) 
+          this.bodies.effects.C[i].enable(1)
+
+        if(this.state.steps[step].update_count == 0)  
+        {
+          let force = new Vector(0.001, 0)
+          force = force.rotate(this.bodies.effects.C[i].get_rotation())
+          this.bodies.effects.C[i].apply_force( this.bodies.effects.C[i].get_position(), force )
+        }
+
+      }   
       //_________________________________________________________________Mouse
       
       if(this.debug_mode.switch_selected_inter_help)
