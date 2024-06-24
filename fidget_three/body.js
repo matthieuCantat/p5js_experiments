@@ -17,12 +17,12 @@ export default class body_build{
         m: new Matrix(),
         m_offset: new Matrix(),
         m_transform: new Matrix(),
+        m_shape: new Matrix(),
         parent:null,
         z: 0,
         w: 1,
         h: 1,
         slop: 0,
-        box: null,
         type: -1,
         rot: 0,
         collision: true,
@@ -62,8 +62,9 @@ export default class body_build{
       this.m_offset = args.m_offset
       this.m_transform = args.m_transform
       this.z = args.z
-      this.w = args.w
-      this.h = args.h
+      this.m_shape = args.m_shape
+      //this.w = args.w
+      //this.h = args.h
       this.slop = args.slop
       this.rot = rad(args.rot)
       this.extra_rotation = 0
@@ -119,64 +120,61 @@ export default class body_build{
       else
         this.type = min(max(Math.round(Matter.Common.random(-1, max_choice+1)),0),max_choice)
   
+      /*
       this.shape_vertices = Matter.Vertices.create([], Matter.Body)
-  
-      if( args.box != null )
-      {
-        this.w = args.box.w
-        this.h = args.box.h
-        this.type = args.box.type
-        this.shape_vertices = args.box.shape_vertices
-      }
-      else
-      {
-        switch(this.type) {    
-          case 1:
-            this.w = args.w/2
-            break;
-          case 2:
-            this.w = args.w/2
-            break; 
-          case 3:
-            this.w = args.w/2
-            break;  
-          case 4:
-            this.w = args.w/2
-            break;               
-          case 5:
-            this.w = args.w/2
-            var points_scale = []
-            for(let i = 0; i < arrow.length;i+=2)
-              points_scale.push( { x:arrow[i]*this.w, y:arrow[i+1]*this.w})
-            this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
-            break;     
-          case 6:
-            this.w = args.w/2
-            var points_scale = []
-            for(let i = 0; i < chevron.length;i+=2)
-              points_scale.push( { x:chevron[i]*this.w, y:chevron[i+1]*this.w})
-            this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
-            break;    
-          case 7:
-            this.w = args.w/2
-            var points_scale = []
-            for(let i = 0; i < star.length;i+=2)
-              points_scale.push( { x:star[i]*this.w, y:star[i+1]*this.w})
-            this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
-            break;   
-          case 8:
-            this.w = args.w/2
-            var points_scale = []
-            for(let i = 0; i < horseShoe.length;i+=2)
-              points_scale.push( { x:horseShoe[i]*this.w, y:horseShoe[i+1]*this.w})
-            this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
-            break;
-          case 10:
-            //this.w = args.w/2
-            //this.h = args.h/2
-            break;                                                       
-          }
-      }
+ 
+      
+      switch(this.type) {    
+        case 1:
+          this.w = args.w/2
+          break;
+          
+        case 2:
+          this.w = args.w/2
+          break; 
+        case 3:
+          this.w = args.w/2
+          break;  
+        case 4:
+          this.w = args.w/2
+          break;               
+        case 5:
+          this.w = args.w/2
+          var points_scale = []
+          for(let i = 0; i < arrow.length;i+=2)
+            points_scale.push( { x:arrow[i]*this.w, y:arrow[i+1]*this.w})
+          this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
+          break;     
+        case 6:
+          this.w = args.w/2
+          var points_scale = []
+          for(let i = 0; i < chevron.length;i+=2)
+            points_scale.push( { x:chevron[i]*this.w, y:chevron[i+1]*this.w})
+          this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
+          break;    
+        case 7:
+          this.w = args.w/2
+          var points_scale = []
+          for(let i = 0; i < star.length;i+=2)
+            points_scale.push( { x:star[i]*this.w, y:star[i+1]*this.w})
+          this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
+          break;   
+        case 8:
+          this.w = args.w/2
+          var points_scale = []
+          for(let i = 0; i < horseShoe.length;i+=2)
+            points_scale.push( { x:horseShoe[i]*this.w, y:horseShoe[i+1]*this.w})
+          this.shape_vertices = Matter.Vertices.create(points_scale, Matter.Body)      
+          break;
+        case 10:
+          //this.w = args.w/2
+          //this.h = args.h/2
+          break;                                                       
+        }
+        */
+        
+      
+        
   
   
       //this.color = [100,100,100]
@@ -194,17 +192,21 @@ export default class body_build{
 
     init_physics()
     {
-      let p = {x:0,y:0}
+      let p = this.m_shape.get_row(2).get_value()
+      let w = this.m_shape.get_row(0).mag()
+      let h = this.m_shape.get_row(1).mag()
+      let r = this.m_shape.getRotation()
 
       switch(this.type) {
         case 0:
-          this.body = Matter.Bodies.rectangle(p.x, p.y, this.w, this.h);
-          Matter.Body.rotate(this.body, this.rot)
+          this.body = Matter.Bodies.rectangle(p.x, p.y, w, h);
+          Matter.Body.rotate(this.body, r)
           break;
         case 1:
-          this.body = Matter.Bodies.circle(p.x, p.y, this.w);
-          Matter.Body.rotate(this.body, this.rot)
+          this.body = Matter.Bodies.circle(p.x, p.y, w/2.);
+          Matter.Body.rotate(this.body, r)
           break;
+          /*
         case 2:
           this.body = Matter.Bodies.polygon(p.x, p.y, 3, this.w);
           Matter.Body.rotate(this.body, this.rot)
@@ -239,13 +241,14 @@ export default class body_build{
           this.body = Matter.Body.create({parts: [bodyA, bodyB]});
           Matter.Body.rotate(this.body, this.rot)
           break; 
+          */
         case 10:  
-          this.body = Matter.Bodies.trapezoid(p.x, p.y, this.w, this.h , rad(this.slop*2))
-          Matter.Body.rotate(this.body, this.rot)
+          this.body = Matter.Bodies.trapezoid(p.x, p.y, w, h , rad(this.slop*2))
+          Matter.Body.rotate(this.body, r)
           break;      
         case 11:  
-          this.body = Matter.Bodies.circle(p.x, p.y, this.w);//tmp
-          Matter.Body.rotate(this.body, this.rot)
+          this.body = Matter.Bodies.circle(p.x, p.y, w);//tmp
+          Matter.Body.rotate(this.body, r)
           break;             
         }
   
@@ -523,18 +526,23 @@ export default class body_build{
     setup_shapes_three(group_fidget){
       this.mesh_three = { group : null, shape : null, line : null}
 
+      let p = this.m_shape.get_row(2).get_value()
+      let w = this.m_shape.get_row(0).mag()
+      let h = this.m_shape.get_row(1).mag()
+      let r = this.m_shape.getRotation()
+
       switch(this.type) {
         case 0:
-          this.shape_three = ut.rect( this.w, this.h );
+          this.shape_three = ut.rect( w, h );
           break;
         case 1:
-          this.shape_three = ut.circle(this.w);
+          this.shape_three = ut.circle(w/2);
           break;
         case 10:  
-          this.shape_three = ut.roundedTrap( this.w, this.h, this.slop, 0 )
+          this.shape_three = ut.roundedTrap( w, h, this.slop, 0 )
           break; 
         case 11: 
-          this.shape_three = ut.arc( this.w, this.arc_limites[0], this.arc_limites[1])
+          this.shape_three = ut.arc( w, this.arc_limites[0], this.arc_limites[1])
           break;      
         }
 

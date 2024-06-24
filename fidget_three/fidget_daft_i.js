@@ -87,12 +87,15 @@ export default class fidget_daft_i extends fidget{
     /////////////////////////////////////////////////////   
     let z_depth = 0
     let z_depth_incr = 0.1
+
+    let m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(this.screen_dims.x/2))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(this.screen_dims.y))
     
     let oBackground = {
       m:this.m,
       z:z_depth, 
-      w : this.screen_dims.x/2, 
-      h : this.screen_dims.y, 
+      m_shape: m_shape,
       do_shape: true,
       do_line:true,         
       color: this.color_background,
@@ -114,7 +117,6 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
                                                 name:'geo_background_L',
                                                 m_offset:mo_background_L, 
-                                                //rot:0, 
                                                 collision:false, 
                                                 debug_matrix_info: false,
                                                 debug_matrix_axes: debug.matrix_axes,  
@@ -127,7 +129,6 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
                                                 name:'geo_background_R', 
                                                 m_offset:mo_background_R,
-                                                //rot:0, 
                                                 collision:false,  
                                                 debug_matrix_info: false,
                                                 debug_matrix_axes: debug.matrix_axes,  
@@ -138,91 +139,105 @@ export default class fidget_daft_i extends fidget{
 
     /////////////////////////////////////////////////////  
 
-      this.bodies.inters.background = new body_build({
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine, 
-        mouse_constraint: this.mouse_constraint,
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(350/2.4*s))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(220/2.4*s))
+    
 
-        name:'inter_background',
-        highlight_selection:[],  
-        
-        m:this.m,
-        parent:null,
-        m_offset:new Matrix(),
-        z:z_depth,
-        w:350/2.4*s,
-        h:220/2.4*s,
-        type : utils.shape.rectangle,
+    this.bodies.inters.background = new body_build({
+      screen_dims: this.screen_dims,
+      matter_engine: this.matter_engine, 
+      mouse_constraint: this.mouse_constraint,
 
-        do_shape: true,
-        do_line:true,                                           
-        color:utils.color.grey,
-        color_line: utils.color.black,
-        texture_three: text_checker_three_grey, 
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
-        collision_category: utils.collision_category.none,
-        collision_mask: utils.collision_category.none,
-        //collision_category: utils.collision_category.inter,
-        //collision_mask: utils.collision_category.mouse,
-        constraints:[
-          { name:'point'    ,type:'dyn_point', stiffness: 0.05,damping:0.01,length:0.01},
-          { name:'orient'   ,type:'dyn_orient',stiffness: 0.2,damping:0.01,length:0.01},
-          { name:'rot_limit',type:'kin_limit', x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
-        ],    
-
-        density:0.01, 
-        frictionAir:0.3,  
-        
-        debug_matrix_info: false,
-        debug_matrix_axes: debug.matrix_axes,  
-        debug_cns_axes: debug.cns_axes,   
-        debug_force_visibility: debug.force_visibility,                                                     
-      })
-
+      name:'inter_background',
+      highlight_selection:[],  
       
+      m:this.m,
+      parent:null,
+      m_offset:new Matrix(),
+      m_shape:m_shape,
+      z:z_depth,
+      type : utils.shape.rectangle,
 
+      do_shape: true,
+      do_line:true,                                           
+      color:utils.color.grey,
+      color_line: utils.color.black,
+      texture_three: text_checker_three_grey, 
+      shader: this.shaders.length != 0 ? this.shaders[0] : null,
+      collision_category: utils.collision_category.none,
+      collision_mask: utils.collision_category.none,
+      //collision_category: utils.collision_category.inter,
+      //collision_mask: utils.collision_category.mouse,
+      constraints:[
+        { name:'point'    ,type:'dyn_point', stiffness: 0.05,damping:0.01,length:0.01},
+        { name:'orient'   ,type:'dyn_orient',stiffness: 0.2,damping:0.01,length:0.01},
+        { name:'rot_limit',type:'kin_limit', x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
+      ],    
 
-      // build
-      this.bodies.geos.circle = new body_build({
-                                      screen_dims: this.screen_dims,
-                                      matter_engine: this.matter_engine,
-                                      mouse_constraint: this.mouse_constraint,
-
-                                      name:'geo_circle',
-
-                                      m:this.m,
-                                      parent:this.bodies.inters.background,
-                                      m_offset:new Matrix(),
-                                      z:z_depth,
-                                      w:50*s,
-                                      type:utils.shape.circle,
-
-                                      do_shape: true,
-                                      do_line:true,                                         
-                                      color: this.colors[0],
-                                      color_line: utils.color.black,
-                                      texture_three: text_checker_three,
-                                      shader: this.shaders.length != 0 ? this.shaders[0] : null,
-
-                                      collision_category: utils.collision_category.blue,
-                                      collision_mask: utils.collision_category.default ,    
-                                      constraints:[
-                                        { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                        { name:'orient',type:'kin_orient',target:this.bodies.inters.background},
-                                        //{  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.1,damping:0.01,length:0.01},
-                                        //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},                                          
-                                      ],                                      
-                                      density:0.001,     
-                                      
-                                      debug_matrix_info: false,
-                                      debug_matrix_axes: debug.matrix_axes,  
-                                      debug_cns_axes: debug.cns_axes,    
-                                      debug_force_visibility: debug.force_visibility,                                                                                 
-                                      })
+      density:0.01, 
+      frictionAir:0.3,  
+      
+      debug_matrix_info: false,
+      debug_matrix_axes: debug.matrix_axes,  
+      debug_cns_axes: debug.cns_axes,   
+      debug_force_visibility: debug.force_visibility,                                                     
+    })
 
     
-      let scale_inter = 20.2                                
+
+
+    // build
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(50*s))
+        
+    this.bodies.geos.circle = new body_build({
+                                    screen_dims: this.screen_dims,
+                                    matter_engine: this.matter_engine,
+                                    mouse_constraint: this.mouse_constraint,
+
+                                    name:'geo_circle',
+
+                                    m:this.m,
+                                    parent:this.bodies.inters.background,
+                                    m_offset:new Matrix(),
+                                    m_shape: m_shape,
+                                    z:z_depth,
+                                    type:utils.shape.circle,
+
+                                    do_shape: true,
+                                    do_line:true,                                         
+                                    color: this.colors[0],
+                                    color_line: utils.color.black,
+                                    texture_three: text_checker_three,
+                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
+                                    collision_category: utils.collision_category.blue,
+                                    collision_mask: utils.collision_category.default ,    
+                                    constraints:[
+                                      { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
+                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background},
+                                      //{  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.1,damping:0.01,length:0.01},
+                                      //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},                                          
+                                    ],                                      
+                                    density:0.001,     
+                                    
+                                    debug_matrix_info: false,
+                                    debug_matrix_axes: debug.matrix_axes,  
+                                    debug_cns_axes: debug.cns_axes,    
+                                    debug_force_visibility: debug.force_visibility,                                                                                 
+                                    })
+
+    
+      let scale_inter = 20.2 
+      
+      
       // build
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(50*s+scale_inter))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(50*s+scale_inter))
+
       this.bodies.inters.circle = new body_build({
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine,
@@ -234,8 +249,8 @@ export default class fidget_daft_i extends fidget{
         m:this.m,
         parent:this.bodies.inters.background,
         m_offset:new Matrix(),
+        m_shape:m_shape,
         z:z_depth,
-        w:50*s+scale_inter,
         type:utils.shape.circle,
 
         do_shape: true,
@@ -263,6 +278,11 @@ export default class fidget_daft_i extends fidget{
                                         
       z_depth += z_depth_incr  
 
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(74*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(18*s))
+
+
       this.bodies.geos.rectangle = new body_build({ 
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
@@ -274,9 +294,8 @@ export default class fidget_daft_i extends fidget{
                                         m:this.m,
                                         parent:this.bodies.inters.background,
                                         m_offset:new Matrix(),
+                                        m_shape:m_shape,
                                         z:z_depth,
-                                        w : 74*s, 
-                                        h : 18*s, 
                                         type : utils.shape.rectangle,
 
                                         do_shape: true,
@@ -304,6 +323,9 @@ export default class fidget_daft_i extends fidget{
                                         debug_force_visibility: debug.force_visibility,                                                                                 
                                       })
 
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(18*s+scale_inter))
 
       this.bodies.inters.rectangle = new body_build({ 
                                         screen_dims: this.screen_dims,
@@ -317,9 +339,8 @@ export default class fidget_daft_i extends fidget{
                                         m:this.m,
                                         parent:this.bodies.inters.background,
                                         m_offset:new Matrix(),
+                                        m_shape: m_shape,
                                         z:z_depth,
-                                        w : 74*s+scale_inter, 
-                                        h : 18*s+scale_inter, 
                                         type : utils.shape.rectangle,
 
                                         do_shape: true,
@@ -344,6 +365,10 @@ export default class fidget_daft_i extends fidget{
                                       })
 
 
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(16.21*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(3.51*s))
+
       let oRect = {
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
@@ -351,9 +376,8 @@ export default class fidget_daft_i extends fidget{
 
         m:this.m,
         parent:this.bodies.inters.background,
-        z:z_depth,
-        w : 16.21*s,
-        h : 3.51*s,  
+        m_shape: m_shape,
+        z:z_depth, 
         type: utils.shape.rectangle,
 
         do_shape: true,
@@ -399,14 +423,15 @@ export default class fidget_daft_i extends fidget{
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
 
-                                             
+      let m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))                                            
       this.bodies.inters.rectangles.push(new body_build({ ...oRect, 
                                               name:'inter_rectangle_TR',
                                               highlight_selection:[this.bodies.geos.rectangles[0]],  
 
                                               m_offset:om_rA,
-                                              w : oRect.w+scale_inter,
-                                              h : oRect.h+scale_inter, 
+                                              m_shape:m_shape_modif,
 
                                               do_shape: true,
                                               do_line:true,                                         
@@ -441,6 +466,7 @@ export default class fidget_daft_i extends fidget{
                                               
 
                                               m_offset:om_rB,
+                                              m_shape:m_shape,
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,
@@ -453,8 +479,7 @@ export default class fidget_daft_i extends fidget{
                                               highlight_selection:[this.bodies.geos.rectangles[1]],   
 
                                               m_offset:om_rB,
-                                              w : oRect.w+scale_inter,
-                                              h : oRect.h+scale_inter, 
+                                              m_shape:m_shape_modif,
 
                                               do_shape: true,
                                               do_line:true,                                         
@@ -490,7 +515,8 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangles.push(new body_build({ ...oRect,
                                               name:'geo_rectangle_BL',   
 
-                                              m_offset:om_rC, 
+                                              m_offset:om_rC,
+                                              m_shape:m_shape, 
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,
@@ -503,8 +529,7 @@ export default class fidget_daft_i extends fidget{
                                               highlight_selection:[this.bodies.geos.rectangles[2]],   
 
                                               m_offset:om_rC,
-                                              w : oRect.w+scale_inter,
-                                              h : oRect.h+scale_inter, 
+                                              m_shape:m_shape_modif,
 
                                               do_shape: true,
                                               do_line:true,                                         
@@ -536,6 +561,7 @@ export default class fidget_daft_i extends fidget{
                                               name:'geo_rectangle_TL',
 
                                               m_offset:om_rD,
+                                              m_shape:m_shape,
 
                                               debug_matrix_info: false,
                                               debug_matrix_axes: debug.matrix_axes,  
@@ -548,8 +574,7 @@ export default class fidget_daft_i extends fidget{
                                               highlight_selection:[this.bodies.geos.rectangles[3]], 
 
                                               m_offset:om_rD,
-                                              w : oRect.w+scale_inter,
-                                              h : oRect.h+scale_inter, 
+                                              m_shape:m_shape_modif,
 
                                               do_shape: true,
                                               do_line:true,                                         
@@ -573,7 +598,10 @@ export default class fidget_daft_i extends fidget{
                                             }))                                               
       // other
 
-                                            
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(200/2.4*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(50/2.4*s))
+
       this.bodies.inters.B = new body_build({
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
@@ -585,9 +613,8 @@ export default class fidget_daft_i extends fidget{
                                         m:this.m,
                                         parent:this.bodies.inters.background,
                                         m_offset:new Matrix(),
+                                        m_shape:m_shape,
                                         z:z_depth,
-                                        w:200/2.4*s,
-                                        h:50/2.4*s,
                                         type : utils.shape.rectangle,
 
                                         do_shape: true,
@@ -619,7 +646,12 @@ export default class fidget_daft_i extends fidget{
       
       
       let mo_iBh = new Matrix()                                    
-      mo_iBh.setTranslation(0,0.)   
+      mo_iBh.setTranslation(0,0.)  
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(400/2.4*s*0.355))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(1))   
+
       this.bodies.helpers.stepB = new body_build({ 
                                                     screen_dims: this.screen_dims,
                                                     matter_engine: this.matter_engine,  
@@ -629,10 +661,9 @@ export default class fidget_daft_i extends fidget{
 
                                                     m:this.m,
                                                     parent:this.bodies.inters.background,                                                      
-                                                    m_offset:mo_iBh,                                              
-                                                    w : 400/2.4*s*0.355, 
-                                                    h : 1, 
-                                                    rot:-90,
+                                                    m_offset:mo_iBh,
+                                                    m_shape:m_shape,                                              
+                                                    //rot:-90,
                                                     type:utils.shape.arc,
                                                     arc_limites : [0, 3.14*0.5],                                                     
 
@@ -653,6 +684,9 @@ export default class fidget_daft_i extends fidget{
 
 
 
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(50/2.4*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(200/2.4*s))    
 
       this.bodies.inters.C = new body_build({ 
                                       screen_dims: this.screen_dims,
@@ -664,11 +698,10 @@ export default class fidget_daft_i extends fidget{
 
                                       m:this.m,
                                       m_offset:new Matrix(),
+                                      m_shape:m_shape,
                                       parent:this.bodies.inters.background,
                                       z:z_depth,
                                       //rot:0,
-                                      w:50/2.4*s,
-                                      h:200/2.4*s,
                                       type : utils.shape.rectangle,
 
                                       do_shape: true,
@@ -700,7 +733,12 @@ export default class fidget_daft_i extends fidget{
 
 
     let mo_iCh = new Matrix()                                    
-    mo_iCh.setTranslation(0.,-59*s/2.)       
+    mo_iCh.setTranslation(0.,-59*s/2.)      
+    
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(1))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(59*s))  
+
     this.bodies.helpers.stepC = new body_build({  
                                                   screen_dims: this.screen_dims,
                                                   matter_engine: this.matter_engine, 
@@ -710,9 +748,8 @@ export default class fidget_daft_i extends fidget{
 
                                                   m:this.m,
                                                   parent:this.bodies.inters.background,                                                    
-                                                  m_offset:mo_iCh,                                            
-                                                  w : 1, 
-                                                  h : 59*s, 
+                                                  m_offset:mo_iCh,  
+                                                  m_shape:m_shape,                                          
                                                   type:utils.shape.rectangle,
 
                                                   do_shape: false,
@@ -732,6 +769,11 @@ export default class fidget_daft_i extends fidget{
                                                   }) 
     var om_iA = new Matrix()
     om_iA.setTranslation(-130,-50)
+
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(100/2.4*s))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(100/2.4*s)) 
+
     this.bodies.inters.A = new body_build({  
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
@@ -743,9 +785,8 @@ export default class fidget_daft_i extends fidget{
                                     m:this.m,
                                     parent:this.bodies.inters.background,                                    
                                     m_offset:om_iA,
+                                    m_shape:m_shape,
                                     z:z_depth,
-                                    rot:0,
-                                    w:100/2.4*s,
                                     type : utils.shape.circle,
 
                                     do_shape: true,
@@ -776,7 +817,12 @@ export default class fidget_daft_i extends fidget{
     z_depth += z_depth_incr
 
     let mo_iAh = new Matrix()                                    
-    mo_iAh.setTranslation(-130,-50+25*s/2.)     
+    mo_iAh.setTranslation(-130,-50+25*s/2.)    
+
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(1))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(25*s)) 
+
     this.bodies.helpers.stepA = new body_build({  
                                                   screen_dims: this.screen_dims,
                                                   matter_engine: this.matter_engine,
@@ -786,9 +832,8 @@ export default class fidget_daft_i extends fidget{
 
                                                   m:this.m,
                                                   m_offset:mo_iAh,
+                                                  m_shape:m_shape,
                                                   parent:this.bodies.inters.background,                                               
-                                                  w : 1, 
-                                                  h : 25*s, 
                                                   type:utils.shape.rectangle,
 
                                                   do_shape: false,
@@ -915,7 +960,10 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.B.enable(1) 
       this.bodies.inters.background.enable(1)
       this.bodies.inters.C.constraints.axe.pos_override = 0
-
+      this.bodies.inters.circle.enable(1)
+      //this.bodies.inters.rectangle.enable(1)
+      for( let i=0; i < this.bodies.inters.rectangles.length; i++)
+        this.bodies.inters.rectangles[i].enable(1)
         
       //_________________________________________________________________Clean Other
       this.bodies.geos.rectangles[1].enable(0)
@@ -965,6 +1013,10 @@ export default class fidget_daft_i extends fidget{
       //this.bodies.inters.B.m_transform.setRotation(rad(270))
       this.bodies.inters.C.enable(1) 
       this.bodies.inters.background.enable(1)
+      this.bodies.inters.circle.enable(1)
+      //this.bodies.inters.rectangle.enable(1)
+      for( let i=0; i < this.bodies.inters.rectangles.length; i++)
+        this.bodies.inters.rectangles[i].enable(1)      
       //_________________________________________________________________Clean Other
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
@@ -1015,6 +1067,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.A.constraints.axe.pos_override = 1
       //this.bodies.inters.B.m_transform.setRotation(rad(270))
       this.bodies.inters.C.constraints.axe.pos_override = 1
+
       //_________________________________________________________________Clean Other
 
       this.bodies.geos.rectangles[1].enable(0)
