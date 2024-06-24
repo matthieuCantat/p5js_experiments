@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX } from './utils.js';
+import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY } from './utils.js';
 import fidget_daft_i from './fidget_daft_i.js';
 import fidget_windmill from './fidget_windmill.js';
 
