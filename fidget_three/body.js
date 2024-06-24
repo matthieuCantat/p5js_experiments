@@ -13,6 +13,7 @@ export default class body_build{
       const defaultOptions = {
         type:'body',
         name:'default name',
+        highlight_selection:[],
         m: new Matrix(),
         m_offset: new Matrix(),
         m_transform: new Matrix(),
@@ -54,7 +55,8 @@ export default class body_build{
       
 
       this.type = args.type
-      this.name = args.name    
+      this.name = args.name   
+      this.highlight_selection = args.highlight_selection    
       this.m = args.m
       this.parent = args.parent
       this.m_offset = args.m_offset
@@ -700,7 +702,9 @@ export default class body_build{
       {
         this.mesh_three.line.material.color = ut.convert_to_three_color(this.color_line)
         if(this.transparency_activate)
-          this.mesh_three.line.material.opacity = 1. - this.transparency_line        
+          this.mesh_three.line.material.opacity = 1. - this.transparency_line  
+          
+        
       }
 
     }

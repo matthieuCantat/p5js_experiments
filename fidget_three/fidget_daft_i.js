@@ -1,6 +1,6 @@
 
 import fidget from './fidget.js';
-import { utils,clamp,rad,deg,isMousePressed,mouseX, mouseY } from './utils.js';
+import { utils,switch_selection,clamp,rad,deg,isMousePressed,mouseX, mouseY } from './utils.js';
 import body_build from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
@@ -137,6 +137,7 @@ export default class fidget_daft_i extends fidget{
         mouse_constraint: this.mouse_constraint,
 
         name:'inter_background',
+        highlight_selection:[this.bodies.geos.circle,this.bodies.geos.rectangles[0],this.bodies.geos.rectangles[1],this.bodies.geos.rectangles[2]],  
         
         m:this.m,
         parent:null,
@@ -170,7 +171,7 @@ export default class fidget_daft_i extends fidget{
         debug_force_visibility: debug.force_visibility,                                                     
       })
 
-
+      
 
 
       // build
@@ -218,6 +219,7 @@ export default class fidget_daft_i extends fidget{
                                         mouse_constraint: this.mouse_constraint,
 
                                         name:'geo_rectangle',
+                                         
 
                                         m:this.m,
                                         parent:this.bodies.inters.background,
@@ -296,7 +298,8 @@ export default class fidget_daft_i extends fidget{
         offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
       om_rA.setRotation(rad(rot_tmp+180))                                       
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_TR',        
+                                              name:'geo_rectangle_TR',
+
                                               m_offset:om_rA,
 
                                               debug_matrix_info: false,
@@ -315,7 +318,8 @@ export default class fidget_daft_i extends fidget{
         offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp) 
       om_rB.setRotation(rad(rot_tmp+180))            
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_BR',          
+                                              name:'geo_rectangle_BR',  
+
                                               m_offset:om_rB,
 
                                               debug_matrix_info: false,
@@ -335,7 +339,8 @@ export default class fidget_daft_i extends fidget{
         offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)  
       om_rC.setRotation(rad(rot_tmp+180))             
       this.bodies.geos.rectangles.push(new body_build({ ...oRect,
-                                              name:'geo_rectangle_BL',         
+                                              name:'geo_rectangle_BL',   
+
                                               m_offset:om_rC, 
 
                                               debug_matrix_info: false,
@@ -350,7 +355,8 @@ export default class fidget_daft_i extends fidget{
         offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
       om_rD.setRotation(rad(rot_tmp+180))                                          
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_TL',           
+                                              name:'geo_rectangle_TL',
+
                                               m_offset:om_rD,
 
                                               debug_matrix_info: false,
@@ -360,13 +366,15 @@ export default class fidget_daft_i extends fidget{
                                             })) 
       
       // other
-  
+
+                                            
       this.bodies.inters.B = new body_build({
                                         screen_dims: this.screen_dims,
                                         matter_engine: this.matter_engine,  
                                         mouse_constraint: this.mouse_constraint,
 
                                         name:'inter_B',   
+                                        highlight_selection:[this.bodies.geos.rectangle],  
 
                                         m:this.m,
                                         parent:this.bodies.inters.background,
@@ -446,6 +454,7 @@ export default class fidget_daft_i extends fidget{
                                       mouse_constraint: this.mouse_constraint,
 
                                       name:'inter_C', 
+                                      highlight_selection:[this.bodies.geos.rectangle], 
 
                                       m:this.m,
                                       m_offset:new Matrix(),
@@ -522,7 +531,8 @@ export default class fidget_daft_i extends fidget{
                                     matter_engine: this.matter_engine,
                                     mouse_constraint: this.mouse_constraint,
 
-                                    name:'inter_A',      
+                                    name:'inter_A',     
+                                    highlight_selection:[this.bodies.geos.rectangles[3]],  
 
                                     m:this.m,
                                     parent:this.bodies.inters.background,                                    
@@ -588,7 +598,13 @@ export default class fidget_daft_i extends fidget{
                                                   collision_mask: utils.collision_category.none ,
 
                                                   density:0.1,  
-                                                  })                              
+                                                  })      
+                                                  
+                                                  
+      this.bodies.inters.background.highlight_selection = [this.bodies.geos.circle,this.bodies.geos.rectangle,this.bodies.geos.rectangles[0],this.bodies.geos.rectangles[1],this.bodies.geos.rectangles[2]] 
+      //this.bodies.inters.B.highlight_selection = [this.bodies.geos.rectangle]
+      //this.bodies.inters.C.highlight_selection = [this.bodies.geos.rectangle]
+      //this.bodies.inters.A.highlight_selection = [this.bodies.geos.rectangles[3]]                                                  
     }
   ////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
@@ -597,12 +613,11 @@ export default class fidget_daft_i extends fidget{
   get_resolution_coef_info( )
   {   
 
-    let A = 0
-    A = clamp(this.bodies.inters.A.constraints.axe.current_pos ,0,1)//clamp(deg(this.bodies.inters.A.body.angle)*-1/35.0     ,0,1)
+    let A = clamp(this.bodies.inters.A.constraints.axe.current_pos ,0,1)//clamp(deg(this.bodies.inters.A.body.angle)*-1/35.0     ,0,1)
     let B = clamp(deg(this.bodies.inters.B.get_local_rotation())/90.0     ,0,1)
     let C = clamp(this.bodies.inters.C.constraints.axe.current_pos ,0,1) 
     let D = 0
-
+    
     if ( this.anim_mode )
     {
       let s = [0,1,2,3]   
@@ -630,14 +645,14 @@ export default class fidget_daft_i extends fidget{
     if(C==1)
       this.state.current_step = 3 
     if((D==1)&&(!this.anim_mode))
-      this.state.current_step = 4             
+      this.state.current_step = 4    
+      
+
   }
   
 
   set_step_resolution( resolution_coef, update_interaction = false)
   {
-    // utils
-    var selected_body = this.mouse_constraint.constraint.bodyB
 
     // clean
     this.bodies_axe_clean_override()
@@ -683,7 +698,8 @@ export default class fidget_daft_i extends fidget{
     res_coef = this.state.steps[step].resoluton_coef
     do_it = this.state.current_step == step
     if( do_it )
-    {         
+    {      
+      
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       this.bodies.inters.B.enable(1) 
@@ -711,7 +727,17 @@ export default class fidget_daft_i extends fidget{
       }      
    
       //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.inters.A, this.bodies.inters.B)
+      if(this.debug_mode.switch_selected_inter_help)
+      {
+        this.switch_selection_transition( step, selected_body, this.bodies.inters.A, this.bodies.inters.B)
+      }
+      else
+      {
+        if( (this.bodies.inters.A.is_selected == true) &&(isMousePressed == false) )
+          switch_selection( this.mouse_constraint, null)  
+      }
+
+          
       //_________________________________________________________________Update
       this.update_step_count(step)
     
@@ -723,6 +749,7 @@ export default class fidget_daft_i extends fidget{
     do_it = this.state.current_step == step
     if( do_it )
     {
+
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       //this.bodies.inters.B.m_transform.setRotation(rad(270))
@@ -732,6 +759,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
       //_________________________________________________________________Control
+      this.bodies.geos.rectangle.m_transform.setRotation(rad(90))
        
       this.bodies.geos.rectangle.constraints.axe.pos_override = res_coef
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
@@ -745,14 +773,27 @@ export default class fidget_daft_i extends fidget{
       }  
             
       //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+      if(this.debug_mode.switch_selected_inter_help)
+      {      
+        this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+      }      
+      else
+      {
+        if( (this.bodies.inters.B.is_selected == true) &&(isMousePressed == false) )
+          switch_selection( this.mouse_constraint, null)
+      }
+      
+      
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
       this.update_step_count(step)   
       
       if(this.anim_mode)
         this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2)
+        
     } 
+
+
     ////////////////////////////////////////////////////////////////////////////////////
     step = 3
     res_coef = this.state.steps[step].resoluton_coef
@@ -780,7 +821,17 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Control
 
       //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+      
+      if(this.debug_mode.switch_selected_inter_help)
+      {
+        this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+      }
+      else
+      {
+        if( (this.bodies.inters.B.is_selected == true) &&(isMousePressed == false) )
+          switch_selection( this.mouse_constraint, null)  
+      }
+        
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
       this.update_step_count(step) 

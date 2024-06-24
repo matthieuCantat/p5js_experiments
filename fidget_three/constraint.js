@@ -2,6 +2,7 @@
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import { rad, deg, snap_point_on_line, proj_vector_on_line} from './utils.js';
+//import { join } from 'path';
 
 
 
@@ -43,8 +44,18 @@ export class dyn_constraint_build_custom_orient{
       
 
       this.is_enable = true
+      this.selection_change_do_rebind = false
       
   
+  }
+
+  rebind()
+  {
+    let m_target = this.target.get_out_matrix()
+    let m_obj = this.obj.get_out_matrix()
+    let m_delta = m_obj.getMult(m_target.getInverse())
+    this.target_pos_offset = m_delta
+    console.log('rebind', this.target_pos_offset.getRotation())
   }
 
   apply()
@@ -69,7 +80,15 @@ export class dyn_constraint_build_custom_orient{
         if(this.obj.is_selected)
         {
           stiffness = this.stiffness_at_selection
+          if( stiffness == 0 )
+            this.selection_change_do_rebind = true
         }
+        else if(this.selection_change_do_rebind)
+        {
+          this.rebind()
+          this.selection_change_do_rebind = false
+        }
+
       }
       if( stiffness == 1.0)
       {
@@ -168,7 +187,17 @@ export class dyn_constraint_build{
 
         this.cns = Matter.Constraint.create(opt);
         Matter.Composite.add( this.matter_engine.world, [ this.cns ])
-    
+ 
+        this.selection_change_do_rebind = false        
+
+    }
+
+    rebind()
+    {
+      let m_target = this.target.get_out_matrix()
+      let m_obj = this.obj.get_out_matrix()
+      let m_delta = m_obj.getMult(m_target.getInverse())
+      this.cns.pointB = m_delta.get_row(2).get_value()
     }
 
     apply()
@@ -180,14 +209,28 @@ export class dyn_constraint_build{
           //console.log(this.obj.name, 'is selected')
           this.cns.stiffness = this.stiffness_at_selection
           if(this.stiffness_at_selection == 0 )
+          {
             this.enable(false)
+            this.selection_change_do_rebind = true
+          }
+            
         }
         else
         {
           //console.log(this.obj.name, 'is not selected')
           this.cns.stiffness = this.stiffness
           if(this.stiffness_at_selection == 0 )
-            this.enable(true)          
+          {
+            if( this.selection_change_do_rebind == true )
+            {
+              this.rebind()
+            }
+
+            this.selection_change_do_rebind = false
+            
+            this.enable(true) 
+          }
+                     
         }
       }
         //this.cns.pointB = this.pB

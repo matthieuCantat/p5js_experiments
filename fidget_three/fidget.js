@@ -625,10 +625,12 @@ export default class fidget{
   {
     if( mouse_cns.constraint.bodyB != null )
     {
-      for( let i =0; i < this.bodies_draw_order.length; i+=2)
+      let body_to_highlight = []
+      let body_to_reduce    = []
+      for( let k =0; k < this.bodies_draw_order.length; k+=2)
       {   
-        let b_type = this.bodies_draw_order[i+0]
-        let key = this.bodies_draw_order[i+1]
+        let b_type = this.bodies_draw_order[k+0]
+        let key = this.bodies_draw_order[k+1]
          
         if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
         {
@@ -641,11 +643,19 @@ export default class fidget{
               {
                 this.bodies[b_type][key][i].color = utils.color.redLight
                 this.bodies[b_type][key][i].is_selected = true
+
+                for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
+                  body_to_highlight.push(this.bodies[b_type][key][i].highlight_selection[j])
+                
               }
               else
               {
                 this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
                 this.bodies[b_type][key][i].is_selected = false
+
+                for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
+                  body_to_reduce.push(this.bodies[b_type][key][i].highlight_selection[j])  
+
               }
           
             }
@@ -656,11 +666,19 @@ export default class fidget{
             {
               this.bodies[b_type][key].color = utils.color.redLight
               this.bodies[b_type][key].is_selected = true
+
+              for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
+                body_to_highlight.push(this.bodies[b_type][key].highlight_selection[j])  
+
             }
             else
             {
               this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
               this.bodies[b_type][key].is_selected = false
+
+              for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
+                body_to_reduce.push(this.bodies[b_type][key].highlight_selection[j])  
+
             }
 
           }
@@ -668,6 +686,17 @@ export default class fidget{
            
         } 
       } 
+
+      for( let i = 0 ; i < body_to_reduce.length; i++)
+      {
+        body_to_reduce[i].color_line = [0,0,0]
+        body_to_reduce[i].update_color_three()
+      }
+      for( let i = 0 ; i < body_to_highlight.length; i++)
+      {
+        body_to_highlight[i].color_line = [255,255,255]
+        body_to_highlight[i].update_color_three()
+      }
  
     } 
     
