@@ -979,6 +979,11 @@ export default class fidget_daft_i extends fidget{
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
           this.bodies.geos.rectangles[i].constraints.axe.pos_override = -1+pos_override   
     
+
+      let m = new Matrix(this.bodies.inters.circle.m_shape_init)
+      m.scale(1.85,1.85)
+      this.bodies.inters.circle.update_shape_coords(m)
+
       if(  this.anim_mode )   
       {
         this.bodies.inters.B.rot_override = res_coef*rad(90)

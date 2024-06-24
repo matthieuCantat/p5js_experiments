@@ -62,6 +62,7 @@ export default class body_build{
       this.m_offset = args.m_offset
       this.m_transform = args.m_transform
       this.z = args.z
+      this.m_shape_init = args.m_shape
       this.m_shape = args.m_shape
       //this.w = args.w
       //this.h = args.h
@@ -190,67 +191,75 @@ export default class body_build{
       this.init_physics()
     }
 
-    init_physics()
+    matter_get_shape(m)
     {
-      let p = this.m_shape.get_row(2).get_value()
-      let w = this.m_shape.get_row(0).mag()
-      let h = this.m_shape.get_row(1).mag()
-      let r = this.m_shape.getRotation()
+      let p = m.get_row(2).get_value()
+      let w = m.get_row(0).mag()
+      let h = m.get_row(1).mag()
+      let r = m.getRotation()
 
+      let body = null
       switch(this.type) {
         case 0:
-          this.body = Matter.Bodies.rectangle(p.x, p.y, w, h);
-          Matter.Body.rotate(this.body, r)
+          body = Matter.Bodies.rectangle(p.x, p.y, w, h);
+          Matter.Body.rotate(body, r)
           break;
         case 1:
-          this.body = Matter.Bodies.circle(p.x, p.y, w/2.);
-          Matter.Body.rotate(this.body, r)
+          body = Matter.Bodies.circle(p.x, p.y, w/2.);
+          Matter.Body.rotate(body, r)
           break;
           /*
         case 2:
-          this.body = Matter.Bodies.polygon(p.x, p.y, 3, this.w);
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.polygon(p.x, p.y, 3, this.w);
+          Matter.Body.rotate(body, this.rot)
           break;
         case 3:
-          this.body = Matter.Bodies.polygon(p.x, p.y, 5, this.w);
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.polygon(p.x, p.y, 5, this.w);
+          Matter.Body.rotate(body, this.rot)
           break;     
         case 4:
-          this.body = Matter.Bodies.polygon(p.x, p.y, 6, this.w);
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.polygon(p.x, p.y, 6, this.w);
+          Matter.Body.rotate(body, this.rot)
           break;  
         case 5:    
-          this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+          Matter.Body.rotate(body, this.rot)
           break;     
         case 6: 
-          this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+          Matter.Body.rotate(body, this.rot)
           break;    
         case 7:     
-          this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+          Matter.Body.rotate(body, this.rot)
           break;   
         case 8:     
-          this.body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Bodies.fromVertices(p.x, p.y, this.shape_vertices)
+          Matter.Body.rotate(body, this.rot)
           break;      
         case 9:  
           var bodyA = Matter.Bodies.rectangle(p.x, p.y, this.w, this.h/3);   
           var bodyB = Matter.Bodies.rectangle(p.x, p.y, this.w/3, this.h); 
-          this.body = Matter.Body.create({parts: [bodyA, bodyB]});
-          Matter.Body.rotate(this.body, this.rot)
+          body = Matter.Body.create({parts: [bodyA, bodyB]});
+          Matter.Body.rotate(body, this.rot)
           break; 
           */
         case 10:  
-          this.body = Matter.Bodies.trapezoid(p.x, p.y, w, h , rad(this.slop*2))
-          Matter.Body.rotate(this.body, r)
+          body = Matter.Bodies.trapezoid(p.x, p.y, w, h , rad(this.slop*2))
+          Matter.Body.rotate(body, r)
           break;      
         case 11:  
-          this.body = Matter.Bodies.circle(p.x, p.y, w);//tmp
-          Matter.Body.rotate(this.body, r)
+          body = Matter.Bodies.circle(p.x, p.y, w);//tmp
+          Matter.Body.rotate(body, r)
           break;             
-        }
+        } 
+        
+        return body
+    }
+
+    init_physics()
+    {
+      this.body = this.matter_get_shape(this.m_shape)
   
       Matter.Body.setDensity(this.body, this.density)
       if( this.mass != null )
@@ -317,16 +326,14 @@ export default class body_build{
   
       Matter.Composite.add( this.matter_engine.world, this.body)      
     }
-    /*
-    is_selected()
-    {
-      if( this.mouse_constraint.constraint.bodyB != null )
-        if( this.body == this.mouse_constraint.constraint.bodyB )
-          return true
-      return false
-    }
-    */
 
+    matter_update_shape_coords(m)
+    {
+      let new_body = this.matter_get_shape(m)
+      this.m_shape = m
+      Matter.Body.setVertices(this.body, new_body.vertices)
+
+    }
 
     apply_scale( value )
     {
@@ -521,7 +528,9 @@ export default class body_build{
     }
     
   
-    update_shape(m)
+
+
+    three_get_shape_points(m)
     {
       this.m_shape = m
       let p = this.m_shape.get_row(2).get_value()
@@ -531,81 +540,95 @@ export default class body_build{
 
 
       // Three
+      let shape_three = null
       switch(this.type) {
         case 0:
-          this.shape_three = ut.rect( w, h );
+          shape_three = ut.rect( w, h );
           break;
         case 1:
-          this.shape_three = ut.circle(w/2);
+          shape_three = ut.circle(w/2);
           break;
         case 10:  
-          this.shape_three = ut.roundedTrap( w, h, this.slop, 0 )
+          shape_three = ut.roundedTrap( w, h, this.slop, 0 )
           break; 
         case 11: 
-          this.shape_three = ut.arc( w, this.arc_limites[0], this.arc_limites[1])
+          shape_three = ut.arc( w, this.arc_limites[0], this.arc_limites[1])
           break;      
         }  
-        
-        //this.shape_three
-        //this.mesh_three.shape
-        //this.mesh_three.group
-
+      return shape_three
     }
-  
-    setup_shapes_three(group_fidget){
-      this.mesh_three = { group : null, shape : null, line : null}
 
-      let p = this.m_shape.get_row(2).get_value()
-      let w = this.m_shape.get_row(0).mag()
-      let h = this.m_shape.get_row(1).mag()
-      let r = this.m_shape.getRotation()
+    three_fill_with_shapes( group, m )
+    {
+      let shape_points = this.three_get_shape_points(m)
 
-      switch(this.type) {
-        case 0:
-          this.shape_three = ut.rect( w, h );
-          break;
-        case 1:
-          this.shape_three = ut.circle(w/2);
-          break;
-        case 10:  
-          this.shape_three = ut.roundedTrap( w, h, this.slop, 0 )
-          break; 
-        case 11: 
-          this.shape_three = ut.arc( w, this.arc_limites[0], this.arc_limites[1])
-          break;      
-        }
-
-      this.mesh_three.group = new THREE.Group();
-      group_fidget.add(this.mesh_three.group)
+      let out = {
+        shape:null,
+        line:null,
+      }
 
       if(this.do_shape)
       {
-          this.mesh_three.shape = ut.addShape_polygon( 
-              this.shape_three, 
-              this.texture_three, 
-              this.color, 
-              this.transparency_activate, 
-              this.transparency)  
+        out.shape = ut.addShape_polygon( 
+          shape_points, 
+          this.texture_three, 
+          this.color, 
+          this.transparency_activate, 
+          this.transparency)  
 
-          this.mesh_three.group.add( this.mesh_three.shape )      
-      }   
-  
+        group.add( out.shape ) 
+      }
       if(this.do_line)
       {
-          this.mesh_three.line = ut.addShape_line( 
-              this.shape_three, 
-              this.color_line, 
-              this.transparency_activate, 
-              this.transparency_line) 
+        out.line = ut.addShape_line( 
+          shape_points, 
+          this.texture_three, 
+          this.color, 
+          this.transparency_activate, 
+          this.transparency)  
 
-          this.mesh_three.group.add( this.mesh_three.line )                    
+        group.add( out.line ) 
       }
+      return out
+    }
+
+    update_shape_coords(m)
+    {
+      this.matter_update_shape_coords(m)
+      this.three_update_shape_coords(m)
+
+    }
+
+    three_update_shape_coords(m)
+    {
+      this.m_shape = m
+      let shape_points = this.three_get_shape_points(m)
+      if(this.do_shape)
+      {
+        this.mesh_three.shape.geometry.setFromPoints(shape_points.getPoints());
+      }
+      if(this.do_line)
+      {
+        this.mesh_three.line.geometry.setFromPoints(shape_points.getPoints());
+      }     
+    }
+
+
+    setup_shapes_three(group_fidget){
+      this.mesh_three = { group : null, shape : null, line : null}
+
+      this.mesh_three.group = new THREE.Group();
+      let _out = this.three_fill_with_shapes( this.mesh_three.group, this.m_shape )
+      this.mesh_three.shape = _out.shape
+      this.mesh_three.line  = _out.line
+
+      group_fidget.add(this.mesh_three.group)
+      
+
 
       if(this.debug_cns_axes)
       {
 
-     
-        
         if(( this.constraints.axe != null)&&(this.constraints.axe.enable == true ))
         {
           this.constraints.axe.update_debug()
