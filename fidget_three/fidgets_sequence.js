@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY } from './utils.js';
+import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY , userIsInteracting} from './utils.js';
 import fidget_daft_i from './fidget_daft_i.js';
 import fidget_windmill from './fidget_windmill.js';
 
@@ -146,6 +146,7 @@ export default class fidgets_sequence
         let texts_to_draw = [
           'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
           'mouse position : ' + mouseX + ' : '+mouseY ,
+          'user is interacting : '+ userIsInteracting,
           /*
           'count : ' + this.fidgets[0].state.update_count,
           'res : ' + Math.round( this.fidgets[0].state.resolution_coef, 2 ) + ' / 4',

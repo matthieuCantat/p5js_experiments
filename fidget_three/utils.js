@@ -471,17 +471,20 @@ export function proj_vector_on_line(v_line, v)
 // Declare the boolean value as a global variable
 export var isMousePressed = false;
 export var isScreenTouched = false;
+export var userIsInteracting = false;
 export var mouseX = 0;
 export var mouseY = 0;
 // Function to handle the mousedown event
 function handleMouseDown(event) {
     isMousePressed = true;
+    userIsInteracting = isScreenTouched || isMousePressed
     //console.log('Mouse is pressed:', isMousePressed);
 }
 
 // Function to handle the mouseup event
 function handleMouseUp(event) {
     isMousePressed = false;
+    userIsInteracting = isScreenTouched || isMousePressed
     //console.log('Mouse is pressed:', isMousePressed);
 }
 
@@ -494,11 +497,13 @@ function handleMouseMove(event) {
 
 function handleTouchDown(event) {
   isScreenTouched = true;
+  userIsInteracting = isScreenTouched || isMousePressed
   //console.log('Mouse is pressed:', isMousePressed);
 }
 
 function handleTouchUp(event) {
   isScreenTouched = true;
+  userIsInteracting = isScreenTouched || isMousePressed
   //console.log('Mouse is pressed:', isMousePressed);
 }
 
