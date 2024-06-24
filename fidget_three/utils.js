@@ -220,6 +220,10 @@ export class Draw_text_debug
       null,
       null,
       null,
+      null,
+      null,
+      null,
+      null,
       null]
     
 
@@ -466,6 +470,7 @@ export function proj_vector_on_line(v_line, v)
 ////////////////////////////////////////////////// mouse pressed
 // Declare the boolean value as a global variable
 export var isMousePressed = false;
+export var isScreenTouched = false;
 export var mouseX = 0;
 export var mouseY = 0;
 // Function to handle the mousedown event
@@ -512,6 +517,7 @@ document.addEventListener('touchstart', function(event) {
     updateStatus('Screen touched');
     console.log('Touch start:', event.touches);
     isMousePressed = true;
+    isScreenTouched = true;
 }, false);
 
 document.addEventListener('touchmove', function(event) {
@@ -524,6 +530,7 @@ document.addEventListener('touchend', function(event) {
     updateStatus('Touch ended');
     console.log('Touch end:', event.changedTouches);
     isMousePressed = false;
+    isScreenTouched = false;
 }, false);
 
 
