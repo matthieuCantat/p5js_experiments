@@ -1,6 +1,6 @@
 
 import fidget from './fidget.js';
-import { utils,switch_selection,clamp,rad,deg,isMousePressed,mouseX, mouseY } from './utils.js';
+import { utils,switch_selection,clamp,rad,deg,userIsInteracting,mouseX, mouseY } from './utils.js';
 import body_build from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
@@ -1232,7 +1232,7 @@ export default class fidget_daft_i extends fidget{
       }
       else
       {
-        if( (this.bodies.inters.A.is_selected == true) &&(isMousePressed == false) )
+        if( (this.bodies.inters.A.is_selected == true) &&(userIsInteracting == false) )
           switch_selection( this.mouse_constraint, null)  
       }
 
@@ -1296,7 +1296,7 @@ export default class fidget_daft_i extends fidget{
       }      
       else
       {
-        if( (this.bodies.inters.B.is_selected == true) &&(isMousePressed == false) )
+        if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
           switch_selection( this.mouse_constraint, null)
       }
       
@@ -1360,7 +1360,7 @@ export default class fidget_daft_i extends fidget{
       }
       else
       {
-        if( (this.bodies.inters.B.is_selected == true) &&(isMousePressed == false) )
+        if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
           switch_selection( this.mouse_constraint, null)  
       }
         
@@ -1492,7 +1492,7 @@ export default class fidget_daft_i extends fidget{
     if ( this.touch_enable == false )
       return 
 
-    if( isMousePressed )
+    if( userIsInteracting )
     {
       
       this.mouse_pressed_positions_at_update.push( new Vector( mouseX , mouseY ) )    

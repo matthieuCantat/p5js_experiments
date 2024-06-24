@@ -1,6 +1,6 @@
 
 import fidget from './fidget.js';
-import { utils,clamp,rad,deg,isMousePressed,mouseX, mouseY } from './utils.js';
+import { utils,clamp,rad,deg,userIsInteracting,mouseX, mouseY } from './utils.js';
 import body_build from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
@@ -864,7 +864,7 @@ export default class fidget_windmill extends fidget{
     if ( this.touch_enable == false )
       return 
 
-    if( isMousePressed )
+    if( userIsInteracting )
     {
       
       this.mouse_pressed_positions_at_update.push( new Vector( mouseX , mouseY ) )    
