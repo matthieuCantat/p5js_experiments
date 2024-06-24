@@ -110,7 +110,7 @@ export default class fidget_daft_i extends fidget{
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
       type: utils.shape.rectangle,
-      density:0.1, 
+      density:0.05, 
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
       mouse_constraint: this.mouse_constraint,
@@ -237,7 +237,7 @@ export default class fidget_daft_i extends fidget{
                                     })
 
     
-      let scale_inter = 20.2 
+      let scale_inter = 40.2 
       
       
       // build
@@ -273,7 +273,7 @@ export default class fidget_daft_i extends fidget{
           {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.99,damping:0.001,length:0.01},
           {  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.99,damping:0.001,length:0.01},                                          
         ],                                      
-        density:0.1,     
+        density:0.05,     
         
         debug_matrix_info: false,
         debug_matrix_axes: debug.matrix_axes,  
@@ -363,7 +363,7 @@ export default class fidget_daft_i extends fidget{
                                           {  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.99,damping:0.001,length:0.01}, 
                                         ],
 
-                                        density:0.1, 
+                                        density:0.05, 
 
                                         debug_matrix_info: false,
                                         debug_matrix_axes: debug.matrix_axes,  
@@ -641,7 +641,7 @@ export default class fidget_daft_i extends fidget{
                                           { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
                                         ],      
 
-                                        density:0.1, 
+                                        density:0.05, 
 
                                         debug_matrix_info: false,
                                         debug_matrix_axes: debug.matrix_axes,  
@@ -686,7 +686,7 @@ export default class fidget_daft_i extends fidget{
                                                     collision_category: utils.collision_category.none,
                                                     collision_mask: utils.collision_category.none ,
                                                  
-                                                    density:0.1,    
+                                                    density:0.05,    
                                                     }) 
 
 
@@ -728,7 +728,7 @@ export default class fidget_daft_i extends fidget{
                                         { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001 },
                                       ], 
 
-                                      density:0.1, 
+                                      density:0.05, 
 
                                       debug_matrix_info: false,
                                       debug_matrix_axes: debug.matrix_axes,  
@@ -771,7 +771,7 @@ export default class fidget_daft_i extends fidget{
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
                                                   
-                                                  density:0.1, 
+                                                  density:0.05, 
 
                                                   }) 
     var om_iA = new Matrix()
@@ -813,7 +813,7 @@ export default class fidget_daft_i extends fidget{
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ], 
 
-                                    density:0.1, 
+                                    density:0.05, 
              
                                     debug_matrix_info: false,
                                     debug_matrix_axes: debug.matrix_axes,  
@@ -1069,7 +1069,7 @@ export default class fidget_daft_i extends fidget{
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
 
-                                                  density:0.1,  
+                                                  density:0.05,  
                                                   })      
                                                   
                                                   
