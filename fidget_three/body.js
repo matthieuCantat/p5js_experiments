@@ -521,7 +521,36 @@ export default class body_build{
     }
     
   
+    update_shape(m)
+    {
+      this.m_shape = m
+      let p = this.m_shape.get_row(2).get_value()
+      let w = this.m_shape.get_row(0).mag()
+      let h = this.m_shape.get_row(1).mag()
+      let r = this.m_shape.getRotation() 
 
+
+      // Three
+      switch(this.type) {
+        case 0:
+          this.shape_three = ut.rect( w, h );
+          break;
+        case 1:
+          this.shape_three = ut.circle(w/2);
+          break;
+        case 10:  
+          this.shape_three = ut.roundedTrap( w, h, this.slop, 0 )
+          break; 
+        case 11: 
+          this.shape_three = ut.arc( w, this.arc_limites[0], this.arc_limites[1])
+          break;      
+        }  
+        
+        //this.shape_three
+        //this.mesh_three.shape
+        //this.mesh_three.group
+
+    }
   
     setup_shapes_three(group_fidget){
       this.mesh_three = { group : null, shape : null, line : null}
@@ -552,22 +581,24 @@ export default class body_build{
       if(this.do_shape)
       {
           this.mesh_three.shape = ut.addShape_polygon( 
-              this.mesh_three.group, 
               this.shape_three, 
               this.texture_three, 
               this.color, 
               this.transparency_activate, 
-              this.transparency)        
+              this.transparency)  
+
+          this.mesh_three.group.add( this.mesh_three.shape )      
       }   
   
       if(this.do_line)
       {
           this.mesh_three.line = ut.addShape_line( 
-              this.mesh_three.group, 
               this.shape_three, 
               this.color_line, 
               this.transparency_activate, 
-              this.transparency_line)       
+              this.transparency_line) 
+
+          this.mesh_three.group.add( this.mesh_three.line )                    
       }
 
       if(this.debug_cns_axes)
@@ -585,10 +616,11 @@ export default class body_build{
           //let axes_grp = new THREE.Group();
           //group_fidget.add(axes_grp)
 
-          ut.addShape_line(  
-            group_fidget, 
+          let mesh = ut.addShape_line(  
             shape, 
             [255,0,255])
+
+            group_fidget.add( mesh ) 
         }
       }
 
@@ -601,30 +633,30 @@ export default class body_build{
         let mesh = null        
         shape = ut.rect( len, wid )
         mesh = ut.addShape_polygon(  
-          this.mesh_three.group, 
           shape, 
           null,
           [255,0,0])
+        this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
 
         mesh = ut.addShape_line(  
-          this.mesh_three.group, 
           shape, 
           [0,0,0])
+        this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
 
         shape = ut.rect( wid, len )
-        mesh = ut.addShape_polygon(  
-          this.mesh_three.group, 
+        mesh = ut.addShape_polygon(   
           shape, 
           null,
           [0,255,0])
+        this.mesh_three.group.add( mesh ) 
         mesh.position.y =  len/2.0
 
         mesh = ut.addShape_line(  
-          this.mesh_three.group, 
           shape, 
           [0,0,0])
+        this.mesh_three.group.add( mesh ) 
         mesh.position.y =  len/2.0
         
       }

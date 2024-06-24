@@ -132,7 +132,6 @@ export function arc( radius,min_angle,max_angle ) {
 
 
 export function addShape_polygon( 
-    group, 
     shape, 
     texture = null, 
     color = null, 
@@ -149,14 +148,12 @@ export function addShape_polygon(
         mat_opt.map = texture
     
     let mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
-    group.add( mesh );
 
     return mesh
 }
 
 
 export function addShape_line( 
-    group, 
     shape, 
     color = null, 
     transparency_activate = false, 
@@ -170,8 +167,7 @@ export function addShape_line(
     if( color != null )
         mat_opt_line.color = convert_to_three_color(color)
 
-    let mesh = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( mat_opt_line ) );    
-    group.add( mesh )    
+    let mesh = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( mat_opt_line ) );       
 
 
     return mesh
