@@ -492,18 +492,24 @@ function handleMouseMove(event) {
   //console.log('Mouse position:', mouseX, mouseY);
 }
 
+function handleTouchDown(event) {
+  isScreenTouched = true;
+  //console.log('Mouse is pressed:', isMousePressed);
+}
+
 // Attach event listeners when the document is fully loaded
 window.onload = function() {
     document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
-    //document.addEventListener('touchstart', handleMouseDown,false);
+    document.addEventListener('touchstart', handleTouchDown);
     //document.addEventListener('touchend', handleMouseUp,false);
     //document.addEventListener('touchmove', handleMouseMove,false);    
 }
 ////////////////////////////////////////////////// mouse pressed
 
 
+/*
 // Get the status div
 const statusDiv = document.getElementById('status');
 
@@ -533,7 +539,7 @@ document.addEventListener('touchend', function(event) {
     isScreenTouched = false;
 }, false);
 
-
+*/
 
 
 
