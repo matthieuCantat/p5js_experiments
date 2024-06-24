@@ -502,15 +502,17 @@ function handleTouchDown(event) {
 }
 
 function handleTouchUp(event) {
-  isScreenTouched = true;
+  isScreenTouched = false;
   userIsInteracting = isScreenTouched || isMousePressed
   //console.log('Mouse is pressed:', isMousePressed);
 }
 
 
 function handleTouchMove(event) {
-  mouseX = event.clientX;
-  mouseY = event.clientY;
+  const touch = event.touches[0] || event.changedTouches[0];
+  
+  mouseX = touch.clientX;
+  mouseY = touch.clientY;
   //console.log('Mouse is pressed:', isMousePressed);
 }
 
