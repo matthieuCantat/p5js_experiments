@@ -288,7 +288,7 @@ export class Mouse_manager
         let pos = new Vector( mouseX, mouseY) 
         var selected_body = this.mouse_constraint.constraint.bodyB
 
-        let delta = new Vector()
+        let delta = new Vector(0,0)
         let do_break = false
         let fidget_selected_body = null
         let m = null
