@@ -55,7 +55,7 @@ export class dyn_constraint_build_custom_orient{
     let m_obj = this.obj.get_out_matrix()
     let m_delta = m_obj.getMult(m_target.getInverse())
     this.target_pos_offset = m_delta
-    console.log('rebind', this.target_pos_offset.getRotation())
+    
   }
 
   apply()
@@ -610,6 +610,7 @@ export class constraint_build{
             do_position: true,
             do_orientation: true,
             apply_on_input: false,
+            stiffness: 1,
         };
         const args = { ...defaultOptions, ...in_options };
 
@@ -629,6 +630,7 @@ export class constraint_build{
         this.apply_on_input = args.apply_on_input
 
         this.is_enable = true
+        this.stiffness = args.stiffness
         
     
     }
@@ -653,12 +655,33 @@ export class constraint_build{
         {
           if(this.do_position)
           {
-            this.obj.set_position(m.get_row(2))
+            if( this.stiffness == 1.0 )
+            {
+              this.obj.set_position(m.get_row(2))
+            }
+            else
+            {
+              let p_current = this.obj.get_out_matrix().get_row(2)
+              let p_target = m.get_row(2)
+              let p_mix = p_target.getMult(this.stiffness ).getAdd( p_current.getMult(1.0-this.stiffness ) )
+              this.obj.set_position(p_mix)
+            }
+
           }
 
           if(this.do_orientation)
           {
-            this.obj.set_angle(m.getRotation())
+            if( this.stiffness == 1.0 )
+            {       
+              this.obj.set_angle(m.getRotation())     
+            }
+            else{
+              let r_current = this.obj.get_out_matrix().getRotation()
+              let r_target = m.getRotation()    
+              let r_mix = r_target * this.stiffness +r_current * (1.0-this.stiffness )        
+              this.obj.set_angle(r_mix)
+            }
+
           }
 
         }

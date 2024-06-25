@@ -37,9 +37,11 @@ export default class fidget_daft_i extends fidget{
             rectangles:[],
           },
           effects : {
+            movA_trails:[],
             colA_sparcles:[],
             colA_shapes:[],
             colA_wall:null,
+            movB_trails:[],
             colB_sparcles:[],
             colB_shapes:[],
             colB_wall:null,
@@ -61,9 +63,11 @@ export default class fidget_daft_i extends fidget{
             'inters','rectangles',
             'inters','B',
             'inters','C',
-            'inters','A',     
+            'inters','A',              
             'geos','circle',
-            'geos','rectangle',      
+            'effects','movB_trails',
+            'geos','rectangle',  
+            'effects','movA_trails',       
             'geos','rectangles',
             'helpers','stepA',
             'helpers','stepB',
@@ -301,87 +305,165 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s))
       m_shape.set_row(1,m_shape.get_row(1).getMult(18*s))
 
+      let oRectangle = { 
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine,  
+        mouse_constraint: this.mouse_constraint,
 
-      this.bodies.geos.rectangle = new body_build({ 
-                                        screen_dims: this.screen_dims,
-                                        matter_engine: this.matter_engine,  
-                                        mouse_constraint: this.mouse_constraint,
+        name:'geo_rectangle',
+         
 
-                                        name:'geo_rectangle',
-                                         
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_offset:new Matrix(),
+        m_shape:m_shape,
+        z:z_depth,
+        type : utils.shape.rectangle,
 
-                                        m:this.m,
-                                        parent:this.bodies.inters.background,
-                                        m_offset:new Matrix(),
-                                        m_shape:m_shape,
-                                        z:z_depth,
-                                        type : utils.shape.rectangle,
+        do_shape: true,
+        do_line:true,                                           
+        color : this.colors[1],
+        color_line: utils.color.black,
+        //texture_three: text_checker_three, 
+        shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
-                                        do_shape: true,
-                                        do_line:true,                                           
-                                        color : this.colors[1],
-                                        color_line: utils.color.black,
-                                        //texture_three: text_checker_three, 
-                                        shader: this.shaders.length != 0 ? this.shaders[0] : null,
+        collision_category : utils.collision_category.green,
+        collision_mask : utils.collision_category.default, 
+        constraints:[
+          //{  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.1,damping:0.01,length:0.01},
+          //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},  
+          { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
+          { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
+          {  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
+        ],                                         
 
-                                        collision_category : utils.collision_category.green,
-                                        collision_mask : utils.collision_category.default, 
-                                        constraints:[
-                                          //{  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.1,damping:0.01,length:0.01},
-                                          //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},  
-                                          { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                          { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
-                                          {  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
-                                        ],                                         
+        density:0.001, 
 
-                                        density:0.001, 
+        debug_matrix_info: false,
+        debug_matrix_axes: debug.matrix_axes,  
+        debug_cns_axes: debug.cns_axes,      
+        debug_force_visibility: debug.force_visibility,                                                                                 
+      }
 
-                                        debug_matrix_info: false,
-                                        debug_matrix_axes: debug.matrix_axes,  
-                                        debug_cns_axes: debug.cns_axes,      
-                                        debug_force_visibility: debug.force_visibility,                                                                                 
-                                      })
+
+      this.bodies.geos.rectangle = new body_build(oRectangle)
+
+      
+      this.bodies.effects.movB_trails.push(new body_build({ ...oRectangle, 
+                                              name:'effect_movB_trails1',
+
+                                              do_shape: true,
+                                              do_line:false,                                         
+                                              color:utils.color.red,
+                                              //color_line: utils.color.black,
+                                              //texture_three: text_checker_three_grey, 
+
+                                              collision_category: utils.collision_category.none,
+                                              collision_mask: utils.collision_category.none,                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangle,  stiffness: 0.15},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangle, stiffness: 0.15}, 
+                                              ],
+
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
+                                            }))    
+      this.bodies.effects.movB_trails.push(new body_build({ ...oRectangle, 
+                                              name:'effect_movB_trails2',
+
+                                              do_shape: true,
+                                              do_line:false,                                         
+                                              color:utils.color.blue,
+                                              //color_line: utils.color.black,
+                                              //texture_three: text_checker_three_grey, 
+
+                                              collision_category: utils.collision_category.none,
+                                              collision_mask: utils.collision_category.none,                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangle,  stiffness: 0.2},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangle, stiffness: 0.2}, 
+                                              ],
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
+                                            }))  
+                                                                                    
+      this.bodies.effects.movB_trails.push(new body_build({ ...oRectangle, 
+                                              name:'effect_movB_trails3',
+
+                                              do_shape: true,
+                                              do_line:false,                                         
+                                              color:utils.color.green,
+                                              //color_line: utils.color.black,
+                                              //texture_three: text_checker_three_grey, 
+
+                                              collision_category: utils.collision_category.none,
+                                              collision_mask: utils.collision_category.none,                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangle,  stiffness: 0.3},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangle, stiffness: 0.3}, 
+                                              ],
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
+                                            }))     
+
+
+
+
 
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
       m_shape.set_row(1,m_shape.get_row(1).getMult(18*s+scale_inter))
 
       this.bodies.inters.rectangle = new body_build({ 
-                                        screen_dims: this.screen_dims,
-                                        matter_engine: this.matter_engine,  
-                                        mouse_constraint: this.mouse_constraint,
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine,  
+        mouse_constraint: this.mouse_constraint,
 
-                                        name:'inter_rectangle',
-                                        highlight_selection:[this.bodies.geos.rectangle],  
-                                         
+        name:'inter_rectangle',
+        highlight_selection:[this.bodies.geos.rectangle],  
+         
 
-                                        m:this.m,
-                                        parent:this.bodies.inters.background,
-                                        m_offset:new Matrix(),
-                                        m_shape: m_shape,
-                                        z:z_depth,
-                                        type : utils.shape.rectangle,
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_offset:new Matrix(),
+        m_shape: m_shape,
+        z:z_depth,
+        type : utils.shape.rectangle,
 
-                                        do_shape: true,
-                                        do_line:true,                                         
-                                        color:utils.color.grey,
-                                        color_line: utils.color.black,
-                                        texture_three: text_checker_three_grey, 
+        do_shape: true,
+        do_line:true,                                         
+        color:utils.color.grey,
+        color_line: utils.color.black,
+        texture_three: text_checker_three_grey, 
 
-                                        collision_category: utils.collision_category.inter,
-                                        collision_mask: utils.collision_category.mouse, 
-                                        constraints:[
-                                          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.99,damping:0.001,length:0.01},
-                                          {  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.99,damping:0.001,length:0.01}, 
-                                        ],
+        collision_category: utils.collision_category.inter,
+        collision_mask: utils.collision_category.mouse, 
+        constraints:[
+          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.99,damping:0.001,length:0.01},
+          {  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.99,damping:0.001,length:0.01}, 
+        ],
 
-                                        density:0.01, 
+        density:0.01, 
 
-                                        debug_matrix_info: false,
-                                        debug_matrix_axes: debug.matrix_axes,  
-                                        debug_cns_axes: debug.cns_axes,      
-                                        debug_force_visibility: debug.force_visibility,                                                                                 
-                                      })
+        debug_matrix_info: false,
+        debug_matrix_axes: debug.matrix_axes,  
+        debug_cns_axes: debug.cns_axes,      
+        debug_force_visibility: debug.force_visibility,                                                                                 
+      })
+
+                                            
+      // other
+
+
 
 
       m_shape = new Matrix()
@@ -615,6 +697,82 @@ export default class fidget_daft_i extends fidget{
                                               debug_cns_axes: debug.cns_axes,  
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             }))                                               
+      
+      this.bodies.effects.movA_trails.push(new body_build({ ...oRect, 
+                                              name:'effect_movA_trails1',
+
+                                              m_offset:om_rD,
+                                              m_shape:m_shape,
+
+                                              do_shape: true,
+                                              do_line:false,                                         
+                                              color:utils.color.red,
+                                              //color_line: utils.color.black,
+                                              //texture_three: text_checker_three_grey, 
+
+                                              collision_category: utils.collision_category.none,
+                                              collision_mask: utils.collision_category.none,                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangles[3],  stiffness: 0.15},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangles[3], stiffness: 0.15}, 
+                                              ],
+
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
+                                            }))    
+      this.bodies.effects.movA_trails.push(new body_build({ ...oRect, 
+                                              name:'effect_movA_trails2',
+
+                                              m_offset:om_rD,
+                                              m_shape:m_shape,
+
+                                              do_shape: true,
+                                              do_line:false,                                         
+                                              color:utils.color.blue,
+                                              //color_line: utils.color.black,
+                                              //texture_three: text_checker_three_grey, 
+
+                                              collision_category: utils.collision_category.none,
+                                              collision_mask: utils.collision_category.none,                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangles[3],  stiffness: 0.2},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangles[3], stiffness: 0.2}, 
+                                              ],
+
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
+                                            }))                                             
+      this.bodies.effects.movA_trails.push(new body_build({ ...oRect, 
+                                              name:'effect_movA_trails3',
+
+                                              m_offset:om_rD,
+                                              m_shape:m_shape,
+
+                                              do_shape: true,
+                                              do_line:false,                                         
+                                              color:utils.color.green,
+                                              //color_line: utils.color.black,
+                                              //texture_three: text_checker_three_grey, 
+
+                                              collision_category: utils.collision_category.none,
+                                              collision_mask: utils.collision_category.none,                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangles[3],  stiffness: 0.3},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangles[3], stiffness: 0.3}, 
+                                              ],
+
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,     
+                                              debug_force_visibility: debug.force_visibility,                                                          
+                                            }))                                              
       // other
 
       m_shape = new Matrix()
@@ -1224,8 +1382,8 @@ export default class fidget_daft_i extends fidget{
                         
       } 
       om_EA1 = new Matrix()
-      om_EA1.setTranslation(0,0)
-      om_EA1.setRotation(rad(-90))                                       
+      om_EA1.setTranslation(0,200)
+      om_EA1.setRotation(rad(90))                                      
       this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
                                               name:'effect_colC_sparcles1',
 
@@ -1238,8 +1396,8 @@ export default class fidget_daft_i extends fidget{
                                             })) 
 
       om_EA1 = new Matrix()
-      om_EA1.setTranslation(0,0)
-      om_EA1.setRotation(rad(-135))                                       
+      om_EA1.setTranslation(0,200)
+      om_EA1.setRotation(rad(45))                                       
       this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
                                               name:'effect_colC_sparcles2',
 
@@ -1251,8 +1409,8 @@ export default class fidget_daft_i extends fidget{
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
       om_EA1 = new Matrix()
-      om_EA1.setTranslation(0,0)
-      om_EA1.setRotation(rad(-45))                                       
+      om_EA1.setTranslation(0,200)
+      om_EA1.setRotation(rad(135))                                       
       this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
                                               name:'effect_colC_sparcles3',
 
@@ -1461,7 +1619,6 @@ export default class fidget_daft_i extends fidget{
         this.bodies.effects.colA_wall.enable(1)
 
         let m = new Matrix(this.bodies.effects.colA_wall.m_shape_init)
-        console.log(this.state.steps[step].update_count)
         m = m.scale(0.01+this.state.steps[step].update_count*0.1,1)
         this.bodies.effects.colA_wall.update_shape_coords(m)
       }
@@ -1477,7 +1634,11 @@ export default class fidget_daft_i extends fidget{
       if( this.state.steps[step].update_count < 40) 
       {
         for( let i=0; i < this.bodies.effects.colA_shapes.length; i++)
-          this.bodies.effects.colA_shapes[i].enable(1)           
+          this.bodies.effects.colA_shapes[i].enable(1)   
+          
+          for( let i=0; i < this.bodies.effects.movA_trails.length; i++)
+          this.bodies.effects.movA_trails[i].enable(1)    
+                  
       }            
          
       //_________________________________________________________________Mouse
@@ -1576,11 +1737,14 @@ export default class fidget_daft_i extends fidget{
         for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
           this.bodies.effects.colB_sparcles[i].enable(1)
       }      
-            
+
       if( this.state.steps[step].update_count < 40) 
       {
         for( let i=0; i < this.bodies.effects.colB_shapes.length; i++)
-          this.bodies.effects.colB_shapes[i].enable(1)           
+          this.bodies.effects.colB_shapes[i].enable(1)    
+          
+        for( let i=0; i < this.bodies.effects.movB_trails.length; i++)
+          this.bodies.effects.movB_trails[i].enable(1)             
       }   
 
       
@@ -1647,6 +1811,13 @@ export default class fidget_daft_i extends fidget{
         }
 
       }   
+
+      if( this.state.steps[step].update_count < 40) 
+      {
+
+        for( let i=0; i < this.bodies.effects.movB_trails.length; i++)
+          this.bodies.effects.movB_trails[i].enable(1)             
+      }         
       //_________________________________________________________________Mouse
       
       if(this.debug_mode.switch_selected_inter_help)

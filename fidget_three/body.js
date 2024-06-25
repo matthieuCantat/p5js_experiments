@@ -747,7 +747,11 @@ export default class body_build{
           //'5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef, 2) + ' / 1',
         ]
         this.draw_text_debug.update_three(texts_to_draw)
-      }      
+      }  
+      
+      
+      // mouse cns
+      
 
     }
 
