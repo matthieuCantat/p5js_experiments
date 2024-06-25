@@ -299,7 +299,7 @@ export class Mouse_manager
 
                 if(this.selection_delta != null)
                 {
-                    //pos = this.selection_delta.getMult(m)
+                    pos = this.selection_delta.getMult(m)
                 }
                 else{
                     this.selection_delta = mouse_pos.getMult(m.getInverse())
