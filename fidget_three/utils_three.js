@@ -291,12 +291,13 @@ export class Mouse_manager
         let delta = new Vector()
         let do_break = false
         let fidget_selected_body = null
+        let m = null
         if(selected_body != null  )
         {
             fidget_selected_body = this.fidget.get_selected_body()
             if( fidget_selected_body != null)
             {
-                let m = fidget_selected_body.get_out_matrix()
+                m = fidget_selected_body.get_out_matrix()
 
                 if(this.selection_delta != null)
                 {
@@ -345,6 +346,7 @@ export class Mouse_manager
                 'selected_body : ' + fidget_selected_body.name,
                 'mouse_lock_selection : ' + this.mouse_lock_selection,
                 'selection_delta : ' + Math.round(selection_delta.x) + ' | ' + Math.round(selection_delta.y),
+                'm : ' + Math.round(m.a) + ' | ' + Math.round(m.b) + ' | ' +Math.round(m.c) + ' | ' +Math.round(m.d) + ' | ' +Math.round(m.e) + ' | ' +Math.round(m.f),
                 'pos : ' + Math.round(pos.x()) + ' | ' + Math.round(pos.y()),
                 'mouse_pos : ' + Math.round(mouse_pos.x()) + ' | ' + Math.round(mouse_pos.y()),
                 'delta : ' + Math.round(delta.x()) + ' | ' + Math.round(delta.y()),
