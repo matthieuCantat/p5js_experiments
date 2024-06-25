@@ -290,7 +290,7 @@ export class Mouse_manager
         let do_break = false
         let fidget_selected_body = null
         let m = null
-        if(selected_body != null  )
+        if((userIsInteracting)&&(selected_body != null  ))
         {
             fidget_selected_body = this.fidget.get_selected_body()
             if( fidget_selected_body != null)
@@ -301,7 +301,8 @@ export class Mouse_manager
                 {
                     pos = this.selection_delta.getMult(m)
                 }
-                else{
+                else
+                {
                     this.selection_delta = mouse_pos.getMult(m.getInverse())
                     pos = mouse_pos
                 }
@@ -316,6 +317,10 @@ export class Mouse_manager
                     pos = mouse_pos
                     this.selection_delta = null 
                 } 
+            }
+            else
+            {
+                this.selection_delta = null                   
             }           
         }
         else{
