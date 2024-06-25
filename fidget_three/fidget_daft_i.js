@@ -69,9 +69,9 @@ export default class fidget_daft_i extends fidget{
             'geos','rectangle',  
             'effects','movA_trails',       
             'geos','rectangles',
-            'helpers','stepA',
-            'helpers','stepB',
-            'helpers','stepC', 
+            //'helpers','stepA',
+            //'helpers','stepB',
+            //'helpers','stepC', 
             'effects','colA_sparcles',       
             'effects','colA_shapes',
             'effects','colA_wall',           
@@ -2072,7 +2072,7 @@ export default class fidget_daft_i extends fidget{
   animate_three()
   {
     this.bodies_animate_three()
-    this.draw_help_three()
+    //this.draw_help_three()
   }  
 }
   

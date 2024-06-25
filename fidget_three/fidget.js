@@ -52,7 +52,7 @@ export default class fidget{
     this.anim_mode = false
     this.matter_engine = matter_engine
     this.mouse_constraint = mouse_constraint
-    this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, true)
+    this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, this.debug_mode.mouse_info)
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
