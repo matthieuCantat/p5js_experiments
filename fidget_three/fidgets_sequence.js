@@ -144,12 +144,12 @@ export default class fidgets_sequence
       if(this.debug_mode.fidget_steps_info)
       {
         let texts_to_draw = [
-          /*
+          
           'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
           'mouse position : ' + mouseX + ' : '+mouseY ,
           'user is interacting : '+ userIsInteracting,
-          */
           
+          /*
           'count : ' + this.fidgets[0].state.update_count,
           'res : ' + Math.round( this.fidgets[0].state.resolution_coef, 2 ) + ' / 4',
           'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,
@@ -165,6 +165,7 @@ export default class fidgets_sequence
           '4 - res Coef: ' + Math.round( this.fidgets[0].state.steps[4].resoluton_coef, 2) + ' / 1',
           '5 - count: ' + this.fidgets[0].state.steps[5].update_count,
           '5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef, 2) + ' / 1',
+          */
           
         ]
         this.draw_text_debug.update_three(texts_to_draw)
