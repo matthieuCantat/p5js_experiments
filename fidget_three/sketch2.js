@@ -61,11 +61,11 @@ var nbr = 1
 var debug = { disable_animation:true,
               switch_selected_inter_help:false,
               force_visibility:false,
-              show_inter:false,
+              show_inter:true,
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,
-              mouse_info:false,
+              mouse_info:true,
                 }
 
 var ground_enable = false
