@@ -223,11 +223,11 @@ export class Mouse_manager
     }
 
     setup(scene)
-    {
-        
+    {  
         let mouse_pos = new Vector( mouseX, mouseY) 
 
         let pos = new Vector( mouseX, mouseY) 
+        /*
         var selected_body = this.mouse_constraint.constraint.bodyB
         if( selected_body != null )
         {
@@ -242,19 +242,15 @@ export class Mouse_manager
                     pos = this.selection_delta.getMult(m)
                 }
                 else{
-                    this.selection_delta = mouse_pos.getMult(m.getInverse())
+                    //this.selection_delta = mouse_pos.getMult(m.getInverse())
                     pos = mouse_pos
                 }
             }
-
-
-
         }
         else{
             this.selection_delta = null
-
         }
-            
+        */    
         
         let shape_coords = line( 
             convert_coords_matter_to_three(pos,this.screen_dims), 
