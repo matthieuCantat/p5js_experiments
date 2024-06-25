@@ -52,7 +52,7 @@ export default class fidget{
     this.anim_mode = false
     this.matter_engine = matter_engine
     this.mouse_constraint = mouse_constraint
-    this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this)
+    this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, true)
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
@@ -658,7 +658,7 @@ export default class fidget{
   {
     if(this.Mouse.mouse_lock_selection)
       return
-      
+
     if( mouse_cns.constraint.bodyB != null )
     {
       let body_to_highlight = []

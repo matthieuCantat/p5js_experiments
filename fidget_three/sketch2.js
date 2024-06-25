@@ -64,7 +64,7 @@ var debug = { disable_animation:true,
               show_inter:false,
               matrix_axes:false,
               cns_axes:false,
-              fidget_steps_info:true,
+              fidget_steps_info:false,
                 }
 
 var ground_enable = false

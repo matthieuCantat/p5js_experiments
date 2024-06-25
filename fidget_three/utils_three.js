@@ -1,7 +1,7 @@
 
 import * as THREE from 'three';
 import Vector from './vector.js'
-import { rad, convert_coords_matter_to_three, mouseX, mouseY, switch_selection, userIsInteracting} from './utils.js';
+import { rad, convert_coords_matter_to_three, mouseX, mouseY, switch_selection, userIsInteracting, Draw_text_debug} from './utils.js';
 
 
 
@@ -202,7 +202,7 @@ export function convert_to_three_color(color_array)
 
 export class Mouse_manager
 {
-    constructor(mouse_constraint,screen_dims,fidget)
+    constructor(mouse_constraint,screen_dims,fidget,debug)
     {
         this.mouse_constraint = mouse_constraint
         this.screen_dims = screen_dims
@@ -212,6 +212,14 @@ export class Mouse_manager
         this.break_dist = 60.0
         this.selection_delta = null
         this.mouse_lock_selection = false
+
+        this.draw_text_debug = null
+        this.debug = debug
+        if(this.debug)
+        {
+            this.draw_text_debug = new Draw_text_debug(this.screen_dims)
+            this.draw_text_debug.mouse_cns = this.mouse_constraint
+        }         
     }
 
     setup(scene)
@@ -256,6 +264,9 @@ export class Mouse_manager
                 [255,255,0])
     
         scene.add( this.mesh_line )
+
+        if(this.debug)
+            this.draw_text_debug.setup_three(scene)        
     
     }
 
@@ -271,14 +282,18 @@ export class Mouse_manager
                 switch_selection( this.mouse_constraint, null) 
             }
         }
-        
+
         let mouse_pos = new Vector( mouseX, mouseY) 
 
         let pos = new Vector( mouseX, mouseY) 
         var selected_body = this.mouse_constraint.constraint.bodyB
+
+        let delta = new Vector()
+        let do_break = false
+        let fidget_selected_body = null
         if(selected_body != null  )
         {
-            let fidget_selected_body = this.fidget.get_selected_body()
+            fidget_selected_body = this.fidget.get_selected_body()
             if( fidget_selected_body != null)
             {
                 let m = fidget_selected_body.get_out_matrix()
@@ -292,10 +307,10 @@ export class Mouse_manager
                     pos = mouse_pos
                 }
 
-                let delta = mouse_pos.getSub(pos)
+                delta = mouse_pos.getSub(pos)
 
-
-                if(this.break_dist<delta.mag())
+                do_break = this.break_dist<delta.mag()
+                if(do_break)
                 {
                     this.mouse_lock_selection = true
                     switch_selection( this.mouse_constraint, null) 
@@ -313,5 +328,33 @@ export class Mouse_manager
             convert_coords_matter_to_three(pos,this.screen_dims), 
             convert_coords_matter_to_three(mouse_pos,this.screen_dims) );        
         this.mesh_line.geometry.setFromPoints(shape_coords.getPoints());
+
+       
+        if(this.debug)
+        {
+          let selection_delta = {x:0,y:0}
+          if(this.selection_delta != null)
+            selection_delta = this.selection_delta.get_value()
+            
+
+          let texts_to_draw = []
+
+          if(fidget_selected_body != null)
+          {
+            texts_to_draw = [
+                'selected_body : ' + fidget_selected_body.name,
+                'mouse_lock_selection : ' + this.mouse_lock_selection,
+                'selection_delta : ' + Math.round(selection_delta.x) + ' | ' + Math.round(selection_delta.y),
+                'pos : ' + Math.round(pos.x()) + ' | ' + Math.round(pos.y()),
+                'mouse_pos : ' + Math.round(mouse_pos.x()) + ' | ' + Math.round(mouse_pos.y()),
+                'delta : ' + Math.round(delta.x()) + ' | ' + Math.round(delta.y()),
+                'delta_length : ' + Math.round(delta.mag()),
+                'break_dist : ' + this.break_dist,
+                'do_break : ' + do_break,
+            ]   
+          }
+
+          this.draw_text_debug.update_three(texts_to_draw)
+        }        
     }
 }
