@@ -280,6 +280,8 @@ export class Mouse_manager
         }
 
         let mouse_pos = new Vector( mouseX, mouseY) 
+        if( mouse_pos.mag() == 0)
+            return
 
         let pos = new Vector( mouseX, mouseY) 
         var selected_body = this.mouse_constraint.constraint.bodyB
