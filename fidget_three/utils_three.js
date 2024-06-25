@@ -1,7 +1,7 @@
 
 import * as THREE from 'three';
 import Vector from './vector.js'
-import { rad} from './utils.js';
+import { rad, convert_coords_matter_to_three, mouseX, mouseY, switch_selection, userIsInteracting} from './utils.js';
 
 
 
@@ -197,4 +197,121 @@ export function get_texture_grid_checker_grey()
 export function convert_to_three_color(color_array)
 {
     return new THREE.Color("rgb("+Math.floor(color_array[0])+", "+Math.floor(color_array[1])+", "+Math.floor(color_array[2])+")");
+}
+
+
+export class Mouse_manager
+{
+    constructor(mouse_constraint,screen_dims,fidget)
+    {
+        this.mouse_constraint = mouse_constraint
+        this.screen_dims = screen_dims
+        this.fidget = fidget
+        this.mesh_line = null
+
+        this.break_dist = 60.0
+        this.selection_delta = null
+        this.mouse_lock_selection = false
+    }
+
+    setup(scene)
+    {
+        
+        let mouse_pos = new Vector( mouseX, mouseY) 
+
+        let pos = new Vector( mouseX, mouseY) 
+        var selected_body = this.mouse_constraint.constraint.bodyB
+        if( selected_body != null )
+        {
+            let fidget_selected_body = this.fidget.get_selected_body()
+            if( fidget_selected_body != null)
+            {
+                let m = fidget_selected_body.get_out_matrix()
+
+                let delta = new Vector()
+                if(this.selection_delta != null)
+                {
+                    pos = this.selection_delta.getMult(m)
+                }
+                else{
+                    this.selection_delta = mouse_pos.getMult(m.getInverse())
+                    pos = mouse_pos
+                }
+            }
+
+
+
+        }
+        else{
+            this.selection_delta = null
+
+        }
+            
+        
+        let shape_coords = line( 
+            convert_coords_matter_to_three(pos,this.screen_dims), 
+            convert_coords_matter_to_three(mouse_pos,this.screen_dims) );
+        this.mesh_line = addShape_line(  
+            shape_coords, 
+                [255,255,0])
+    
+        scene.add( this.mesh_line )
+    
+    }
+
+    update()
+    {
+        if(this.mouse_lock_selection)
+        {
+            if(userIsInteracting == false)
+            {
+                this.mouse_lock_selection = false
+            }
+            else{
+                switch_selection( this.mouse_constraint, null) 
+            }
+        }
+        
+        let mouse_pos = new Vector( mouseX, mouseY) 
+
+        let pos = new Vector( mouseX, mouseY) 
+        var selected_body = this.mouse_constraint.constraint.bodyB
+        if(selected_body != null  )
+        {
+            let fidget_selected_body = this.fidget.get_selected_body()
+            if( fidget_selected_body != null)
+            {
+                let m = fidget_selected_body.get_out_matrix()
+
+                if(this.selection_delta != null)
+                {
+                    pos = this.selection_delta.getMult(m)
+                }
+                else{
+                    this.selection_delta = mouse_pos.getMult(m.getInverse())
+                    pos = mouse_pos
+                }
+
+                let delta = mouse_pos.getSub(pos)
+
+
+                if(this.break_dist<delta.mag())
+                {
+                    this.mouse_lock_selection = true
+                    switch_selection( this.mouse_constraint, null) 
+                    pos = mouse_pos
+                    this.selection_delta = null 
+                } 
+            }           
+        }
+        else{
+            this.selection_delta = null
+        }
+
+
+        let shape_coords = line( 
+            convert_coords_matter_to_three(pos,this.screen_dims), 
+            convert_coords_matter_to_three(mouse_pos,this.screen_dims) );        
+        this.mesh_line.geometry.setFromPoints(shape_coords.getPoints());
+    }
 }

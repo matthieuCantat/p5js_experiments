@@ -2,9 +2,8 @@
 
 import Vector from './vector.js';
 import { utils, switch_selection } from './utils.js';
-import * as ut from './utils_three.js';
 import * as THREE from 'three';
-
+import { Mouse_manager } from './utils_three.js'
 class state_step_tpl{
   constructor()
   {
@@ -53,6 +52,7 @@ export default class fidget{
     this.anim_mode = false
     this.matter_engine = matter_engine
     this.mouse_constraint = mouse_constraint
+    this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this)
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
@@ -319,7 +319,6 @@ export default class fidget{
   bodies_setup_shapes_three( body_type_filter = [] )
   {
   
-    console.log('bodies_setup_shapes_three')
     this.group_three = new THREE.Group();
 
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
@@ -342,10 +341,11 @@ export default class fidget{
         
       } 
     }
+
+    this.Mouse.setup(this.group_three)
   }  
   bodies_animate_three( body_type_filter = [] )
   {
-    this.group_three = new THREE.Group();
 
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
@@ -368,6 +368,8 @@ export default class fidget{
         
       } 
     }
+
+    this.Mouse.update()
   }  
   /*
   bodies_set_visibility_three( value,body_type_filter = [] )
@@ -620,9 +622,43 @@ export default class fidget{
     } 
   }
 
+  get_selected_body(body_type_filter = [] )
+  {
+    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    {   
+      let b_type = this.bodies_draw_order[i+0]
+      let key = this.bodies_draw_order[i+1]
+       
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      {
+
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
+            if(this.bodies[b_type][key][i].is_selected)
+              return this.bodies[b_type][key][i]           
+          }
+            
+        }
+        else
+
+          if(this.bodies[b_type][key].is_selected)
+            return this.bodies[b_type][key]
+        
+      } 
+    }   
+    
+    return null
+    
+  }
+
 
   mouse_select_highlight(mouse_cns,body_type_filter = [] )
   {
+    if(this.Mouse.mouse_lock_selection)
+      return
+      
     if( mouse_cns.constraint.bodyB != null )
     {
       let body_to_highlight = []

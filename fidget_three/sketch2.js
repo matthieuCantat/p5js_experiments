@@ -30,7 +30,7 @@ event.preventDefault();
 
 var matter_engine = Matter.Engine.create();
 
-var mouseConstraint = Matter.MouseConstraint.create(matter_engine, {
+var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
   //mouse: mouse,
   collisionFilter: {category: utils.collision_category.mouse, mask: utils.collision_category.inter}, // <---
   constraint: {
@@ -45,7 +45,7 @@ var mouseConstraint = Matter.MouseConstraint.create(matter_engine, {
 });
 
 
-Matter.Composite.add(matter_engine.world, mouseConstraint);
+Matter.Composite.add(matter_engine.world, mouse_constraint);
 
 
 
@@ -73,6 +73,7 @@ var ground_enable = false
 
 /////////////////////////////////////////// variables
 var F_sequence = null
+
 var shdrs = [] 
 
 
@@ -88,7 +89,7 @@ let m = new Matrix()
 m.setTranslation(width/2, height/2 )
 
 let s = 2.2
-F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, matter_engine, mouseConstraint, shdrs,debug)
+F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, matter_engine, mouse_constraint, shdrs,debug)
 F_sequence.setup()
 
 
@@ -133,6 +134,8 @@ function init() {
     F_sequence.setup_shapes_fidgets_three(scene)
     F_sequence.setup_chrono_three(scene)
     F_sequence.setup_debug_three(scene)
+
+
 
     ///////////////// Background shader
     uniforms = {
@@ -193,5 +196,9 @@ function animate() {
     uniforms[ 'time' ].value = performance.now() / 1000;
     renderer.render( scene, camera );
     stats.update();
+    
 
 }
+
+
+
