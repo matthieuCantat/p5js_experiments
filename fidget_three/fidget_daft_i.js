@@ -37,9 +37,15 @@ export default class fidget_daft_i extends fidget{
             rectangles:[],
           },
           effects : {
-            A:[],
-            B:[],
-            C:[],
+            colA_sparcles:[],
+            colA_shapes:[],
+            colA_wall:null,
+            colB_sparcles:[],
+            colB_shapes:[],
+            colB_wall:null,
+            colC_sparcles:[],
+            colC_shapes:[],
+            colC_wall:null,
           },
           helpers : {
             stepA:null,
@@ -62,9 +68,15 @@ export default class fidget_daft_i extends fidget{
             'helpers','stepA',
             'helpers','stepB',
             'helpers','stepC', 
-            'effects','A',                  
-            'effects','B', 
-            'effects','C',                               
+            'effects','colA_sparcles',       
+            'effects','colA_shapes',
+            'effects','colA_wall',           
+            'effects','colB_sparcles', 
+            'effects','colB_shapes', 
+            'effects','colB_wall', 
+            'effects','colC_sparcles', 
+            //'effects','colC_shapes',
+            //'effects','colC_wall',                                        
             ]         
       
         this.end_step = 4
@@ -110,7 +122,7 @@ export default class fidget_daft_i extends fidget{
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
       type: utils.shape.rectangle,
-      density:0.05, 
+      density:0.01, 
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
       mouse_constraint: this.mouse_constraint,
@@ -273,7 +285,7 @@ export default class fidget_daft_i extends fidget{
           {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.99,damping:0.001,length:0.01},
           {  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.99,damping:0.001,length:0.01},                                          
         ],                                      
-        density:0.05,     
+        density:0.01,     
         
         debug_matrix_info: false,
         debug_matrix_axes: debug.matrix_axes,  
@@ -363,7 +375,7 @@ export default class fidget_daft_i extends fidget{
                                           {  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.99,damping:0.001,length:0.01}, 
                                         ],
 
-                                        density:0.05, 
+                                        density:0.01, 
 
                                         debug_matrix_info: false,
                                         debug_matrix_axes: debug.matrix_axes,  
@@ -641,7 +653,7 @@ export default class fidget_daft_i extends fidget{
                                           { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
                                         ],      
 
-                                        density:0.05, 
+                                        density:0.01, 
 
                                         debug_matrix_info: false,
                                         debug_matrix_axes: debug.matrix_axes,  
@@ -686,7 +698,7 @@ export default class fidget_daft_i extends fidget{
                                                     collision_category: utils.collision_category.none,
                                                     collision_mask: utils.collision_category.none ,
                                                  
-                                                    density:0.05,    
+                                                    density:0.01,    
                                                     }) 
 
 
@@ -728,7 +740,7 @@ export default class fidget_daft_i extends fidget{
                                         { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001 },
                                       ], 
 
-                                      density:0.05, 
+                                      density:0.01, 
 
                                       debug_matrix_info: false,
                                       debug_matrix_axes: debug.matrix_axes,  
@@ -771,7 +783,7 @@ export default class fidget_daft_i extends fidget{
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
                                                   
-                                                  density:0.05, 
+                                                  density:0.01, 
 
                                                   }) 
     var om_iA = new Matrix()
@@ -813,7 +825,7 @@ export default class fidget_daft_i extends fidget{
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ], 
 
-                                    density:0.05, 
+                                    density:0.01, 
              
                                     debug_matrix_info: false,
                                     debug_matrix_axes: debug.matrix_axes,  
@@ -854,8 +866,8 @@ export default class fidget_daft_i extends fidget{
       var om_EA1 = new Matrix()
       om_EA1.setTranslation(-145,15)
       om_EA1.setRotation(rad(90))                                       
-      this.bodies.effects.A.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_A1',
+      this.bodies.effects.colA_sparcles.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colA_sparcles1',
 
                                               m_offset:om_EA1,
 
@@ -864,12 +876,33 @@ export default class fidget_daft_i extends fidget{
                                               debug_cns_axes: debug.cns_axes,  
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
+
+      m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
+      this.bodies.effects.colA_shapes.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colA_shape1',
+
+                                              m_offset:om_EA1,
+                                              m_shape: m_shape_modif,
+                                              z:z_depth, 
+                                              type: utils.shape.rectangle,
+
+                                              do_shape: false,
+                                              do_line:true, 
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            }))                                             
+
 
       om_EA1 = new Matrix()
       om_EA1.setTranslation(-145,15)
       om_EA1.setRotation(rad(45))                                       
-      this.bodies.effects.A.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_A1',
+      this.bodies.effects.colA_sparcles.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colA_sparcles2',
 
                                               m_offset:om_EA1,
 
@@ -878,11 +911,33 @@ export default class fidget_daft_i extends fidget{
                                               debug_cns_axes: debug.cns_axes,  
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
+
+
+      m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
+      this.bodies.effects.colA_shapes.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colA_shape1',
+
+                                              m_offset:om_EA1,
+                                              m_shape: m_shape_modif,
+                                              z:z_depth, 
+                                              type: utils.shape.rectangle,
+
+                                              do_shape: false,
+                                              do_line:true, 
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            }))                                             
+
       om_EA1 = new Matrix()
       om_EA1.setTranslation(-145,15)
       om_EA1.setRotation(rad(135))                                       
-      this.bodies.effects.A.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_A1',
+      this.bodies.effects.colA_sparcles.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colA_sparcles3',
 
                                               m_offset:om_EA1,
 
@@ -892,7 +947,72 @@ export default class fidget_daft_i extends fidget{
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
 
+      m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
+      this.bodies.effects.colA_shapes.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colA_shape1',
 
+                                              m_offset:om_EA1,
+                                              m_shape: m_shape_modif,
+                                              z:z_depth, 
+                                              type: utils.shape.rectangle,
+
+                                              do_shape: false,
+                                              do_line:true, 
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            }))                                             
+
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(55*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(1.*s))
+
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(-145,4)
+      om_EA1.setRotation(rad(0))                                       
+      this.bodies.effects.colA_wall = new body_build({  
+                                    screen_dims: this.screen_dims,
+                                    matter_engine: this.matter_engine,
+                                    mouse_constraint: this.mouse_constraint,
+
+                                    name:'effect_colA_wall',     
+                                    highlight_selection:[this.bodies.geos.rectangles[3]],  
+
+                                    m:this.m,
+                                    parent:this.bodies.inters.background,                                    
+                                    m_offset:om_EA1,
+                                    m_shape:m_shape,
+                                    z:z_depth,
+                                    type : utils.shape.rectangle,
+
+                                    do_shape: true,
+                                    do_line:false,                                       
+                                    color:utils.color.white,
+                                    color_line: utils.color.black,
+                                    //texture_three: text_checker_three_grey, 
+                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
+                                    collision_category: utils.collision_category.none,
+                                    collision_mask: utils.collision_category.none,
+                               
+
+                                    density:0.01, 
+             
+                                    debug_matrix_info: false,
+                                    debug_matrix_axes: debug.matrix_axes,  
+                                    debug_cns_axes: debug.cns_axes, 
+                                    debug_force_visibility: debug.force_visibility,                                                                                
+                                  }) 
+
+
+
+
+      ////////////////////////////////////////////////////////////////////
 
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
@@ -925,8 +1045,8 @@ export default class fidget_daft_i extends fidget{
       om_EA1 = new Matrix()
       om_EA1.setTranslation(15,-80)
       om_EA1.setRotation(rad(0))                                       
-      this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_B1',
+      this.bodies.effects.colB_sparcles.push(new body_build({ ...oEffectsB, 
+                                              name:'effect_colB_sparcles1',
 
                                               m_offset:om_EA1,
 
@@ -935,12 +1055,34 @@ export default class fidget_daft_i extends fidget{
                                               debug_cns_axes: debug.cns_axes,  
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
+
+
+      m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
+      this.bodies.effects.colB_shapes.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colB_shape1',
+
+                                              m_offset:om_EA1,
+                                              m_shape: m_shape_modif,
+                                              z:z_depth, 
+                                              type: utils.shape.rectangle,
+
+                                              do_shape: false,
+                                              do_line:true, 
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            }))                                             
+
 
       om_EA1 = new Matrix()
       om_EA1.setTranslation(15,-80)
       om_EA1.setRotation(rad(45))                                       
-      this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_B2',
+      this.bodies.effects.colB_sparcles.push(new body_build({ ...oEffectsB, 
+                                              name:'effect_colB_sparcles2',
 
                                               m_offset:om_EA1,
 
@@ -949,11 +1091,34 @@ export default class fidget_daft_i extends fidget{
                                               debug_cns_axes: debug.cns_axes,  
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
+
+
+
+      m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
+      this.bodies.effects.colB_shapes.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colB_shape2',
+
+                                              m_offset:om_EA1,
+                                              m_shape: m_shape_modif,
+                                              z:z_depth, 
+                                              type: utils.shape.rectangle,
+
+                                              do_shape: false,
+                                              do_line:true, 
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            }))   
+
       om_EA1 = new Matrix()
       om_EA1.setTranslation(15,-80)
       om_EA1.setRotation(rad(-45))                                       
-      this.bodies.effects.B.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_B3',
+      this.bodies.effects.colB_sparcles.push(new body_build({ ...oEffectsB, 
+                                              name:'effect_colB_sparcles3',
 
                                               m_offset:om_EA1,
 
@@ -964,7 +1129,71 @@ export default class fidget_daft_i extends fidget{
                                             })) 
 
 
+      m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
+      this.bodies.effects.colB_shapes.push(new body_build({ ...oEffectsA, 
+                                              name:'effect_colB_shape2',
 
+                                              m_offset:om_EA1,
+                                              m_shape: m_shape_modif,
+                                              z:z_depth, 
+                                              type: utils.shape.rectangle,
+
+                                              do_shape: false,
+                                              do_line:true, 
+
+                                              debug_matrix_info: false,
+                                              debug_matrix_axes: debug.matrix_axes,  
+                                              debug_cns_axes: debug.cns_axes,  
+                                              debug_force_visibility: debug.force_visibility,                                                         
+                                            }))                                               
+
+
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(55*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(1.*s))
+
+      om_EA1 = new Matrix()
+      om_EA1.setTranslation(20,-80)
+      om_EA1.setRotation(rad(90))                                       
+      this.bodies.effects.colB_wall = new body_build({  
+                                    screen_dims: this.screen_dims,
+                                    matter_engine: this.matter_engine,
+                                    mouse_constraint: this.mouse_constraint,
+
+                                    name:'effect_colB_wall',     
+                                    highlight_selection:[this.bodies.geos.rectangles[3]],  
+
+                                    m:this.m,
+                                    parent:this.bodies.inters.background,                                    
+                                    m_offset:om_EA1,
+                                    m_shape:m_shape,
+                                    z:z_depth,
+                                    type : utils.shape.rectangle,
+
+                                    do_shape: true,
+                                    do_line:false,                                       
+                                    color:utils.color.white,
+                                    color_line: utils.color.black,
+                                    //texture_three: text_checker_three_grey, 
+                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
+                                    collision_category: utils.collision_category.none,
+                                    collision_mask: utils.collision_category.none,
+                               
+
+                                    density:0.01, 
+             
+                                    debug_matrix_info: false,
+                                    debug_matrix_axes: debug.matrix_axes,  
+                                    debug_cns_axes: debug.cns_axes, 
+                                    debug_force_visibility: debug.force_visibility,                                                                                
+                                  }) 
+
+
+      //////////////////////////////////////////////////////////
 
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
@@ -997,8 +1226,8 @@ export default class fidget_daft_i extends fidget{
       om_EA1 = new Matrix()
       om_EA1.setTranslation(0,0)
       om_EA1.setRotation(rad(-90))                                       
-      this.bodies.effects.C.push(new body_build({ ...oEffectsC, 
-                                              name:'effect_C1',
+      this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
+                                              name:'effect_colC_sparcles1',
 
                                               m_offset:om_EA1,
 
@@ -1011,8 +1240,8 @@ export default class fidget_daft_i extends fidget{
       om_EA1 = new Matrix()
       om_EA1.setTranslation(0,0)
       om_EA1.setRotation(rad(-135))                                       
-      this.bodies.effects.C.push(new body_build({ ...oEffectsC, 
-                                              name:'effect_C2',
+      this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
+                                              name:'effect_colC_sparcles2',
 
                                               m_offset:om_EA1,
 
@@ -1024,8 +1253,8 @@ export default class fidget_daft_i extends fidget{
       om_EA1 = new Matrix()
       om_EA1.setTranslation(0,0)
       om_EA1.setRotation(rad(-45))                                       
-      this.bodies.effects.C.push(new body_build({ ...oEffectsC, 
-                                              name:'effect_C3',
+      this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
+                                              name:'effect_colC_sparcles3',
 
                                               m_offset:om_EA1,
 
@@ -1069,7 +1298,7 @@ export default class fidget_daft_i extends fidget{
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
 
-                                                  density:0.05,  
+                                                  density:0.01,  
                                                   })      
                                                   
                                                   
@@ -1211,19 +1440,45 @@ export default class fidget_daft_i extends fidget{
         this.bodies.inters.B.rot_override = res_coef*rad(90)
       }      
       //_________________________________________________________________effects
-      for( let i=0; i < this.bodies.effects.A.length; i++)
-      {
-        if( this.state.steps[step].update_count < 20) 
-          this.bodies.effects.A[i].enable(1)
 
-        if(this.state.steps[step].update_count == 0)  
+
+
+    
+
+      if(this.state.steps[step].update_count == 0)  
+      {      
+        for( let i=0; i < this.bodies.effects.colA_sparcles.length; i++)
         {
           let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.A[i].get_rotation())
-          this.bodies.effects.A[i].apply_force( this.bodies.effects.A[i].get_position(), force )
+          force = force.rotate(this.bodies.effects.colA_sparcles[i].get_rotation())
+          let pos = this.bodies.effects.colA_sparcles[i].get_position()
+          this.bodies.effects.colA_sparcles[i].apply_force( pos, force )
+          this.bodies.effects.colA_shapes[i].apply_force( pos, force.getMult(0.1) )
         }
-
       }
+      if( this.state.steps[step].update_count < 10) 
+      {
+        this.bodies.effects.colA_wall.enable(1)
+
+        let m = new Matrix(this.bodies.effects.colA_wall.m_shape_init)
+        console.log(this.state.steps[step].update_count)
+        m = m.scale(0.01+this.state.steps[step].update_count*0.1,1)
+        this.bodies.effects.colA_wall.update_shape_coords(m)
+      }
+
+
+      if( this.state.steps[step].update_count < 20) 
+      {
+        for( let i=0; i < this.bodies.effects.colA_sparcles.length; i++)
+          this.bodies.effects.colA_sparcles[i].enable(1)       
+      }
+
+
+      if( this.state.steps[step].update_count < 40) 
+      {
+        for( let i=0; i < this.bodies.effects.colA_shapes.length; i++)
+          this.bodies.effects.colA_shapes[i].enable(1)           
+      }            
          
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
@@ -1276,19 +1531,59 @@ export default class fidget_daft_i extends fidget{
       } 
 
       //_________________________________________________________________effects
-      for( let i=0; i < this.bodies.effects.B.length; i++)
+      /*
+      for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
       {
         if( this.state.steps[step].update_count < 20) 
-          this.bodies.effects.B[i].enable(1)
+          this.bodies.effects.colB_sparcles[i].enable(1)
 
         if(this.state.steps[step].update_count == 0)  
         {
           let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.B[i].get_rotation())
-          this.bodies.effects.B[i].apply_force( this.bodies.effects.B[i].get_position(), force )
+          force = force.rotate(this.bodies.effects.colB_sparcles[i].get_rotation())
+          this.bodies.effects.colB_sparcles[i].apply_force( this.bodies.effects.colB_sparcles[i].get_position(), force )
         }
 
-      }            
+      }
+      */ 
+
+
+      if(this.state.steps[step].update_count == 0)  
+      {      
+        for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
+        {
+          let force = new Vector(0.001, 0)
+          force = force.rotate(this.bodies.effects.colB_sparcles[i].get_rotation())
+          let pos = this.bodies.effects.colB_sparcles[i].get_position()
+          this.bodies.effects.colB_sparcles[i].apply_force( pos, force )
+          this.bodies.effects.colB_shapes[i].apply_force( pos, force.getMult(0.1) )
+        }
+      }
+
+
+      if( this.state.steps[step].update_count < 10) 
+      {
+        this.bodies.effects.colB_wall.enable(1)
+
+        let m = new Matrix(this.bodies.effects.colB_wall.m_shape_init)
+        m = m.scale(0.01+this.state.steps[step].update_count*0.5,1)
+        this.bodies.effects.colB_wall.update_shape_coords(m)
+      }
+      
+
+      if( this.state.steps[step].update_count < 20) 
+      {
+        for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
+          this.bodies.effects.colB_sparcles[i].enable(1)
+      }      
+            
+      if( this.state.steps[step].update_count < 40) 
+      {
+        for( let i=0; i < this.bodies.effects.colB_shapes.length; i++)
+          this.bodies.effects.colB_shapes[i].enable(1)           
+      }   
+
+      
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
       {      
@@ -1339,16 +1634,16 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Control
 
       //_________________________________________________________________effects
-      for( let i=0; i < this.bodies.effects.C.length; i++)
+      for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
       {
         if( this.state.steps[step].update_count < 20) 
-          this.bodies.effects.C[i].enable(1)
+          this.bodies.effects.colC_sparcles[i].enable(1)
 
         if(this.state.steps[step].update_count == 0)  
         {
           let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.C[i].get_rotation())
-          this.bodies.effects.C[i].apply_force( this.bodies.effects.C[i].get_position(), force )
+          force = force.rotate(this.bodies.effects.colC_sparcles[i].get_rotation())
+          this.bodies.effects.colC_sparcles[i].apply_force( this.bodies.effects.colC_sparcles[i].get_position(), force )
         }
 
       }   
