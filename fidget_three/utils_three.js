@@ -209,7 +209,7 @@ export class Mouse_manager
         this.fidget = fidget
         this.mesh_line = null
 
-        this.break_dist = 60.0
+        this.break_dist = 660.0
         this.selection_delta = null
         this.mouse_lock_selection = false
 
