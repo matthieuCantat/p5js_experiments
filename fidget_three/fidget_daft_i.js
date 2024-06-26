@@ -217,7 +217,7 @@ export default class fidget_daft_i extends fidget{
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
     m_shape.set_row(1,m_shape.get_row(1).getMult(50*s))
-        
+     
     this.bodies.geos.circle = new body_build({
                                     screen_dims: this.screen_dims,
                                     matter_engine: this.matter_engine,
@@ -2147,6 +2147,9 @@ export default class fidget_daft_i extends fidget{
   {
     this.bodies_cns_enable(false, ['geos'])
     
+    
+
+
     
     // custom color
     this.bodies_override_color(null, ['geos'])
