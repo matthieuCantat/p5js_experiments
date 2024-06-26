@@ -659,69 +659,67 @@ export default class fidget{
     if(this.Mouse.mouse_lock_selection)
       return
 
-    if( mouse_cns.constraint.bodyB != null )
-    {
-      let body_to_highlight = []
-      let body_to_reduce    = []
-      for( let k =0; k < this.bodies_draw_order.length; k+=2)
-      {   
-        let b_type = this.bodies_draw_order[k+0]
-        let key = this.bodies_draw_order[k+1]
-         
-        if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+    let body_to_highlight = []
+    let body_to_reduce    = []
+    for( let k =0; k < this.bodies_draw_order.length; k+=2)
+    {   
+      let b_type = this.bodies_draw_order[k+0]
+      let key = this.bodies_draw_order[k+1]
+        
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      {
+
+        if( this.bodies[b_type][key].constructor === Array)
         {
-
-          if( this.bodies[b_type][key].constructor === Array)
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            if( this.bodies[b_type][key][i].body == mouse_cns.constraint.bodyB )
             {
-              if( this.bodies[b_type][key][i].body == mouse_cns.constraint.bodyB )
-              {
-                this.bodies[b_type][key][i].color = utils.color.redLight
-                this.bodies[b_type][key][i].is_selected = true
+              this.bodies[b_type][key][i].color = utils.color.redLight
+              this.bodies[b_type][key][i].is_selected = true
 
-                for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
-                  body_to_highlight.push(this.bodies[b_type][key][i].highlight_selection[j])
-                
-              }
-              else
-              {
-                this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
-                this.bodies[b_type][key][i].is_selected = false
-
-                for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
-                  body_to_reduce.push(this.bodies[b_type][key][i].highlight_selection[j])  
-
-              }
-          
-            }
-          }
-          else
-          {
-            if( this.bodies[b_type][key].body == mouse_cns.constraint.bodyB )
-            {
-              this.bodies[b_type][key].color = utils.color.redLight
-              this.bodies[b_type][key].is_selected = true
-
-              for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
-                body_to_highlight.push(this.bodies[b_type][key].highlight_selection[j])  
-
+              for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
+                body_to_highlight.push(this.bodies[b_type][key][i].highlight_selection[j])
+              
             }
             else
             {
-              this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
-              this.bodies[b_type][key].is_selected = false
+              this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
+              this.bodies[b_type][key][i].is_selected = false
 
-              for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
-                body_to_reduce.push(this.bodies[b_type][key].highlight_selection[j])  
+              for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
+                body_to_reduce.push(this.bodies[b_type][key][i].highlight_selection[j])  
 
             }
+        
+          }
+        }
+        else
+        {
+          if( this.bodies[b_type][key].body == mouse_cns.constraint.bodyB )
+          {
+            this.bodies[b_type][key].color = utils.color.redLight
+            this.bodies[b_type][key].is_selected = true
+
+            for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
+              body_to_highlight.push(this.bodies[b_type][key].highlight_selection[j])  
+
+          }
+          else
+          {
+            this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
+            this.bodies[b_type][key].is_selected = false
+
+            for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
+              body_to_reduce.push(this.bodies[b_type][key].highlight_selection[j])  
 
           }
 
-           
-        } 
+        }
+
+          
       } 
+    
 
       for( let i = 0 ; i < body_to_reduce.length; i++)
       {
