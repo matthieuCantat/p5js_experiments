@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { rad, deg, snap_point_on_line, proj_vector_on_line} from './utils.js';
+import { rad, deg, snap_point_on_line, proj_vector_on_line, userIsInteracting} from './utils.js';
 //import { join } from 'path';
 
 
@@ -493,11 +493,9 @@ export class cns_axe{
       }
 
 
-      if(this.transfer_delta_as_parent_force)
+      if((this.transfer_delta_as_parent_force)&&(userIsInteracting))
       {
         let v_delta = p_out_before.getSub(p_out)
-        //v_delta.mult(0.1)
-        //console.log(p_out.get_value(),v_delta.get_value())
         this.Follower.parent.apply_force(p_out,v_delta)
       }
 
