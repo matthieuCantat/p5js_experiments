@@ -594,7 +594,7 @@ export default class fidget{
 
   bodies_enable( value,body_type_filter = [] )
   {
-    this.bodies_cns_enable(value,body_type_filter)
+    //this.bodies_cns_enable(value,body_type_filter)
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
