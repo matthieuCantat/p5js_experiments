@@ -481,18 +481,18 @@ export default class fidget{
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            for( let j = 0; j < this.bodies[b_type][key][i].constraints.length; j++)
+            for( var cns in this.bodies[b_type][key][i].constraints )
             {
-              this.bodies[b_type][key][i].constraints[j].enable(value)
+              this.bodies[b_type][key][i].constraints[cns].is_enable = value
             }
 
           }
 
         }
         else      
-          for( let j = 0; j < this.bodies[b_type][key].constraints.length; j++)
+          for( var cns in this.bodies[b_type][key].constraints )
           {
-            this.bodies[b_type][key].constraints[j].enable(value)          
+            this.bodies[b_type][key].constraints[cns].is_enable = value          
           }
   
       }  
