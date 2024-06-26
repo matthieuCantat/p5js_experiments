@@ -499,6 +499,10 @@ function handleTouchDown(event) {
   isScreenTouched = true;
   userIsInteracting = isScreenTouched || isMousePressed
   //console.log('Mouse is pressed:', isMousePressed);
+  // mouse must be update sooner
+  const touch = event.touches[0] || event.changedTouches[0]; 
+  mouseX = touch.clientX;
+  mouseY = touch.clientY;  
 }
 
 function handleTouchUp(event) {
