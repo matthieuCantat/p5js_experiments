@@ -293,6 +293,7 @@ export class cns_axe{
       this.debug = true  
       this.debug_pts = [null,null]
       this.current_pos = 0
+      this.transfer_delta_as_parent_force = true
       
       if( ( this.vLine == null )&&( this.Follower_axe != null) )
       {
@@ -367,7 +368,8 @@ export class cns_axe{
       let p_init       = m_init.get_row(2)
   
       let m_out        = this.Follower.get_out_matrix()
-      let p_out        = m_out.get_row(2)
+      let p_out_before        = m_out.get_row(2)
+      let p_out = new Vector(p_out_before)
   
       
       let p_rotCenter  = this.extra_rotation_center.getMult(m_parent)
@@ -489,6 +491,16 @@ export class cns_axe{
         } 
         
       }
+
+
+      if(this.transfer_delta_as_parent_force)
+      {
+        let v_delta = p_out_before.getSub(p_out)
+        //v_delta.mult(0.1)
+        //console.log(p_out.get_value(),v_delta.get_value())
+        this.Follower.parent.apply_force(p_out,v_delta)
+      }
+
       
       return true
     }

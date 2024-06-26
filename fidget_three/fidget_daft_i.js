@@ -29,6 +29,7 @@ export default class fidget_daft_i extends fidget{
             A:null,
             B:null,
             C:null,
+            test:[],
           },
           geos : {
             backgrounds:[],
@@ -80,7 +81,8 @@ export default class fidget_daft_i extends fidget{
             'effects','colB_wall', 
             'effects','colC_sparcles', 
             //'effects','colC_shapes',
-            //'effects','colC_wall',                                        
+            //'effects','colC_wall',    
+            'inters','test',                                     
             ]         
       
         this.end_step = 4
@@ -1458,12 +1460,270 @@ export default class fidget_daft_i extends fidget{
 
                                                   density:0.01,  
                                                   })      
-                                                  
-                                                  
-      this.bodies.inters.background.highlight_selection = [this.bodies.geos.circle,this.bodies.geos.rectangle,this.bodies.geos.rectangles[0],this.bodies.geos.rectangles[1],this.bodies.geos.rectangles[2]] 
-      //this.bodies.inters.B.highlight_selection = [this.bodies.geos.rectangle]
-      //this.bodies.inters.C.highlight_selection = [this.bodies.geos.rectangle]
-      //this.bodies.inters.A.highlight_selection = [this.bodies.geos.rectangles[3]]                                                  
+        
+      /*                                          
+      ////////////////////////////////////////////////////////////////////////////////////////// test                                            
+      
+      let m_ref = new Matrix()
+      m_ref.setTranslation(0,300)
+      //m_ref.setRotation(rad(45))
+      let scale_ref = 50
+      let pos_dist = 100
+      let neg_dist = 50
+      let col_thickness = 100
+      let margin = 1
+
+
+
+      let opt_test = {
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine,  
+        mouse_constraint: this.mouse_constraint,
+
+        parent:this.bodies.inters.background,
+      }
+
+      let m_offset_A = new Matrix(m_ref)
+
+      let p_ref = m_ref.get_row(2)
+      let vY_ref = m_ref.get_row(1)
+      vY_ref.normalize()
+      vY_ref.mult(scale_ref/2.0+col_thickness/2.0+margin)
+      let vX_ref = m_ref.get_row(0)
+      vX_ref.normalize()
+      let offset_pos = pos_dist - (pos_dist + neg_dist)/2
+      vX_ref.mult(offset_pos)
+      let p_offset = p_ref.getAdd(vY_ref).getAdd(vX_ref)
+      m_offset_A.set_row(2, p_offset)
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(pos_dist+neg_dist))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(col_thickness))
+
+      this.bodies.inters.test.push( new body_build({ ...opt_test,
+
+            name:'inter_rectangle',
+            
+
+            m:this.m,
+            
+            m_offset:m_offset_A,
+            m_shape: m_shape,
+            z:z_depth,
+            type : utils.shape.rectangle,
+
+            do_shape: true,
+            do_line:true,                                         
+            color:utils.color.grey,
+            color_line: utils.color.black,
+            texture_three: text_checker_three_grey, 
+
+            collision_category: utils.collision_category.mouse,
+            collision_mask: utils.collision_category.inter ,
+            constraints:[
+              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_A.get_row(2) , stiffness: 0.8, damping:0.1,length:0.01},
+              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+            ],
+
+            density:0.01, 
+
+            debug_matrix_info: false,
+            debug_matrix_axes: debug.matrix_axes,  
+            debug_cns_axes: debug.cns_axes,      
+            debug_force_visibility: debug.force_visibility,                                                                                 
+          })
+      )
+
+
+      let m_offset_B = new Matrix(m_ref)
+
+      p_ref = m_ref.get_row(2)
+      vY_ref = m_ref.get_row(1)
+      vY_ref.normalize()
+      vY_ref.mult(scale_ref/2.0+col_thickness/2.0+margin)
+      vX_ref = m_ref.get_row(0)
+      vX_ref.normalize()
+      offset_pos = pos_dist - (pos_dist + neg_dist)/2
+      vX_ref.mult(offset_pos)
+      p_offset = p_ref.getSub(vY_ref).getAdd(vX_ref)
+      m_offset_B.set_row(2, p_offset)
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(pos_dist+neg_dist))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(col_thickness))
+
+      this.bodies.inters.test.push( new body_build({ ...opt_test,
+
+            name:'inter_rectangle',
+            
+
+            m:this.m,
+            
+            m_offset:m_offset_B,
+            m_shape: m_shape,
+            z:z_depth,
+            type : utils.shape.rectangle,
+
+            do_shape: true,
+            do_line:true,                                         
+            color:utils.color.grey,
+            color_line: utils.color.black,
+            texture_three: text_checker_three_grey, 
+
+            collision_category: utils.collision_category.mouse,
+            collision_mask: utils.collision_category.inter ,
+            constraints:[
+              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_B.get_row(2) , stiffness: 0.8,damping:0.1,length:0.01},
+              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+            ],
+
+            density:0.01, 
+
+            debug_matrix_info: false,
+            debug_matrix_axes: debug.matrix_axes,  
+            debug_cns_axes: debug.cns_axes,      
+            debug_force_visibility: debug.force_visibility,                                                                                 
+          })
+      )
+
+
+      let m_offset_C = new Matrix(m_ref)
+
+      p_ref = m_ref.get_row(2)
+      vX_ref = m_ref.get_row(0)
+      vX_ref.normalize()
+      vX_ref.mult(pos_dist+col_thickness/2.0)
+      p_offset = p_ref.getAdd(vX_ref)
+      m_offset_C.set_row(2, p_offset)
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(col_thickness))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(scale_ref+col_thickness*2.0))
+
+      this.bodies.inters.test.push( new body_build({ ...opt_test,
+
+            name:'inter_rectangle',
+            
+
+            m:this.m,
+            
+            m_offset:m_offset_C,
+            m_shape: m_shape,
+            z:z_depth,
+            type : utils.shape.rectangle,
+
+            do_shape: true,
+            do_line:true,                                         
+            color:utils.color.grey,
+            color_line: utils.color.black,
+            texture_three: text_checker_three_grey, 
+
+            collision_category: utils.collision_category.mouse,
+            collision_mask: utils.collision_category.inter ,
+            constraints:[
+              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_C.get_row(2) , stiffness: 0.8,damping:0.1,length:0.01},
+              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+            ],
+
+            density:0.01, 
+
+            debug_matrix_info: false,
+            debug_matrix_axes: debug.matrix_axes,  
+            debug_cns_axes: debug.cns_axes,      
+            debug_force_visibility: debug.force_visibility,                                                                                 
+          })
+      )
+
+
+      let m_offset_D = new Matrix(m_ref)
+
+      p_ref = m_ref.get_row(2)
+      vX_ref = m_ref.get_row(0)
+      vX_ref.normalize()
+      vX_ref.mult((neg_dist+col_thickness/2.0)*-1.)
+      p_offset = p_ref.getAdd(vX_ref)
+      m_offset_D.set_row(2, p_offset)
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(col_thickness))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(scale_ref+col_thickness*2.0))
+
+      this.bodies.inters.test.push( new body_build({ ...opt_test,
+
+            name:'inter_rectangle',
+            
+
+            m:this.m,
+            
+            m_offset:m_offset_D,
+            m_shape: m_shape,
+            z:z_depth,
+            type : utils.shape.rectangle,
+
+            do_shape: true,
+            do_line:true,                                         
+            color:utils.color.grey,
+            color_line: utils.color.black,
+            texture_three: text_checker_three_grey, 
+
+            collision_category: utils.collision_category.mouse,
+            collision_mask: utils.collision_category.inter ,
+            constraints:[
+              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_D.get_row(2) , stiffness: 0.8,damping:0.1,length:0.01},
+              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+            ],
+
+            density:0.01, 
+
+            debug_matrix_info: false,
+            debug_matrix_axes: debug.matrix_axes,  
+            debug_cns_axes: debug.cns_axes,      
+            debug_force_visibility: debug.force_visibility,                                                                                 
+          })
+      )      
+
+      let m_offset = new Matrix(m_ref)
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(scale_ref))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(scale_ref))
+
+      this.bodies.inters.test.push( new body_build({ ...opt_test,
+
+            name:'inter_rectangle',
+            
+
+            m:this.m,
+            
+            m_offset:m_offset,
+            m_shape: m_shape,
+            z:z_depth,
+            type : utils.shape.circle,
+
+            do_shape: true,
+            do_line:true,                                         
+            color:utils.color.grey,
+            color_line: utils.color.black,
+            texture_three: text_checker_three_grey, 
+
+            collision_category: utils.collision_category.inter,//what it is
+            collision_mask: utils.collision_category.mouse ,//what it can collide with
+            constraints:[
+              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset.get_row(2), stiffness: 0.01,damping:0.1,length:0.01},
+              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+            ],
+
+            density:0.9, 
+
+            debug_matrix_info: false,
+            debug_matrix_axes: debug.matrix_axes,  
+            debug_cns_axes: debug.cns_axes,      
+            debug_force_visibility: debug.force_visibility,                                                                                 
+          })
+      )
+      */
+
+
     }
   ////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
@@ -1518,7 +1778,8 @@ export default class fidget_daft_i extends fidget{
     this.bodies_rot_clean_override()
     this.bodies_enable( 0,  ['inters'] )
     this.bodies_enable( 0,  ['effects'] )
-     
+    for( let i=0; i < this.bodies.inters.test.length; i++)
+      this.bodies.inters.test[i].enable(1)     
     
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0

@@ -32,7 +32,8 @@ var matter_engine = Matter.Engine.create();
 
 var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
   //mouse: mouse,
-  collisionFilter: {category: utils.collision_category.mouse, mask: utils.collision_category.inter}, // <---
+  collisionFilter: { category: utils.collision_category.mouse, 
+                     mask: utils.collision_category.inter}, // <---
   constraint: {
       // allow bodies on mouse to rotate
       //stiffness:0.01,
@@ -61,7 +62,7 @@ var nbr = 1
 var debug = { disable_animation:true,
               switch_selected_inter_help:false,
               force_visibility:false,
-              show_inter:false,
+              show_inter:true,
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,
