@@ -594,7 +594,7 @@ export default class fidget{
 
   bodies_enable( value,body_type_filter = [] )
   {
-    
+    this.bodies_cns_enable(value,body_type_filter)
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
@@ -608,6 +608,7 @@ export default class fidget{
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
             this.bodies[b_type][key][i].enable(value)
+    
             if(body_type_filter.length == 0)
               this.bodies[b_type][key][i].do_update = value            
           }
@@ -615,6 +616,7 @@ export default class fidget{
         }
         else
           this.bodies[b_type][key].enable(value)
+          
           if(body_type_filter.length == 0)
             this.bodies[b_type][key].do_update = value
         
