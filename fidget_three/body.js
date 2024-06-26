@@ -351,7 +351,7 @@ export default class body_build{
       if(this.visibility)
         this.body.collisionFilter.category = this.collision_category
       else
-        this.body.collisionFilter.category = utils.collision_category.other
+        this.body.collisionFilter.category = utils.collision_category.none
     }
 
     get_parent_matrix()
