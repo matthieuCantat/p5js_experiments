@@ -82,40 +82,6 @@ export default class fidgets_sequence
     }
 
 
-    draw_fidgets_updates_only()
-    {
-      var rez = this.get_resolution_coef_info()
-      
-      var rez_step = rez*this.fidgets_nbr
-      var i_max = this.fidgets_nbr
-      var coef = i_max-rez_step
-
-      for( let i = 0; i < this.fidgets.length; i++ )
-      {   
-        if(this.anim_mode == false)
-        {
-          if((  i-1< coef  )&&(  coef <= i+1 ))
-            this.fidgets[i].bodies_enable(true)
-          else
-            this.fidgets[i].bodies_enable(false)
-        }
-      }
-
-      for( let i = 0; i < this.fidgets.length; i++ )
-      {   
-        if(this.anim_mode == false)
-        {
-          if((  i-1< coef  )&&(  coef <= i+1 ))
-          {
-          }
-          else{
-            continue
-          }
-        }
-        this.fidgets[i].update()
-        this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
-      }
-    }
 
     setup_shapes_fidgets_three(scene_three)
     {
@@ -133,46 +99,6 @@ export default class fidgets_sequence
         scene_three.add( this.fidgets[i].group_three )
         //this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
       }
-    }
-
-    animate_three()
-    {
-      for( let i = 0; i < this.fidgets.length; i++ )
-        this.fidgets[i].animate_three()
-
-      this.update_chrono_three()
-      if(this.debug_mode.fidget_steps_info)
-      {
-        let texts_to_draw = [
-          /*
-          'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
-          'mouse position : ' + mouseX + ' : '+mouseY ,
-          'user is interacting : '+ userIsInteracting,
-          */
-          
-          'count : ' + this.fidgets[0].state.update_count,
-          'res : ' + Math.round( this.fidgets[0].state.resolution_coef, 2 ) + ' / 4',
-          'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,
-          '0 - count: ' + this.fidgets[0].state.steps[0].update_count,
-          '0 - res: ' + Math.round( this.fidgets[0].state.steps[0].resoluton_coef, 2) + ' / 1',
-          '1 - count: ' + this.fidgets[0].state.steps[1].update_count,
-          '1 - res Coef: ' + Math.round( this.fidgets[0].state.steps[1].resoluton_coef, 2) + ' / 1',
-          '2 - count: ' + this.fidgets[0].state.steps[2].update_count ,
-          '2 - res Coef: ' + Math.round( this.fidgets[0].state.steps[2].resoluton_coef, 2) + ' / 1',
-          '3 - count: ' + this.fidgets[0].state.steps[3].update_count ,
-          '3 - res Coef: ' + Math.round( this.fidgets[0].state.steps[3].resoluton_coef, 2) + ' / 1' ,
-          '4 - count: ' + this.fidgets[0].state.steps[4].update_count,
-          '4 - res Coef: ' + Math.round( this.fidgets[0].state.steps[4].resoluton_coef, 2) + ' / 1',
-          '5 - count: ' + this.fidgets[0].state.steps[5].update_count,
-          '5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef, 2) + ' / 1',
-          
-          
-        ]
-        this.draw_text_debug.update_three(texts_to_draw)
-      }
-        
-      
-
     }
 
 
@@ -287,7 +213,7 @@ export default class fidgets_sequence
       }
       else
       {
-        this.do_anim_override(0 )
+        this.do_anim_override(0)
         if(this.update_count < user_interaction_start)
         {
           this.update_count = user_interaction_start
@@ -346,8 +272,85 @@ export default class fidgets_sequence
       this.update_count += 1
     }
 
+    do_fidget_computation(i)
+    {
+      var rez = this.get_resolution_coef_info()
+      
+      var rez_step = rez*this.fidgets_nbr
+      var i_max = this.fidgets_nbr
+      var coef = i_max-rez_step
+
+      return ((  i-1< coef  )&&(  coef <= i+1 ))
+    }
+
+    draw_fidgets_updates_only()
+    {
+    
+      for( let i = 0; i < this.fidgets.length; i++ )
+      {   
+        if(this.anim_mode == false)
+        {
+          if( this.do_fidget_computation(i) )
+            this.fidgets[i].bodies_enable(true)
+          else
+            this.fidgets[i].bodies_enable(false)
+        }
+      }
+
+      for( let i = 0; i < this.fidgets.length; i++ )
+      {   
+        if((this.anim_mode == false)&&(this.do_fidget_computation(i) == false))
+          continue  
+        this.fidgets[i].update()
+        this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
+      }
+    }
 
 
+    animate_three()
+    {
+
+      for( let i = 0; i < this.fidgets.length; i++ )
+      {   
+        if((this.anim_mode == false)&&(this.do_fidget_computation(i) == false))
+          continue  
+        this.fidgets[i].animate_three()
+      }
+
+      this.update_chrono_three()
+      if(this.debug_mode.fidget_steps_info)
+      {
+        let texts_to_draw = [
+          /*
+          'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
+          'mouse position : ' + mouseX + ' : '+mouseY ,
+          'user is interacting : '+ userIsInteracting,
+          */
+          
+          'count : ' + this.fidgets[0].state.update_count,
+          'res : ' + Math.round( this.fidgets[0].state.resolution_coef, 2 ) + ' / 4',
+          'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,
+          '0 - count: ' + this.fidgets[0].state.steps[0].update_count,
+          '0 - res: ' + Math.round( this.fidgets[0].state.steps[0].resoluton_coef, 2) + ' / 1',
+          '1 - count: ' + this.fidgets[0].state.steps[1].update_count,
+          '1 - res Coef: ' + Math.round( this.fidgets[0].state.steps[1].resoluton_coef, 2) + ' / 1',
+          '2 - count: ' + this.fidgets[0].state.steps[2].update_count ,
+          '2 - res Coef: ' + Math.round( this.fidgets[0].state.steps[2].resoluton_coef, 2) + ' / 1',
+          '3 - count: ' + this.fidgets[0].state.steps[3].update_count ,
+          '3 - res Coef: ' + Math.round( this.fidgets[0].state.steps[3].resoluton_coef, 2) + ' / 1' ,
+          '4 - count: ' + this.fidgets[0].state.steps[4].update_count,
+          '4 - res Coef: ' + Math.round( this.fidgets[0].state.steps[4].resoluton_coef, 2) + ' / 1',
+          '5 - count: ' + this.fidgets[0].state.steps[5].update_count,
+          '5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef, 2) + ' / 1',
+          
+          
+        ]
+        this.draw_text_debug.update_three(texts_to_draw)
+      }
+        
+      
+
+    }
       
 }
 
