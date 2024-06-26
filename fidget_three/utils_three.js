@@ -1,7 +1,16 @@
 
 import * as THREE from 'three';
 import Vector from './vector.js'
-import { rad, convert_coords_matter_to_three, mouseX, mouseY, switch_selection, userIsInteracting, Draw_text_debug} from './utils.js';
+import { 
+    rad, 
+    convert_coords_matter_to_three, 
+    isMousePressed, 
+    isScreenTouched, 
+    userIsInteracting, 
+    mouseX, 
+    mouseY, 
+    switch_selection,  
+    Draw_text_debug} from './utils.js';
 
 
 
@@ -210,7 +219,7 @@ export class Mouse_manager
         this.mesh_line = null
 
         this.break_dist = 660.0
-        this.selection_delta = null
+        this.p_mouse_grap_from_body = null
         this.mouse_lock_selection = false
 
         this.draw_text_debug = null
@@ -219,7 +228,8 @@ export class Mouse_manager
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             this.draw_text_debug.mouse_cns = this.mouse_constraint
-        }         
+        }     
+        this.update_count = 0    
     }
 
     setup(scene)
@@ -279,17 +289,19 @@ export class Mouse_manager
             }
         }
 
-        let mouse_pos = new Vector( mouseX, mouseY) 
-        if( mouse_pos.mag() == 0)
-            return
+        let p_mouse_current = new Vector( mouseX, mouseY) 
+        //if( p_mouse_current.mag() == 0)
+        //    return
 
-        let pos = new Vector( mouseX, mouseY) 
+        let p_mouse_grap = new Vector( mouseX, mouseY) 
         var selected_body = this.mouse_constraint.constraint.bodyB
 
         let delta = new Vector(0,0)
         let do_break = false
         let fidget_selected_body = null
         let m = null
+        let do_save_p_mouse_grap_from_body = false
+
         if((userIsInteracting)&&(selected_body != null  ))
         {
             fidget_selected_body = this.fidget.get_selected_body()
@@ -297,69 +309,85 @@ export class Mouse_manager
             {
                 m = fidget_selected_body.get_out_matrix()
 
-                if(this.selection_delta != null)
-                {
-                    pos = this.selection_delta.getMult(m)
-                }
-                else
-                {
-                    this.selection_delta = mouse_pos.getMult(m.getInverse())
-                    pos = mouse_pos
-                }
+                do_save_p_mouse_grap_from_body = this.p_mouse_grap_from_body == null
+                if(do_save_p_mouse_grap_from_body)
+                    this.p_mouse_grap_from_body = p_mouse_current.getMult(m.getInverse())
 
-                delta = mouse_pos.getSub(pos)
+
+                p_mouse_grap = this.p_mouse_grap_from_body.getMult(m)
+                delta = p_mouse_current.getSub(p_mouse_grap)
 
                 do_break = this.break_dist<delta.mag()
                 if(do_break)
                 {
                     this.mouse_lock_selection = true
                     switch_selection( this.mouse_constraint, null) 
-                    pos = mouse_pos
-                    this.selection_delta = null 
+                    p_mouse_grap = p_mouse_current
+                    this.p_mouse_grap_from_body = null 
                 } 
             }
             else
             {
-                this.selection_delta = null                   
+                this.p_mouse_grap_from_body = null                   
             }           
         }
         else{
-            this.selection_delta = null
+            this.p_mouse_grap_from_body = null
         }
 
 
         let shape_coords = line( 
-            convert_coords_matter_to_three(pos,this.screen_dims), 
-            convert_coords_matter_to_three(mouse_pos,this.screen_dims) );        
+            convert_coords_matter_to_three(p_mouse_grap,this.screen_dims), 
+            convert_coords_matter_to_three(p_mouse_current,this.screen_dims) );        
         this.mesh_line.geometry.setFromPoints(shape_coords.getPoints());
 
        
         if(this.debug)
         {
-          let selection_delta = {x:0,y:0}
-          if(this.selection_delta != null)
-            selection_delta = this.selection_delta.get_value()
-            
+          let p_mouse_grap_from_body = {x:0,y:0}
+          if(this.p_mouse_grap_from_body != null)
+            p_mouse_grap_from_body = this.p_mouse_grap_from_body.get_value()
 
-          let texts_to_draw = []
-
-          if(fidget_selected_body != null)
+          let body_name = 'null'
+          let m_selected_body = {a:0,b:0,c:0,d:0,e:0,f:0}
+          if( fidget_selected_body != null)
           {
-            texts_to_draw = [
-                'selected_body : ' + fidget_selected_body.name,
-                'mouse_lock_selection : ' + this.mouse_lock_selection,
-                'selection_delta : ' + Math.round(selection_delta.x) + ' | ' + Math.round(selection_delta.y),
-                'm : ' + Math.round(m.a) + ' | ' + Math.round(m.b) + ' | ' +Math.round(m.c) + ' | ' +Math.round(m.d) + ' | ' +Math.round(m.e) + ' | ' +Math.round(m.f),
-                'pos : ' + Math.round(pos.x()) + ' | ' + Math.round(pos.y()),
-                'mouse_pos : ' + Math.round(mouse_pos.x()) + ' | ' + Math.round(mouse_pos.y()),
-                'delta : ' + Math.round(delta.x()) + ' | ' + Math.round(delta.y()),
-                'delta_length : ' + Math.round(delta.mag()),
-                'break_dist : ' + this.break_dist,
-                'do_break : ' + do_break,
-            ]   
+            body_name = fidget_selected_body.name            
+            m_selected_body = m
           }
 
+            
+
+          let texts_to_draw = [
+                'update_count :' + this.update_count,
+                'isMousePressed : ' + isMousePressed,
+                'isScreenTouched : ' + isScreenTouched,
+                'userIsInteracting : ' + userIsInteracting,
+
+                'p_mouse_current : ' + Math.round(p_mouse_current.x()) + ' | ' + Math.round(p_mouse_current.y()),
+                'p_mouse_current_coef : ' + Math.round(p_mouse_current.x()/this.screen_dims.x) + ' | ' + Math.round(p_mouse_current.y()/this.screen_dims.y),
+
+                'selected_body : ' + body_name,
+                'm_selected_body : ' + Math.round(m_selected_body.a) + ' | ' + Math.round(m_selected_body.b) + ' | ' +Math.round(m_selected_body.c) + ' | ' +Math.round(m_selected_body.d) + ' | ' +Math.round(m_selected_body.e) + ' | ' +Math.round(m_selected_body.f),
+                'p_selected_body : ' + Math.round(m_selected_body.e) + ' | ' +Math.round(m_selected_body.f),
+                'p_selected_body_coef : ' + Math.round(m_selected_body.e/this.screen_dims.x) + ' | ' +Math.round(m_selected_body.f/this.screen_dims.y),
+
+                'do_save_p_mouse_grap_from_body : ' + do_save_p_mouse_grap_from_body,
+                'p_mouse_grap_from_body : ' + Math.round(p_mouse_grap_from_body.x) + ' | ' + Math.round(p_mouse_grap_from_body.y),
+                
+                'p_mouse_grap : ' + Math.round(p_mouse_grap.x()) + ' | ' + Math.round(p_mouse_grap.y()),
+                'p_mouse_grap_coef : ' + Math.round(p_mouse_grap.x()/this.screen_dims.x) + ' | ' + Math.round(p_mouse_grap.y()/this.screen_dims.y),
+
+                'dist : ' + Math.round(delta.mag()),
+                'break_dist : ' + this.break_dist,
+                'do_break : ' + do_break,
+                'mouse_lock_selection : ' + this.mouse_lock_selection,
+            ]   
+            
+
           this.draw_text_debug.update_three(texts_to_draw)
-        }        
+        }  
+        
+        this.update_count += 1
     }
 }
