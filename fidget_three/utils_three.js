@@ -365,18 +365,18 @@ export class Mouse_manager
                 'userIsInteracting : ' + userIsInteracting,
 
                 'p_mouse_current : ' + Math.round(p_mouse_current.x()) + ' | ' + Math.round(p_mouse_current.y()),
-                'p_mouse_current_coef : ' + Math.round(p_mouse_current.x()/this.screen_dims.x) + ' | ' + Math.round(p_mouse_current.y()/this.screen_dims.y),
+                'p_mouse_current_coef : ' + Math.round(p_mouse_current.x()/this.screen_dims.x*100) + ' | ' + Math.round(p_mouse_current.y()/this.screen_dims.y*100),
 
                 'selected_body : ' + body_name,
                 'm_selected_body : ' + Math.round(m_selected_body.a) + ' | ' + Math.round(m_selected_body.b) + ' | ' +Math.round(m_selected_body.c) + ' | ' +Math.round(m_selected_body.d) + ' | ' +Math.round(m_selected_body.e) + ' | ' +Math.round(m_selected_body.f),
                 'p_selected_body : ' + Math.round(m_selected_body.e) + ' | ' +Math.round(m_selected_body.f),
-                'p_selected_body_coef : ' + Math.round(m_selected_body.e/this.screen_dims.x) + ' | ' +Math.round(m_selected_body.f/this.screen_dims.y),
+                'p_selected_body_coef : ' + Math.round(m_selected_body.e/this.screen_dims.x*100) + ' | ' +Math.round(m_selected_body.f/this.screen_dims.y*100),
 
                 'do_save_p_mouse_grap_from_body : ' + do_save_p_mouse_grap_from_body,
                 'p_mouse_grap_from_body : ' + Math.round(p_mouse_grap_from_body.x) + ' | ' + Math.round(p_mouse_grap_from_body.y),
                 
                 'p_mouse_grap : ' + Math.round(p_mouse_grap.x()) + ' | ' + Math.round(p_mouse_grap.y()),
-                'p_mouse_grap_coef : ' + Math.round(p_mouse_grap.x()/this.screen_dims.x) + ' | ' + Math.round(p_mouse_grap.y()/this.screen_dims.y),
+                'p_mouse_grap_coef : ' + Math.round(p_mouse_grap.x()/this.screen_dims.x*100) + ' | ' + Math.round(p_mouse_grap.y()/this.screen_dims.y*100),
 
                 'dist : ' + Math.round(delta.mag()),
                 'break_dist : ' + this.break_dist,
