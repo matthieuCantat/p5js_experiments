@@ -237,30 +237,7 @@ export class Mouse_manager
         let mouse_pos = new Vector( mouseX, mouseY) 
 
         let pos = new Vector( mouseX, mouseY) 
-        /*
-        var selected_body = this.mouse_constraint.constraint.bodyB
-        if( selected_body != null )
-        {
-            let fidget_selected_body = this.fidget.get_selected_body()
-            if( fidget_selected_body != null)
-            {
-                let m = fidget_selected_body.get_out_matrix()
-
-                let delta = new Vector()
-                if(this.selection_delta != null)
-                {
-                    pos = this.selection_delta.getMult(m)
-                }
-                else{
-                    //this.selection_delta = mouse_pos.getMult(m.getInverse())
-                    pos = mouse_pos
-                }
-            }
-        }
-        else{
-            this.selection_delta = null
-        }
-        */    
+  
         
         let shape_coords = line( 
             convert_coords_matter_to_three(pos,this.screen_dims), 
@@ -302,34 +279,41 @@ export class Mouse_manager
         let m = null
         let do_save_p_mouse_grap_from_body = false
 
-        if((userIsInteracting)&&(selected_body != null  ))
+        if(userIsInteracting)
         {
-            fidget_selected_body = this.fidget.get_selected_body()
-            if( fidget_selected_body != null)
+            if( selected_body != null )
             {
-                m = fidget_selected_body.get_out_matrix()
-
-                do_save_p_mouse_grap_from_body = this.p_mouse_grap_from_body == null
-                if(do_save_p_mouse_grap_from_body)
-                    this.p_mouse_grap_from_body = p_mouse_current.getMult(m.getInverse())
-
-
-                p_mouse_grap = this.p_mouse_grap_from_body.getMult(m)
-                delta = p_mouse_current.getSub(p_mouse_grap)
-
-                do_break = this.break_dist<delta.mag()
-                if(do_break)
+                fidget_selected_body = this.fidget.get_selected_body()
+                if( fidget_selected_body != null)
                 {
-                    this.mouse_lock_selection = true
-                    switch_selection( this.mouse_constraint, null) 
-                    p_mouse_grap = p_mouse_current
-                    this.p_mouse_grap_from_body = null 
+                    m = fidget_selected_body.get_out_matrix()
+    
+                    do_save_p_mouse_grap_from_body = this.p_mouse_grap_from_body == null
+                    if(do_save_p_mouse_grap_from_body)
+                        this.p_mouse_grap_from_body = p_mouse_current.getMult(m.getInverse())
+    
+    
+                    p_mouse_grap = this.p_mouse_grap_from_body.getMult(m)
+                    delta = p_mouse_current.getSub(p_mouse_grap)
+    
+                    do_break = this.break_dist<delta.mag()
+                    if(do_break)
+                    {
+                        this.mouse_lock_selection = true
+                        switch_selection( this.mouse_constraint, null) 
+                        p_mouse_grap = p_mouse_current
+                        this.p_mouse_grap_from_body = null 
+                    } 
+                }
+                else
+                {
+                    this.p_mouse_grap_from_body = null                   
                 } 
             }
-            else
-            {
-                this.p_mouse_grap_from_body = null                   
-            }           
+            else{
+                this.mouse_lock_selection = true
+            }
+          
         }
         else{
             this.p_mouse_grap_from_body = null
