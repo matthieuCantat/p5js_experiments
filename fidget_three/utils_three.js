@@ -218,7 +218,7 @@ export class Mouse_manager
         this.fidget = fidget
         this.mesh_line = null
 
-        this.break_dist = 660.0
+        this.break_dist = 60.0
         this.p_mouse_grap_from_body = null
         this.mouse_lock_selection = false
 
