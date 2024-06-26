@@ -62,7 +62,7 @@ var nbr = 1
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
-              show_inter:true,
+              show_inter:false,
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,

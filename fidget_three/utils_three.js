@@ -228,7 +228,8 @@ export class Mouse_manager
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             this.draw_text_debug.mouse_cns = this.mouse_constraint
         }     
-        this.update_count = 0    
+        this.update_count = 0 
+        this.selected_body_last_eval_name = ''   
     }
 
     setup(scene)
@@ -270,7 +271,8 @@ export class Mouse_manager
         //    return
 
         let p_mouse_grap = new Vector( mouseX, mouseY) 
-        var selected_body = this.mouse_constraint.constraint.bodyB
+        let selected_body = this.mouse_constraint.constraint.bodyB
+        
 
         let delta = new Vector(0,0)
         let do_break = false
@@ -281,15 +283,16 @@ export class Mouse_manager
         let break_dist = 0
         if(userIsInteracting)
         {
-            if( selected_body != null )
+            if( selected_body != null  )
             {
                 fidget_selected_body = this.fidget.get_selected_body()
+
                 if( fidget_selected_body != null)
                 {
                     m = fidget_selected_body.get_out_matrix()
                     break_dist = fidget_selected_body.selection_break_length
     
-                    do_save_p_mouse_grap_from_body = this.p_mouse_grap_from_body == null
+                    do_save_p_mouse_grap_from_body = ((this.p_mouse_grap_from_body == null )||(this.selected_body_last_eval_name != fidget_selected_body.name))
                     if(do_save_p_mouse_grap_from_body)
                         this.p_mouse_grap_from_body = p_mouse_current.getMult(m.getInverse())
     
@@ -308,16 +311,21 @@ export class Mouse_manager
                 }
                 else
                 {
-                    this.p_mouse_grap_from_body = null                   
+                    this.p_mouse_grap_from_body = null
+                    this.selected_body_last_eval_name = ''                   
                 } 
+
+                this.selected_body_last_eval_name = fidget_selected_body.name
             }
             else{
                 this.mouse_lock_selection = true
+                this.selected_body_last_eval_name = ''
             }
           
         }
         else{
             this.p_mouse_grap_from_body = null
+            this.selected_body_last_eval_name = ''
         }
 
 
@@ -373,6 +381,9 @@ export class Mouse_manager
           this.draw_text_debug.update_three(texts_to_draw)
         }  
         
+
+        // next eval
         this.update_count += 1
+
     }
 }

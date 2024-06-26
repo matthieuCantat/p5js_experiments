@@ -256,7 +256,7 @@ export default class fidget_daft_i extends fidget{
                                     })
 
     
-      let scale_inter = 40.2 
+      let scale_inter = 40.0 
       
       
       // build
@@ -421,7 +421,7 @@ export default class fidget_daft_i extends fidget{
 
 
 
-
+      scale_inter = 10.0                                      
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
       m_shape.set_row(1,m_shape.get_row(1).getMult(18*s+scale_inter))
@@ -527,6 +527,7 @@ export default class fidget_daft_i extends fidget{
                                               debug_force_visibility: debug.force_visibility,                                                         
                                             })) 
 
+      scale_inter = 40.0                                       
       let m_shape_modif = new Matrix()
       m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
       m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))                                            
