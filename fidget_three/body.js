@@ -49,7 +49,8 @@ export default class body_build{
         debug_matrix_info: false,
         debug_matrix_axes: false,  
         debug_cns_axes: false,     
-        debug_force_visibility: false,               
+        debug_force_visibility: false, 
+        selection_break_length: 60.,              
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -99,6 +100,7 @@ export default class body_build{
       this.debug_matrix_axes = args.debug_matrix_axes
       this.debug_cns_axes = args.debug_cns_axes  
       this.debug_force_visibility = args.debug_force_visibility
+      this.selection_break_length = args.selection_break_length
 
       this.is_selected = false
       

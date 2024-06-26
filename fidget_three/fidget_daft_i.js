@@ -83,7 +83,8 @@ export default class fidget_daft_i extends fidget{
             //'effects','colC_shapes',
             //'effects','colC_wall',    
             'inters','test',                                     
-            ]         
+            ]   
+  
       
         this.end_step = 4
 
@@ -787,7 +788,8 @@ export default class fidget_daft_i extends fidget{
                                         mouse_constraint: this.mouse_constraint,
 
                                         name:'inter_B',   
-                                        highlight_selection:[this.bodies.geos.rectangle],  
+                                        highlight_selection:[this.bodies.geos.rectangle], 
+                                        selection_break_length:150.0, 
 
                                         m:this.m,
                                         parent:this.bodies.inters.background,
@@ -806,8 +808,8 @@ export default class fidget_daft_i extends fidget{
                                         collision_category: utils.collision_category.inter,
                                         collision_mask: utils.collision_category.mouse,
                                         constraints:[
-                                          //{ name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.99,length:0.1},
-                                          { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
+                                          { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,stiffness: 0.999,damping:0.1,length:0.01},
+                                          //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                           { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.01,length:0.01},  
                                           //{ name:'orient' ,type:'kin_orient' ,target:this.bodies.inters.background},                 
                                           { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
@@ -874,6 +876,7 @@ export default class fidget_daft_i extends fidget{
 
                                       name:'inter_C', 
                                       highlight_selection:[this.bodies.geos.rectangle], 
+                                      selection_break_length:150.0,
 
                                       m:this.m,
                                       m_offset:new Matrix(),
@@ -960,6 +963,7 @@ export default class fidget_daft_i extends fidget{
 
                                     name:'inter_A',     
                                     highlight_selection:[this.bodies.geos.rectangles[3]],  
+                                    selection_break_length:150.0,
 
                                     m:this.m,
                                     parent:this.bodies.inters.background,                                    
@@ -1909,8 +1913,8 @@ export default class fidget_daft_i extends fidget{
       }
       else
       {
-        if( (this.bodies.inters.A.is_selected == true) &&(userIsInteracting == false) )
-          switch_selection( this.mouse_constraint, null)  
+        //if( (this.bodies.inters.A.is_selected == true) &&(userIsInteracting == false) )
+        //  switch_selection( this.mouse_constraint, null)  
       }
 
           
@@ -2016,8 +2020,8 @@ export default class fidget_daft_i extends fidget{
       }      
       else
       {
-        if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
-          switch_selection( this.mouse_constraint, null)
+        //if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
+        //  switch_selection( this.mouse_constraint, null)
       }
       
       
@@ -2087,8 +2091,8 @@ export default class fidget_daft_i extends fidget{
       }
       else
       {
-        if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
-          switch_selection( this.mouse_constraint, null)  
+        //if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
+        //  switch_selection( this.mouse_constraint, null)  
       }
         
       //_________________________________________________________________Update

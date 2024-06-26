@@ -218,7 +218,6 @@ export class Mouse_manager
         this.fidget = fidget
         this.mesh_line = null
 
-        this.break_dist = 60.0
         this.p_mouse_grap_from_body = null
         this.mouse_lock_selection = false
 
@@ -279,6 +278,7 @@ export class Mouse_manager
         let m = null
         let do_save_p_mouse_grap_from_body = false
 
+        let break_dist = 0
         if(userIsInteracting)
         {
             if( selected_body != null )
@@ -287,6 +287,7 @@ export class Mouse_manager
                 if( fidget_selected_body != null)
                 {
                     m = fidget_selected_body.get_out_matrix()
+                    break_dist = fidget_selected_body.selection_break_length
     
                     do_save_p_mouse_grap_from_body = this.p_mouse_grap_from_body == null
                     if(do_save_p_mouse_grap_from_body)
@@ -296,7 +297,7 @@ export class Mouse_manager
                     p_mouse_grap = this.p_mouse_grap_from_body.getMult(m)
                     delta = p_mouse_current.getSub(p_mouse_grap)
     
-                    do_break = this.break_dist<delta.mag()
+                    do_break = break_dist<delta.mag()
                     if(do_break)
                     {
                         this.mouse_lock_selection = true
@@ -363,7 +364,7 @@ export class Mouse_manager
                 'p_mouse_grap_coef : ' + Math.round(p_mouse_grap.x()/this.screen_dims.x*100) + ' | ' + Math.round(p_mouse_grap.y()/this.screen_dims.y*100),
 
                 'dist : ' + Math.round(delta.mag()),
-                'break_dist : ' + this.break_dist,
+                'break_dist : ' + break_dist,
                 'do_break : ' + do_break,
                 'mouse_lock_selection : ' + this.mouse_lock_selection,
             ]   
