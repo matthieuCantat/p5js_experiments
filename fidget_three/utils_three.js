@@ -308,6 +308,8 @@ export class Mouse_manager
                         p_mouse_grap = p_mouse_current
                         this.p_mouse_grap_from_body = null 
                     } 
+
+                    this.selected_body_last_eval_name = fidget_selected_body.name
                 }
                 else
                 {
@@ -315,7 +317,7 @@ export class Mouse_manager
                     this.selected_body_last_eval_name = ''                   
                 } 
 
-                this.selected_body_last_eval_name = fidget_selected_body.name
+                
             }
             else{
                 this.mouse_lock_selection = true
