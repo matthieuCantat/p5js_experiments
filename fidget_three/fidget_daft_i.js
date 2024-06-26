@@ -789,7 +789,7 @@ export default class fidget_daft_i extends fidget{
 
                                         name:'inter_B',   
                                         highlight_selection:[this.bodies.geos.rectangle], 
-                                        selection_break_length:150.0, 
+                                        selection_break_length:300.0, 
 
                                         m:this.m,
                                         parent:this.bodies.inters.background,
@@ -876,7 +876,7 @@ export default class fidget_daft_i extends fidget{
 
                                       name:'inter_C', 
                                       highlight_selection:[this.bodies.geos.rectangle], 
-                                      selection_break_length:150.0,
+                                      selection_break_length:300.0,
 
                                       m:this.m,
                                       m_offset:new Matrix(),
@@ -963,7 +963,7 @@ export default class fidget_daft_i extends fidget{
 
                                     name:'inter_A',     
                                     highlight_selection:[this.bodies.geos.rectangles[3]],  
-                                    selection_break_length:150.0,
+                                    selection_break_length:300.0,
 
                                     m:this.m,
                                     parent:this.bodies.inters.background,                                    
@@ -1909,7 +1909,7 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
       {
-        this.switch_selection_transition( step, selected_body, this.bodies.inters.A, this.bodies.inters.B)
+        this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters.A, this.bodies.inters.B)
       }
       else
       {
@@ -2016,7 +2016,7 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
       {      
-        this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+        this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters.B, this.bodies.inters.C) 
       }      
       else
       {
@@ -2087,7 +2087,7 @@ export default class fidget_daft_i extends fidget{
       
       if(this.debug_mode.switch_selected_inter_help)
       {
-        this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+        this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters.B, this.bodies.inters.C) 
       }
       else
       {

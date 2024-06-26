@@ -60,7 +60,7 @@ let screen_dims = {x:width,y:height}
 /////////////////////////////////////////// setup game
 var nbr = 1
 var debug = { disable_animation:true,
-              switch_selected_inter_help:false,
+              switch_selected_inter_help:true,
               force_visibility:false,
               show_inter:true,
               matrix_axes:false,
