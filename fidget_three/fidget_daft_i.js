@@ -108,7 +108,7 @@ export default class fidget_daft_i extends fidget{
       var text_checker_three = ut.get_texture_grid_checker()
       var text_checker_three_grey = ut.get_texture_grid_checker_grey()    
       
-
+      
 
     /////////////////////////////////////////////////////   
     let z_depth = 0

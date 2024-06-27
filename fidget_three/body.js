@@ -348,6 +348,7 @@ export default class body_build{
     {
       this.visibility = value
       //this.do_update = value
+      Matter.Sleeping.set(this.body, value)
       if(this.visibility)
         this.body.collisionFilter.category = this.collision_category
       else
