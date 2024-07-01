@@ -50,7 +50,15 @@ export default class fidgets_sequence
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             this.draw_text_debug.mouse_cns = this.mouse_constraint
-        }        
+        }   
+        
+        
+        this.chrono_appears_start = 250
+        this.chrono_appears_end   = 290  
+        this.chrono_appears_range = this.chrono_appears_end-this.chrono_appears_start
+
+        this.fidgets_do_computation_last = []
+  
 
     }
 
@@ -63,6 +71,7 @@ export default class fidgets_sequence
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
         this.fidgets[i].setup();
+        this.fidgets_do_computation_last.push(null)
       }
 
     }
@@ -199,7 +208,15 @@ export default class fidgets_sequence
     update()
     {
       var user_interaction_start = 290
-      if(this.debug_mode.disable_animation==false)
+      if(this.debug_mode.disable_animation)
+      {
+        //this.do_anim_override(0)
+        if(this.update_count < user_interaction_start)
+        {
+          this.update_count = user_interaction_start
+        }
+      }
+      else
       {
         //////////////////////////////////////////////////// INTRO
         var intro_reverse_anim_start = 50
@@ -210,20 +227,10 @@ export default class fidgets_sequence
         this.do_anim_override(_anim )  
         //////////////////////////////////////////////////// INTRO
       }
-      else
-      {
-        this.do_anim_override(0)
-        if(this.update_count < user_interaction_start)
-        {
-          this.update_count = user_interaction_start
-        }
-      }
 
-      var chrono_appears_start = 250
-      var chrono_appears_end   = 290  
-      _delta = chrono_appears_end-chrono_appears_start
-      _count = Math.max( 0, this.update_count-chrono_appears_start)
-      _anim = smoothstep( 1 - _count/_delta )
+
+      _count = Math.max( 0, this.update_count-this.chrono_appears_start)
+      _anim = smoothstep( 1 - _count/this.chrono_appears_range )
       
       let blendA = (0.1*(1-_anim)+0.5*_anim)
       let blendB = (0.05*(1-_anim)+0.07*_anim)
@@ -238,15 +245,17 @@ export default class fidgets_sequence
       
       //////////////////////////////////////////////////// INTRO
       
-      if( 0 < this.update_count-user_interaction_start )
+      let chrono_start = ( (user_interaction_start < this.update_count )&&( this.chrono.is_at_start() ) )
+      if( chrono_start )
       {
-        if((this.chrono.is_at_start())&&(this.get_resolution_coef_info() < 0.99 ))
-          this.chrono.start()
-        this.do_anim_override(null ) 
+        //if((this.chrono.is_at_start())&&(this.get_resolution_coef_info() < 0.99 ))
+        this.chrono.start()
+        this.do_anim_override(null) 
       }
 
      
-      if(  0.99 < this.get_resolution_coef_info())
+      let fidget_sequence_ends = 0.99 < this.get_resolution_coef_info()
+      if(  fidget_sequence_ends )
       {
         if(this.chrono.is_at_start() == false)
         {
@@ -276,8 +285,7 @@ export default class fidgets_sequence
       var rez = this.get_resolution_coef_info()
       
       var rez_step = rez*this.fidgets_nbr
-      var i_max = this.fidgets_nbr
-      var coef = i_max-rez_step
+      var coef = this.fidgets_nbr-rez_step
 
       return ((  i-1< coef  )&&(  coef <= i+1 ))
     }
@@ -289,11 +297,19 @@ export default class fidgets_sequence
       {   
         if(this.anim_mode == false)
         {
-          if( this.do_fidget_computation(i) )
-            this.fidgets[i].bodies_enable(true)
-          else
-            this.fidgets[i].bodies_enable(false)
+          
+          let do_computation = this.do_fidget_computation(i)
+          if( this.fidgets_do_computation_last[i] != do_computation )
+          {
+            if(do_computation == true)
+              this.fidgets[i].bodies_enable(true)
+            else
+              this.fidgets[i].bodies_enable(false)
+          }
+          this.fidgets_do_computation_last[i] = do_computation
+
         }
+
       }
 
       for( let i = 0; i < this.fidgets.length; i++ )
