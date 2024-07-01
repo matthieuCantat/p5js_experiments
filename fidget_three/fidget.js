@@ -28,11 +28,11 @@ export default class fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, matter_engine, mouse_constraint,shaders = [],debug=false)
+  constructor( m, s, screen_dims, shaders = [],debug=false)
   {
-    matter_engine        = create_physics_engine()
-    var matter_engine_runner = create_physics_engine_runner(matter_engine)
-    mouse_constraint = create_mouse_constraint(matter_engine)
+    let matter_engine        = create_physics_engine()
+    let matter_engine_runner = create_physics_engine_runner(matter_engine)
+    let mouse_constraint = create_mouse_constraint(matter_engine)
     create_boundary_wall_collision(matter_engine, screen_dims.x,screen_dims.y,false)
     
 

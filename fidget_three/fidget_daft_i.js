@@ -14,9 +14,9 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-    constructor(m,s,screen_dims,matter_engine,mouse_constraint,shaders = [],debug=false,random_color = true)
+    constructor(m,s,screen_dims,shaders = [],debug=false,random_color = true)
     {
-        super(m, s, screen_dims,matter_engine,mouse_constraint,shaders, debug)
+        super(m, s, screen_dims,shaders, debug)
 
         this.title = 'dafti'
 

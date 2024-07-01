@@ -8,7 +8,7 @@ import fidget_windmill from './fidget_windmill.js';
 
 export default class fidgets_sequence
 {
-    constructor( nbr, m, s, screen_dims, matter_engine,mouse_constraint, shaders = [], debug=false)
+    constructor( nbr, m, s, screen_dims, shaders = [], debug=false)
     {
         //option
         this.fidgets_nbr = nbr
@@ -33,14 +33,13 @@ export default class fidgets_sequence
 
         this.shaders = shaders
         this.screen_dims = screen_dims
-        this.matter_engine = matter_engine
-        this.mouse_constraint = mouse_constraint
+
         
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouse_constraint,this.shaders,this.debug_mode)
-            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouse_constraint,this.shaders,this.debug_mode)
-            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.matter_engine,this.mouse_constraint,this.shaders,this.debug_mode)
+            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.shaders,this.debug_mode)
+            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.shaders,this.debug_mode)
+            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
             this.fidgets.push(fidget)
@@ -71,14 +70,14 @@ export default class fidgets_sequence
 
 
 
-    get_random_fidget(p,s,sceen_dims,matter_engine,mouse_constraint,shaders,debug)
+    get_random_fidget(p,s,sceen_dims,shaders,debug)
     {
       
       let r = Math.random()
       if(  0.5 < r)
-        return new fidget_windmill(p,s,sceen_dims,matter_engine,mouse_constraint,shaders,debug)
+        return new fidget_windmill(p,s,sceen_dims,shaders,debug)
       else
-        return new fidget_daft_i(p,s,sceen_dims,matter_engine,mouse_constraint,shaders,debug)   
+        return new fidget_daft_i(p,s,sceen_dims,shaders,debug)   
     }
 
 
