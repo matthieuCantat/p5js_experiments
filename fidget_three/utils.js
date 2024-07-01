@@ -136,7 +136,7 @@ export function apply_force_to_all( bodies, pCenter, toggle )
 
 }
 
-export function create_boundary_wall_collision(width,height,ground_enable=true)
+export function create_boundary_wall_collision(matter_engine, width, height, ground_enable=true)
 {
     // create two boxes and a ground
     let thickness = 100
@@ -152,7 +152,7 @@ export function create_boundary_wall_collision(width,height,ground_enable=true)
     boundaries.push(wall_right)
     boundaries.push(wall_top)
 
-
+    Matter.Composite.add(matter_engine.world, boundaries );
     return boundaries
 }
 
@@ -566,8 +566,60 @@ document.addEventListener('touchend', function(event) {
 
 
 
+export function create_mouse_constraint(matter_engine)
+{
 
+    var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
+        //mouse: mouse,
+        collisionFilter: { category: utils.collision_category.mouse, 
+                           mask: utils.collision_category.inter}, // <---
+        constraint: {
+            // allow bodies on mouse to rotate
+            //stiffness:0.01,
+            damping:0.01,
+            angularStiffness: 0,
+            render: {
+                visible: false
+            }
+        }
+      });
+      
+      Matter.Composite.add(matter_engine.world, mouse_constraint);
 
+    return mouse_constraint   
+}
+
+export function create_physics_engine()
+{
+    var p_engine = Matter.Engine.create();
+    p_engine.constraintIterations = 2 //2
+    p_engine.positionIterations = 6 //6
+    p_engine.velocityIterations = 4 //4
+    
+    //p_engine.timing.lastDelta = 0 // delta value used in the last engine update.
+    //p_engine.timing.lastElapsed = 0 // total execution time elapsed during the last Engine.update in milliseconds.
+    p_engine.timing.timeScale  = 1 // A value of 0 freezes the simulation. A value of 0.1 gives a slow-motion effect. A value of 1.2 gives a speed-up effect.
+    //p_engine.timing.timestamp  = 0 // current simulation-time in milliseconds starting from 0
+    
+    
+    p_engine.enableSleeping  = false //false
+    
+    //p_engine.detector // Matter.Detector
+    
+    //p_engine.world // Matter.Composite
+
+    p_engine.gravity.scale = 0.0    
+
+    return p_engine
+}
+
+export function create_physics_engine_runner(matter_engine)
+{
+  var runner = Matter.Runner.create();
+  Matter.Runner.run(runner, matter_engine);
+  //runner.delta  = 1000 / 60
+  //runner.enabled = false
+}
 
 
 

@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import Vector from './vector.js'
 import { 
+    utils,
     rad, 
     convert_coords_matter_to_three, 
     isMousePressed, 
@@ -389,3 +390,5 @@ export class Mouse_manager
 
     }
 }
+
+

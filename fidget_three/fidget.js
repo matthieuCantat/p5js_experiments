@@ -1,7 +1,12 @@
 
 
 import Vector from './vector.js';
-import { utils, switch_selection } from './utils.js';
+import { utils, 
+  switch_selection, 
+  create_physics_engine,
+  create_mouse_constraint,
+  create_physics_engine_runner,
+  create_boundary_wall_collision} from './utils.js';
 import * as THREE from 'three';
 import { Mouse_manager } from './utils_three.js'
 class state_step_tpl{
@@ -25,6 +30,14 @@ export default class fidget{
 
   constructor( m, s, screen_dims, matter_engine, mouse_constraint,shaders = [],debug=false)
   {
+    matter_engine        = create_physics_engine()
+    var matter_engine_runner = create_physics_engine_runner(matter_engine)
+    mouse_constraint = create_mouse_constraint(matter_engine)
+    create_boundary_wall_collision(matter_engine, screen_dims.x,screen_dims.y,false)
+    
+
+
+
     this.m = m
     this.s = s
     this.screen_dims = screen_dims

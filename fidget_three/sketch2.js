@@ -9,7 +9,12 @@ import Vector from './vector.js'
 import Matrix from './matrix.js'
 import { utils, 
          create_boundary_wall_collision,
-         rad} from './utils.js';
+         rad,
+         create_physics_engine,
+         create_mouse_constraint,
+         create_physics_engine_runner} from './utils.js';
+
+         
 import fidgets_sequence from './fidgets_sequence.js'
 import shader_build from './shader.js';
 
@@ -28,26 +33,6 @@ event.preventDefault();
 }, { passive: false });
 
 
-var matter_engine = Matter.Engine.create();
-
-var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
-  //mouse: mouse,
-  collisionFilter: { category: utils.collision_category.mouse, 
-                     mask: utils.collision_category.inter}, // <---
-  constraint: {
-      // allow bodies on mouse to rotate
-      //stiffness:0.01,
-      damping:0.01,
-      angularStiffness: 0,
-      render: {
-          visible: false
-      }
-  }
-});
-
-
-Matter.Composite.add(matter_engine.world, mouse_constraint);
-
 
 
 /////////////////////////////////////////// setup screen
@@ -58,7 +43,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 4
+var nbr = 50
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
@@ -69,7 +54,6 @@ var debug = { disable_animation:true,
               mouse_info:false,
                 }
 
-var ground_enable = false
 
 
 
@@ -80,12 +64,10 @@ var shdrs = []
 
 
 
-Matter.Composite.add(matter_engine.world, create_boundary_wall_collision(width,height,ground_enable));
 
-var runner = Matter.Runner.create();
-Matter.Runner.run(runner, matter_engine);
+var matter_engine = null
+var mouse_constraint = null
 
-matter_engine.gravity.scale = 0.0
 
 let m = new Matrix()
 m.setTranslation(width/2, height/2 )
@@ -93,13 +75,6 @@ m.setTranslation(width/2, height/2 )
 let s = 2.2
 F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, matter_engine, mouse_constraint, shdrs,debug)
 F_sequence.setup()
-
-
-
-
-
-
-
 
 
 import * as THREE from 'three';

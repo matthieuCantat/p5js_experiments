@@ -302,7 +302,7 @@ export default class fidgets_sequence
         if((this.anim_mode == false)&&(this.do_fidget_computation(i) == false))
           continue  
         this.fidgets[i].update()
-        this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
+        this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
       }
     }
 
