@@ -37,6 +37,7 @@ export default class body_build{
         transparency:255,
         transparency_line:255,        
         shader:null,
+        visibility:true,
         axe_constraint: null,
         density:0.001,
         frictionAir:0.01,
@@ -85,8 +86,10 @@ export default class body_build{
       this.collision = args.collision
       this.collision_category = args.collision_category
       this.collision_mask = args.collision_mask
-      this.visibility = 1
-      this.visibility_override = true
+      this.visibility = args.visibility
+      this.visibility_default = args.visibility
+      //this.visibility_override = true
+      this.debug_force_visibility = args.debug_force_visibility
       this.do_update = true
       this.density = args.density
       this.frictionAir = args.frictionAir
@@ -99,7 +102,6 @@ export default class body_build{
       this.debug_matrix_info = args.debug_matrix_info
       this.debug_matrix_axes = args.debug_matrix_axes
       this.debug_cns_axes = args.debug_cns_axes  
-      this.debug_force_visibility = args.debug_force_visibility
       this.selection_break_length = args.selection_break_length
 
       this.is_selected = false
@@ -346,10 +348,13 @@ export default class body_build{
   
     enable(value)
     {
-      this.visibility = value
+      if(value)
+        this.visibility = this.visibility_default
+      else
+        this.visibility = false
       //this.do_update = value
       //Matter.Sleeping.set(this.body, value==false)
-      if(this.visibility)
+      if(value)
         this.body.collisionFilter.category = this.collision_category
       else
         this.body.collisionFilter.category = utils.collision_category.none
@@ -447,7 +452,7 @@ export default class body_build{
     {
       if(this.debug_force_visibility)
         return 1
-      if( (this.visibility)&&(this.visibility_override)) 
+      if(this.visibility) 
         return 1
       return 0
     }
@@ -621,6 +626,7 @@ export default class body_build{
       this.mesh_three = { group : null, shape : null, line : null}
 
       this.mesh_three.group = new THREE.Group();
+      this.mesh_three.group.visible = false
       let _out = this.three_fill_with_shapes( this.mesh_three.group, this.m_shape )
       this.mesh_three.shape = _out.shape
       this.mesh_three.line  = _out.line

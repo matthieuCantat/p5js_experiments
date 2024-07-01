@@ -185,6 +185,7 @@ export default class fidget_daft_i extends fidget{
       z:z_depth,
       type : utils.shape.rectangle,
 
+      visibility:false,
       do_shape: true,
       do_line:true,                                           
       color:utils.color.grey,
@@ -279,6 +280,7 @@ export default class fidget_daft_i extends fidget{
         z:z_depth,
         type:utils.shape.circle,
 
+        visibility:false,
         do_shape: true,
         do_line:true,                                         
         color:utils.color.grey,
@@ -442,6 +444,7 @@ export default class fidget_daft_i extends fidget{
         z:z_depth,
         type : utils.shape.rectangle,
 
+        visibility:false,
         do_shape: true,
         do_line:true,                                         
         color:utils.color.grey,
@@ -538,6 +541,7 @@ export default class fidget_daft_i extends fidget{
                                               m_offset:om_rA,
                                               m_shape:m_shape_modif,
 
+                                              visibility:false,
                                               do_shape: true,
                                               do_line:true,                                         
                                               color:utils.color.grey,
@@ -586,6 +590,7 @@ export default class fidget_daft_i extends fidget{
                                               m_offset:om_rB,
                                               m_shape:m_shape_modif,
 
+                                              visibility:false,
                                               do_shape: true,
                                               do_line:true,                                         
                                               color:utils.color.grey,
@@ -636,6 +641,7 @@ export default class fidget_daft_i extends fidget{
                                               m_offset:om_rC,
                                               m_shape:m_shape_modif,
 
+                                              visibility:false,
                                               do_shape: true,
                                               do_line:true,                                         
                                               color:utils.color.grey,
@@ -681,6 +687,7 @@ export default class fidget_daft_i extends fidget{
                                               m_offset:om_rD,
                                               m_shape:m_shape_modif,
 
+                                              visibility:false,
                                               do_shape: true,
                                               do_line:true,                                         
                                               color:utils.color.grey,
@@ -799,6 +806,7 @@ export default class fidget_daft_i extends fidget{
                                         z:z_depth,
                                         type : utils.shape.rectangle,
 
+                                        visibility:false,
                                         do_shape: true,
                                         do_line:true,                                           
                                         color:utils.color.grey,
@@ -887,6 +895,7 @@ export default class fidget_daft_i extends fidget{
                                       //rot:0,
                                       type : utils.shape.rectangle,
 
+                                      visibility:false,
                                       do_shape: true,
                                       do_line:true,                                         
                                       color:utils.color.grey,
@@ -973,6 +982,7 @@ export default class fidget_daft_i extends fidget{
                                     z:z_depth,
                                     type : utils.shape.circle,
 
+                                    visibility:false,
                                     do_shape: true,
                                     do_line:true,                                       
                                     color:utils.color.grey,

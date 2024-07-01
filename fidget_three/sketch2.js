@@ -43,7 +43,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 100
+var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
@@ -70,6 +70,7 @@ m.setTranslation(width/2, height/2 )
 let s = 2.2
 F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
 F_sequence.setup()
+
 
 
 import * as THREE from 'three';
@@ -106,6 +107,7 @@ function init() {
     F_sequence.setup_shapes_fidgets_three(scene)
     F_sequence.setup_chrono_three(scene)
     F_sequence.setup_debug_three(scene)
+  
 
 
 

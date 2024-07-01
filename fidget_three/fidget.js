@@ -95,7 +95,7 @@ export default class fidget{
   {     
     console.log('setup : fidget')                      
     this.bodies_set_debug( this.debug_mode )
-    this.bodies_set_visibility(this.debug_mode.show_inter, ['inters'])   
+    this.bodies_set_visibility_override(this.debug_mode.show_inter, ['inters'])   
     this.bodies_init_out_matrix()
   }
 
@@ -559,7 +559,7 @@ export default class fidget{
     }       
   }
 
-  bodies_set_visibility( value,body_type_filter = [] )
+  bodies_set_visibility_override( value,body_type_filter = [] )
   {
     
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
@@ -573,10 +573,46 @@ export default class fidget{
         if( this.bodies[b_type][key].constructor === Array)
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].visibility_override = value
+            this.bodies[b_type][key][i].debug_force_visibility = value
         }
         else
-          this.bodies[b_type][key].visibility_override = value
+          this.bodies[b_type][key].debug_force_visibility = value
+        
+      } 
+    } 
+  }  
+
+
+  bodies_set_visibility( value = null ,body_type_filter = [] )
+  {
+    
+    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    {   
+      let b_type = this.bodies_draw_order[i+0]
+      let key = this.bodies_draw_order[i+1]
+       
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      {
+     
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
+            if(value==null)
+              this.bodies[b_type][key][i].visibility = this.bodies[b_type][key][i].visibility_default 
+            else
+              this.bodies[b_type][key][i].visibility = value
+          }
+            
+        }
+        else
+        {
+          if(value==null)
+            this.bodies[b_type][key].visibility = this.bodies[b_type][key].visibility_default 
+          else
+            this.bodies[b_type][key].visibility = value
+        }
+          
         
       } 
     } 
@@ -612,10 +648,17 @@ export default class fidget{
     if( body_type_filter.length == 0)
     {
       this.matter_engine_runner.enabled = value 
+      
       //console.log('enable',value)
     }
 
+    //if(value)
+    //  this.bodies_set_visibility( null ,body_type_filter )
+    //else
+    //  this.bodies_set_visibility( false ,body_type_filter )
 
+
+    
 
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
@@ -630,6 +673,7 @@ export default class fidget{
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
             this.bodies[b_type][key][i].enable(value)
+            
     
             if(body_type_filter.length == 0)
               this.bodies[b_type][key][i].do_update = value            
@@ -638,6 +682,7 @@ export default class fidget{
         }
         else
           this.bodies[b_type][key].enable(value)
+          
           
           if(body_type_filter.length == 0)
             this.bodies[b_type][key].do_update = value
