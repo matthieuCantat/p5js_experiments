@@ -569,8 +569,10 @@ document.addEventListener('touchend', function(event) {
 export function create_mouse_constraint(matter_engine)
 {
 
+  var mouse = Matter.Mouse.create(document.body)
+
     var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
-        //mouse: mouse,
+        mouse: mouse,
         collisionFilter: { category: utils.collision_category.mouse, 
                            mask: utils.collision_category.inter}, // <---
         constraint: {
