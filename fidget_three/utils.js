@@ -619,6 +619,7 @@ export function create_physics_engine_runner(matter_engine)
   Matter.Runner.run(runner, matter_engine);
   //runner.delta  = 1000 / 60
   //runner.enabled = false
+  return runner
 }
 
 

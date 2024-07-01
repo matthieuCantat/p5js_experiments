@@ -64,6 +64,7 @@ export default class fidget{
     this.touch_enable = true
     this.anim_mode = false
     this.matter_engine = matter_engine
+    this.matter_engine_runner = matter_engine_runner 
     this.mouse_constraint = mouse_constraint
     this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, this.debug_mode.mouse_info)
     /////////////////////////////////////////////////////////////////// build
@@ -605,9 +606,17 @@ export default class fidget{
     } 
   }  
 
-  bodies_enable( value,body_type_filter = [] )
+  bodies_enable( value, body_type_filter = [] )
   {
-    //this.bodies_cns_enable(value,body_type_filter)
+
+    if( body_type_filter.length == 0)
+    {
+      this.matter_engine_runner.enabled = value 
+      //console.log('enable',value)
+    }
+
+
+
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
       let b_type = this.bodies_draw_order[i+0]
