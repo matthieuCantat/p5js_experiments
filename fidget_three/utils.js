@@ -389,6 +389,11 @@ export class Chrono
     this.time_str = time
   }
 
+  three_get_shape_points()
+  {
+    return this.font.generateShapes( this.time_str, 50 );
+  }
+
   update_three(group)
   {
     /*
@@ -426,9 +431,16 @@ export class Chrono
 
     if(this.font == null)
       return false
+
+    //this.three_shape = this.three_get_shape_points()
+    //for( let i = 0; i < this.three_shape.length; i++)
+    //  this.three_geometry.parameters.shapes[i].copy(this.three_shape[i])
+
+
     this.three_shape = this.font.generateShapes( this.time_str, 50 );
     this.three_geometry = new THREE.ShapeGeometry( this.three_shape );
     this.three_mesh.geometry = this.three_geometry;
+
 
     let converted_pos = convert_coords_matter_to_three(this.p, this.screen_dims)
     this.three_mesh.position.x = converted_pos.x()+this.x_offset_to_center
@@ -472,19 +484,31 @@ export function proj_vector_on_line(v_line, v)
 export var isMousePressed = false;
 export var isScreenTouched = false;
 export var userIsInteracting = false;
+var userIsInteracting_last = null;
+export var userInteractionChange = false;
 export var mouseX = 0;
 export var mouseY = 0;
 // Function to handle the mousedown event
 function handleMouseDown(event) {
     isMousePressed = true;
+    userIsInteracting_last = userIsInteracting
     userIsInteracting = isScreenTouched || isMousePressed
+    if( userIsInteracting != userIsInteracting_last)
+      userInteractionChange = true
+    else
+      userInteractionChange = false
     //console.log('Mouse is pressed:', isMousePressed);
 }
 
 // Function to handle the mouseup event
 function handleMouseUp(event) {
     isMousePressed = false;
+    userIsInteracting_last = userIsInteracting
     userIsInteracting = isScreenTouched || isMousePressed
+    if( userIsInteracting != userIsInteracting_last)
+      userInteractionChange = true
+    else
+      userInteractionChange = false    
     //console.log('Mouse is pressed:', isMousePressed);
 }
 
@@ -497,7 +521,12 @@ function handleMouseMove(event) {
 
 function handleTouchDown(event) {
   isScreenTouched = true;
+  userIsInteracting_last = userIsInteracting
   userIsInteracting = isScreenTouched || isMousePressed
+  if( userIsInteracting != userIsInteracting_last)
+    userInteractionChange = true
+  else
+    userInteractionChange = false  
   //console.log('Mouse is pressed:', isMousePressed);
   // mouse must be update sooner
   const touch = event.touches[0] || event.changedTouches[0]; 
@@ -507,7 +536,12 @@ function handleTouchDown(event) {
 
 function handleTouchUp(event) {
   isScreenTouched = false;
+  userIsInteracting_last = userIsInteracting
   userIsInteracting = isScreenTouched || isMousePressed
+  if( userIsInteracting != userIsInteracting_last)
+    userInteractionChange = true
+  else
+    userInteractionChange = false  
   //console.log('Mouse is pressed:', isMousePressed);
 }
 

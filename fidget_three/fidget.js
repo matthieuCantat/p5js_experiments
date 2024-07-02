@@ -109,8 +109,9 @@ export default class fidget{
     return 1      
   }
 
-  set_step_resolution( resolution_coef, update_interaction = false)
+  set_step_resolution( )
   {
+    /*
     // utils
     var selected_body = this.mouse_constraint.constraint.bodyB
 
@@ -135,6 +136,7 @@ export default class fidget{
       this.update_step_count(step)
     }
     ////////////////////////////////////////////////////////////////////////////////////
+    */
   }
 
   update()

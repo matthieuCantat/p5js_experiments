@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY , userIsInteracting} from './utils.js';
+import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY , userIsInteracting,userInteractionChange} from './utils.js';
 import fidget_daft_i from './fidget_daft_i.js';
 import fidget_windmill from './fidget_windmill.js';
 
@@ -57,7 +57,9 @@ export default class fidgets_sequence
         this.chrono_appears_end   = 290  
         this.chrono_appears_range = this.chrono_appears_end-this.chrono_appears_start
 
+        this.fidgets_do_computation = []
         this.fidgets_do_computation_last = []
+        this.resolution_coef = 0
   
 
     }
@@ -71,6 +73,7 @@ export default class fidgets_sequence
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
         this.fidgets[i].setup();
+        this.fidgets_do_computation.push(null)
         this.fidgets_do_computation_last.push(null)
       }
 
@@ -131,20 +134,23 @@ export default class fidgets_sequence
         
       
         if(this.fidgets_to_show[0] < 0 )
-        {
+        {/*
           var a = Math.min(1,Math.max(0,this.end_update_count / 100))
-          this.chrono.stop()
+          
           let blendA = 0.5 *a + 0.1 *(1-a)
           let blendB = 0.07*a + 0.05*(1-a)
           p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
           s_chrono = this.screen_dims.x * blendB
-      
+          */
+          this.chrono.stop()
           this.end_update_count += 1
         }
         else
         {
+          /*
           p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * 0.1)
           s_chrono = this.screen_dims.x * 0.05
+          */
           this.end_update_count = 0
       
         }
@@ -207,6 +213,12 @@ export default class fidgets_sequence
 
     update()
     {
+      this.resolution_coef = this.get_resolution_coef_info()
+      for( let i = 0; i < this.fidgets.length; i++ )
+        this.fidgets_do_computation[i] = this.do_fidget_computation(i)
+        
+
+
       var user_interaction_start = 290
       if(this.debug_mode.disable_animation)
       {
@@ -254,7 +266,7 @@ export default class fidgets_sequence
       }
 
      
-      let fidget_sequence_ends = 0.99 < this.get_resolution_coef_info()
+      let fidget_sequence_ends = 0.99 < this.resolution_coef
       if(  fidget_sequence_ends )
       {
         if(this.chrono.is_at_start() == false)
@@ -282,7 +294,7 @@ export default class fidgets_sequence
 
     do_fidget_computation(i)
     {
-      var rez = this.get_resolution_coef_info()
+      var rez = this.resolution_coef
       
       var rez_step = rez*this.fidgets_nbr
       var coef = this.fidgets_nbr-rez_step
@@ -298,7 +310,7 @@ export default class fidgets_sequence
         if(this.anim_mode == false)
         {
           
-          let do_computation = this.do_fidget_computation(i)
+          let do_computation = this.fidgets_do_computation[i]
           if( this.fidgets_do_computation_last[i] != do_computation )
           {
             if(do_computation == true)
@@ -314,11 +326,14 @@ export default class fidgets_sequence
 
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
-        if((this.anim_mode == false)&&(this.do_fidget_computation(i) == false))
+        if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
         this.fidgets[i].update()
-        this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
+        if(userInteractionChange)
+          this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
       }
+
+
     }
 
 
@@ -327,7 +342,7 @@ export default class fidgets_sequence
 
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
-        if((this.anim_mode == false)&&(this.do_fidget_computation(i) == false))
+        if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
         this.fidgets[i].animate_three()
       }

@@ -1785,12 +1785,9 @@ export default class fidget_daft_i extends fidget{
   }
   
 
-  set_step_resolution( resolution_coef, update_interaction = false)
+  set_step_resolution()
   {
 
-    // clean
-    this.bodies_axe_clean_override()
-    this.bodies_rot_clean_override()
     this.bodies_enable( 0,  ['inters'] )
     this.bodies_enable( 0,  ['effects'] )
     for( let i=0; i < this.bodies.inters.test.length; i++)
@@ -1802,6 +1799,11 @@ export default class fidget_daft_i extends fidget{
     let do_it = this.state.current_step == step
     if( do_it )
     {
+      if(this.state.steps[step].update_count == 0 )
+      {
+        this.bodies_axe_clean_override()
+        this.bodies_rot_clean_override()     
+      }
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.enable(1) 
       this.bodies.inters.background.enable(1)
@@ -1832,6 +1834,7 @@ export default class fidget_daft_i extends fidget{
       this.state.switch_selection_happened_step = step
       this.update_step_count(step)
     }
+
     
     ////////////////////////////////////////////////////////////////////////////////////
     step = 1
@@ -1839,7 +1842,11 @@ export default class fidget_daft_i extends fidget{
     do_it = this.state.current_step == step
     if( do_it )
     {      
-      
+      if(this.state.steps[step].update_count == 0 )
+      {
+        this.bodies_axe_clean_override()
+        this.bodies_rot_clean_override()     
+      }      
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       this.bodies.inters.B.enable(1) 
@@ -1940,7 +1947,11 @@ export default class fidget_daft_i extends fidget{
     do_it = this.state.current_step == step
     if( do_it )
     {
-
+      if(this.state.steps[step].update_count == 0 )
+      {
+        this.bodies_axe_clean_override()
+        this.bodies_rot_clean_override()     
+      }
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       //this.bodies.inters.B.m_transform.setRotation(rad(270))
@@ -2052,7 +2063,11 @@ export default class fidget_daft_i extends fidget{
     do_it = this.state.current_step == step
     if( do_it )
     {
-      
+      if(this.state.steps[step].update_count == 0 )
+      {
+        this.bodies_axe_clean_override()
+        this.bodies_rot_clean_override()     
+      }      
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1
       //this.bodies.inters.B.m_transform.setRotation(rad(270))
@@ -2297,7 +2312,7 @@ export default class fidget_daft_i extends fidget{
     // resolution
     this.state.resolution_coef_last = this.state.resolution_coef
     this.get_resolution_coef_info( this.resolution_coef_override )
-    this.set_step_resolution( this.state.resolution_coef, this.resolution_coef_override != null)
+    this.set_step_resolution()
     this.track_user_drag_error()
     this.bodies_update()
     this.draw_background()
