@@ -2,7 +2,7 @@
 import Vector from './vector.js';
 //import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import * as THREE from 'three';
+import * as THREE from "three";
 
 ////////////////////////////////////////////// utils
 export function rad(value)
@@ -310,6 +310,7 @@ export class Chrono
     this.three_geometry = null
     this.three_mesh = null
     this.screen_dims = screen_dims
+    this.stopTime = false
 
     this.font = null
     let Chrono = this
@@ -347,7 +348,8 @@ export class Chrono
       Chrono.three_mesh.visible = Chrono.v   
       Chrono.three_mesh.scale.x = Chrono.s*0.015  
       Chrono.three_mesh.scale.y = Chrono.s*0.015  
-      Chrono.three_mesh.scale.z = Chrono.s*0.015        
+      Chrono.three_mesh.scale.z = Chrono.s*0.015  
+      Chrono.three_mesh.visible = false  
       scene_three.add( Chrono.three_mesh );
     } ); //end load function   
     
@@ -357,12 +359,19 @@ export class Chrono
   start()
   {
     this.startTime = (new Date()).valueOf();
+    this.stopTime = false
   }
 
   stop()
   {
-    this.startTime = null;
+    //this.startTime = null;
+    this.stopTime = true
   } 
+
+  reset()
+  {
+    this.startTime = null;
+  }
 
   is_at_start()
   {
@@ -380,7 +389,7 @@ export class Chrono
   }
 
   update() {
-    if( this.startTime == null )
+    if( this.stopTime )
       return;
     const currentTime = (new Date()).valueOf();
     const deltaTime = (currentTime - this.startTime);
@@ -436,7 +445,7 @@ export class Chrono
     //for( let i = 0; i < this.three_shape.length; i++)
     //  this.three_geometry.parameters.shapes[i].copy(this.three_shape[i])
 
-
+    this.three_mesh.visible = true
     this.three_shape = this.font.generateShapes( this.time_str, 50 );
     this.three_geometry = new THREE.ShapeGeometry( this.three_shape );
     this.three_mesh.geometry = this.three_geometry;

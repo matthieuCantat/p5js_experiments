@@ -142,8 +142,9 @@ export default class fidgets_sequence
           p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
           s_chrono = this.screen_dims.x * blendB
           */
-          this.chrono.stop()
-          this.end_update_count += 1
+          //this.chrono.stop()
+          //this.end_update_count += 1
+          
         }
         else
         {
@@ -151,13 +152,13 @@ export default class fidgets_sequence
           p_chrono = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * 0.1)
           s_chrono = this.screen_dims.x * 0.05
           */
-          this.end_update_count = 0
+          //this.end_update_count = 0
       
         }
         //this.chrono.p = p_chrono
         //this.chrono.s = s_chrono
-        this.chrono.update()
-        this.chrono.update_three()
+        //this.chrono.update()
+        //this.chrono.update_three()
     }
     
 
@@ -273,8 +274,13 @@ export default class fidgets_sequence
         {
           this.chrono_end_time_show_start = this.update_count
           this.chrono_end_time_show_end   = this.update_count+40  
+
+          this.chrono.update()
+          this.chrono.update_three()
+          this.chrono.stop()          
         }
-        this.chrono.stop()
+
+        
 
         _delta = this.chrono_end_time_show_end-this.chrono_end_time_show_start
         _count = Math.max( 0, this.update_count-this.chrono_end_time_show_start)
