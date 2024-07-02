@@ -442,6 +442,13 @@ export default class fidget_daft_i extends fidget{
 
       var text_checker_three = ut.get_texture_grid_checker()
       var text_checker_three_grey = ut.get_texture_grid_checker_grey()    
+
+
+      let opts_global = {
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine, 
+        mouse_constraint: this.mouse_constraint,
+    }
       
       
 
@@ -453,7 +460,7 @@ export default class fidget_daft_i extends fidget{
     m_shape.set_row(0,m_shape.get_row(0).getMult(this.screen_dims.x/2))
     m_shape.set_row(1,m_shape.get_row(1).getMult(this.screen_dims.y))
     
-    let oBackground = {
+    let oBackground = { ...opts_global,
       m:this.m,
       z:z_depth, 
       m_shape: m_shape,
@@ -465,9 +472,6 @@ export default class fidget_daft_i extends fidget{
       collision_mask: utils.collision_category.none,
       type: utils.shape.rectangle,
       density:0.01, 
-      screen_dims: this.screen_dims,
-      matter_engine: this.matter_engine,
-      mouse_constraint: this.mouse_constraint,
       //texture_three: text_checker_three_grey,
     } 
     z_depth += z_depth_incr
@@ -505,10 +509,7 @@ export default class fidget_daft_i extends fidget{
     m_shape.set_row(1,m_shape.get_row(1).getMult(220/2.4*s))
     
 
-    this.bodies.inters.background = new body_build({
-      screen_dims: this.screen_dims,
-      matter_engine: this.matter_engine, 
-      mouse_constraint: this.mouse_constraint,
+    this.bodies.inters.background = new body_build({ ...opts_global,
 
       name:'inter_background',
       highlight_selection:[],  
@@ -526,7 +527,7 @@ export default class fidget_daft_i extends fidget{
       color:utils.color.grey,
       color_line: utils.color.black,
       texture_three: text_checker_three_grey, 
-      shader: this.shaders.length != 0 ? this.shaders[0] : null,
+
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
       //collision_category: utils.collision_category.inter,
@@ -554,11 +555,7 @@ export default class fidget_daft_i extends fidget{
     m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
     m_shape.set_row(1,m_shape.get_row(1).getMult(50*s))
      
-    this.bodies.geos.circle = new body_build({
-                                    screen_dims: this.screen_dims,
-                                    matter_engine: this.matter_engine,
-                                    mouse_constraint: this.mouse_constraint,
-
+    this.bodies.geos.circle = new body_build({ ...opts_global,
                                     name:'geo_circle',
 
                                     m:this.m,
@@ -573,7 +570,6 @@ export default class fidget_daft_i extends fidget{
                                     color: this.colors[0],
                                     color_line: utils.color.black,
                                     texture_three: text_checker_three,
-                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                     collision_category: utils.collision_category.blue,
                                     collision_mask: utils.collision_category.default ,    
@@ -600,11 +596,7 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(50*s+scale_inter))
       m_shape.set_row(1,m_shape.get_row(1).getMult(50*s+scale_inter))
 
-      this.bodies.inters.circle = new body_build({
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,
-        mouse_constraint: this.mouse_constraint,
-
+      this.bodies.inters.circle = new body_build({ ...opts_global,
         name:'inter_circle',
         highlight_selection:[this.bodies.geos.circle],  
 
@@ -621,7 +613,6 @@ export default class fidget_daft_i extends fidget{
         color:utils.color.grey,
         color_line: utils.color.black,
         texture_three: text_checker_three_grey, 
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
         collision_category: utils.collision_category.inter,
         collision_mask: utils.collision_category.mouse, 
@@ -645,14 +636,9 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s))
       m_shape.set_row(1,m_shape.get_row(1).getMult(18*s))
 
-      let oRectangle = { 
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,  
-        mouse_constraint: this.mouse_constraint,
-
+      let oRectangle = { ...opts_global,
         name:'geo_rectangle',
          
-
         m:this.m,
         parent:this.bodies.inters.background,
         m_offset:new Matrix(),
@@ -665,7 +651,6 @@ export default class fidget_daft_i extends fidget{
         color : this.colors[1],
         color_line: utils.color.black,
         //texture_three: text_checker_three, 
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
         collision_category : utils.collision_category.green,
         collision_mask : utils.collision_category.default, 
@@ -696,11 +681,7 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
       m_shape.set_row(1,m_shape.get_row(1).getMult(18*s+scale_inter))
 
-      this.bodies.inters.rectangle = new body_build({ 
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,  
-        mouse_constraint: this.mouse_constraint,
-
+      this.bodies.inters.rectangle = new body_build({ ...opts_global,
         name:'inter_rectangle',
         highlight_selection:[this.bodies.geos.rectangle],  
          
@@ -744,10 +725,7 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(16.21*s))
       m_shape.set_row(1,m_shape.get_row(1).getMult(3.51*s))
 
-      let oRect = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine, 
-        mouse_constraint: this.mouse_constraint,
+      let oRect = { ...opts_global,
 
         m:this.m,
         parent:this.bodies.inters.background,
@@ -760,7 +738,6 @@ export default class fidget_daft_i extends fidget{
         color: this.colors[2],
         color_line: utils.color.black,
         //texture_three: text_checker_three,
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
         collision_category: utils.collision_category.blue,
         collision_mask: utils.collision_category.default,// | utils.collision_category.blue,
@@ -991,10 +968,7 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(200/2.4*s))
       m_shape.set_row(1,m_shape.get_row(1).getMult(50/2.4*s))
 
-      this.bodies.inters.B = new body_build({
-                                        screen_dims: this.screen_dims,
-                                        matter_engine: this.matter_engine,  
-                                        mouse_constraint: this.mouse_constraint,
+      this.bodies.inters.B = new body_build({ ...opts_global,
 
                                         name:'inter_B',   
                                         highlight_selection:[this.bodies.geos.rectangle], 
@@ -1013,7 +987,6 @@ export default class fidget_daft_i extends fidget{
                                         color:utils.color.grey,
                                         color_line: utils.color.black,
                                         texture_three: text_checker_three_grey,
-                                        shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                         collision_category: utils.collision_category.inter,
                                         collision_mask: utils.collision_category.mouse,
@@ -1043,10 +1016,7 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(400/2.4*s*0.355))
       m_shape.set_row(1,m_shape.get_row(1).getMult(1))   
 
-      this.bodies.helpers.stepB = new body_build({ 
-                                                    screen_dims: this.screen_dims,
-                                                    matter_engine: this.matter_engine,  
-                                                    mouse_constraint: this.mouse_constraint,
+      this.bodies.helpers.stepB = new body_build({  ...opts_global,
 
                                                     name:'helper_B', 
 
@@ -1065,7 +1035,6 @@ export default class fidget_daft_i extends fidget{
                                                     //texture_three: text_checker_three,
                                                     transparency_activate: true,
                                                     transparency_line:1.0,                                                  
-                                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                                     collision_category: utils.collision_category.none,
                                                     collision_mask: utils.collision_category.none ,
@@ -1079,11 +1048,7 @@ export default class fidget_daft_i extends fidget{
       m_shape.set_row(0,m_shape.get_row(0).getMult(50/2.4*s))
       m_shape.set_row(1,m_shape.get_row(1).getMult(200/2.4*s))    
 
-      this.bodies.inters.C = new body_build({ 
-                                      screen_dims: this.screen_dims,
-                                      matter_engine: this.matter_engine,  
-                                      mouse_constraint: this.mouse_constraint,
-
+      this.bodies.inters.C = new body_build({  ...opts_global,
                                       name:'inter_C', 
                                       highlight_selection:[this.bodies.geos.rectangle], 
                                       selection_break_length:300.0,
@@ -1102,7 +1067,6 @@ export default class fidget_daft_i extends fidget{
                                       color:utils.color.grey,
                                       color_line: utils.color.black,
                                       texture_three: text_checker_three_grey, 
-                                      shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                       collision_category: utils.collision_category.inter,
                                       collision_mask: utils.collision_category.mouse,
@@ -1132,10 +1096,7 @@ export default class fidget_daft_i extends fidget{
     m_shape.set_row(0,m_shape.get_row(0).getMult(1))
     m_shape.set_row(1,m_shape.get_row(1).getMult(59*s))  
 
-    this.bodies.helpers.stepC = new body_build({  
-                                                  screen_dims: this.screen_dims,
-                                                  matter_engine: this.matter_engine, 
-                                                  mouse_constraint: this.mouse_constraint,
+    this.bodies.helpers.stepC = new body_build({   ...opts_global,
 
                                                   name:'helper_C',   
 
@@ -1152,7 +1113,6 @@ export default class fidget_daft_i extends fidget{
                                                   transparency_activate: true,
                                                   transparency_line:1.0,     
                                                   //texture_three: text_checker_three,                                              
-                                                  shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
@@ -1167,10 +1127,7 @@ export default class fidget_daft_i extends fidget{
     m_shape.set_row(0,m_shape.get_row(0).getMult(100/2.4*s))
     m_shape.set_row(1,m_shape.get_row(1).getMult(100/2.4*s)) 
 
-    this.bodies.inters.A = new body_build({  
-                                    screen_dims: this.screen_dims,
-                                    matter_engine: this.matter_engine,
-                                    mouse_constraint: this.mouse_constraint,
+    this.bodies.inters.A = new body_build({  ...opts_global,
 
                                     name:'inter_A',     
                                     highlight_selection:[this.bodies.geos.rectangles[3]],  
@@ -1189,7 +1146,6 @@ export default class fidget_daft_i extends fidget{
                                     color:utils.color.grey,
                                     color_line: utils.color.black,
                                     texture_three: text_checker_three_grey, 
-                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                     collision_category: utils.collision_category.inter,
                                     collision_mask: utils.collision_category.mouse,
@@ -1215,9 +1171,7 @@ export default class fidget_daft_i extends fidget{
         z_depth:z_depth,
         rot:0, 
         scale_shape:s,
-        opts:{ screen_dims : this.screen_dims,
-          matter_engine : this.matter_engine,
-          mouse_constraint : this.mouse_constraint,
+        opts:{  ...opts_global,
           m : this.m,
           parent:this.bodies.inters.background}        
       }                            
@@ -1235,9 +1189,7 @@ export default class fidget_daft_i extends fidget{
         z_depth:z_depth,
         rot:-90, 
         scale_shape:s,
-        opts:{ screen_dims : this.screen_dims,
-          matter_engine : this.matter_engine,
-          mouse_constraint : this.mouse_constraint,
+        opts:{  ...opts_global,
           m : this.m,
           parent:this.bodies.inters.background}        
       }                            
@@ -1255,9 +1207,7 @@ export default class fidget_daft_i extends fidget{
         z_depth:z_depth,
         rot:0, 
         scale_shape:s,
-        opts:{ screen_dims : this.screen_dims,
-          matter_engine : this.matter_engine,
-          mouse_constraint : this.mouse_constraint,
+        opts:{ ...opts_global,
           m : this.m,
           parent:this.bodies.inters.background}        
       }                            
@@ -1276,10 +1226,7 @@ export default class fidget_daft_i extends fidget{
     m_shape.set_row(0,m_shape.get_row(0).getMult(1))
     m_shape.set_row(1,m_shape.get_row(1).getMult(25*s)) 
 
-    this.bodies.helpers.stepA = new body_build({  
-                                                  screen_dims: this.screen_dims,
-                                                  matter_engine: this.matter_engine,
-                                                  mouse_constraint: this.mouse_constraint,
+    this.bodies.helpers.stepA = new body_build({   ...opts_global,
 
                                                   name:'helper_A',  
 
@@ -1296,7 +1243,6 @@ export default class fidget_daft_i extends fidget{
                                                   transparency_activate: true,
                                                   transparency_line:1.0,
                                                   //texture_three: text_checker_three,
-                                                  shader: this.shaders.length != 0 ? this.shaders[0] : null,
 
                                                   collision_category: utils.collision_category.none,
                                                   collision_mask: utils.collision_category.none ,
