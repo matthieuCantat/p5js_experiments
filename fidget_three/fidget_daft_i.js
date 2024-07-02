@@ -530,8 +530,7 @@ export default class fidget_daft_i extends fidget{
 
       collision_category: utils.collision_category.none,
       collision_mask: utils.collision_category.none,
-      //collision_category: utils.collision_category.inter,
-      //collision_mask: utils.collision_category.mouse,
+
       constraints:[
         { name:'point'    ,type:'dyn_point', stiffness: 0.05,damping:0.01,length:0.01},
         { name:'orient'   ,type:'dyn_orient',stiffness: 0.2,damping:0.01,length:0.01},
@@ -575,9 +574,7 @@ export default class fidget_daft_i extends fidget{
                                     collision_mask: utils.collision_category.default ,    
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background},
-                                      //{  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.1,damping:0.01,length:0.01},
-                                      //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},                                          
+                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
                                     ],                                      
                                     density:0.001,     
                                     
@@ -655,8 +652,6 @@ export default class fidget_daft_i extends fidget{
         collision_category : utils.collision_category.green,
         collision_mask : utils.collision_category.default, 
         constraints:[
-          //{  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.1,damping:0.01,length:0.01},
-          //{  name:'orient',type:'dyn_orient',target:this.bodies.inters.background,stiffness: 0.1,damping:0.01,length:0.01},  
           { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
           { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
           {  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
@@ -992,9 +987,7 @@ export default class fidget_daft_i extends fidget{
                                         collision_mask: utils.collision_category.mouse,
                                         constraints:[
                                           { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,stiffness: 0.999,damping:0.1,length:0.01},
-                                          //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.01,length:0.01},  
-                                          //{ name:'orient' ,type:'kin_orient' ,target:this.bodies.inters.background},                 
+                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.01,length:0.01},                 
                                           { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
                                         ],      
 
@@ -1072,8 +1065,6 @@ export default class fidget_daft_i extends fidget{
                                       collision_mask: utils.collision_category.mouse,
                                       constraints:[
                                         { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
-                                        //{ name:'orient',type:'dyn_orient',target:this.bodies.inters.background, stiffness: 0.01,damping:0.01,length:0.01},
-                                        //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
                                         { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001 },
                                       ], 
@@ -1151,8 +1142,6 @@ export default class fidget_daft_i extends fidget{
                                     collision_mask: utils.collision_category.mouse,
                                     constraints:[
                                       { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
-                                      //{ name:'orient',type:'dyn_orient',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 0.1,damping:0.01,length:0.01},
-                                      //{ name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                       { name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ], 
