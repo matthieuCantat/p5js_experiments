@@ -8,6 +8,341 @@ import * as ut from './utils_three.js';
 import { and } from './libraries/jsm/nodes/Nodes.js';
 
 
+
+
+
+
+function build_effects_trail(opts,body_target)
+{
+  let bodies = []
+
+  bodies.push(new body_build({ ...opts, 
+                                name: opts.name + 'effect_trails1',
+
+                                do_shape: true,
+                                do_line:false,                                         
+                                color:utils.color.red,
+                                //color_line: utils.color.black,
+                                //texture_three: text_checker_three_grey, 
+
+                                collision_category: utils.collision_category.none,
+                                collision_mask: utils.collision_category.none,                                               
+                                constraints:[
+                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.15},
+                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.15}, 
+                                ],
+
+
+                                //debug_matrix_info: false,
+                                //debug_matrix_axes: debug.matrix_axes,  
+                                //debug_cns_axes: debug.cns_axes,     
+                                //debug_force_visibility: debug.force_visibility,                                                          
+                              }))    
+  bodies.push(new body_build({ ...opts, 
+                                name: opts.name + 'effect_trails2',
+
+                                do_shape: true,
+                                do_line:false,                                         
+                                color:utils.color.blue,
+                                //color_line: utils.color.black,
+                                //texture_three: text_checker_three_grey, 
+
+                                collision_category: utils.collision_category.none,
+                                collision_mask: utils.collision_category.none,                                               
+                                constraints:[
+                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.2},
+                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.2}, 
+                                ],
+
+                                //debug_matrix_info: false,
+                                //debug_matrix_axes: debug.matrix_axes,  
+                                //debug_cns_axes: debug.cns_axes,     
+                                //debug_force_visibility: debug.force_visibility,                                                          
+                              }))  
+                                                                                    
+  bodies.push(new body_build({ ...opts, 
+                                name: opts.name + 'effect_trails3',
+
+                                do_shape: true,
+                                do_line:false,                                         
+                                color:utils.color.green,
+                                //color_line: utils.color.black,
+                                //texture_three: text_checker_three_grey, 
+
+                                collision_category: utils.collision_category.none,
+                                collision_mask: utils.collision_category.none,                                               
+                                constraints:[
+                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.3},
+                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.3}, 
+                                ],
+
+                                //debug_matrix_info: false,
+                                //debug_matrix_axes: debug.matrix_axes,  
+                                //debug_cns_axes: debug.cns_axes,     
+                                //debug_force_visibility: debug.force_visibility,                                                          
+                              }))   
+                                            
+  return bodies
+}
+
+
+function build_effects_particles_sparcles(opts)
+{
+  let bodies = []
+
+  let m_shape = new Matrix()
+  m_shape.set_row(0,m_shape.get_row(0).getMult(8*opts.scale_shape))
+  m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
+
+  let oEffectsA = {
+    screen_dims: opts.opts.screen_dims,
+    matter_engine: opts.opts.matter_engine, 
+    mouse_constraint: opts.opts.mouse_constraint,
+
+    m:opts.opts.m,
+    parent:opts.opts.parent,
+    m_shape: m_shape,
+    z:opts.z_depth, 
+    type: utils.shape.rectangle,
+
+    do_shape: true,
+    do_line:false,           
+    color: utils.color.white,
+    color_line: utils.color.white,
+    //texture_three: text_checker_three,
+
+    collision_category: utils.collision_category.none,
+    collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
+
+    density:0.001, 
+                    
+  } 
+  let om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.rot)+rad(90))                                       
+  bodies.push(new body_build({ ...oEffectsA, 
+                                          name: opts.name + 'effect_sparcles1',
+
+                                          m_offset:om_EA1,
+
+                                          //debug_matrix_info: false,
+                                          //debug_matrix_axes: debug.matrix_axes,  
+                                          //debug_cns_axes: debug.cns_axes,  
+                                          //debug_force_visibility: debug.force_visibility,                                                         
+                                        }))                                            
+
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.rot)+rad(45))                                       
+  bodies.push(new body_build({ ...oEffectsA, 
+                                          name: opts.name + 'effect_sparcles2',
+
+                                          m_offset:om_EA1,
+
+                                          //debug_matrix_info: false,
+                                          //debug_matrix_axes: debug.matrix_axes,  
+                                          //debug_cns_axes: debug.cns_axes,  
+                                          //debug_force_visibility: debug.force_visibility,                                                         
+                                        })) 
+                                        
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.rot)+rad(135))                                       
+  bodies.push(new body_build({ ...oEffectsA, 
+                                          name: opts.name + 'effect_sparcles3',
+
+                                          m_offset:om_EA1,
+
+                                          //debug_matrix_info: false,
+                                          //debug_matrix_axes: debug.matrix_axes,  
+                                          //debug_cns_axes: debug.cns_axes,  
+                                          //debug_force_visibility: debug.force_visibility,                                                         
+                                        })) 
+
+  return bodies                              
+}
+
+
+
+
+function build_effects_particles_shapes(opts)
+{
+  let bodies = []
+
+  let m_shape = new Matrix()
+  m_shape.set_row(0,m_shape.get_row(0).getMult(8*opts.scale_shape))
+  m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
+
+  let oEffectsA = {
+    screen_dims: opts.opts.screen_dims,
+    matter_engine: opts.opts.matter_engine, 
+    mouse_constraint: opts.opts.mouse_constraint,
+
+    m:opts.opts.m,
+    parent:opts.opts.parent,
+    m_shape: m_shape,
+    z:opts.z_depth, 
+    type: utils.shape.rectangle,
+
+    do_shape: true,
+    do_line:false,           
+    color: utils.color.white,
+    color_line: utils.color.white,
+    //texture_three: text_checker_three,
+
+    collision_category: utils.collision_category.none,
+    collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
+
+    density:0.001, 
+                    
+  } 
+  let om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.rot)+rad(90))                                       
+
+
+  let m_shape_modif = new Matrix()
+  m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*opts.scale_shape))
+  m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*opts.scale_shape))                                            
+  bodies.push(new body_build({ ...oEffectsA, 
+                                          name: opts.name + 'effect_particle_shape1',
+
+                                          m_offset:om_EA1,
+                                          m_shape: m_shape_modif,
+                                          z:opts.z_depth, 
+                                          type: utils.shape.rectangle,
+
+                                          do_shape: false,
+                                          do_line:true, 
+
+                                          //debug_matrix_info: false,
+                                          //debug_matrix_axes: debug.matrix_axes,  
+                                          //debug_cns_axes: debug.cns_axes,  
+                                          //debug_force_visibility: debug.force_visibility,                                                         
+                                        }))                                             
+
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.rot)+rad(45))                                       
+
+
+
+  m_shape_modif = new Matrix()
+  m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*opts.scale_shape))
+  m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*opts.scale_shape))                                            
+  bodies.push(new body_build({ ...oEffectsA, 
+                                          name: opts.name + 'effect_particle_shape2',
+
+                                          m_offset:om_EA1,
+                                          m_shape: m_shape_modif,
+                                          z:opts.z_depth, 
+                                          type: utils.shape.rectangle,
+
+                                          do_shape: false,
+                                          do_line:true, 
+
+                                          //debug_matrix_info: false,
+                                          //debug_matrix_axes: debug.matrix_axes,  
+                                          //debug_cns_axes: debug.cns_axes,  
+                                          //debug_force_visibility: debug.force_visibility,                                                         
+                                        }))                                             
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.rot)+rad(135))                                       
+
+
+  m_shape_modif = new Matrix()
+  m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*opts.scale_shape))
+  m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*opts.scale_shape))                                            
+  bodies.push(new body_build({ ...oEffectsA, 
+                                          name: opts.name + 'effect_particle_shape3',
+
+                                          m_offset:om_EA1,
+                                          m_shape: m_shape_modif,
+                                          z:opts.z_depth, 
+                                          type: utils.shape.rectangle,
+
+                                          do_shape: false,
+                                          do_line:true, 
+
+                                          //debug_matrix_info: false,
+                                          //debug_matrix_axes: debug.matrix_axes,  
+                                          //debug_cns_axes: debug.cns_axes,  
+                                          //debug_force_visibility: debug.force_visibility,                                                         
+                                        }))                                             
+
+
+  return bodies                              
+}
+
+
+
+
+
+function build_effects_wall(opts)
+{
+                                    
+  let m_shape = new Matrix()
+  m_shape.set_row(0,m_shape.get_row(0).getMult(55*opts.scale_shape))
+  m_shape.set_row(1,m_shape.get_row(1).getMult(1.*opts.scale_shape))
+
+  let om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y()-1)
+  om_EA1.setRotation(rad(opts.rot)+rad(0))                                       
+  let body = new body_build({ 
+                                screen_dims: opts.opts.screen_dims,
+                                matter_engine: opts.opts.matter_engine,
+                                mouse_constraint: opts.opts.mouse_constraint,
+
+                                name: opts.name+'effect_wall',     
+
+                                m:opts.opts.m,
+                                parent:opts.opts.parent,                                    
+                                m_offset:om_EA1,
+                                m_shape:m_shape,
+                                z:opts.z_depth,
+                                type : utils.shape.rectangle,
+
+                                do_shape: true,
+                                do_line:false,                                       
+                                color:utils.color.white,
+                                color_line: utils.color.black,
+                                //texture_three: text_checker_three_grey, 
+
+                                collision_category: utils.collision_category.none,
+                                collision_mask: utils.collision_category.none,
+                          
+
+                                density:0.01, 
+        
+                                //debug_matrix_info: false,
+                                //debug_matrix_axes: debug.matrix_axes,  
+                                //debug_cns_axes: debug.cns_axes, 
+                                //debug_force_visibility: debug.force_visibility,                                                                                
+                              }) 
+                              
+
+  return body                              
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export default class fidget_daft_i extends fidget{
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -80,8 +415,8 @@ export default class fidget_daft_i extends fidget{
             'effects','colB_shapes', 
             'effects','colB_wall', 
             'effects','colC_sparcles', 
-            //'effects','colC_shapes',
-            //'effects','colC_wall',    
+            'effects','colC_shapes',
+            'effects','colC_wall',    
             'inters','test',                                     
             ]   
   
@@ -352,74 +687,7 @@ export default class fidget_daft_i extends fidget{
 
 
       this.bodies.geos.rectangle = new body_build(oRectangle)
-
-      
-      this.bodies.effects.movB_trails.push(new body_build({ ...oRectangle, 
-                                              name:'effect_movB_trails1',
-
-                                              do_shape: true,
-                                              do_line:false,                                         
-                                              color:utils.color.red,
-                                              //color_line: utils.color.black,
-                                              //texture_three: text_checker_three_grey, 
-
-                                              collision_category: utils.collision_category.none,
-                                              collision_mask: utils.collision_category.none,                                               
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangle,  stiffness: 0.15},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangle, stiffness: 0.15}, 
-                                              ],
-
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            }))    
-      this.bodies.effects.movB_trails.push(new body_build({ ...oRectangle, 
-                                              name:'effect_movB_trails2',
-
-                                              do_shape: true,
-                                              do_line:false,                                         
-                                              color:utils.color.blue,
-                                              //color_line: utils.color.black,
-                                              //texture_three: text_checker_three_grey, 
-
-                                              collision_category: utils.collision_category.none,
-                                              collision_mask: utils.collision_category.none,                                               
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangle,  stiffness: 0.2},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangle, stiffness: 0.2}, 
-                                              ],
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            }))  
-                                                                                    
-      this.bodies.effects.movB_trails.push(new body_build({ ...oRectangle, 
-                                              name:'effect_movB_trails3',
-
-                                              do_shape: true,
-                                              do_line:false,                                         
-                                              color:utils.color.green,
-                                              //color_line: utils.color.black,
-                                              //texture_three: text_checker_three_grey, 
-
-                                              collision_category: utils.collision_category.none,
-                                              collision_mask: utils.collision_category.none,                                               
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangle,  stiffness: 0.3},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangle, stiffness: 0.3}, 
-                                              ],
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            }))     
-
+      this.bodies.effects.movB_trails = build_effects_trail(oRectangle,this.bodies.geos.rectangle)
 
 
 
@@ -667,123 +935,56 @@ export default class fidget_daft_i extends fidget{
       om_rD.setTranslation(
         offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
         offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
-      om_rD.setRotation(rad(rot_tmp+180))                                          
-      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_TL',
-
-                                              m_offset:om_rD,
-                                              m_shape:m_shape,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            })) 
+      om_rD.setRotation(rad(rot_tmp+180))   
       
+      let oRect_TL = { ...oRect, 
+        name:'geo_rectangle_TL',
+
+        m_offset:om_rD,
+        m_shape:m_shape,
+
+        debug_matrix_info: false,
+        debug_matrix_axes: debug.matrix_axes,  
+        debug_cns_axes: debug.cns_axes,     
+        debug_force_visibility: debug.force_visibility,                                                          
+      }  
+
+      this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
+      this.bodies.effects.movA_trails = build_effects_trail(oRect_TL,this.bodies.geos.rectangles[3])                                
+
+                                            
       this.bodies.inters.rectangles.push(new body_build({ ...oRect, 
-                                              name:'inter_rectangle_TL',
-                                              highlight_selection:[this.bodies.geos.rectangles[3]], 
+        name:'inter_rectangle_TL',
+        highlight_selection:[this.bodies.geos.rectangles[3]], 
 
-                                              m_offset:om_rD,
-                                              m_shape:m_shape_modif,
+        m_offset:om_rD,
+        m_shape:m_shape_modif,
 
-                                              visibility:false,
-                                              do_shape: true,
-                                              do_line:true,                                         
-                                              color:utils.color.grey,
-                                              color_line: utils.color.black,
-                                              texture_three: text_checker_three_grey, 
+        visibility:false,
+        do_shape: true,
+        do_line:true,                                         
+        color:utils.color.grey,
+        color_line: utils.color.black,
+        texture_three: text_checker_three_grey, 
+
+        collision_category: utils.collision_category.inter,
+        collision_mask: utils.collision_category.mouse, 
+        constraints:[
+          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_rD.get_row(2), stiffness: 0.999,damping:0.1,length:0.01},
+          {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, target_pos_offset:om_rD.get_row(2),stiffness: 1.0,damping:0.1,length:0.01}, 
+        ],
+
+        density:0.2, 
+                                                      
+        debug_matrix_info: false,
+        debug_matrix_axes: debug.matrix_axes,  
+        debug_cns_axes: debug.cns_axes,  
+        debug_force_visibility: debug.force_visibility,                                                         
+      }  ))      
+
       
-                                              collision_category: utils.collision_category.inter,
-                                              collision_mask: utils.collision_category.mouse, 
-                                              constraints:[
-                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_rD.get_row(2), stiffness: 0.999,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, target_pos_offset:om_rD.get_row(2),stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-
-                                              density:0.2, 
-                                                                                            
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))                                               
-      
-      this.bodies.effects.movA_trails.push(new body_build({ ...oRect, 
-                                              name:'effect_movA_trails1',
-
-                                              m_offset:om_rD,
-                                              m_shape:m_shape,
-
-                                              do_shape: true,
-                                              do_line:false,                                         
-                                              color:utils.color.red,
-                                              //color_line: utils.color.black,
-                                              //texture_three: text_checker_three_grey, 
-
-                                              collision_category: utils.collision_category.none,
-                                              collision_mask: utils.collision_category.none,                                               
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangles[3],  stiffness: 0.15},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangles[3], stiffness: 0.15}, 
-                                              ],
-
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            }))    
-      this.bodies.effects.movA_trails.push(new body_build({ ...oRect, 
-                                              name:'effect_movA_trails2',
-
-                                              m_offset:om_rD,
-                                              m_shape:m_shape,
-
-                                              do_shape: true,
-                                              do_line:false,                                         
-                                              color:utils.color.blue,
-                                              //color_line: utils.color.black,
-                                              //texture_three: text_checker_three_grey, 
-
-                                              collision_category: utils.collision_category.none,
-                                              collision_mask: utils.collision_category.none,                                               
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangles[3],  stiffness: 0.2},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangles[3], stiffness: 0.2}, 
-                                              ],
-
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            }))                                             
-      this.bodies.effects.movA_trails.push(new body_build({ ...oRect, 
-                                              name:'effect_movA_trails3',
-
-                                              m_offset:om_rD,
-                                              m_shape:m_shape,
-
-                                              do_shape: true,
-                                              do_line:false,                                         
-                                              color:utils.color.green,
-                                              //color_line: utils.color.black,
-                                              //texture_three: text_checker_three_grey, 
-
-                                              collision_category: utils.collision_category.none,
-                                              collision_mask: utils.collision_category.none,                                               
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.geos.rectangles[3],  stiffness: 0.3},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.geos.rectangles[3], stiffness: 0.3}, 
-                                              ],
-
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,     
-                                              debug_force_visibility: debug.force_visibility,                                                          
-                                            }))                                              
+     
+                                                                                       
       // other
 
       m_shape = new Matrix()
@@ -1008,436 +1209,63 @@ export default class fidget_daft_i extends fidget{
                                     debug_force_visibility: debug.force_visibility,                                                                                
                                   })
 
+      let opts_colA_sparcles = {
+        name:'colA',
+        p:new Vector(-145,15),
+        z_depth:z_depth,
+        rot:0, 
+        scale_shape:s,
+        opts:{ screen_dims : this.screen_dims,
+          matter_engine : this.matter_engine,
+          mouse_constraint : this.mouse_constraint,
+          m : this.m,
+          parent:this.bodies.inters.background}        
+      }                            
 
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(2*s))
-
-      let oEffectsA = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine, 
-        mouse_constraint: this.mouse_constraint,
-
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_shape: m_shape,
-        z:z_depth, 
-        type: utils.shape.rectangle,
-
-        do_shape: true,
-        do_line:false,           
-        color: utils.color.white,
-        color_line: utils.color.white,
-        //texture_three: text_checker_three,
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
-
-        collision_category: utils.collision_category.none,
-        collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
-
-        density:0.001, 
-                        
-      } 
-      var om_EA1 = new Matrix()
-      om_EA1.setTranslation(-145,15)
-      om_EA1.setRotation(rad(90))                                       
-      this.bodies.effects.colA_sparcles.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colA_sparcles1',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-      m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
-      this.bodies.effects.colA_shapes.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colA_shape1',
-
-                                              m_offset:om_EA1,
-                                              m_shape: m_shape_modif,
-                                              z:z_depth, 
-                                              type: utils.shape.rectangle,
-
-                                              do_shape: false,
-                                              do_line:true, 
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))                                             
-
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(-145,15)
-      om_EA1.setRotation(rad(45))                                       
-      this.bodies.effects.colA_sparcles.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colA_sparcles2',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-
-      m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
-      this.bodies.effects.colA_shapes.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colA_shape1',
-
-                                              m_offset:om_EA1,
-                                              m_shape: m_shape_modif,
-                                              z:z_depth, 
-                                              type: utils.shape.rectangle,
-
-                                              do_shape: false,
-                                              do_line:true, 
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))                                             
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(-145,15)
-      om_EA1.setRotation(rad(135))                                       
-      this.bodies.effects.colA_sparcles.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colA_sparcles3',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-      m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
-      this.bodies.effects.colA_shapes.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colA_shape1',
-
-                                              m_offset:om_EA1,
-                                              m_shape: m_shape_modif,
-                                              z:z_depth, 
-                                              type: utils.shape.rectangle,
-
-                                              do_shape: false,
-                                              do_line:true, 
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))                                             
-
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(55*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(1.*s))
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(-145,4)
-      om_EA1.setRotation(rad(0))                                       
-      this.bodies.effects.colA_wall = new body_build({  
-                                    screen_dims: this.screen_dims,
-                                    matter_engine: this.matter_engine,
-                                    mouse_constraint: this.mouse_constraint,
-
-                                    name:'effect_colA_wall',     
-                                    highlight_selection:[this.bodies.geos.rectangles[3]],  
-
-                                    m:this.m,
-                                    parent:this.bodies.inters.background,                                    
-                                    m_offset:om_EA1,
-                                    m_shape:m_shape,
-                                    z:z_depth,
-                                    type : utils.shape.rectangle,
-
-                                    do_shape: true,
-                                    do_line:false,                                       
-                                    color:utils.color.white,
-                                    color_line: utils.color.black,
-                                    //texture_three: text_checker_three_grey, 
-                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
-
-                                    collision_category: utils.collision_category.none,
-                                    collision_mask: utils.collision_category.none,
-                               
-
-                                    density:0.01, 
-             
-                                    debug_matrix_info: false,
-                                    debug_matrix_axes: debug.matrix_axes,  
-                                    debug_cns_axes: debug.cns_axes, 
-                                    debug_force_visibility: debug.force_visibility,                                                                                
-                                  }) 
-
-
+      this.bodies.effects.colA_sparcles = build_effects_particles_sparcles(opts_colA_sparcles) 
+      this.bodies.effects.colA_shapes = build_effects_particles_shapes(opts_colA_sparcles)       
+      this.bodies.effects.colA_wall = build_effects_wall(opts_colA_sparcles)
 
 
       ////////////////////////////////////////////////////////////////////
 
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(2*s))
+      let opts_colB_sparcles = {
+        name:'colB',
+        p:new Vector(15,-80),
+        z_depth:z_depth,
+        rot:-90, 
+        scale_shape:s,
+        opts:{ screen_dims : this.screen_dims,
+          matter_engine : this.matter_engine,
+          mouse_constraint : this.mouse_constraint,
+          m : this.m,
+          parent:this.bodies.inters.background}        
+      }                            
 
-      let oEffectsB = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine, 
-        mouse_constraint: this.mouse_constraint,
-
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_shape: m_shape,
-        z:z_depth, 
-        type: utils.shape.rectangle,
-
-        do_shape: true,
-        do_line:false,           
-        color: utils.color.white,
-        color_line: utils.color.white,
-        //texture_three: text_checker_three,
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
-
-        collision_category: utils.collision_category.none,
-        collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
-
-        density:0.001, 
-                        
-      } 
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(15,-80)
-      om_EA1.setRotation(rad(0))                                       
-      this.bodies.effects.colB_sparcles.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_colB_sparcles1',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-
-      m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
-      this.bodies.effects.colB_shapes.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colB_shape1',
-
-                                              m_offset:om_EA1,
-                                              m_shape: m_shape_modif,
-                                              z:z_depth, 
-                                              type: utils.shape.rectangle,
-
-                                              do_shape: false,
-                                              do_line:true, 
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))                                             
-
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(15,-80)
-      om_EA1.setRotation(rad(45))                                       
-      this.bodies.effects.colB_sparcles.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_colB_sparcles2',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-
-
-      m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
-      this.bodies.effects.colB_shapes.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colB_shape2',
-
-                                              m_offset:om_EA1,
-                                              m_shape: m_shape_modif,
-                                              z:z_depth, 
-                                              type: utils.shape.rectangle,
-
-                                              do_shape: false,
-                                              do_line:true, 
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))   
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(15,-80)
-      om_EA1.setRotation(rad(-45))                                       
-      this.bodies.effects.colB_sparcles.push(new body_build({ ...oEffectsB, 
-                                              name:'effect_colB_sparcles3',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-
-      m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*s))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*s))                                            
-      this.bodies.effects.colB_shapes.push(new body_build({ ...oEffectsA, 
-                                              name:'effect_colB_shape2',
-
-                                              m_offset:om_EA1,
-                                              m_shape: m_shape_modif,
-                                              z:z_depth, 
-                                              type: utils.shape.rectangle,
-
-                                              do_shape: false,
-                                              do_line:true, 
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            }))                                               
-
-
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(55*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(1.*s))
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(20,-80)
-      om_EA1.setRotation(rad(90))                                       
-      this.bodies.effects.colB_wall = new body_build({  
-                                    screen_dims: this.screen_dims,
-                                    matter_engine: this.matter_engine,
-                                    mouse_constraint: this.mouse_constraint,
-
-                                    name:'effect_colB_wall',     
-                                    highlight_selection:[this.bodies.geos.rectangles[3]],  
-
-                                    m:this.m,
-                                    parent:this.bodies.inters.background,                                    
-                                    m_offset:om_EA1,
-                                    m_shape:m_shape,
-                                    z:z_depth,
-                                    type : utils.shape.rectangle,
-
-                                    do_shape: true,
-                                    do_line:false,                                       
-                                    color:utils.color.white,
-                                    color_line: utils.color.black,
-                                    //texture_three: text_checker_three_grey, 
-                                    shader: this.shaders.length != 0 ? this.shaders[0] : null,
-
-                                    collision_category: utils.collision_category.none,
-                                    collision_mask: utils.collision_category.none,
-                               
-
-                                    density:0.01, 
-             
-                                    debug_matrix_info: false,
-                                    debug_matrix_axes: debug.matrix_axes,  
-                                    debug_cns_axes: debug.cns_axes, 
-                                    debug_force_visibility: debug.force_visibility,                                                                                
-                                  }) 
+      this.bodies.effects.colB_sparcles = build_effects_particles_sparcles(opts_colB_sparcles) 
+      this.bodies.effects.colB_shapes = build_effects_particles_shapes(opts_colB_sparcles)       
+      this.bodies.effects.colB_wall = build_effects_wall(opts_colB_sparcles)
 
 
       //////////////////////////////////////////////////////////
 
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(8*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(2*s))
+      let opts_colC_sparcles = {
+        name:'colC',
+        p:new Vector(0,200),
+        z_depth:z_depth,
+        rot:0, 
+        scale_shape:s,
+        opts:{ screen_dims : this.screen_dims,
+          matter_engine : this.matter_engine,
+          mouse_constraint : this.mouse_constraint,
+          m : this.m,
+          parent:this.bodies.inters.background}        
+      }                            
 
-      let oEffectsC = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine, 
-        mouse_constraint: this.mouse_constraint,
+      this.bodies.effects.colC_sparcles = build_effects_particles_sparcles(opts_colC_sparcles) 
+      this.bodies.effects.colC_shapes = build_effects_particles_shapes(opts_colC_sparcles)       
+      this.bodies.effects.colC_wall = build_effects_wall(opts_colC_sparcles)
 
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_shape: m_shape,
-        z:z_depth, 
-        type: utils.shape.rectangle,
-
-        do_shape: true,
-        do_line:false,           
-        color: utils.color.white,
-        color_line: utils.color.white,
-        //texture_three: text_checker_three,
-        shader: this.shaders.length != 0 ? this.shaders[0] : null,
-
-        collision_category: utils.collision_category.none,
-        collision_mask: utils.collision_category.none,// | utils.collision_category.blue,         
-
-        density:0.001, 
-                        
-      } 
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(0,200)
-      om_EA1.setRotation(rad(90))                                      
-      this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
-                                              name:'effect_colC_sparcles1',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(0,200)
-      om_EA1.setRotation(rad(45))                                       
-      this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
-                                              name:'effect_colC_sparcles2',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
-      om_EA1 = new Matrix()
-      om_EA1.setTranslation(0,200)
-      om_EA1.setRotation(rad(135))                                       
-      this.bodies.effects.colC_sparcles.push(new body_build({ ...oEffectsC, 
-                                              name:'effect_colC_sparcles3',
-
-                                              m_offset:om_EA1,
-
-                                              debug_matrix_info: false,
-                                              debug_matrix_axes: debug.matrix_axes,  
-                                              debug_cns_axes: debug.cns_axes,  
-                                              debug_force_visibility: debug.force_visibility,                                                         
-                                            })) 
 
     z_depth += z_depth_incr
 
@@ -1475,268 +1303,7 @@ export default class fidget_daft_i extends fidget{
 
                                                   density:0.01,  
                                                   })      
-        
-      /*                                          
-      ////////////////////////////////////////////////////////////////////////////////////////// test                                            
-      
-      let m_ref = new Matrix()
-      m_ref.setTranslation(0,300)
-      //m_ref.setRotation(rad(45))
-      let scale_ref = 50
-      let pos_dist = 100
-      let neg_dist = 50
-      let col_thickness = 100
-      let margin = 1
-
-
-
-      let opt_test = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,  
-        mouse_constraint: this.mouse_constraint,
-
-        parent:this.bodies.inters.background,
-      }
-
-      let m_offset_A = new Matrix(m_ref)
-
-      let p_ref = m_ref.get_row(2)
-      let vY_ref = m_ref.get_row(1)
-      vY_ref.normalize()
-      vY_ref.mult(scale_ref/2.0+col_thickness/2.0+margin)
-      let vX_ref = m_ref.get_row(0)
-      vX_ref.normalize()
-      let offset_pos = pos_dist - (pos_dist + neg_dist)/2
-      vX_ref.mult(offset_pos)
-      let p_offset = p_ref.getAdd(vY_ref).getAdd(vX_ref)
-      m_offset_A.set_row(2, p_offset)
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(pos_dist+neg_dist))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(col_thickness))
-
-      this.bodies.inters.test.push( new body_build({ ...opt_test,
-
-            name:'inter_rectangle',
-            
-
-            m:this.m,
-            
-            m_offset:m_offset_A,
-            m_shape: m_shape,
-            z:z_depth,
-            type : utils.shape.rectangle,
-
-            do_shape: true,
-            do_line:true,                                         
-            color:utils.color.grey,
-            color_line: utils.color.black,
-            texture_three: text_checker_three_grey, 
-
-            collision_category: utils.collision_category.mouse,
-            collision_mask: utils.collision_category.inter ,
-            constraints:[
-              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_A.get_row(2) , stiffness: 0.8, damping:0.1,length:0.01},
-              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
-            ],
-
-            density:0.01, 
-
-            debug_matrix_info: false,
-            debug_matrix_axes: debug.matrix_axes,  
-            debug_cns_axes: debug.cns_axes,      
-            debug_force_visibility: debug.force_visibility,                                                                                 
-          })
-      )
-
-
-      let m_offset_B = new Matrix(m_ref)
-
-      p_ref = m_ref.get_row(2)
-      vY_ref = m_ref.get_row(1)
-      vY_ref.normalize()
-      vY_ref.mult(scale_ref/2.0+col_thickness/2.0+margin)
-      vX_ref = m_ref.get_row(0)
-      vX_ref.normalize()
-      offset_pos = pos_dist - (pos_dist + neg_dist)/2
-      vX_ref.mult(offset_pos)
-      p_offset = p_ref.getSub(vY_ref).getAdd(vX_ref)
-      m_offset_B.set_row(2, p_offset)
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(pos_dist+neg_dist))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(col_thickness))
-
-      this.bodies.inters.test.push( new body_build({ ...opt_test,
-
-            name:'inter_rectangle',
-            
-
-            m:this.m,
-            
-            m_offset:m_offset_B,
-            m_shape: m_shape,
-            z:z_depth,
-            type : utils.shape.rectangle,
-
-            do_shape: true,
-            do_line:true,                                         
-            color:utils.color.grey,
-            color_line: utils.color.black,
-            texture_three: text_checker_three_grey, 
-
-            collision_category: utils.collision_category.mouse,
-            collision_mask: utils.collision_category.inter ,
-            constraints:[
-              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_B.get_row(2) , stiffness: 0.8,damping:0.1,length:0.01},
-              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
-            ],
-
-            density:0.01, 
-
-            debug_matrix_info: false,
-            debug_matrix_axes: debug.matrix_axes,  
-            debug_cns_axes: debug.cns_axes,      
-            debug_force_visibility: debug.force_visibility,                                                                                 
-          })
-      )
-
-
-      let m_offset_C = new Matrix(m_ref)
-
-      p_ref = m_ref.get_row(2)
-      vX_ref = m_ref.get_row(0)
-      vX_ref.normalize()
-      vX_ref.mult(pos_dist+col_thickness/2.0)
-      p_offset = p_ref.getAdd(vX_ref)
-      m_offset_C.set_row(2, p_offset)
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(col_thickness))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(scale_ref+col_thickness*2.0))
-
-      this.bodies.inters.test.push( new body_build({ ...opt_test,
-
-            name:'inter_rectangle',
-            
-
-            m:this.m,
-            
-            m_offset:m_offset_C,
-            m_shape: m_shape,
-            z:z_depth,
-            type : utils.shape.rectangle,
-
-            do_shape: true,
-            do_line:true,                                         
-            color:utils.color.grey,
-            color_line: utils.color.black,
-            texture_three: text_checker_three_grey, 
-
-            collision_category: utils.collision_category.mouse,
-            collision_mask: utils.collision_category.inter ,
-            constraints:[
-              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_C.get_row(2) , stiffness: 0.8,damping:0.1,length:0.01},
-              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
-            ],
-
-            density:0.01, 
-
-            debug_matrix_info: false,
-            debug_matrix_axes: debug.matrix_axes,  
-            debug_cns_axes: debug.cns_axes,      
-            debug_force_visibility: debug.force_visibility,                                                                                 
-          })
-      )
-
-
-      let m_offset_D = new Matrix(m_ref)
-
-      p_ref = m_ref.get_row(2)
-      vX_ref = m_ref.get_row(0)
-      vX_ref.normalize()
-      vX_ref.mult((neg_dist+col_thickness/2.0)*-1.)
-      p_offset = p_ref.getAdd(vX_ref)
-      m_offset_D.set_row(2, p_offset)
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(col_thickness))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(scale_ref+col_thickness*2.0))
-
-      this.bodies.inters.test.push( new body_build({ ...opt_test,
-
-            name:'inter_rectangle',
-            
-
-            m:this.m,
-            
-            m_offset:m_offset_D,
-            m_shape: m_shape,
-            z:z_depth,
-            type : utils.shape.rectangle,
-
-            do_shape: true,
-            do_line:true,                                         
-            color:utils.color.grey,
-            color_line: utils.color.black,
-            texture_three: text_checker_three_grey, 
-
-            collision_category: utils.collision_category.mouse,
-            collision_mask: utils.collision_category.inter ,
-            constraints:[
-              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset_D.get_row(2) , stiffness: 0.8,damping:0.1,length:0.01},
-              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
-            ],
-
-            density:0.01, 
-
-            debug_matrix_info: false,
-            debug_matrix_axes: debug.matrix_axes,  
-            debug_cns_axes: debug.cns_axes,      
-            debug_force_visibility: debug.force_visibility,                                                                                 
-          })
-      )      
-
-      let m_offset = new Matrix(m_ref)
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(scale_ref))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(scale_ref))
-
-      this.bodies.inters.test.push( new body_build({ ...opt_test,
-
-            name:'inter_rectangle',
-            
-
-            m:this.m,
-            
-            m_offset:m_offset,
-            m_shape: m_shape,
-            z:z_depth,
-            type : utils.shape.circle,
-
-            do_shape: true,
-            do_line:true,                                         
-            color:utils.color.grey,
-            color_line: utils.color.black,
-            texture_three: text_checker_three_grey, 
-
-            collision_category: utils.collision_category.inter,//what it is
-            collision_mask: utils.collision_category.mouse ,//what it can collide with
-            constraints:[
-              {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset: m_offset.get_row(2), stiffness: 0.01,damping:0.1,length:0.01},
-              {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
-            ],
-
-            density:0.9, 
-
-            debug_matrix_info: false,
-            debug_matrix_axes: debug.matrix_axes,  
-            debug_cns_axes: debug.cns_axes,      
-            debug_force_visibility: debug.force_visibility,                                                                                 
-          })
-      )
-      */
+     
 
 
     }
@@ -2089,6 +1656,50 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Control
 
       //_________________________________________________________________effects
+
+
+
+
+      if(this.state.steps[step].update_count == 0)  
+      {      
+        for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
+        {
+          let force = new Vector(0.001, 0)
+          force = force.rotate(this.bodies.effects.colC_sparcles[i].get_rotation())
+          let pos = this.bodies.effects.colC_sparcles[i].get_position()
+          this.bodies.effects.colC_sparcles[i].apply_force( pos, force )
+          this.bodies.effects.colC_shapes[i].apply_force( pos, force.getMult(0.1) )
+        }
+      }
+
+
+      if( this.state.steps[step].update_count < 10) 
+      {
+        this.bodies.effects.colC_wall.enable(1)
+
+        let m = new Matrix(this.bodies.effects.colC_wall.m_shape_init)
+        m = m.scale(0.01+this.state.steps[step].update_count*0.5,1)
+        this.bodies.effects.colC_wall.update_shape_coords(m)
+      }
+      
+
+      if( this.state.steps[step].update_count < 20) 
+      {
+        for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
+          this.bodies.effects.colC_sparcles[i].enable(1)
+      }      
+
+      if( this.state.steps[step].update_count < 40) 
+      {
+        for( let i=0; i < this.bodies.effects.colC_shapes.length; i++)
+          this.bodies.effects.colC_shapes[i].enable(1)    
+          
+         
+      }   
+
+
+      /*
+
       for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
       {
         if( this.state.steps[step].update_count < 20) 
@@ -2109,6 +1720,7 @@ export default class fidget_daft_i extends fidget{
         for( let i=0; i < this.bodies.effects.movB_trails.length; i++)
           this.bodies.effects.movB_trails[i].enable(1)             
       }         
+      */
       //_________________________________________________________________Mouse
       
       if(this.debug_mode.switch_selected_inter_help)
