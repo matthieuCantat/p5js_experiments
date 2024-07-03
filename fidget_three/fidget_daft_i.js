@@ -14,68 +14,58 @@ import { and } from './libraries/jsm/nodes/Nodes.js';
 
 function build_effects_trail(opts,body_target)
 {
-
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
   let opts_collision_no_interaction = {
     collision_category: utils.collision_category.none,
     collision_mask: utils.collision_category.none
-  }      
+  } 
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }  
+  let opts_trail = {
+                    ...opts, 
+                    ...opts_global,
+                    ...opts_collision_no_interaction,
+                    ...opts_debug,
+                    do_shape: true,
+                    do_line:false,                                             
+  }
 
+  ////////////////////////////////////////////////////////////////////////////////
   let bodies = []
 
-  bodies.push(new body_build({  ...opts, 
-                                ...opts_collision_no_interaction,
-                                name: opts.name + 'effect_trails1',
-
-                                do_shape: true,
-                                do_line:false,                                         
+  bodies.push(new body_build({  ...opts_trail, 
+                                name: opts.name + 'effect_trails1',                                       
                                 color:utils.color.red,
-   
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.15},
                                   {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.15}, 
-                                ],
-
-                                //debug_matrix_info: false,
-                                //debug_matrix_axes: debug.matrix_axes,  
-                                //debug_cns_axes: debug.cns_axes,     
-                                //debug_force_visibility: debug.force_visibility,                                                          
-                              }))    
-  bodies.push(new body_build({  ...opts, 
-                                ...opts_collision_no_interaction,
-                                name: opts.name + 'effect_trails2',
-
-                                do_shape: true,
-                                do_line:false,                                         
-                                color:utils.color.blue,
-                                               
+                                ],                                                   
+                              })) 
+                                 
+  bodies.push(new body_build({  ...opts_trail,                                 
+                                name: opts.name + 'effect_trails2',        
+                                color:utils.color.blue,              
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.2},
                                   {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.2}, 
-                                ],
-
-                                //debug_matrix_info: false,
-                                //debug_matrix_axes: debug.matrix_axes,  
-                                //debug_cns_axes: debug.cns_axes,     
-                                //debug_force_visibility: debug.force_visibility,                                                          
+                                ],                                                          
                               }))  
                                                                                     
-  bodies.push(new body_build({  ...opts, 
-                                ...opts_collision_no_interaction,
-                                name: opts.name + 'effect_trails3',
-
-                                do_shape: true,
-                                do_line:false,                                         
-                                color:utils.color.green,
-                                             
+  bodies.push(new body_build({  ...opts_trail, 
+                                name: opts.name + 'effect_trails3',    
+                                color:utils.color.green,          
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.3},
                                   {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.3}, 
-                                ],
-
-                                //debug_matrix_info: false,
-                                //debug_matrix_axes: debug.matrix_axes,  
-                                //debug_cns_axes: debug.cns_axes,     
-                                //debug_force_visibility: debug.force_visibility,                                                          
+                                ],                                                       
                               }))   
                                             
   return bodies
@@ -84,10 +74,23 @@ function build_effects_trail(opts,body_target)
 
 function build_effects_particles_sparcles(opts)
 { 
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+
   let opts_collision_no_interaction = {
     collision_category: utils.collision_category.none,
     collision_mask: utils.collision_category.none
   }   
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }  
+  ////////////////////////////////////////////////////////////////////////////////
 
   let bodies = []
 
@@ -95,13 +98,12 @@ function build_effects_particles_sparcles(opts)
   m_shape.set_row(0,m_shape.get_row(0).getMult(8*opts.scale_shape))
   m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
 
-  let oEffectsA = { ...opts_collision_no_interaction,
-    screen_dims: opts.opts.screen_dims,
-    matter_engine: opts.opts.matter_engine, 
-    mouse_constraint: opts.opts.mouse_constraint,
+  let oEffectsA = { 
+    ...opts_global,
+    ...opts_collision_no_interaction,
+    ...opts_debug,
 
-    m:opts.opts.m,
-    parent:opts.opts.parent,
+    parent:opts.parent,
     m_shape: m_shape,
     z:opts.z_depth, 
     type: utils.shape.rectangle,
@@ -115,182 +117,134 @@ function build_effects_particles_sparcles(opts)
     density:0.001, 
                     
   } 
+
   let om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(90))                                       
-  bodies.push(new body_build({ ...oEffectsA, 
-                                          name: opts.name + 'effect_sparcles1',
+  om_EA1.setRotation(rad(opts.rot)+rad(90)) 
 
-                                          m_offset:om_EA1,
-
-                                          //debug_matrix_info: false,
-                                          //debug_matrix_axes: debug.matrix_axes,  
-                                          //debug_cns_axes: debug.cns_axes,  
-                                          //debug_force_visibility: debug.force_visibility,                                                         
-                                        }))                                            
-
+  bodies.push(new body_build({ ...oEffectsA,          
+                                name: opts.name + 'effect_sparcles1',
+                                m_offset:om_EA1,                                                        
+                              }))                                            
 
   om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(45))                                       
-  bodies.push(new body_build({ ...oEffectsA, 
-                                          name: opts.name + 'effect_sparcles2',
+  om_EA1.setRotation(rad(opts.rot)+rad(45))
 
-                                          m_offset:om_EA1,
-
-                                          //debug_matrix_info: false,
-                                          //debug_matrix_axes: debug.matrix_axes,  
-                                          //debug_cns_axes: debug.cns_axes,  
-                                          //debug_force_visibility: debug.force_visibility,                                                         
-                                        })) 
+  bodies.push(new body_build({ ...oEffectsA,   
+                                name: opts.name + 'effect_sparcles2',
+                                m_offset:om_EA1,                                                     
+                              })) 
                                         
-
   om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(135))                                       
-  bodies.push(new body_build({ ...oEffectsA, 
-                                          name: opts.name + 'effect_sparcles3',
+  om_EA1.setRotation(rad(opts.rot)+rad(135))
 
-                                          m_offset:om_EA1,
-
-                                          //debug_matrix_info: false,
-                                          //debug_matrix_axes: debug.matrix_axes,  
-                                          //debug_cns_axes: debug.cns_axes,  
-                                          //debug_force_visibility: debug.force_visibility,                                                         
-                                        })) 
+  bodies.push(new body_build({ ...oEffectsA,     
+                                name: opts.name + 'effect_sparcles3',
+                                m_offset:om_EA1,                                                       
+                              })) 
 
   return bodies                              
 }
-
-
 
 
 function build_effects_particles_shapes(opts)
 {
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+
   let opts_collision_no_interaction = {
     collision_category: utils.collision_category.none,
     collision_mask: utils.collision_category.none
   }   
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }  
+  ////////////////////////////////////////////////////////////////////////////////
 
   let bodies = []
 
   let m_shape = new Matrix()
-  m_shape.set_row(0,m_shape.get_row(0).getMult(8*opts.scale_shape))
+  m_shape.set_row(0,m_shape.get_row(0).getMult(2*opts.scale_shape))
   m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
 
   let oEffectsA = {
+    ...opts_global,
     ...opts_collision_no_interaction,
-    screen_dims: opts.opts.screen_dims,
-    matter_engine: opts.opts.matter_engine, 
-    mouse_constraint: opts.opts.mouse_constraint,
+    ...opts_debug,
 
-    m:opts.opts.m,
-    parent:opts.opts.parent,
+    parent:opts.parent,
     m_shape: m_shape,
     z:opts.z_depth, 
     type: utils.shape.rectangle,
 
-    do_shape: true,
-    do_line:false,           
+    do_shape: false,
+    do_line:true,           
     color: utils.color.white,
     color_line: utils.color.white,
     //texture_three: text_checker_three,
     
-
-    density:0.001, 
-                    
+    density:0.001,               
   } 
+
   let om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y())
   om_EA1.setRotation(rad(opts.rot)+rad(90))                                       
 
-
-  let m_shape_modif = new Matrix()
-  m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*opts.scale_shape))
-  m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*opts.scale_shape))                                            
   bodies.push(new body_build({ ...oEffectsA, 
-                                          name: opts.name + 'effect_particle_shape1',
-
-                                          m_offset:om_EA1,
-                                          m_shape: m_shape_modif,
-                                          z:opts.z_depth, 
-                                          type: utils.shape.rectangle,
-
-                                          do_shape: false,
-                                          do_line:true, 
-
-                                          //debug_matrix_info: false,
-                                          //debug_matrix_axes: debug.matrix_axes,  
-                                          //debug_cns_axes: debug.cns_axes,  
-                                          //debug_force_visibility: debug.force_visibility,                                                         
-                                        }))                                             
-
+                                name: opts.name + 'effect_particle_shape1',
+                                m_offset:om_EA1,                                                
+                              }))                                             
 
   om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y())
   om_EA1.setRotation(rad(opts.rot)+rad(45))                                       
 
-
-
-  m_shape_modif = new Matrix()
-  m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*opts.scale_shape))
-  m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*opts.scale_shape))                                            
   bodies.push(new body_build({ ...oEffectsA, 
-                                          name: opts.name + 'effect_particle_shape2',
-
-                                          m_offset:om_EA1,
-                                          m_shape: m_shape_modif,
-                                          z:opts.z_depth, 
-                                          type: utils.shape.rectangle,
-
-                                          do_shape: false,
-                                          do_line:true, 
-
-                                          //debug_matrix_info: false,
-                                          //debug_matrix_axes: debug.matrix_axes,  
-                                          //debug_cns_axes: debug.cns_axes,  
-                                          //debug_force_visibility: debug.force_visibility,                                                         
-                                        }))                                             
+                                name: opts.name + 'effect_particle_shape2',
+                                m_offset:om_EA1,                                                     
+                              }))                                             
 
   om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(135))                                       
+  om_EA1.setRotation(rad(opts.rot)+rad(135))                                         
 
-
-  m_shape_modif = new Matrix()
-  m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(2*opts.scale_shape))
-  m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(2*opts.scale_shape))                                            
   bodies.push(new body_build({ ...oEffectsA, 
-                                          name: opts.name + 'effect_particle_shape3',
-
-                                          m_offset:om_EA1,
-                                          m_shape: m_shape_modif,
-                                          z:opts.z_depth, 
-                                          type: utils.shape.rectangle,
-
-                                          do_shape: false,
-                                          do_line:true, 
-
-                                          //debug_matrix_info: false,
-                                          //debug_matrix_axes: debug.matrix_axes,  
-                                          //debug_cns_axes: debug.cns_axes,  
-                                          //debug_force_visibility: debug.force_visibility,                                                         
-                                        }))                                             
+                                name: opts.name + 'effect_particle_shape3',
+                                m_offset:om_EA1,                                                   
+                              }))                                             
 
 
   return bodies                              
 }
 
-
-
-
-
 function build_effects_wall(opts)
 {
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+
   let opts_collision_no_interaction = {
     collision_category: utils.collision_category.none,
     collision_mask: utils.collision_category.none
   }   
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }    
+
+  ////////////////////////////////////////////////////////////////////////////////
                                       
   let m_shape = new Matrix()
   m_shape.set_row(0,m_shape.get_row(0).getMult(55*opts.scale_shape))
@@ -299,16 +253,13 @@ function build_effects_wall(opts)
   let om_EA1 = new Matrix()
   om_EA1.setTranslation(opts.p.x(),opts.p.y()-1)
   om_EA1.setRotation(rad(opts.rot)+rad(0))                                       
-  let body = new body_build({ 
+  let body = new body_build({   ...opts_global,
                                 ...opts_collision_no_interaction,    
-                                screen_dims: opts.opts.screen_dims,
-                                matter_engine: opts.opts.matter_engine,
-                                mouse_constraint: opts.opts.mouse_constraint,
+                                ...opts_debug,
 
                                 name: opts.name+'effect_wall',     
 
-                                m:opts.opts.m,
-                                parent:opts.opts.parent,                                    
+                                parent:opts.parent,                                    
                                 m_offset:om_EA1,
                                 m_shape:m_shape,
                                 z:opts.z_depth,
@@ -320,12 +271,7 @@ function build_effects_wall(opts)
                                 color_line: utils.color.black,
                                 //texture_three: text_checker_three_grey, 
 
-                                density:0.01, 
-        
-                                //debug_matrix_info: false,
-                                //debug_matrix_axes: debug.matrix_axes,  
-                                //debug_cns_axes: debug.cns_axes, 
-                                //debug_force_visibility: debug.force_visibility,                                                                                
+                                density:0.01,                                                                                
                               }) 
                               
 
@@ -1071,53 +1017,40 @@ export default class fidget_daft_i extends fidget{
                                                                              
                                   })
 
+      let opts_sparcles = {
+        ...opts_global,
+        ...opts_debug,
+        z_depth:z_depth,
+        scale_shape:s,
+        parent:this.bodies.inters.background      
+      }  
+
       let opts_colA_sparcles = {
+        ...opts_sparcles,
         name:'colA',
         p:new Vector(-145,15),
-        z_depth:z_depth,
-        rot:0, 
-        scale_shape:s,
-        opts:{  ...opts_global,
-          m : this.m,
-          parent:this.bodies.inters.background}        
+        rot:0,      
       }                            
-
       this.bodies.effects.colA_sparcles = build_effects_particles_sparcles(opts_colA_sparcles) 
       this.bodies.effects.colA_shapes = build_effects_particles_shapes(opts_colA_sparcles)       
       this.bodies.effects.colA_wall = build_effects_wall(opts_colA_sparcles)
 
-
-      ////////////////////////////////////////////////////////////////////
-
       let opts_colB_sparcles = {
+        ...opts_sparcles,       
         name:'colB',
         p:new Vector(15,-80),
-        z_depth:z_depth,
-        rot:-90, 
-        scale_shape:s,
-        opts:{  ...opts_global,
-          m : this.m,
-          parent:this.bodies.inters.background}        
+        rot:-90,     
       }                            
-
       this.bodies.effects.colB_sparcles = build_effects_particles_sparcles(opts_colB_sparcles) 
       this.bodies.effects.colB_shapes = build_effects_particles_shapes(opts_colB_sparcles)       
       this.bodies.effects.colB_wall = build_effects_wall(opts_colB_sparcles)
 
-
-      //////////////////////////////////////////////////////////
-
       let opts_colC_sparcles = {
+        ...opts_sparcles,        
         name:'colC',
         p:new Vector(0,200),
-        z_depth:z_depth,
-        rot:0, 
-        scale_shape:s,
-        opts:{ ...opts_global,
-          m : this.m,
-          parent:this.bodies.inters.background}        
+        rot:0,        
       }                            
-
       this.bodies.effects.colC_sparcles = build_effects_particles_sparcles(opts_colC_sparcles) 
       this.bodies.effects.colC_shapes = build_effects_particles_shapes(opts_colC_sparcles)       
       this.bodies.effects.colC_wall = build_effects_wall(opts_colC_sparcles)
