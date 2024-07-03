@@ -278,8 +278,60 @@ function build_effects_wall(opts)
   return body                              
 }
 
+/*
+anim_effect({
+  count:this.state.steps[step].update_count,
+  sparcles:this.bodies.effects.colA_sparcles,
+  shapes:this.bodies.effects.colA_shapes,
+  wall:this.bodies.effects.colA_wall,
+  trails:this.bodies.effects.movA_trails,
+})
+*/
+function anim_effect(opts)
+{
+  if(opts.count == 0)  
+  {      
+    for( let i=0; i < opts.sparcles.length; i++)
+    {
+      let force = new Vector(0.001, 0)
+      force = force.rotate(opts.sparcles[i].get_rotation())
+      let pos = opts.sparcles[i].get_position()
+
+      opts.sparcles[i].apply_force( pos, force )
+      opts.shapes[i].apply_force( pos, force.getMult(0.1) )
+    }
+  }
+
+  if( opts.count < 10) 
+  {
+    if( opts.wall != null)
+    {
+      opts.wall.enable(1)
+
+      let m = new Matrix(opts.wall.m_shape_init)
+      m = m.scale(0.01+opts.count*0.1,1)
+      opts.wall.update_shape_coords(m)
+    }
+  }
 
 
+  if( opts.count < 20) 
+  {
+    for( let i=0; i < opts.sparcles.length; i++)
+    opts.sparcles[i].enable(1)       
+  }
+
+
+  if( opts.count < 40) 
+  {
+    for( let i=0; i < opts.shapes.length; i++)
+      opts.shapes[i].enable(1)   
+      
+    for( let i=0; i < opts.trails.length; i++)
+      opts.trails[i].enable(1)    
+              
+  }    
+}
 
 
 
@@ -1232,48 +1284,14 @@ export default class fidget_daft_i extends fidget{
       }      
       //_________________________________________________________________effects
 
-
-
-    
-
-      if(this.state.steps[step].update_count == 0)  
-      {      
-        for( let i=0; i < this.bodies.effects.colA_sparcles.length; i++)
-        {
-          let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.colA_sparcles[i].get_rotation())
-          let pos = this.bodies.effects.colA_sparcles[i].get_position()
-          this.bodies.effects.colA_sparcles[i].apply_force( pos, force )
-          this.bodies.effects.colA_shapes[i].apply_force( pos, force.getMult(0.1) )
-        }
-      }
-      if( this.state.steps[step].update_count < 10) 
-      {
-        this.bodies.effects.colA_wall.enable(1)
-
-        let m = new Matrix(this.bodies.effects.colA_wall.m_shape_init)
-        m = m.scale(0.01+this.state.steps[step].update_count*0.1,1)
-        this.bodies.effects.colA_wall.update_shape_coords(m)
-      }
-
-
-      if( this.state.steps[step].update_count < 20) 
-      {
-        for( let i=0; i < this.bodies.effects.colA_sparcles.length; i++)
-          this.bodies.effects.colA_sparcles[i].enable(1)       
-      }
-
-
-      if( this.state.steps[step].update_count < 40) 
-      {
-        for( let i=0; i < this.bodies.effects.colA_shapes.length; i++)
-          this.bodies.effects.colA_shapes[i].enable(1)   
-          
-          for( let i=0; i < this.bodies.effects.movA_trails.length; i++)
-          this.bodies.effects.movA_trails[i].enable(1)    
-                  
-      }            
-         
+      anim_effect({
+        count:this.state.steps[step].update_count,
+        sparcles:this.bodies.effects.colA_sparcles,
+        shapes:this.bodies.effects.colA_shapes,
+        wall:this.bodies.effects.colA_wall,
+        trails:this.bodies.effects.movA_trails,
+      })
+       
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
       {
@@ -1329,61 +1347,13 @@ export default class fidget_daft_i extends fidget{
       } 
 
       //_________________________________________________________________effects
-      /*
-      for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
-      {
-        if( this.state.steps[step].update_count < 20) 
-          this.bodies.effects.colB_sparcles[i].enable(1)
-
-        if(this.state.steps[step].update_count == 0)  
-        {
-          let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.colB_sparcles[i].get_rotation())
-          this.bodies.effects.colB_sparcles[i].apply_force( this.bodies.effects.colB_sparcles[i].get_position(), force )
-        }
-
-      }
-      */ 
-
-
-      if(this.state.steps[step].update_count == 0)  
-      {      
-        for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
-        {
-          let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.colB_sparcles[i].get_rotation())
-          let pos = this.bodies.effects.colB_sparcles[i].get_position()
-          this.bodies.effects.colB_sparcles[i].apply_force( pos, force )
-          this.bodies.effects.colB_shapes[i].apply_force( pos, force.getMult(0.1) )
-        }
-      }
-
-
-      if( this.state.steps[step].update_count < 10) 
-      {
-        this.bodies.effects.colB_wall.enable(1)
-
-        let m = new Matrix(this.bodies.effects.colB_wall.m_shape_init)
-        m = m.scale(0.01+this.state.steps[step].update_count*0.5,1)
-        this.bodies.effects.colB_wall.update_shape_coords(m)
-      }
-      
-
-      if( this.state.steps[step].update_count < 20) 
-      {
-        for( let i=0; i < this.bodies.effects.colB_sparcles.length; i++)
-          this.bodies.effects.colB_sparcles[i].enable(1)
-      }      
-
-      if( this.state.steps[step].update_count < 40) 
-      {
-        for( let i=0; i < this.bodies.effects.colB_shapes.length; i++)
-          this.bodies.effects.colB_shapes[i].enable(1)    
-          
-        for( let i=0; i < this.bodies.effects.movB_trails.length; i++)
-          this.bodies.effects.movB_trails[i].enable(1)             
-      }   
-
+      anim_effect({
+        count:this.state.steps[step].update_count,
+        sparcles:this.bodies.effects.colB_sparcles,
+        shapes:this.bodies.effects.colB_shapes,
+        wall:this.bodies.effects.colB_wall,
+        trails:this.bodies.effects.movB_trails,
+      })
       
       //_________________________________________________________________Mouse
       if(this.debug_mode.switch_selected_inter_help)
@@ -1440,70 +1410,14 @@ export default class fidget_daft_i extends fidget{
 
       //_________________________________________________________________effects
 
-
-
-
-      if(this.state.steps[step].update_count == 0)  
-      {      
-        for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
-        {
-          let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.colC_sparcles[i].get_rotation())
-          let pos = this.bodies.effects.colC_sparcles[i].get_position()
-          this.bodies.effects.colC_sparcles[i].apply_force( pos, force )
-          this.bodies.effects.colC_shapes[i].apply_force( pos, force.getMult(0.1) )
-        }
-      }
-
-
-      if( this.state.steps[step].update_count < 10) 
-      {
-        this.bodies.effects.colC_wall.enable(1)
-
-        let m = new Matrix(this.bodies.effects.colC_wall.m_shape_init)
-        m = m.scale(0.01+this.state.steps[step].update_count*0.5,1)
-        this.bodies.effects.colC_wall.update_shape_coords(m)
-      }
-      
-
-      if( this.state.steps[step].update_count < 20) 
-      {
-        for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
-          this.bodies.effects.colC_sparcles[i].enable(1)
-      }      
-
-      if( this.state.steps[step].update_count < 40) 
-      {
-        for( let i=0; i < this.bodies.effects.colC_shapes.length; i++)
-          this.bodies.effects.colC_shapes[i].enable(1)    
-          
-         
-      }   
-
-
-      /*
-
-      for( let i=0; i < this.bodies.effects.colC_sparcles.length; i++)
-      {
-        if( this.state.steps[step].update_count < 20) 
-          this.bodies.effects.colC_sparcles[i].enable(1)
-
-        if(this.state.steps[step].update_count == 0)  
-        {
-          let force = new Vector(0.001, 0)
-          force = force.rotate(this.bodies.effects.colC_sparcles[i].get_rotation())
-          this.bodies.effects.colC_sparcles[i].apply_force( this.bodies.effects.colC_sparcles[i].get_position(), force )
-        }
-
-      }   
-
-      if( this.state.steps[step].update_count < 40) 
-      {
-
-        for( let i=0; i < this.bodies.effects.movB_trails.length; i++)
-          this.bodies.effects.movB_trails[i].enable(1)             
-      }         
-      */
+      anim_effect({
+        count:this.state.steps[step].update_count,
+        sparcles:this.bodies.effects.colC_sparcles,
+        shapes:this.bodies.effects.colC_shapes,
+        wall:this.bodies.effects.colC_wall,
+        trails:[],
+      })
+     
       //_________________________________________________________________Mouse
       
       if(this.debug_mode.switch_selected_inter_help)
