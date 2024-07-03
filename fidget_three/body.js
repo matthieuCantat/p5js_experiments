@@ -1,7 +1,12 @@
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import { utils , rad, deg, Draw_text_debug,convert_coords_matter_to_three} from './utils.js';
-import {dyn_constraint_build, constraint_build, cns_axe,limit,dyn_constraint_build_custom_orient} from './constraint.js';
+import { 
+  dyn_constraint_build, 
+  constraint_build, 
+  cns_axe,limit,
+  dyn_constraint_build_custom_orient,
+  connect} from './constraint.js';
 import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 import * as THREE from 'three';
@@ -276,36 +281,44 @@ export default class body_build{
       {
         this.constraints_order.push(this.constraints_args[i].name)
 
+        let cns = null
         if(this.constraints_args[i].type == 'dyn_point')
         { 
-          this.constraints[this.constraints_args[i].name] = new dyn_constraint_build({obj: this, ...this.constraints_args[i]})//build_constraint(this,this.constraints_args[i])          
+          cns = new dyn_constraint_build({obj: this, ...this.constraints_args[i]})//build_constraint(this,this.constraints_args[i])          
         }
 
         if(this.constraints_args[i].type == 'dyn_orient')
         {
-          this.constraints[this.constraints_args[i].name] = new dyn_constraint_build_custom_orient({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
+          cns = new dyn_constraint_build_custom_orient({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
         }
 
         if(this.constraints_args[i].type == 'kin_point')
         { 
-          this.constraints[this.constraints_args[i].name] = new constraint_build({obj: this, ...this.constraints_args[i],do_position:true,do_orientation:false})//build_constraint(this,this.constraints_args[i])          
+          cns = new constraint_build({obj: this, ...this.constraints_args[i],do_position:true,do_orientation:false})//build_constraint(this,this.constraints_args[i])          
         }
 
         if(this.constraints_args[i].type == 'kin_orient')
         {
-          this.constraints[this.constraints_args[i].name] = new constraint_build({obj: this, ...this.constraints_args[i],do_position:false,do_orientation:true})//build_constraint(this,this.constraints_args[i],offset)                 
+          cns = new constraint_build({obj: this, ...this.constraints_args[i],do_position:false,do_orientation:true})//build_constraint(this,this.constraints_args[i],offset)                 
         }
 
         /////////////////// axe
         if(this.constraints_args[i].type == 'kin_axe')
         {
-          this.constraints[this.constraints_args[i].name] =  new cns_axe({ Follower: this, ...this.constraints_args[i] })   
+          cns =  new cns_axe({ Follower: this, ...this.constraints_args[i] })   
         }
 
         if(this.constraints_args[i].type == 'kin_limit')
         {
-          this.constraints[this.constraints_args[i].name] =  new limit({ Follower: this, ...this.constraints_args[i], obj:this })   
+          cns =  new limit({ Follower: this, ...this.constraints_args[i], obj:this })   
         }
+
+        if(this.constraints_args[i].type == 'connect')
+        {
+          cns =  new connect({ ...this.constraints_args[i], obj:this })   
+        }
+
+        this.constraints[this.constraints_args[i].name] = cns
 
       }
 
@@ -328,7 +341,9 @@ export default class body_build{
       }
   
   
-      Matter.Composite.add( this.matter_engine.world, this.body)      
+      Matter.Composite.add( this.matter_engine.world, this.body)    
+      
+      this.set_out_matrix(this.get_init_matrix())
     }
 
     matter_update_shape_coords(m)
