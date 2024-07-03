@@ -497,15 +497,19 @@ export default class fidget_daft_i extends fidget{
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,
+
       m:this.m,
+      parent:null,
+      m_offset:new Matrix(),      
       z:z_depth, 
       m_shape: m_shape,
+      type: utils.shape.rectangle,
 
       do_shape: true,
       do_line:true,         
       color: this.color_background,
       color_line: utils.color.black,
-      type: utils.shape.rectangle,
+
       density:0.01, 
       collision:false, 
       //texture_three: text_checker_three_grey,
@@ -756,7 +760,8 @@ export default class fidget_daft_i extends fidget{
       om_rA.setTranslation(
         offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
         offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
-      om_rA.setRotation(rad(rot_tmp+180))                                       
+      om_rA.setRotation(rad(rot_tmp+180))    
+
       this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
                                               name:'geo_rectangle_TR',
 
@@ -766,7 +771,8 @@ export default class fidget_daft_i extends fidget{
       scale_inter = 40.0                                       
       let m_shape_modif = new Matrix()
       m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))                                            
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
+                                                
       this.bodies.inters.rectangles.push(new body_build({ 
                                               ...oRect, 
                                               ...opts_collision_mouse_interaction,
