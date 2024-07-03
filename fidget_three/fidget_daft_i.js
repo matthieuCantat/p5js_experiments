@@ -772,7 +772,7 @@ export default class fidget_daft_i extends fidget{
       let m_shape_modif = new Matrix()
       m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
       m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
-                                                
+
       this.bodies.inters.rectangles.push(new body_build({ 
                                               ...oRect, 
                                               ...opts_collision_mouse_interaction,
@@ -1146,6 +1146,57 @@ export default class fidget_daft_i extends fidget{
                                                   })      
      
 
+    this.steps_info = [
+      {
+        bodies_enable:[this.bodies.inters.A, 
+                      this.bodies.inters.background,
+                      this.bodies.inters.circle,
+                      this.bodies.inters.rectangle,
+                      this.bodies.inters.rectangles[0],
+                      this.bodies.inters.rectangles[1],
+                      this.bodies.inters.rectangles[2],
+                      this.bodies.inters.rectangles[3],
+                      this.bodies.geos.backgrounds[0],
+                      this.bodies.geos.backgrounds[1],
+                      this.bodies.geos.circle,
+                      this.bodies.geos.rectangle,                      
+                      this.bodies.geos.rectangles[0],
+                      this.bodies.geos.rectangles[1],
+                      this.bodies.geos.rectangles[2],
+                      this.bodies.geos.rectangles[3],]
+      },
+      {
+        bodies_enable:[ 
+          this.bodies.inters.B,
+          this.bodies.inters.background,
+          this.bodies.inters.circle,
+          this.bodies.inters.rectangle,
+          this.bodies.inters.rectangles[0],
+          this.bodies.inters.rectangles[2],
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],          
+          this.bodies.geos.circle,
+          this.bodies.geos.rectangle,                      
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[2],]
+      },  
+      {
+        bodies_enable:[
+          this.bodies.inters.C,
+          this.bodies.inters.background,
+          this.bodies.inters.circle,
+          this.bodies.inters.rectangle,
+          this.bodies.inters.rectangles[0],
+          this.bodies.inters.rectangles[2],
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],          
+          this.bodies.geos.circle,
+          this.bodies.geos.rectangle,                      
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[2],]
+      },   
+    ]                                              
+
 
     }
   ////////////////////////////////////////////////////////////////////////////////////
@@ -1195,11 +1246,7 @@ export default class fidget_daft_i extends fidget{
 
   set_step_resolution()
   {
-
-    this.bodies_enable( 0,  ['inters'] )
-    this.bodies_enable( 0,  ['effects'] )
-    for( let i=0; i < this.bodies.inters.test.length; i++)
-      this.bodies.inters.test[i].enable(1)     
+    this.bodies_enable( 0,  ['effects'] ) 
     
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -1209,20 +1256,17 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()     
-      }
-      //_________________________________________________________________Clean Inter
-      this.bodies.inters.A.enable(1) 
-      this.bodies.inters.background.enable(1)
-      this.bodies.inters.circle.enable(1)
-      this.bodies.inters.rectangle.enable(1)
-      for( let i=0; i < this.bodies.inters.rectangles.length; i++)
-        this.bodies.inters.rectangles[i].enable(1)
+        this.bodies_enable( 0,  ['inters'] )  
+        this.bodies_enable( 0,  ['geos'] )  
 
+        this.bodies_axe_clean_override()
+        this.bodies_rot_clean_override()
+
+        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
+          this.steps_info[step].bodies_enable[i].enable(1) 
+   
+      }
       //_________________________________________________________________Clean Other
-      this.bodies.geos.rectangles[1].enable(1)
-      this.bodies.geos.rectangles[3].enable(1)
 
       this.bodies.geos.rectangle.constraints.axe.pos_override = -1
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
@@ -1252,23 +1296,19 @@ export default class fidget_daft_i extends fidget{
     {      
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()     
-      }      
-      //_________________________________________________________________Clean Inter
-      this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-      this.bodies.inters.B.enable(1) 
-      this.bodies.inters.background.enable(1)
-      this.bodies.inters.C.constraints.axe.pos_override = 0
-      this.bodies.inters.circle.enable(1)
-      //this.bodies.inters.rectangle.enable(1)
-      for( let i=0; i < this.bodies.inters.rectangles.length; i++)
-        this.bodies.inters.rectangles[i].enable(1)
-        
-      //_________________________________________________________________Clean Other
-      this.bodies.geos.rectangles[1].enable(0)
-      this.bodies.geos.rectangles[3].enable(0)
+        this.bodies_enable( 0,  ['inters'] )  
+        this.bodies_enable( 0,  ['geos'] )  
 
+        this.bodies_axe_clean_override()
+        this.bodies_rot_clean_override()
+
+        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
+          this.steps_info[step].bodies_enable[i].enable(1)     
+      }      
+
+
+      this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
+      this.bodies.inters.C.constraints.axe.pos_override = 0      
       this.bodies.geos.circle.scale = 1.85
       this.bodies.geos.rectangle.pos_override = 0
 
@@ -1323,22 +1363,18 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
+        this.bodies_enable( 0,  ['inters'] )  
+        this.bodies_enable( 0,  ['geos'] )  
+
         this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()     
-      }
-      //_________________________________________________________________Clean Inter
-      this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-      //this.bodies.inters.B.m_transform.setRotation(rad(270))
-      this.bodies.inters.C.enable(1) 
-      this.bodies.inters.background.enable(1)
-      this.bodies.inters.circle.enable(1)
-      //this.bodies.inters.rectangle.enable(1)
-      for( let i=0; i < this.bodies.inters.rectangles.length; i++)
-        this.bodies.inters.rectangles[i].enable(1)      
-      //_________________________________________________________________Clean Other
-      this.bodies.geos.rectangles[1].enable(0)
-      this.bodies.geos.rectangles[3].enable(0)
+        this.bodies_rot_clean_override()
+
+        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
+          this.steps_info[step].bodies_enable[i].enable(1)     
+      }   
+
       //_________________________________________________________________Control
+      this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       this.bodies.geos.rectangle.m_transform.setRotation(rad(90))
        
       this.bodies.geos.rectangle.constraints.axe.pos_override = res_coef
