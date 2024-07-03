@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { rad, deg, snap_point_on_line, proj_vector_on_line, userIsInteracting} from './utils.js';
+import { rad, deg, clamp, snap_point_on_line, proj_vector_on_line, userIsInteracting} from './utils.js';
 //import { join } from 'path';
 
 
@@ -133,7 +133,7 @@ export class dyn_constraint_build{
             obj: null,
             obj_pos_offset: new Vector(),
             target: null,
-            target_pos_offset: new Vector(),
+            //target_pos_offset: new Vector(),
             
             stiffness: 0.001,
             stiffness_at_selection: null,
@@ -148,17 +148,26 @@ export class dyn_constraint_build{
         this.obj = args.obj
         this.obj_pos_offset = args.obj_pos_offset
         this.target = args.target
-        this.target_pos_offset = args.target_pos_offset
+        //this.target_pos_offset = args.target_pos_offset
         
         this.stiffness = args.stiffness
         this.stiffness_at_selection = args.stiffness_at_selection
         this.damping = args.damping
         this.length = args.length
         this.y_offset = args.y_offset
-        
+    
+        //compute pos offset
+        this.target_pos_offset = new Vector()
+        if( this.target != null)
+        {
+          let m_target = this.target.get_init_matrix()
+          let m_obj = this.obj.get_init_matrix()
+          let m_delta = m_obj.getMult(m_target.getInverse())
+          this.target_pos_offset = m_delta.get_row(2)         
+        }
+
         //build
 
-    
         var opt = {
             bodyA: this.obj.body,
             pointA: this.obj_pos_offset.get_value(),
@@ -189,6 +198,9 @@ export class dyn_constraint_build{
         Matter.Composite.add( this.matter_engine.world, [ this.cns ])
  
         this.selection_change_do_rebind = false        
+
+
+
 
     }
 
@@ -707,3 +719,84 @@ export class constraint_build{
 }
 
 
+
+export class connect{
+  
+  constructor( in_options ){
+  // Default options
+    const defaultOptions = {
+      obj:null,
+      attr:'scale',
+      target:null, 
+      target_attr:'ty', 
+      target_space:'local',
+      target_remap:null,   
+    };
+    const args = { ...defaultOptions, ...in_options };
+    
+    this.obj          = args.obj
+    this.attr         = args.attr
+    this.target       = args.target
+    this.target_attr  = args.target_attr
+    this.target_space = args.target_space      
+    this.target_remap = args.target_remap
+
+  }
+
+  apply()
+  {
+      if(this.is_enable == false)
+          return false
+
+      let m_parent = this.target.parent.get_out_matrix()
+      let m_world = this.target.get_out_matrix().getMult(m_parent.getInverse())
+      
+
+      let m = null
+      if(this.target_space == 'local')
+      {
+        let m_init_parent = this.target.parent.get_init_matrix()
+        let m_init = this.target.get_init_matrix().getMult(m_init_parent.getInverse())
+        m = m_world.getMult(m_init.getInverse())
+      }
+      else{
+        m = m_world
+      }
+
+      
+ 
+      let value = null
+      if( this.target_attr == 'tx' )
+        value = m.get_row(2).x()      
+      if( this.target_attr == 'ty' )
+        value = m.get_row(2).y()
+      if( this.target_attr == 'r' )
+        value = deg(m.getRotation())
+
+      //console.log(value)
+      
+      if( this.target_remap != null )
+      {
+        value = clamp( value, this.target_remap[0], this.target_remap[1] ) 
+        value = value/(this.target_remap[1]-this.target_remap[0])
+        value = value*(this.target_remap[3]-this.target_remap[2])+this.target_remap[2]
+      }
+      
+      
+
+      if( this.attr == 'scale' )
+        this.obj.scale = value
+      if( this.attr == 'r' )
+        this.obj.m_transform.setRotation(rad(value))  
+
+
+      return true
+
+  }
+
+  enable(value)
+  {
+      this.is_enable = value
+  }
+
+}
