@@ -1441,12 +1441,7 @@ export default class fidget_daft_i extends fidget{
 
   set_step_resolution()
   {
-    this.bodies_enable( 0,  ['effects'] ) 
-    this.bodies_enable( 1,  ['bones'] ) 
 
-
-    
-    ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
     let res_coef = this.state.steps[step].resoluton_coef
     let do_it = this.state.current_step == step
@@ -1454,8 +1449,6 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
- 
-
         this.bodies_axe_clean_override()
         this.bodies_rot_clean_override()
 
@@ -1466,18 +1459,13 @@ export default class fidget_daft_i extends fidget{
         this.bodies_constraints_enable( true ) 
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
-   
       }
 
-
-      
       if(  this.anim_mode )   
       {
         this.bodies.inters.A.constraints.axe.pos_override = res_coef
       }
  
-
-
       //_________________________________________________________________Update
       this.state.switch_selection_happened_step = step
       this.update_step_count(step)
@@ -1568,7 +1556,6 @@ export default class fidget_daft_i extends fidget{
       //_________________________________________________________________Control
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
 
-
       if(  this.anim_mode )   
       {
         this.bodies.inters.C.constraints.axe.pos_override = res_coef
@@ -1592,8 +1579,7 @@ export default class fidget_daft_i extends fidget{
       {
         //if( (this.bodies.inters.B.is_selected == true) &&(userIsInteracting == false) )
         //  switch_selection( this.mouse_constraint, null)
-      }
-      
+      }    
       
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
@@ -1624,37 +1610,12 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false)         
       }      
-      /*
-      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-      {
-        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-        this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
-        this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
-      }
-      */
-            
+ 
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1
-      //this.bodies.inters.B.m_transform.setRotation(rad(270))
       this.bodies.inters.C.constraints.axe.pos_override = 1
-
       //_________________________________________________________________Clean Other
-      /*
-      this.bodies.geos.rectangles[1].enable(0)
-      this.bodies.geos.rectangles[3].enable(0)
-      */
-
-      // Keep position safe
-      //this.bodies.geos.circle.scale = 1.85 - 1.42
-      /*
-      this.bodies.geos.rectangle.constraints.axe.pos_override = 1
-      for( let i=0; i < this.bodies.geos.rectangles.length; i++)
-        this.bodies.geos.rectangles[i].constraints.axe.pos_override = 1
-        */
-  
-
       //_________________________________________________________________Control
-
       //_________________________________________________________________effects
 
       anim_effect({
@@ -1775,29 +1736,6 @@ export default class fidget_daft_i extends fidget{
     }
   }  
 
-  set_across_steps()
-  {
-    /*
-    let offset_from_center = new Vector(65,0)
-    let _value = this.state.steps[0].resoluton_coef*35 //Math.min( Math.max( 0, -a_inter1),35)
-  
-    
-    this.bodies.geos.rectangles[0].constraints.axe.extra_rotation        = Math.min( Math.max( 0, _value),35)
-    this.bodies.geos.rectangles[0].constraints.axe.extra_rotation_center = offset_from_center
-  
-    this.bodies.geos.rectangles[1].constraints.axe.extra_rotation        = Math.min( Math.max( 0, _value),35)*-1
-    this.bodies.geos.rectangles[1].constraints.axe.extra_rotation_center = offset_from_center
-  
-    offset_from_center = new Vector(-65,0) 
-  
-    this.bodies.geos.rectangles[2].constraints.axe.extra_rotation        = Math.min( Math.max( 0, _value),35)
-    this.bodies.geos.rectangles[2].constraints.axe.extra_rotation_center = offset_from_center
-  
-    this.bodies.geos.rectangles[3].constraints.axe.extra_rotation        = Math.min( Math.max( 0, _value),35)*-1
-    this.bodies.geos.rectangles[3].constraints.axe.extra_rotation_center = offset_from_center
-    */
-
-  }
 
 
   track_user_drag_error()
@@ -1865,7 +1803,6 @@ export default class fidget_daft_i extends fidget{
   update()
   {
     this.anim_mode =  this.resolution_coef_override != null
-    this.set_across_steps()
     // resolution
     this.state.resolution_coef_last = this.state.resolution_coef
     this.get_resolution_coef_info( this.resolution_coef_override )
