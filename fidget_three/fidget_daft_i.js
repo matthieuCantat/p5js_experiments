@@ -1915,7 +1915,6 @@ export default class fidget_daft_i extends fidget{
         //_________________________________________________________________Mouse
         if(this.debug_mode.switch_selected_inter_help)
         {
-          console.log('switch')
           this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[0], this.bodies.inters_step.steps[1])
         }
         else
@@ -1961,7 +1960,6 @@ export default class fidget_daft_i extends fidget{
         this.bodies.inters_step.steps[0].set_resolution_coef(1)
         this.bodies.inters_step.steps[1].set_resolution_coef(1)
         this.bodies.inters_step.steps[2].set_resolution_coef(null)  
-        console.log('switch2')
         //_________________________________________________________________Mouse
         if(this.debug_mode.switch_selected_inter_help)
         {      
