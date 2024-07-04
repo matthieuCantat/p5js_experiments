@@ -250,8 +250,9 @@ export default class fidget_daft_i extends fidget{
     })
 
 
-    
 
+
+    
     
     let scale_inter = 40.0 
 
@@ -288,8 +289,6 @@ export default class fidget_daft_i extends fidget{
                                     density:0.01, 
                                                                              
                                   })    
-
-
 
 
 
@@ -359,8 +358,6 @@ export default class fidget_daft_i extends fidget{
                              
 
 
-
-
       scale_inter = 10.0                                      
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
@@ -391,7 +388,7 @@ export default class fidget_daft_i extends fidget{
         density:0.01,                                                                                
       })
 
-      
+
      
                                                                                        
       // other
@@ -469,7 +466,7 @@ export default class fidget_daft_i extends fidget{
     z_depth += z_depth_incr
 
 
-                                            
+
     // build
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
@@ -498,12 +495,12 @@ export default class fidget_daft_i extends fidget{
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
                                       { name:'orient',type:'kin_orient',target:this.bodies.inters.background},  
-                                      { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                      { name:'connect_scale_iA', type:'connect', target:this.bodies.inters.A, 
                                         attr:'scale',
                                         target_attr:'ty', 
                                         target_space:'local',
                                         target_remap:[0,55,1,1.82] },  
-                                      { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                      { name:'connect_scale_iC', type:'connect', target:this.bodies.inters.C, 
                                         attr:'scale',
                                         target_attr:'ty', 
                                         target_space:'local',
@@ -513,6 +510,7 @@ export default class fidget_daft_i extends fidget{
                                                                                
                                     })
       this.bodies.inters.circle.highlight_selection = [this.bodies.geos.circle]
+
 
 
 
@@ -583,17 +581,17 @@ export default class fidget_daft_i extends fidget{
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
-                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                { name:'connect_rot_iA', type:'connect', target:this.bodies.inters.A, 
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
                                                   target_remap:[0,55,0,35] },  
-                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                { name:'connect_tx_iB', type:'connect', target:this.bodies.inters.B, 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
                                                   target_remap:[0,90,0,-85] },    
-                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                { name:'connect_tx_iC', type:'connect', target:this.bodies.inters.C, 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
@@ -602,6 +600,8 @@ export default class fidget_daft_i extends fidget{
                                               density:0.2, 
 
                                             }))     
+
+
 
       var om_rA = new Matrix()
       om_rA.setTranslation(ray_tmp*-1,0) 
@@ -617,6 +617,8 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],                                              
                                             })) 
+
+
 
       scale_inter = 40.0                                       
       let m_shape_modif = new Matrix()
@@ -675,17 +677,17 @@ export default class fidget_daft_i extends fidget{
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
-                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                { name:'connect_rot_iA', type:'connect', target:this.bodies.inters.A, 
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
                                                   target_remap:[0,55,0,-35] },   
-                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                { name:'connect_tx_iB', type:'connect', target:this.bodies.inters.B, 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
                                                   target_remap:[0,90,0,-85] },   
-                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                { name:'connect_tx_iC', type:'connect', target:this.bodies.inters.C, 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
@@ -765,17 +767,17 @@ export default class fidget_daft_i extends fidget{
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
-                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                { name:'connect_rot_iA', type:'connect', target:this.bodies.inters.A, 
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
                                                   target_remap:[0,55,0,35] },  
-                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                { name:'connect_tx_iB', type:'connect', target:this.bodies.inters.B, 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
                                                   target_remap:[0,90,0,85] },  
-                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                { name:'connect_tx_iC', type:'connect', target:this.bodies.inters.C, 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
@@ -824,8 +826,11 @@ export default class fidget_daft_i extends fidget{
                                             }))      
                                             
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
       rot_tmp = 180+35    
 
+      
       m_shape_bones = new Matrix()
       m_shape_bones.setScale(s*10)
 
@@ -853,17 +858,17 @@ export default class fidget_daft_i extends fidget{
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
-                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                { name:'connect_rot_iA', type:'connect', target:this.bodies.inters.A, 
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
                                                   target_remap:[0,55,0,-35] },  
-                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                { name:'connect_tx_iB', type:'connect', target:this.bodies.inters.B, 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
                                                   target_remap:[0,90,0,85] },
-                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                { name:'connect_tx_iC', type:'connect', target:this.bodies.inters.C, 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
@@ -892,7 +897,6 @@ export default class fidget_daft_i extends fidget{
 
       this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
       this.bodies.effects.movA_trails = build_effects_trail(oRect_TL,this.bodies.geos.rectangles[3])                                
-
 
       
       this.bodies.inters.A.highlight_selection = [this.bodies.geos.rectangles[3]]
@@ -926,12 +930,12 @@ export default class fidget_daft_i extends fidget{
         { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
         //{  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
-        { name:'connectA', type:'connect', target:this.bodies.inters.B, 
+        { name:'connect_rot_iB', type:'connect', target:this.bodies.inters.B, 
           attr:'r',
           target_attr:'r', 
           target_space:'local',
           target_remap: null },          
-        { name:'connectB', type:'connect', target:this.bodies.inters.C, 
+        { name:'connect_ty_iC', type:'connect', target:this.bodies.inters.C, 
           attr:'ty',
           target_attr:'ty', 
           target_space:'local',
@@ -940,6 +944,11 @@ export default class fidget_daft_i extends fidget{
 
       density:0.001,                                                                                 
     }
+    
+
+
+    
+
 
 
     this.bodies.geos.rectangle = new body_build(oRectangle)
@@ -1053,7 +1062,9 @@ export default class fidget_daft_i extends fidget{
                                                   })      
      
 
+
     this.steps_info = [
+      ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable:[this.bodies.inters.A, 
                       this.bodies.inters.background,
@@ -1075,8 +1086,70 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.bones.rectangles[1],
                       this.bodies.bones.rectangles[2],
                       this.bodies.bones.rectangles[3],                    
-                    ]
-      },
+                    ],
+        constraints_disable:[
+          //this.bodies.inters.background.constraints.point,
+          //this.bodies.inters.background.constraints.orient,
+          //this.bodies.inters.background.constraints.rot_limit,
+          //this.bodies.inters.A.constraints.point,
+          //this.bodies.inters.A.constraints.orient,
+          //this.bodies.inters.A.constraints.axe,
+          //this.bodies.inters.circle.point,
+          //this.bodies.inters.circle.orient,
+          //this.bodies.inters.B.constraints.point,
+          //this.bodies.inters.B.constraints.orient,
+          //this.bodies.inters.B.constraints.rot_limit,
+          //this.bodies.inters.rectangle.constraints.point, 
+          //this.bodies.inters.rectangle.constraints.orient,
+          //this.bodies.inters.C.constraints.point,
+          //this.bodies.inters.C.constraints.orient,
+          //this.bodies.inters.C.constraints.axe, 
+          //this.bodies.geos.circle.constraints.point,
+          //this.bodies.geos.circle.constraints.orient,
+          //this.bodies.geos.circle.constraints.connect_scale_iA,
+          this.bodies.geos.circle.constraints.connect_scale_iC,
+          //this.bodies.bones.rectangles[0].constraints.point,
+          //this.bodies.bones.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[0].constraints.connect_rot_iA,
+          this.bodies.bones.rectangles[0].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[0].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[0].constraints.point,
+          //this.bodies.geos.rectangles[0].constraints.orient,
+          //this.bodies.inters.rectangles[0].constraints.point,
+          //this.bodies.inters.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.point,
+          //this.bodies.bones.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.connect_rot_iA,
+          this.bodies.bones.rectangles[1].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[1].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[1].constraints.point,
+          //this.bodies.geos.rectangles[1].constraints.orient,
+          //this.bodies.inters.rectangles[1].constraints.point,
+          //this.bodies.inters.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.point,
+          //this.bodies.bones.rectangles[2].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.connect_rot_iA,
+          this.bodies.bones.rectangles[2].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[2].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[2].constraints.point,
+          //this.bodies.geos.rectangles[2].constraints.orient,
+          //this.bodies.inters.rectangles[3].constraints.point,
+          //this.bodies.inters.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.point,
+          //this.bodies.bones.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.connect_rot_iA,
+          this.bodies.bones.rectangles[3].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[3].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[3].constraints.point,
+          //this.bodies.geos.rectangles[3].constraints.orient,
+          //this.bodies.geos.rectangle.constraints.point,
+          //this.bodies.geos.rectangle.constraints.orient,
+          this.bodies.geos.rectangle.constraints.connect_rot_iB,
+          this.bodies.geos.rectangle.constraints.connect_ty_iC,
+        ],
+
+                  
+      },///////////////////////////////////////////////////////////////////////////////////// 1
       {
         bodies_enable:[ 
           this.bodies.inters.B,
@@ -1095,8 +1168,68 @@ export default class fidget_daft_i extends fidget{
           this.bodies.bones.rectangles[1],
           this.bodies.bones.rectangles[2],
           this.bodies.bones.rectangles[3],           
-        ]
-      },  
+        ],
+        constraints_disable:[
+          //this.bodies.inters.background.constraints.point,
+          //this.bodies.inters.background.constraints.orient,
+          //this.bodies.inters.background.constraints.rot_limit,
+          //this.bodies.inters.A.constraints.point,
+          //this.bodies.inters.A.constraints.orient,
+          //this.bodies.inters.A.constraints.axe,
+          //this.bodies.inters.circle.point,
+          //this.bodies.inters.circle.orient,
+          //this.bodies.inters.B.constraints.point,
+          //this.bodies.inters.B.constraints.orient,
+          //this.bodies.inters.B.constraints.rot_limit,
+          //this.bodies.inters.rectangle.constraints.point, 
+          //this.bodies.inters.rectangle.constraints.orient,
+          //this.bodies.inters.C.constraints.point,
+          //this.bodies.inters.C.constraints.orient,
+          //this.bodies.inters.C.constraints.axe, 
+          //this.bodies.geos.circle.constraints.point,
+          //this.bodies.geos.circle.constraints.orient,
+          //this.bodies.geos.circle.constraints.connect_scale_iA,
+          this.bodies.geos.circle.constraints.connect_scale_iC,
+          //this.bodies.bones.rectangles[0].constraints.point,
+          //this.bodies.bones.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[0].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[0].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[0].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[0].constraints.point,
+          //this.bodies.geos.rectangles[0].constraints.orient,
+          //this.bodies.inters.rectangles[0].constraints.point,
+          //this.bodies.inters.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.point,
+          //this.bodies.bones.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[1].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[1].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[1].constraints.point,
+          //this.bodies.geos.rectangles[1].constraints.orient,
+          //this.bodies.inters.rectangles[1].constraints.point,
+          //this.bodies.inters.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.point,
+          //this.bodies.bones.rectangles[2].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[2].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[2].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[2].constraints.point,
+          //this.bodies.geos.rectangles[2].constraints.orient,
+          //this.bodies.inters.rectangles[3].constraints.point,
+          //this.bodies.inters.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.point,
+          //this.bodies.bones.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[3].constraints.connect_tx_iB,
+          this.bodies.bones.rectangles[3].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[3].constraints.point,
+          //this.bodies.geos.rectangles[3].constraints.orient,
+          //this.bodies.geos.rectangle.constraints.point,
+          //this.bodies.geos.rectangle.constraints.orient,
+          //this.bodies.geos.rectangle.constraints.connect_rot_iB,
+          this.bodies.geos.rectangle.constraints.connect_ty_iC,    
+        ],
+      }, ///////////////////////////////////////////////////////////////////////////////////// 2 
       {
         bodies_enable:[
           this.bodies.inters.C,
@@ -1115,7 +1248,147 @@ export default class fidget_daft_i extends fidget{
           this.bodies.bones.rectangles[1],
           this.bodies.bones.rectangles[2],
           this.bodies.bones.rectangles[3],            
-        ]
+        ],
+        constraints_disable:[
+          //this.bodies.inters.background.constraints.point,
+          //this.bodies.inters.background.constraints.orient,
+          //this.bodies.inters.background.constraints.rot_limit,
+          //this.bodies.inters.A.constraints.point,
+          //this.bodies.inters.A.constraints.orient,
+          //this.bodies.inters.A.constraints.axe,
+          //this.bodies.inters.circle.point,
+          //this.bodies.inters.circle.orient,
+          //this.bodies.inters.B.constraints.point,
+          //this.bodies.inters.B.constraints.orient,
+          //this.bodies.inters.B.constraints.rot_limit,
+          //this.bodies.inters.rectangle.constraints.point, 
+          //this.bodies.inters.rectangle.constraints.orient,
+          //this.bodies.inters.C.constraints.point,
+          //this.bodies.inters.C.constraints.orient,
+          //this.bodies.inters.C.constraints.axe, 
+          //this.bodies.geos.circle.constraints.point,
+          //this.bodies.geos.circle.constraints.orient,
+          //this.bodies.geos.circle.constraints.connect_scale_iA,
+          //this.bodies.geos.circle.constraints.connect_scale_iC,
+          //this.bodies.bones.rectangles[0].constraints.point,
+          //this.bodies.bones.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[0].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[0].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[0].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[0].constraints.point,
+          //this.bodies.geos.rectangles[0].constraints.orient,
+          //this.bodies.inters.rectangles[0].constraints.point,
+          //this.bodies.inters.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.point,
+          //this.bodies.bones.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[1].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[1].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[1].constraints.point,
+          //this.bodies.geos.rectangles[1].constraints.orient,
+          //this.bodies.inters.rectangles[1].constraints.point,
+          //this.bodies.inters.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.point,
+          //this.bodies.bones.rectangles[2].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[2].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[2].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[2].constraints.point,
+          //this.bodies.geos.rectangles[2].constraints.orient,
+          //this.bodies.inters.rectangles[3].constraints.point,
+          //this.bodies.inters.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.point,
+          //this.bodies.bones.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[3].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[3].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[3].constraints.point,
+          //this.bodies.geos.rectangles[3].constraints.orient,
+          //this.bodies.geos.rectangle.constraints.point,
+          //this.bodies.geos.rectangle.constraints.orient,
+          //this.bodies.geos.rectangle.constraints.connect_rot_iB,
+          //this.bodies.geos.rectangle.constraints.connect_ty_iC,   
+        ],
+      }, ///////////////////////////////////////////////////////////////////////////////////// 3
+      {
+        bodies_enable:[
+          this.bodies.inters.C,
+          this.bodies.inters.background,
+          this.bodies.inters.circle,
+          //this.bodies.inters.rectangle,
+          //this.bodies.inters.rectangles[0],
+          //this.bodies.inters.rectangles[2],
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],          
+          this.bodies.geos.circle,
+          this.bodies.geos.rectangle,                      
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[2],
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],            
+        ],
+        constraints_disable:[
+          //this.bodies.inters.background.constraints.point,
+          //this.bodies.inters.background.constraints.orient,
+          //this.bodies.inters.background.constraints.rot_limit,
+          //this.bodies.inters.A.constraints.point,
+          //this.bodies.inters.A.constraints.orient,
+          //this.bodies.inters.A.constraints.axe,
+          //this.bodies.inters.circle.point,
+          //this.bodies.inters.circle.orient,
+          //this.bodies.inters.B.constraints.point,
+          //this.bodies.inters.B.constraints.orient,
+          //this.bodies.inters.B.constraints.rot_limit,
+          //this.bodies.inters.rectangle.constraints.point, 
+          //this.bodies.inters.rectangle.constraints.orient,
+          //this.bodies.inters.C.constraints.point,
+          //this.bodies.inters.C.constraints.orient,
+          //this.bodies.inters.C.constraints.axe, 
+          //this.bodies.geos.circle.constraints.point,
+          //this.bodies.geos.circle.constraints.orient,
+          //this.bodies.geos.circle.constraints.connect_scale_iA,
+          //this.bodies.geos.circle.constraints.connect_scale_iC,
+          //this.bodies.bones.rectangles[0].constraints.point,
+          //this.bodies.bones.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[0].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[0].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[0].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[0].constraints.point,
+          //this.bodies.geos.rectangles[0].constraints.orient,
+          //this.bodies.inters.rectangles[0].constraints.point,
+          //this.bodies.inters.rectangles[0].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.point,
+          //this.bodies.bones.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[1].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[1].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[1].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[1].constraints.point,
+          //this.bodies.geos.rectangles[1].constraints.orient,
+          //this.bodies.inters.rectangles[1].constraints.point,
+          //this.bodies.inters.rectangles[1].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.point,
+          //this.bodies.bones.rectangles[2].constraints.orient,
+          //this.bodies.bones.rectangles[2].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[2].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[2].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[2].constraints.point,
+          //this.bodies.geos.rectangles[2].constraints.orient,
+          //this.bodies.inters.rectangles[3].constraints.point,
+          //this.bodies.inters.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.point,
+          //this.bodies.bones.rectangles[3].constraints.orient,
+          //this.bodies.bones.rectangles[3].constraints.connect_rot_iA,
+          //this.bodies.bones.rectangles[3].constraints.connect_tx_iB,
+          //this.bodies.bones.rectangles[3].constraints.connect_tx_iC,
+          //this.bodies.geos.rectangles[3].constraints.point,
+          //this.bodies.geos.rectangles[3].constraints.orient,
+          //this.bodies.geos.rectangle.constraints.point,
+          //this.bodies.geos.rectangle.constraints.orient,
+          //this.bodies.geos.rectangle.constraints.connect_rot_iB,
+          //this.bodies.geos.rectangle.constraints.connect_ty_iC,   
+        ],
       },   
     ]                                              
 
@@ -1190,16 +1463,10 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1) 
 
-        // constraint enable
-        this.bodies.geos.circle.constraints.connectA.enable(true)
-        this.bodies.geos.circle.constraints.connectC.enable(false)
-        this.bodies.geos.rectangle.constraints.connectA.enable(false)
-        for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-        {
-          this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-          this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
-          this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
-        }          
+        this.bodies_constraints_enable( true ) 
+        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
+          this.steps_info[step].constraints_disable[i].enable(false) 
+   
       }
 
 
@@ -1233,16 +1500,10 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1) 
           
-        // constraint enable
-        this.bodies.geos.circle.constraints.connectA.enable(false)
-        this.bodies.geos.circle.constraints.connectC.enable(false)
-        this.bodies.geos.rectangle.constraints.connectA.enable(true)
-        for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-        {
-          this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-          this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
-          this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
-        }          
+        this.bodies_constraints_enable( true ) 
+        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
+          this.steps_info[step].constraints_disable[i].enable(false) 
+    
       }       
 
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
@@ -1299,17 +1560,9 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1)   
           
-        // constraint enable
-        this.bodies.geos.circle.constraints.connectA.enable(false)
-        this.bodies.geos.circle.constraints.connectC.enable(true)
-  
-        this.bodies.geos.rectangle.constraints.connectA.enable(true)
-        for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-        {
-          this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-          this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
-          this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
-        }
+        this.bodies_constraints_enable( true ) 
+        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
+          this.steps_info[step].constraints_disable[i].enable(false) 
       }   
 
       //_________________________________________________________________Control
@@ -1362,14 +1615,23 @@ export default class fidget_daft_i extends fidget{
       {
         this.bodies_axe_clean_override()
         this.bodies_rot_clean_override()     
-      }      
 
+        this.bodies_enable( 0 ) 
+        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
+          this.steps_info[step].bodies_enable[i].enable(1)   
+          
+        this.bodies_constraints_enable( true ) 
+        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
+          this.steps_info[step].constraints_disable[i].enable(false)         
+      }      
+      /*
       for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
       {
         this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
         this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
         this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
       }
+      */
             
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1
@@ -1377,9 +1639,10 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.C.constraints.axe.pos_override = 1
 
       //_________________________________________________________________Clean Other
-
+      /*
       this.bodies.geos.rectangles[1].enable(0)
       this.bodies.geos.rectangles[3].enable(0)
+      */
 
       // Keep position safe
       //this.bodies.geos.circle.scale = 1.85 - 1.42
@@ -1463,7 +1726,7 @@ export default class fidget_daft_i extends fidget{
 
   do_explode(step)
   {
-    this.bodies_cns_enable(false, ['geos'])
+    this.bodies_constraints_enable(false, ['geos'])
     
     
 

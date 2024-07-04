@@ -486,7 +486,7 @@ export default class fidget{
     }  
   }
 
-  bodies_cns_enable(value,body_type_filter = [] )
+  bodies_constraints_enable(value,body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
@@ -502,7 +502,7 @@ export default class fidget{
           {
             for( var cns in this.bodies[b_type][key][i].constraints )
             {
-              this.bodies[b_type][key][i].constraints[cns].is_enable = value
+              this.bodies[b_type][key][i].constraints[cns].enable(value)
             }
 
           }
@@ -511,7 +511,7 @@ export default class fidget{
         else      
           for( var cns in this.bodies[b_type][key].constraints )
           {
-            this.bodies[b_type][key].constraints[cns].is_enable = value          
+            this.bodies[b_type][key].constraints[cns].enable(value)         
           }
   
       }  
