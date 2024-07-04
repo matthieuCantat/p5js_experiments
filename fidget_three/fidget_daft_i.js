@@ -288,8 +288,9 @@ export default class fidget_daft_i extends fidget{
 
                                     density:0.01, 
                                                                              
-                                  })    
-
+                                  }) 
+    this.bodies.inters.A.get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }
+    this.bodies.inters.A.set_resolution_coef = function(res = null){ this.constraints.axe.current_pos = res }
 
 
 
@@ -355,7 +356,8 @@ export default class fidget_daft_i extends fidget{
                                         density:0.01, 
                                                                                     
                                       })
-                             
+      this.bodies.inters.B.get_resolution_coef = function(){ return clamp(deg(this.get_local_rotation())/90.0     ,0,1) }  
+      this.bodies.inters.B.set_resolution_coef = function(res = null){ if(res!=null)this.set_angle(rad(res*90.0),false) }                     
 
 
       scale_inter = 10.0                                      
@@ -462,6 +464,8 @@ export default class fidget_daft_i extends fidget{
                                       density:0.01, 
                                                                               
                                     })
+    this.bodies.inters.C.get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }
+    this.bodies.inters.C.set_resolution_coef = function(res = null){ this.constraints.axe.current_pos = res }
  
     z_depth += z_depth_incr
 
@@ -1401,9 +1405,9 @@ export default class fidget_daft_i extends fidget{
   get_resolution_coef_info( )
   {   
 
-    let A = clamp(this.bodies.inters.A.constraints.axe.current_pos ,0,1)//clamp(deg(this.bodies.inters.A.body.angle)*-1/35.0     ,0,1)
-    let B = clamp(deg(this.bodies.inters.B.get_local_rotation())/90.0     ,0,1)
-    let C = clamp(this.bodies.inters.C.constraints.axe.current_pos ,0,1) 
+    let A = this.bodies.inters.A.get_resolution_coef() //clamp(this.bodies.inters.A.constraints.axe.current_pos ,0,1)//clamp(deg(this.bodies.inters.A.body.angle)*-1/35.0     ,0,1)
+    let B = this.bodies.inters.B.get_resolution_coef() //clamp(deg(this.bodies.inters.B.get_local_rotation())/90.0     ,0,1)
+    let C = this.bodies.inters.C.get_resolution_coef() //clamp(this.bodies.inters.C.constraints.axe.current_pos ,0,1) 
     let D = 0
     
     if ( this.anim_mode )
@@ -1457,9 +1461,9 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
 
-        this.bodies.inters.A.constraints.axe.pos_override = null
-        //this.bodies.inters.B.constraints.axe.pos_override = 0
-        this.bodies.inters.C.constraints.axe.pos_override = 0            
+        this.bodies.inters.A.set_resolution_coef(null)
+        this.bodies.inters.B.set_resolution_coef(0)
+        this.bodies.inters.C.set_resolution_coef(0)       
       }
 
       //_________________________________________________________________Update
@@ -1484,9 +1488,9 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
   
-        this.bodies.inters.A.constraints.axe.pos_override = 1
-        //this.bodies.inters.B.constraints.axe.pos_override = null
-        this.bodies.inters.C.constraints.axe.pos_override = 0       
+        this.bodies.inters.A.set_resolution_coef(1)
+        this.bodies.inters.B.set_resolution_coef(null)
+        this.bodies.inters.C.set_resolution_coef(0)      
         
         let m = new Matrix(this.bodies.inters.circle.m_shape_init)
         m.scale(1.85,1.85)
@@ -1535,9 +1539,9 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
 
-        this.bodies.inters.A.constraints.axe.pos_override = 1
-        //this.bodies.inters.B.constraints.axe.pos_override = 1
-        this.bodies.inters.C.constraints.axe.pos_override = null 
+        this.bodies.inters.A.set_resolution_coef(1)
+        this.bodies.inters.B.set_resolution_coef(1)
+        this.bodies.inters.C.set_resolution_coef(null)  
       }   
       //_________________________________________________________________Control
       //_________________________________________________________________effects
@@ -1586,9 +1590,9 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false)    
           
-        this.bodies.inters.A.constraints.axe.pos_override = 1
-        //this.bodies.inters.B.constraints.axe.pos_override = 1
-        this.bodies.inters.C.constraints.axe.pos_override = 1
+          this.bodies.inters.A.set_resolution_coef(1)
+          this.bodies.inters.B.set_resolution_coef(1)
+          this.bodies.inters.C.set_resolution_coef(1) 
       }      
 
       //_________________________________________________________________Clean Inter
