@@ -96,6 +96,7 @@ export default class fidget{
     console.log('setup : fidget')                      
     this.bodies_set_debug( this.debug_mode )
     this.bodies_set_visibility_secondary(this.debug_mode.show_inters, ['inters'])  
+    this.bodies_set_visibility_secondary(this.debug_mode.show_inters_steps, ['inters_step']) 
     this.bodies_set_visibility_secondary(this.debug_mode.show_geos, ['geos']) 
     this.bodies_set_visibility_secondary(this.debug_mode.show_effects, ['effects']) 
     this.bodies_set_visibility_secondary(this.debug_mode.show_bones, ['bones'])  
