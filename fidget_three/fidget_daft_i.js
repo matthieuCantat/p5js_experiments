@@ -504,10 +504,10 @@ export default class fidget_daft_i extends fidget{
                                         target_space:'local',
                                         target_remap:[0,55,1,1.82] },  
                                       { name:'connectC', type:'connect', target:this.bodies.inters.C, 
-                                        attr:'tx',
+                                        attr:'scale',
                                         target_attr:'ty', 
                                         target_space:'local',
-                                        target_remap:[0,110,1.82,1] },
+                                        target_remap:[0,110,1.82,0.45] },
                                     ],                                      
                                     density:0.001,     
                                                                                
