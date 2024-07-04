@@ -1449,9 +1449,6 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()
-
         this.bodies_enable( 0)  
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1) 
@@ -1459,13 +1456,12 @@ export default class fidget_daft_i extends fidget{
         this.bodies_constraints_enable( true ) 
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
+
+        this.bodies.inters.A.constraints.axe.pos_override = null
+        //this.bodies.inters.B.constraints.axe.pos_override = 0
+        this.bodies.inters.C.constraints.axe.pos_override = 0            
       }
 
-      if(  this.anim_mode )   
-      {
-        this.bodies.inters.A.constraints.axe.pos_override = res_coef
-      }
- 
       //_________________________________________________________________Update
       this.state.switch_selection_happened_step = step
       this.update_step_count(step)
@@ -1480,10 +1476,6 @@ export default class fidget_daft_i extends fidget{
     {      
       if(this.state.steps[step].update_count == 0 )
       {
-
-        this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()
-
         this.bodies_enable( 0 )  
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1) 
@@ -1491,23 +1483,17 @@ export default class fidget_daft_i extends fidget{
         this.bodies_constraints_enable( true ) 
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
-    
+  
+        this.bodies.inters.A.constraints.axe.pos_override = 1
+        //this.bodies.inters.B.constraints.axe.pos_override = null
+        this.bodies.inters.C.constraints.axe.pos_override = 0       
+        
+        let m = new Matrix(this.bodies.inters.circle.m_shape_init)
+        m.scale(1.85,1.85)
+        this.bodies.inters.circle.update_shape_coords(m)        
       }       
-
-      this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-      this.bodies.inters.C.constraints.axe.pos_override = 0      
-
-
-      let m = new Matrix(this.bodies.inters.circle.m_shape_init)
-      m.scale(1.85,1.85)
-      this.bodies.inters.circle.update_shape_coords(m)
-
-      if(  this.anim_mode )   
-      {
-        this.bodies.inters.B.rot_override = res_coef*rad(90)
-      }      
+   
       //_________________________________________________________________effects
-
       anim_effect({
         count:this.state.steps[step].update_count,
         sparcles:this.bodies.effects.colA_sparcles,
@@ -1541,9 +1527,6 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()
-
         this.bodies_enable( 0 ) 
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1)   
@@ -1551,16 +1534,12 @@ export default class fidget_daft_i extends fidget{
         this.bodies_constraints_enable( true ) 
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
           this.steps_info[step].constraints_disable[i].enable(false) 
+
+        this.bodies.inters.A.constraints.axe.pos_override = 1
+        //this.bodies.inters.B.constraints.axe.pos_override = 1
+        this.bodies.inters.C.constraints.axe.pos_override = null 
       }   
-
       //_________________________________________________________________Control
-      this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-
-      if(  this.anim_mode )   
-      {
-        this.bodies.inters.C.constraints.axe.pos_override = res_coef
-      } 
-
       //_________________________________________________________________effects
       anim_effect({
         count:this.state.steps[step].update_count,
@@ -1599,21 +1578,20 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_axe_clean_override()
-        this.bodies_rot_clean_override()     
-
         this.bodies_enable( 0 ) 
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1)   
           
         this.bodies_constraints_enable( true ) 
         for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
-          this.steps_info[step].constraints_disable[i].enable(false)         
+          this.steps_info[step].constraints_disable[i].enable(false)    
+          
+        this.bodies.inters.A.constraints.axe.pos_override = 1
+        //this.bodies.inters.B.constraints.axe.pos_override = 1
+        this.bodies.inters.C.constraints.axe.pos_override = 1
       }      
- 
+
       //_________________________________________________________________Clean Inter
-      this.bodies.inters.A.constraints.axe.pos_override = 1
-      this.bodies.inters.C.constraints.axe.pos_override = 1
       //_________________________________________________________________Clean Other
       //_________________________________________________________________Control
       //_________________________________________________________________effects

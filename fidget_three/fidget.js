@@ -461,7 +461,7 @@ export default class fidget{
       } 
     }
   }
-
+  /*
   bodies_axe_clean_override( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
@@ -485,6 +485,7 @@ export default class fidget{
       } 
     }  
   }
+  */
 
   bodies_constraints_enable(value,body_type_filter = [] )
   {
@@ -518,7 +519,7 @@ export default class fidget{
        
     }   
   }
-
+  /*
   bodies_rot_clean_override( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
@@ -540,6 +541,7 @@ export default class fidget{
       } 
     }  
   }
+  */
 
   
 
