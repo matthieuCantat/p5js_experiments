@@ -95,7 +95,10 @@ export default class fidget{
   {     
     console.log('setup : fidget')                      
     this.bodies_set_debug( this.debug_mode )
-    this.bodies_set_visibility_override(this.debug_mode.show_inter, ['inters'])   
+    this.bodies_set_visibility_secondary(this.debug_mode.show_inters, ['inters'])  
+    this.bodies_set_visibility_secondary(this.debug_mode.show_geos, ['geos']) 
+    this.bodies_set_visibility_secondary(this.debug_mode.show_effects, ['effects']) 
+    this.bodies_set_visibility_secondary(this.debug_mode.show_bones, ['bones'])  
     this.bodies_init_out_matrix()
   }
 
@@ -560,6 +563,29 @@ export default class fidget{
       } 
     }       
   }
+
+  bodies_set_visibility_secondary( value,body_type_filter = [] )
+  {
+    
+    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    {   
+      let b_type = this.bodies_draw_order[i+0]
+      let key = this.bodies_draw_order[i+1]
+       
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      {
+     
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            this.bodies[b_type][key][i].visibility_secondary = value
+        }
+        else
+          this.bodies[b_type][key].visibility_secondary = value
+        
+      } 
+    } 
+  }  
 
   bodies_set_visibility_override( value,body_type_filter = [] )
   {

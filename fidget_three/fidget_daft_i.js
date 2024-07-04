@@ -1,349 +1,25 @@
 
 import fidget from './fidget.js';
-import { utils,switch_selection,clamp,rad,deg,userIsInteracting,mouseX, mouseY } from './utils.js';
-import body_build from './body.js';
+import { 
+  utils,
+  switch_selection,
+  clamp,
+  rad,
+  deg,
+  userIsInteracting,
+  mouseX, 
+  mouseY, } from './utils.js';
+import { body_build,
+  build_effects_trail,
+  build_effects_particles_sparcles,
+  build_effects_particles_shapes,
+  build_effects_wall,
+  anim_effect,
+} from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import * as ut from './utils_three.js';
 import { and } from './libraries/jsm/nodes/Nodes.js';
-
-
-
-
-
-
-function build_effects_trail(opts,body_target)
-{
-  let opts_global = {
-    screen_dims: opts.screen_dims,
-    matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
-  }
-  let opts_collision_no_interaction = {
-    collision_category: utils.collision_category.none,
-    collision_mask: utils.collision_category.none
-  } 
-  let opts_debug = {
-    debug_matrix_info: false,
-    debug_matrix_axes: opts.debug_matrix_axes,  
-    debug_cns_axes: opts.debug_cns_axes,   
-    debug_force_visibility: opts.debug_force_visibility,             
-  }  
-  let opts_trail = {
-                    ...opts, 
-                    ...opts_global,
-                    ...opts_collision_no_interaction,
-                    ...opts_debug,
-                    do_shape: true,
-                    do_line:false,                                             
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////
-  let bodies = []
-
-  bodies.push(new body_build({  ...opts_trail, 
-                                name: opts.name + 'effect_trails1',                                       
-                                color:utils.color.red,
-                                constraints:[
-                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.15},
-                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.15}, 
-                                ],                                                   
-                              })) 
-                                 
-  bodies.push(new body_build({  ...opts_trail,                                 
-                                name: opts.name + 'effect_trails2',        
-                                color:utils.color.blue,              
-                                constraints:[
-                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.2},
-                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.2}, 
-                                ],                                                          
-                              }))  
-                                                                                    
-  bodies.push(new body_build({  ...opts_trail, 
-                                name: opts.name + 'effect_trails3',    
-                                color:utils.color.green,          
-                                constraints:[
-                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.3},
-                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.3}, 
-                                ],                                                       
-                              }))   
-                                            
-  return bodies
-}
-
-
-function build_effects_particles_sparcles(opts)
-{ 
-  let opts_global = {
-    screen_dims: opts.screen_dims,
-    matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
-  }
-
-  let opts_collision_no_interaction = {
-    collision_category: utils.collision_category.none,
-    collision_mask: utils.collision_category.none
-  }   
-  let opts_debug = {
-    debug_matrix_info: false,
-    debug_matrix_axes: opts.debug_matrix_axes,  
-    debug_cns_axes: opts.debug_cns_axes,   
-    debug_force_visibility: opts.debug_force_visibility,             
-  }  
-  ////////////////////////////////////////////////////////////////////////////////
-
-  let bodies = []
-
-  let m_shape = new Matrix()
-  m_shape.set_row(0,m_shape.get_row(0).getMult(8*opts.scale_shape))
-  m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
-
-  let oEffectsA = { 
-    ...opts_global,
-    ...opts_collision_no_interaction,
-    ...opts_debug,
-
-    parent:opts.parent,
-    m_shape: m_shape,
-    z:opts.z_depth, 
-    type: utils.shape.rectangle,
-
-    do_shape: true,
-    do_line:false,           
-    color: utils.color.white,
-    color_line: utils.color.white,
-    //texture_three: text_checker_three,,         
-
-    density:0.001, 
-                    
-  } 
-
-  let om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(90)) 
-
-  bodies.push(new body_build({ ...oEffectsA,          
-                                name: opts.name + 'effect_sparcles1',
-                                m_offset:om_EA1,                                                        
-                              }))                                            
-
-  om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(45))
-
-  bodies.push(new body_build({ ...oEffectsA,   
-                                name: opts.name + 'effect_sparcles2',
-                                m_offset:om_EA1,                                                     
-                              })) 
-                                        
-  om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(135))
-
-  bodies.push(new body_build({ ...oEffectsA,     
-                                name: opts.name + 'effect_sparcles3',
-                                m_offset:om_EA1,                                                       
-                              })) 
-
-  return bodies                              
-}
-
-
-function build_effects_particles_shapes(opts)
-{
-  let opts_global = {
-    screen_dims: opts.screen_dims,
-    matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
-  }
-
-  let opts_collision_no_interaction = {
-    collision_category: utils.collision_category.none,
-    collision_mask: utils.collision_category.none
-  }   
-  let opts_debug = {
-    debug_matrix_info: false,
-    debug_matrix_axes: opts.debug_matrix_axes,  
-    debug_cns_axes: opts.debug_cns_axes,   
-    debug_force_visibility: opts.debug_force_visibility,             
-  }  
-  ////////////////////////////////////////////////////////////////////////////////
-
-  let bodies = []
-
-  let m_shape = new Matrix()
-  m_shape.set_row(0,m_shape.get_row(0).getMult(2*opts.scale_shape))
-  m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
-
-  let oEffectsA = {
-    ...opts_global,
-    ...opts_collision_no_interaction,
-    ...opts_debug,
-
-    parent:opts.parent,
-    m_shape: m_shape,
-    z:opts.z_depth, 
-    type: utils.shape.rectangle,
-
-    do_shape: false,
-    do_line:true,           
-    color: utils.color.white,
-    color_line: utils.color.white,
-    //texture_three: text_checker_three,
-    
-    density:0.001,               
-  } 
-
-  let om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(90))                                       
-
-  bodies.push(new body_build({ ...oEffectsA, 
-                                name: opts.name + 'effect_particle_shape1',
-                                m_offset:om_EA1,                                                
-                              }))                                             
-
-  om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(45))                                       
-
-  bodies.push(new body_build({ ...oEffectsA, 
-                                name: opts.name + 'effect_particle_shape2',
-                                m_offset:om_EA1,                                                     
-                              }))                                             
-
-  om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y())
-  om_EA1.setRotation(rad(opts.rot)+rad(135))                                         
-
-  bodies.push(new body_build({ ...oEffectsA, 
-                                name: opts.name + 'effect_particle_shape3',
-                                m_offset:om_EA1,                                                   
-                              }))                                             
-
-
-  return bodies                              
-}
-
-function build_effects_wall(opts)
-{
-  let opts_global = {
-    screen_dims: opts.screen_dims,
-    matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
-  }
-
-  let opts_collision_no_interaction = {
-    collision_category: utils.collision_category.none,
-    collision_mask: utils.collision_category.none
-  }   
-  let opts_debug = {
-    debug_matrix_info: false,
-    debug_matrix_axes: opts.debug_matrix_axes,  
-    debug_cns_axes: opts.debug_cns_axes,   
-    debug_force_visibility: opts.debug_force_visibility,             
-  }    
-
-  ////////////////////////////////////////////////////////////////////////////////
-                                      
-  let m_shape = new Matrix()
-  m_shape.set_row(0,m_shape.get_row(0).getMult(55*opts.scale_shape))
-  m_shape.set_row(1,m_shape.get_row(1).getMult(1.*opts.scale_shape))
-
-  let om_EA1 = new Matrix()
-  om_EA1.setTranslation(opts.p.x(),opts.p.y()-1)
-  om_EA1.setRotation(rad(opts.rot)+rad(0))                                       
-  let body = new body_build({   ...opts_global,
-                                ...opts_collision_no_interaction,    
-                                ...opts_debug,
-
-                                name: opts.name+'effect_wall',     
-
-                                parent:opts.parent,                                    
-                                m_offset:om_EA1,
-                                m_shape:m_shape,
-                                z:opts.z_depth,
-                                type : utils.shape.rectangle,
-
-                                do_shape: true,
-                                do_line:false,                                       
-                                color:utils.color.white,
-                                color_line: utils.color.black,
-                                //texture_three: text_checker_three_grey, 
-
-                                density:0.01,                                                                                
-                              }) 
-                              
-
-  return body                              
-}
-
-/*
-anim_effect({
-  count:this.state.steps[step].update_count,
-  sparcles:this.bodies.effects.colA_sparcles,
-  shapes:this.bodies.effects.colA_shapes,
-  wall:this.bodies.effects.colA_wall,
-  trails:this.bodies.effects.movA_trails,
-})
-*/
-function anim_effect(opts)
-{
-  if(opts.count == 0)  
-  {      
-    for( let i=0; i < opts.sparcles.length; i++)
-    {
-      let force = new Vector(0.001, 0)
-      force = force.rotate(opts.sparcles[i].get_rotation())
-      let pos = opts.sparcles[i].get_position()
-
-      opts.sparcles[i].apply_force( pos, force )
-      opts.shapes[i].apply_force( pos, force.getMult(0.1) )
-    }
-  }
-
-  if( opts.count < 10) 
-  {
-    if( opts.wall != null)
-    {
-      opts.wall.enable(1)
-
-      let m = new Matrix(opts.wall.m_shape_init)
-      m = m.scale(0.01+opts.count*0.1,1)
-      opts.wall.update_shape_coords(m)
-    }
-  }
-
-
-  if( opts.count < 20) 
-  {
-    for( let i=0; i < opts.sparcles.length; i++)
-    opts.sparcles[i].enable(1)       
-  }
-
-
-  if( opts.count < 40) 
-  {
-    for( let i=0; i < opts.shapes.length; i++)
-      opts.shapes[i].enable(1)   
-      
-    for( let i=0; i < opts.trails.length; i++)
-      opts.trails[i].enable(1)    
-              
-  }    
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -377,6 +53,9 @@ export default class fidget_daft_i extends fidget{
             rectangle:null,
             rectangles:[],
           },
+          bones : {
+            rectangles:[],
+          },     
           effects : {
             movA_trails:[],
             colA_sparcles:[],
@@ -397,6 +76,7 @@ export default class fidget_daft_i extends fidget{
           },          
         }
         this.bodies_draw_order = [
+            
             'geos','backgrounds', 
             'inters','background',
             'inters','circle',
@@ -404,7 +84,7 @@ export default class fidget_daft_i extends fidget{
             'inters','rectangles',
             'inters','B',
             'inters','C',
-            'inters','A',              
+            'inters','A',      
             'geos','circle',
             'effects','movB_trails',
             'geos','rectangle',  
@@ -421,8 +101,8 @@ export default class fidget_daft_i extends fidget{
             'effects','colB_wall', 
             'effects','colC_sparcles', 
             'effects','colC_shapes',
-            'effects','colC_wall',    
-            'inters','test',                                     
+            'effects','colC_wall',  
+            'bones','rectangles',                                       
             ]   
   
       
@@ -469,7 +149,7 @@ export default class fidget_daft_i extends fidget{
       }
 
       let opts_visual_inter = {
-        visibility:false,
+        visibility:true,
         do_shape: true,
         do_line:true,                                           
         color:utils.color.grey,
@@ -569,346 +249,82 @@ export default class fidget_daft_i extends fidget{
                                                  
     })
 
+
     
 
+    
+    let scale_inter = 40.0 
 
-    // build
+    var om_iA = new Matrix()
+    om_iA.setTranslation(-130,-50)
+
     m_shape = new Matrix()
-    m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
-    m_shape.set_row(1,m_shape.get_row(1).getMult(50*s))
-     
-    this.bodies.geos.circle = new body_build({ 
+    m_shape.set_row(0,m_shape.get_row(0).getMult(100/2.4*s))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(100/2.4*s)) 
+
+    this.bodies.inters.A = new body_build({  
                                     ...opts_global,
-                                    ...opts_collision_activate,
+                                    ...opts_collision_mouse_interaction,
+                                    ...opts_visual_inter,
                                     ...opts_debug,
 
-                                    name:'geo_circle',
+                                    name:'inter_A',     
+                                    //highlight_selection:[this.bodies.geos.rectangles[3]],  
+                                    selection_break_length:300.0,
 
                                     m:this.m,
-                                    parent:this.bodies.inters.background,
-                                    m_offset:new Matrix(),
-                                    m_shape: m_shape,
+                                    parent:this.bodies.inters.background,                                    
+                                    m_offset:om_iA,
+                                    m_shape:m_shape,
                                     z:z_depth,
-                                    type:utils.shape.circle,
+                                    type : utils.shape.circle,
 
-                                    do_shape: true,
-                                    do_line:true,                                         
-                                    color: this.colors[0],
-                                    color_line: utils.color.black,
-                                    texture_three: text_checker_three,
-  
                                     constraints:[
-                                      { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
-                                    ],                                      
-                                    density:0.001,     
-                                                                               
-                                    })
+                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
+                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
+                                      { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
+                                    ], 
 
-    
-      let scale_inter = 40.0 
+                                    density:0.01, 
+                                                                             
+                                  })    
+
+
+
+
+
+
       
-      
-      // build
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(50*s+scale_inter))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(50*s+scale_inter))
+    // build
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(50*s+scale_inter))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(50*s+scale_inter))
 
-      this.bodies.inters.circle = new body_build({
-        ...opts_global,
-        ...opts_collision_mouse_interaction,
-        ...opts_visual_inter,
-        ...opts_debug,
+    this.bodies.inters.circle = new body_build({
+      ...opts_global,
+      ...opts_collision_mouse_interaction,
+      ...opts_visual_inter,
+      ...opts_debug,
 
-        name:'inter_circle',
-        highlight_selection:[this.bodies.geos.circle],  
+      name:'inter_circle',
+      //highlight_selection:[this.bodies.geos.circle],  
 
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_offset:new Matrix(),
-        m_shape:m_shape,
-        z:z_depth,
-        type:utils.shape.circle,
+      m:this.m,
+      parent:this.bodies.inters.background,
+      m_offset:new Matrix(),
+      m_shape:m_shape,
+      z:z_depth,
+      type:utils.shape.circle,
 
-        constraints:[
-          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01},                                          
-        ],                                      
-        density:0.01,     
-                                                                                        
-        })
-
-
-                                        
-      z_depth += z_depth_incr  
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(74*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(18*s))
-
-      let oRectangle = { 
-        ...opts_global,
-        ...opts_collision_activate,
-        ...opts_debug,
-
-        name:'geo_rectangle',
-         
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_offset:new Matrix(),
-        m_shape:m_shape,
-        z:z_depth,
-        type : utils.shape.rectangle,
-
-        do_shape: true,
-        do_line:true,                                           
-        color : this.colors[1],
-        color_line: utils.color.black,
-        //texture_three: text_checker_three, 
-
-        constraints:[
-          { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
-          { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
-          {  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
-        ],                                         
-
-        density:0.001,                                                                                 
-      }
-
-
-      this.bodies.geos.rectangle = new body_build(oRectangle)
-      this.bodies.effects.movB_trails = build_effects_trail(oRectangle,this.bodies.geos.rectangle)
-
-
-
-      scale_inter = 10.0                                      
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(18*s+scale_inter))
-
-      this.bodies.inters.rectangle = new body_build({
-        ...opts_global,
-        ...opts_collision_mouse_interaction,
-        ...opts_visual_inter,
-        ...opts_debug,
-
-        name:'inter_rectangle',
-        highlight_selection:[this.bodies.geos.rectangle],  
-         
-
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_offset:new Matrix(),
-        m_shape: m_shape,
-        z:z_depth,
-        type : utils.shape.rectangle,
- 
-        constraints:[
-          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
-        ],
-
-        density:0.01,                                                                                
+      constraints:[
+        {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+        {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01},                                          
+      ],                                      
+      density:0.01,     
+                                                                                      
       })
 
-                                            
-      // other
 
-
-
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(16.21*s))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(3.51*s))
-
-      let oRect = { 
-        ...opts_global,
-        ...opts_collision_activate,
-        ...opts_debug,
-
-        m:this.m,
-        parent:this.bodies.inters.background,
-        m_shape: m_shape,
-        z:z_depth, 
-        type: utils.shape.rectangle,
-
-        do_shape: true,
-        do_line:true,           
-        color: this.colors[2],
-        color_line: utils.color.black,
-        //texture_three: text_checker_three,
-
-        constraints:[
-          { name:'axe'   ,type:'kin_axe', axe:0, distPos: 66.1*s, distNeg: 0.001 },
-        ],         
-
-        density:0.001, 
-                        
-      } 
-      z_depth += z_depth_incr
-  
-      let ray_tmp = 80
-      let rot_tmp = 0 
-      let offset_from_center = new Vector(0,0)
-  
-  
-      // right 
-      rot_tmp = 0-35  
-      offset_from_center = new Vector(65,0)    
-
-      var om_rA = new Matrix()
-      om_rA.setTranslation(
-        offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
-      om_rA.setRotation(rad(rot_tmp+180))    
-
-      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_TR',
-
-                                              m_offset:om_rA,                                                     
-                                            })) 
-
-      scale_inter = 40.0                                       
-      let m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
-
-      this.bodies.inters.rectangles.push(new body_build({ 
-                                              ...oRect, 
-                                              ...opts_collision_mouse_interaction,
-                                              ...opts_visual_inter,
-
-                                              name:'inter_rectangle_TR',
-                                              highlight_selection:[this.bodies.geos.rectangles[0]],  
-
-                                              m_offset:om_rA,
-                                              m_shape:m_shape_modif,
-
-                                              constraints:[
-                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_rA.get_row(2), stiffness: 0.999,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, target_pos_offset:om_rA.get_row(2), stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-                                              density:0.2, 
-                                                    
-                                            }))                                             
-  
-      rot_tmp = 0+35  
-      offset_from_center = new Vector(65,0)   
-
-      var om_rB = new Matrix()
-      om_rB.setTranslation(
-        offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp) 
-      om_rB.setRotation(rad(rot_tmp+180))            
-      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_BR', 
-                                              
-
-                                              m_offset:om_rB,
-                                              m_shape:m_shape,
-                                                   
-                                            })) 
-  
-      this.bodies.inters.rectangles.push(new body_build({ 
-                                              ...oRect, 
-                                              ...opts_collision_mouse_interaction,
-                                              ...opts_visual_inter,
-
-                                              name:'inter_rectangle_BR',
-                                              highlight_selection:[this.bodies.geos.rectangles[1]],   
-
-                                              m_offset:om_rB,
-                                              m_shape:m_shape_modif,
-       
-                                              constraints:[
-                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_rB.get_row(2), stiffness: 0.999,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, target_pos_offset:om_rB.get_row(2),stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-
-                                              density:0.2, 
-                                                       
-                                            }))  
-
-      // left
-  
-      rot_tmp = 180-35  
-      offset_from_center = new Vector(-65,0)
-
-      var om_rC = new Matrix()
-      om_rC.setTranslation(
-        offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)  
-      om_rC.setRotation(rad(rot_tmp+180))             
-      this.bodies.geos.rectangles.push(new body_build({ ...oRect,
-                                              name:'geo_rectangle_BL',   
-
-                                              m_offset:om_rC,
-                                              m_shape:m_shape, 
-                                                    
-                                            })) 
-                                            
-      this.bodies.inters.rectangles.push(new body_build({ 
-                                              ...oRect, 
-                                              ...opts_collision_mouse_interaction,
-                                              ...opts_visual_inter,
-
-                                              name:'inter_rectangle_BL',
-                                              highlight_selection:[this.bodies.geos.rectangles[2]],   
-
-                                              m_offset:om_rC,
-                                              m_shape:m_shape_modif,
-
-                                              constraints:[
-                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_rC.get_row(2), stiffness: 0.999,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, target_pos_offset:om_rC.get_row(2),stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-
-                                              density:0.2, 
-                                                        
-                                            }))                                              
-      rot_tmp = 180+35    
-      var om_rD = new Matrix()
-      om_rD.setTranslation(
-        offset_from_center.x()+Math.cos(rad(rot_tmp))*ray_tmp,
-        offset_from_center.y()+Math.sin(rad(rot_tmp))*ray_tmp)   
-      om_rD.setRotation(rad(rot_tmp+180))   
-      
-      let oRect_TL = { ...oRect, 
-        name:'geo_rectangle_TL',
-
-        m_offset:om_rD,
-        m_shape:m_shape,
-                                                        
-      }  
-
-      this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
-      this.bodies.effects.movA_trails = build_effects_trail(oRect_TL,this.bodies.geos.rectangles[3])                                
-
-                                            
-      this.bodies.inters.rectangles.push(new body_build({ 
-        ...oRect, 
-        ...opts_collision_mouse_interaction,
-        ...opts_visual_inter,
-
-        name:'inter_rectangle_TL',
-        highlight_selection:[this.bodies.geos.rectangles[3]], 
-
-        m_offset:om_rD,
-        m_shape:m_shape_modif,
-
-        constraints:[
-          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_rD.get_row(2), stiffness: 0.999,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, target_pos_offset:om_rD.get_row(2),stiffness: 1.0,damping:0.1,length:0.01}, 
-        ],
-
-        density:0.2, 
-                                                        
-      }  ))      
-
-      
-     
-                                                                                       
-      // other
 
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(200/2.4*s))
@@ -921,7 +337,7 @@ export default class fidget_daft_i extends fidget{
                                         ...opts_debug,
 
                                         name:'inter_B',   
-                                        highlight_selection:[this.bodies.geos.rectangle], 
+                                        //highlight_selection:[this.bodies.geos.rectangle], 
                                         selection_break_length:300.0, 
 
                                         m:this.m,
@@ -940,6 +356,47 @@ export default class fidget_daft_i extends fidget{
                                         density:0.01, 
                                                                                     
                                       })
+                             
+
+
+
+
+      scale_inter = 10.0                                      
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(18*s+scale_inter))
+
+      this.bodies.inters.rectangle = new body_build({
+        ...opts_global,
+        ...opts_collision_mouse_interaction,
+        ...opts_visual_inter,
+        ...opts_debug,
+
+        name:'inter_rectangle',
+        //highlight_selection:[this.bodies.geos.rectangle],  
+         
+
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_offset:new Matrix(),
+        m_shape: m_shape,
+        z:z_depth,
+        type : utils.shape.rectangle,
+ 
+        constraints:[
+          {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+          {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+        ],
+
+        density:0.01,                                                                                
+      })
+
+      
+     
+                                                                                       
+      // other
+
+
       z_depth += z_depth_incr            
 
       
@@ -960,7 +417,7 @@ export default class fidget_daft_i extends fidget{
                                                     parent:this.bodies.inters.background,                                                      
                                                     m_offset:mo_iBh,
                                                     m_shape:m_shape,                                              
-                                                    //rot:-90,
+                                                    
                                                     type:utils.shape.arc,
                                                     arc_limites : [0, 3.14*0.5],                                                     
 
@@ -988,7 +445,7 @@ export default class fidget_daft_i extends fidget{
                                       ...opts_debug,
 
                                       name:'inter_C', 
-                                      highlight_selection:[this.bodies.geos.rectangle], 
+                                      //highlight_selection:[this.bodies.geos.rectangle], 
                                       selection_break_length:300.0,
 
                                       m:this.m,
@@ -996,7 +453,7 @@ export default class fidget_daft_i extends fidget{
                                       m_shape:m_shape,
                                       parent:this.bodies.inters.background,
                                       z:z_depth,
-                                      //rot:0,
+                                      
                                       type : utils.shape.rectangle,
 
                                       constraints:[
@@ -1010,6 +467,488 @@ export default class fidget_daft_i extends fidget{
                                     })
  
     z_depth += z_depth_incr
+
+
+                                            
+    // build
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(50*s))
+     
+    this.bodies.geos.circle = new body_build({ 
+                                    ...opts_global,
+                                    ...opts_collision_activate,
+                                    ...opts_debug,
+
+                                    name:'geo_circle',
+
+                                    m:this.m,
+                                    parent:this.bodies.inters.background,
+                                    m_offset:new Matrix(),
+                                    m_shape: m_shape,
+                                    z:z_depth,
+                                    type:utils.shape.circle,
+
+                                    do_shape: true,
+                                    do_line:true,                                         
+                                    color: this.colors[0],
+                                    color_line: utils.color.black,
+                                    texture_three: text_checker_three,
+  
+                                    constraints:[
+                                      { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
+                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background},  
+                                      { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                        attr:'scale',
+                                        target_attr:'ty', 
+                                        target_space:'local',
+                                        target_remap:[0,55,1,1.82] },  
+                                      { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                        attr:'tx',
+                                        target_attr:'ty', 
+                                        target_space:'local',
+                                        target_remap:[0,110,1.82,1] },
+                                    ],                                      
+                                    density:0.001,     
+                                                                               
+                                    })
+      this.bodies.inters.circle.highlight_selection = [this.bodies.geos.circle]
+
+
+
+      m_shape = new Matrix()
+      m_shape.set_row(0,m_shape.get_row(0).getMult(16.21*s))
+      m_shape.set_row(1,m_shape.get_row(1).getMult(3.51*s))
+
+      let oRect = { 
+        ...opts_global,
+        ...opts_collision_activate,
+        ...opts_debug,
+
+        m:this.m,
+        parent:this.bodies.inters.background,
+        m_shape: m_shape,
+        z:z_depth, 
+        type: utils.shape.rectangle,
+
+        do_shape: true,
+        do_line:true,           
+        color: this.colors[2],
+        color_line: utils.color.black,
+        //texture_three: text_checker_three,
+
+        //constraints:[
+        //  { name:'axe'   ,type:'kin_axe', axe:0, distPos: 66.1*s, distNeg: 0.001 },
+        //],         
+
+        density:0.001, 
+                        
+      } 
+      z_depth += z_depth_incr
+  
+      let ray_tmp = 80
+      let rot_tmp = 0 
+      let offset_from_center = new Vector(0,0)
+  
+       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // right 
+      rot_tmp = -35  
+
+
+
+      let m_shape_bones = new Matrix()
+      m_shape_bones.setScale(s*10)
+
+      var om_rA_bones = new Matrix()
+      om_rA_bones.setTranslation(65,0)
+      om_rA_bones.setRotation(rad(rot_tmp+180))  
+
+      this.bodies.bones.rectangles.push(new body_build({ 
+                                              ...opts_global,
+                                              ...opts_collision_no_interaction,
+                                              ...opts_visual_inter,
+                                              ...opts_debug,
+
+                                              name:'bones_rectangle_TR',
+                                              
+                                              m:this.m,
+                                              parent:this.bodies.inters.background,
+                                              m_offset:om_rA_bones,
+                                              m_shape:m_shape_bones,
+                                              z:z_depth, 
+                                              type: utils.shape.circle,
+
+                                              color: utils.color.blue,
+                                              
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
+                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                  attr:'r',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,55,0,35] },  
+                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                  attr:'tx',
+                                                  target_attr:'r', 
+                                                  target_space:'local',
+                                                  target_remap:[0,90,0,-85] },    
+                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                  attr:'tx',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,110,-85,-145] },                                                                                                                                                     
+                                              ],
+                                              density:0.2, 
+
+                                            }))     
+
+      var om_rA = new Matrix()
+      om_rA.setTranslation(ray_tmp*-1,0) 
+
+      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+                                              name:'geo_rectangle_TR',
+
+                                              parent:this.bodies.bones.rectangles[0],
+                                              m_offset:om_rA,  
+                                              
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],                                              
+                                            })) 
+
+      scale_inter = 40.0                                       
+      let m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
+
+      this.bodies.inters.rectangles.push(new body_build({ 
+                                              ...oRect, 
+                                              ...opts_collision_mouse_interaction,
+                                              ...opts_visual_inter,
+
+                                              name:'inter_rectangle_TR',
+                                              highlight_selection:[this.bodies.geos.rectangles[0]],  
+
+                                              parent:this.bodies.bones.rectangles[0],
+                                              m_offset:om_rA,
+                                              m_shape:m_shape_modif,
+
+                                              constraints:[
+                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+                                              density:0.2, 
+                                                    
+                                            })) 
+                                            
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////                                      
+
+      rot_tmp = 35  
+
+      m_shape_bones = new Matrix()
+      m_shape_bones.setScale(s*10)
+
+      var om_rB_bones = new Matrix()
+      om_rB_bones.setTranslation(65,0)
+      om_rB_bones.setRotation(rad(rot_tmp+180))  
+
+      this.bodies.bones.rectangles.push(new body_build({ 
+                                              ...opts_global,
+                                              ...opts_collision_no_interaction,
+                                              ...opts_visual_inter,
+                                              ...opts_debug,
+
+                                              name:'bones_rectangle_BR',
+                                              
+                                              m:this.m,
+                                              parent:this.bodies.inters.background,
+                                              m_offset:om_rB_bones,
+                                              m_shape:m_shape_bones,
+                                              z:z_depth, 
+                                              type: utils.shape.circle,
+
+                                              color: utils.color.blue,
+                                              
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
+                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                  attr:'r',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,55,0,-35] },   
+                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                  attr:'tx',
+                                                  target_attr:'r', 
+                                                  target_space:'local',
+                                                  target_remap:[0,90,0,-85] },   
+                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                  attr:'tx',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,110,-85,-145] },                                                                                                                                                       
+                                              ],
+                                              density:0.2,                                                     
+                                            })) 
+
+      var om_rB = new Matrix()
+      om_rB.setTranslation(ray_tmp*-1,0)        
+
+      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+                                              name:'geo_rectangle_BR', 
+                                              
+                                              parent:this.bodies.bones.rectangles[1],
+                                              m_offset:om_rB,
+                                              m_shape:m_shape,
+
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+
+                                                   
+                                            })) 
+  
+      this.bodies.inters.rectangles.push(new body_build({ 
+                                              ...oRect, 
+                                              ...opts_collision_mouse_interaction,
+                                              ...opts_visual_inter,
+
+                                              name:'inter_rectangle_BR',
+                                              highlight_selection:[this.bodies.geos.rectangles[1]],   
+
+                                              parent:this.bodies.bones.rectangles[1],
+                                              m_offset:om_rB,
+                                              m_shape:m_shape_modif,
+       
+                                              constraints:[
+                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+
+                                              density:0.2, 
+                                                       
+                                            }))  
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////                                      
+      // left
+  
+      rot_tmp = 180-35 
+      
+      m_shape_bones = new Matrix()
+      m_shape_bones.setScale(s*10)
+
+      var om_rC_bones = new Matrix()
+      om_rC_bones.setTranslation(-65,0)
+      om_rC_bones.setRotation(rad(rot_tmp+180))  
+
+      this.bodies.bones.rectangles.push(new body_build({ 
+                                              ...opts_global,
+                                              ...opts_collision_no_interaction,
+                                              ...opts_visual_inter,
+                                              ...opts_debug,
+
+                                              name:'bones_rectangle_BL',
+                                              
+                                              m:this.m,
+                                              parent:this.bodies.inters.background,
+                                              m_offset:om_rC_bones,
+                                              m_shape:m_shape_bones,
+                                              z:z_depth, 
+                                              type: utils.shape.circle,
+
+                                              color: utils.color.blue,
+
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
+                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                  attr:'r',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,55,0,35] },  
+                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                  attr:'tx',
+                                                  target_attr:'r', 
+                                                  target_space:'local',
+                                                  target_remap:[0,90,0,85] },  
+                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                  attr:'tx',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,110,85,145] },                                                                                                                                                          
+                                              ],
+                                              density:0.2,                                               
+                                                    
+                                            })) 
+
+      var om_rC = new Matrix()
+      om_rC.setTranslation(ray_tmp*-1,0) 
+
+      this.bodies.geos.rectangles.push(new body_build({ ...oRect,
+                                              name:'geo_rectangle_BL',   
+
+                                              parent:this.bodies.bones.rectangles[2],
+                                              m_offset:om_rC,
+                                              m_shape:m_shape, 
+                                               
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[2], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[2], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+
+                                            })) 
+                                            
+      this.bodies.inters.rectangles.push(new body_build({ 
+                                              ...oRect, 
+                                              ...opts_collision_mouse_interaction,
+                                              ...opts_visual_inter,
+
+                                              name:'inter_rectangle_BL',
+                                              highlight_selection:[this.bodies.geos.rectangles[2]],   
+
+                                              parent:this.bodies.bones.rectangles[2],
+                                              m_offset:om_rC,
+                                              m_shape:m_shape_modif,
+
+                                              constraints:[
+                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+
+                                              density:0.2, 
+                                                        
+                                            }))      
+                                            
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      rot_tmp = 180+35    
+
+      m_shape_bones = new Matrix()
+      m_shape_bones.setScale(s*10)
+
+      var om_rD_bones = new Matrix()
+      om_rD_bones.setTranslation(-65,0)
+      om_rD_bones.setRotation(rad(rot_tmp+180))  
+
+      this.bodies.bones.rectangles.push(new body_build({ 
+                                              ...opts_global,
+                                              ...opts_collision_no_interaction,
+                                              ...opts_visual_inter,
+                                              ...opts_debug,
+
+                                              name:'bones_rectangle_TL',
+                                              
+                                              m:this.m,
+                                              parent:this.bodies.inters.background,
+                                              m_offset:om_rD_bones,
+                                              m_shape:m_shape_bones,
+                                              z:z_depth, 
+                                              type: utils.shape.circle,
+
+                                              color: utils.color.blue,
+
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01},
+                                                { name:'connectA', type:'connect', target:this.bodies.inters.A, 
+                                                  attr:'r',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,55,0,-35] },  
+                                                { name:'connectB', type:'connect', target:this.bodies.inters.B, 
+                                                  attr:'tx',
+                                                  target_attr:'r', 
+                                                  target_space:'local',
+                                                  target_remap:[0,90,0,85] },
+                                                { name:'connectC', type:'connect', target:this.bodies.inters.C, 
+                                                  attr:'tx',
+                                                  target_attr:'ty', 
+                                                  target_space:'local',
+                                                  target_remap:[0,110,85,145] },                                                                                                                                                            
+                                              ],
+                                              density:0.2,                                               
+                                                    
+                                            })) 
+
+      var om_rD = new Matrix()
+      om_rD.setTranslation(ray_tmp*-1,0)   
+      
+      let oRect_TL = { ...oRect, 
+        name:'geo_rectangle_TL',
+
+        parent:this.bodies.bones.rectangles[3],
+        m_offset:om_rD,
+        m_shape:m_shape,
+             
+        constraints:[
+          {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[3], stiffness: 1.0,damping:0.1,length:0.01},
+          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[3], stiffness: 1.0,damping:0.1,length:0.01}, 
+        ],
+
+      }  
+
+      this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
+      this.bodies.effects.movA_trails = build_effects_trail(oRect_TL,this.bodies.geos.rectangles[3])                                
+
+
+      
+      this.bodies.inters.A.highlight_selection = [this.bodies.geos.rectangles[3]]
+
+
+    m_shape = new Matrix()
+    m_shape.set_row(0,m_shape.get_row(0).getMult(74*s))
+    m_shape.set_row(1,m_shape.get_row(1).getMult(18*s))
+
+    let oRectangle = { 
+      ...opts_global,
+      ...opts_collision_activate,
+      ...opts_debug,
+
+      name:'geo_rectangle',
+       
+      m:this.m,
+      parent:this.bodies.inters.background,
+      m_offset:new Matrix(),
+      m_shape:m_shape,
+      z:z_depth,
+      type : utils.shape.rectangle,
+
+      do_shape: true,
+      do_line:true,                                           
+      color : this.colors[1],
+      color_line: utils.color.black,
+      //texture_three: text_checker_three, 
+
+      constraints:[
+        { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
+        { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                                                                  
+        //{  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },
+        { name:'connectA', type:'connect', target:this.bodies.inters.B, 
+          attr:'r',
+          target_attr:'r', 
+          target_space:'local',
+          target_remap: null },          
+        { name:'connectB', type:'connect', target:this.bodies.inters.C, 
+          attr:'ty',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap: null },                
+      ],                                         
+
+      density:0.001,                                                                                 
+    }
+
+
+    this.bodies.geos.rectangle = new body_build(oRectangle)
+    this.bodies.inters.B.highlight_selection = [this.bodies.geos.rectangle]  
+    this.bodies.inters.C.highlight_selection = [this.bodies.geos.rectangle]       
+    this.bodies.inters.rectangle.highlight_selection = [this.bodies.geos.rectangle]   
+    this.bodies.effects.movB_trails = build_effects_trail(oRectangle,this.bodies.geos.rectangle)
+
+
 
 
     let mo_iCh = new Matrix()                                    
@@ -1041,39 +980,7 @@ export default class fidget_daft_i extends fidget{
                                                   density:0.01, 
 
                                                   }) 
-    var om_iA = new Matrix()
-    om_iA.setTranslation(-130,-50)
 
-    m_shape = new Matrix()
-    m_shape.set_row(0,m_shape.get_row(0).getMult(100/2.4*s))
-    m_shape.set_row(1,m_shape.get_row(1).getMult(100/2.4*s)) 
-
-    this.bodies.inters.A = new body_build({  
-                                    ...opts_global,
-                                    ...opts_collision_mouse_interaction,
-                                    ...opts_visual_inter,
-                                    ...opts_debug,
-
-                                    name:'inter_A',     
-                                    highlight_selection:[this.bodies.geos.rectangles[3]],  
-                                    selection_break_length:300.0,
-
-                                    m:this.m,
-                                    parent:this.bodies.inters.background,                                    
-                                    m_offset:om_iA,
-                                    m_shape:m_shape,
-                                    z:z_depth,
-                                    type : utils.shape.circle,
-
-                                    constraints:[
-                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, target_pos_offset:om_iA.get_row(2),stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
-                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
-                                      { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
-                                    ], 
-
-                                    density:0.01, 
-                                                                             
-                                  })
 
       let opts_sparcles = {
         ...opts_global,
@@ -1087,7 +994,7 @@ export default class fidget_daft_i extends fidget{
         ...opts_sparcles,
         name:'colA',
         p:new Vector(-145,15),
-        rot:0,      
+        r:0,      
       }                            
       this.bodies.effects.colA_sparcles = build_effects_particles_sparcles(opts_colA_sparcles) 
       this.bodies.effects.colA_shapes = build_effects_particles_shapes(opts_colA_sparcles)       
@@ -1097,7 +1004,7 @@ export default class fidget_daft_i extends fidget{
         ...opts_sparcles,       
         name:'colB',
         p:new Vector(15,-80),
-        rot:-90,     
+        r:-90,     
       }                            
       this.bodies.effects.colB_sparcles = build_effects_particles_sparcles(opts_colB_sparcles) 
       this.bodies.effects.colB_shapes = build_effects_particles_shapes(opts_colB_sparcles)       
@@ -1107,7 +1014,7 @@ export default class fidget_daft_i extends fidget{
         ...opts_sparcles,        
         name:'colC',
         p:new Vector(0,200),
-        rot:0,        
+        r:0,        
       }                            
       this.bodies.effects.colC_sparcles = build_effects_particles_sparcles(opts_colC_sparcles) 
       this.bodies.effects.colC_shapes = build_effects_particles_shapes(opts_colC_sparcles)       
@@ -1155,7 +1062,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.inters.rectangles[0],
                       this.bodies.inters.rectangles[1],
                       this.bodies.inters.rectangles[2],
-                      this.bodies.inters.rectangles[3],
+                      //this.bodies.inters.rectangles[3],
                       this.bodies.geos.backgrounds[0],
                       this.bodies.geos.backgrounds[1],
                       this.bodies.geos.circle,
@@ -1163,37 +1070,52 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.geos.rectangles[0],
                       this.bodies.geos.rectangles[1],
                       this.bodies.geos.rectangles[2],
-                      this.bodies.geos.rectangles[3],]
+                      this.bodies.geos.rectangles[3],
+                      this.bodies.bones.rectangles[0],
+                      this.bodies.bones.rectangles[1],
+                      this.bodies.bones.rectangles[2],
+                      this.bodies.bones.rectangles[3],                    
+                    ]
       },
       {
         bodies_enable:[ 
           this.bodies.inters.B,
           this.bodies.inters.background,
           this.bodies.inters.circle,
-          this.bodies.inters.rectangle,
-          this.bodies.inters.rectangles[0],
-          this.bodies.inters.rectangles[2],
+          //this.bodies.inters.rectangle,
+          //this.bodies.inters.rectangles[0],
+          //this.bodies.inters.rectangles[2],
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],          
           this.bodies.geos.circle,
           this.bodies.geos.rectangle,                      
           this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[2],]
+          this.bodies.geos.rectangles[2],
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],           
+        ]
       },  
       {
         bodies_enable:[
           this.bodies.inters.C,
           this.bodies.inters.background,
           this.bodies.inters.circle,
-          this.bodies.inters.rectangle,
-          this.bodies.inters.rectangles[0],
-          this.bodies.inters.rectangles[2],
+          //this.bodies.inters.rectangle,
+          //this.bodies.inters.rectangles[0],
+          //this.bodies.inters.rectangles[2],
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],          
           this.bodies.geos.circle,
           this.bodies.geos.rectangle,                      
           this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[2],]
+          this.bodies.geos.rectangles[2],
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],            
+        ]
       },   
     ]                                              
 
@@ -1247,6 +1169,9 @@ export default class fidget_daft_i extends fidget{
   set_step_resolution()
   {
     this.bodies_enable( 0,  ['effects'] ) 
+    this.bodies_enable( 1,  ['bones'] ) 
+
+
     
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -1267,13 +1192,21 @@ export default class fidget_daft_i extends fidget{
    
       }
       //_________________________________________________________________Clean Other
-
+      /*
       this.bodies.geos.rectangle.constraints.axe.pos_override = -1
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
           this.bodies.geos.rectangles[i].constraints.axe.pos_override = -1
+          */
       //_________________________________________________________________Control
-
-      this.bodies.geos.circle.scale = 1 + res_coef * 0.85 
+      this.bodies.geos.circle.constraints.connectA.enable(true)
+      this.bodies.geos.circle.constraints.connectC.enable(false)
+      this.bodies.geos.rectangle.constraints.connectA.enable(false)
+      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+      {
+        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+        this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
+        this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
+      }
       
       if(  this.anim_mode )   
       {
@@ -1306,19 +1239,29 @@ export default class fidget_daft_i extends fidget{
           this.steps_info[step].bodies_enable[i].enable(1)     
       }      
 
+      this.bodies.geos.circle.constraints.connectA.enable(false)
+      this.bodies.geos.circle.constraints.connectC.enable(false)
+      this.bodies.geos.rectangle.constraints.connectA.enable(true)
+      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+      {
+        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+        this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
+        this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
+      }
+        
 
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       this.bodies.inters.C.constraints.axe.pos_override = 0      
-      this.bodies.geos.circle.scale = 1.85
-      this.bodies.geos.rectangle.pos_override = 0
+      //this.bodies.geos.rectangle.pos_override = 0
 
       //_________________________________________________________________Control
-      this.bodies.geos.rectangle.m_transform.setRotation(rad(res_coef*90))
+      
 
+      /*
       var pos_override = (res_coef )*1.63
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
           this.bodies.geos.rectangles[i].constraints.axe.pos_override = -1+pos_override   
-    
+      */
 
       let m = new Matrix(this.bodies.inters.circle.m_shape_init)
       m.scale(1.85,1.85)
@@ -1372,16 +1315,25 @@ export default class fidget_daft_i extends fidget{
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1)     
       }   
+      this.bodies.geos.circle.constraints.connectA.enable(false)
+      this.bodies.geos.circle.constraints.connectC.enable(true)
 
+      this.bodies.geos.rectangle.constraints.connectA.enable(true)
+      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+      {
+        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+        this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
+        this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
+      }
       //_________________________________________________________________Control
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-      this.bodies.geos.rectangle.m_transform.setRotation(rad(90))
-       
+      //this.bodies.geos.rectangle.m_transform.setRotation(rad(90))
+      /*
       this.bodies.geos.rectangle.constraints.axe.pos_override = res_coef
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
           this.bodies.geos.rectangles[i].constraints.axe.pos_override = 0.63+0.37*res_coef*1.1
-
-      this.bodies.geos.circle.scale = 1.85 - 1.42*res_coef*1.1
+      */
+      //this.bodies.geos.circle.scale = 1.85 - 1.42*res_coef*1.1
 
       if(  this.anim_mode )   
       {
@@ -1430,6 +1382,14 @@ export default class fidget_daft_i extends fidget{
         this.bodies_axe_clean_override()
         this.bodies_rot_clean_override()     
       }      
+
+      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+      {
+        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+        this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
+        this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
+      }
+            
       //_________________________________________________________________Clean Inter
       this.bodies.inters.A.constraints.axe.pos_override = 1
       //this.bodies.inters.B.m_transform.setRotation(rad(270))
@@ -1441,11 +1401,12 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangles[3].enable(0)
 
       // Keep position safe
-      this.bodies.geos.circle.scale = 1.85 - 1.42
-
+      //this.bodies.geos.circle.scale = 1.85 - 1.42
+      /*
       this.bodies.geos.rectangle.constraints.axe.pos_override = 1
       for( let i=0; i < this.bodies.geos.rectangles.length; i++)
         this.bodies.geos.rectangles[i].constraints.axe.pos_override = 1
+        */
   
 
       //_________________________________________________________________Control
@@ -1572,7 +1533,7 @@ export default class fidget_daft_i extends fidget{
 
   set_across_steps()
   {
-
+    /*
     let offset_from_center = new Vector(65,0)
     let _value = this.state.steps[0].resoluton_coef*35 //Math.min( Math.max( 0, -a_inter1),35)
   
@@ -1590,6 +1551,7 @@ export default class fidget_daft_i extends fidget{
   
     this.bodies.geos.rectangles[3].constraints.axe.extra_rotation        = Math.min( Math.max( 0, _value),35)*-1
     this.bodies.geos.rectangles[3].constraints.axe.extra_rotation_center = offset_from_center
+    */
 
   }
 

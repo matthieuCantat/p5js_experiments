@@ -11,7 +11,7 @@ import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 import * as THREE from 'three';
 
-export default class body_build{
+export class body_build{
   
     constructor( in_options ){
     // Default options
@@ -29,7 +29,6 @@ export default class body_build{
         h: 1,
         slop: 0,
         type: -1,
-        rot: 0,
         collision: true,
         collision_category: utils.collision_category.default,
         collision_mask: utils.collision_category.default,
@@ -74,7 +73,7 @@ export default class body_build{
       //this.w = args.w
       //this.h = args.h
       this.slop = args.slop
-      this.rot = rad(args.rot)
+      //this.rot = 0
       this.extra_rotation = 0
       this.rot_override = null
       this.scale = 1.0
@@ -93,6 +92,7 @@ export default class body_build{
       this.collision_mask = args.collision_mask
       this.visibility = args.visibility
       this.visibility_default = args.visibility
+      this.visibility_secondary = true
       //this.visibility_override = true
       this.debug_force_visibility = args.debug_force_visibility
       this.do_update = true
@@ -467,7 +467,7 @@ export default class body_build{
     {
       if(this.debug_force_visibility)
         return 1
-      if(this.visibility) 
+      if( this.visibility && this.visibility_secondary ) 
         return 1
       return 0
     }
@@ -479,10 +479,74 @@ export default class body_build{
       this.m_transform.set_row(2,p_transform_target)
     }
 
-    set_position(v)
+    set_position( in_position, position_space = null, orient_space = null)
     {
-      Matter.Body.setPosition(this.body, v.get_value())
+
+      let in_vector_processed = null
+      if( orient_space== 'parent' )
+      {
+        let m_parent_orient = this.parent.get_out_matrix()
+        m_parent_orient.set_row(2,new Vector())
+        in_vector_processed = in_position.mult(m_parent_orient)        
+      }
+      if( orient_space == 'in' )
+      {
+        let m_in_orient = this.get_in_matrix()
+        m_in_orient.set_row(2,new Vector())
+        in_vector_processed = in_position.mult(m_in_orient)        
+      }
+
+      if( orient_space == 'out' )
+      {
+        let m_out_orient = this.get_in_matrix()
+        m_out_orient.set_row(2,new Vector())
+        in_vector_processed = in_position.mult(m_out_orient)        
+      }
+
+      ///////////////
+      let in_position_processed = in_position
+      if( position_space == 'parent' )
+      {
+        let m_parent = this.parent.get_out_matrix()
+        if(in_vector_processed != null)
+        {
+          in_position_processed = m_parent.get_row(2).getAdd(in_vector_processed)
+        }
+        else
+        {
+          in_position_processed = in_position.mult(m_parent)  
+        }
+
+      }
+      if( position_space == 'in' )
+      {
+        let m_in = this.get_in_matrix()
+        if(in_vector_processed != null)
+        {
+          in_position_processed = m_in.get_row(2).getAdd(in_vector_processed)
+        }
+        else
+        {
+          in_position_processed = in_position.mult(m_in)      
+        }   
+      }
+      if( position_space == 'out' )
+      {
+        let m_out = this.get_out_matrix()
+        if(in_vector_processed != null)
+        {
+          in_position_processed = m_out.get_row(2).getAdd(in_vector_processed)
+        }
+        else
+        {
+          in_position_processed = in_position.mult(m_out)    
+        }     
+      }
+
+
+      Matter.Body.setPosition(this.body, in_position_processed.get_value())
     }
+
   
     set_velocity(v,update_input = false)
     {
@@ -494,12 +558,18 @@ export default class body_build{
       Matter.Body.applyForce(this.body, p.get_value(), v.get_value())
     }
     
-    set_angle(a, override = false)
+    set_angle(a, override = true)
     {
-      let angle = this.rot+a
+    
+      let angle = null
       if(override)
         angle = a
-       
+      else
+      {
+        angle = this.get_in_matrix().getRotation()+a
+      }
+           
+
       Matter.Body.setAngle(this.body, angle)
     }
 
@@ -839,3 +909,339 @@ function build_constraint(body,cns_opts,offset = 0)
   return new constraint_build(options)  
 }
 */
+
+
+
+
+
+
+export function build_effects_trail(opts,body_target)
+{
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+  let opts_collision_no_interaction = {
+    collision_category: utils.collision_category.none,
+    collision_mask: utils.collision_category.none
+  } 
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }  
+  let opts_trail = {
+                    ...opts, 
+                    ...opts_global,
+                    ...opts_collision_no_interaction,
+                    ...opts_debug,
+                    do_shape: true,
+                    do_line:false,                                             
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  let bodies = []
+
+  bodies.push(new body_build({  ...opts_trail, 
+                                name: opts.name + 'effect_trails1',                                       
+                                color:utils.color.red,
+                                constraints:[
+                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.15},
+                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.15}, 
+                                ],                                                   
+                              })) 
+                                 
+  bodies.push(new body_build({  ...opts_trail,                                 
+                                name: opts.name + 'effect_trails2',        
+                                color:utils.color.blue,              
+                                constraints:[
+                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.2},
+                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.2}, 
+                                ],                                                          
+                              }))  
+                                                                                    
+  bodies.push(new body_build({  ...opts_trail, 
+                                name: opts.name + 'effect_trails3',    
+                                color:utils.color.green,          
+                                constraints:[
+                                  {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.3},
+                                  {  name:'orient',type:'kin_orient',target:body_target, stiffness: 0.3}, 
+                                ],                                                       
+                              }))   
+                                            
+  return bodies
+}
+
+export function build_effects_particles_sparcles(opts)
+{ 
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+
+  let opts_collision_no_interaction = {
+    collision_category: utils.collision_category.none,
+    collision_mask: utils.collision_category.none
+  }   
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }  
+  ////////////////////////////////////////////////////////////////////////////////
+
+  let bodies = []
+
+  let m_shape = new Matrix()
+  m_shape.set_row(0,m_shape.get_row(0).getMult(8*opts.scale_shape))
+  m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
+
+  let oEffectsA = { 
+    ...opts_global,
+    ...opts_collision_no_interaction,
+    ...opts_debug,
+
+    parent:opts.parent,
+    m_shape: m_shape,
+    z:opts.z_depth, 
+    type: utils.shape.rectangle,
+
+    do_shape: true,
+    do_line:false,           
+    color: utils.color.white,
+    color_line: utils.color.white,
+    //texture_three: text_checker_three,,         
+
+    density:0.001, 
+                    
+  } 
+
+  let om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.r)+rad(90)) 
+
+  bodies.push(new body_build({ ...oEffectsA,          
+                                name: opts.name + 'effect_sparcles1',
+                                m_offset:om_EA1,                                                        
+                              }))                                            
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.r)+rad(45))
+
+  bodies.push(new body_build({ ...oEffectsA,   
+                                name: opts.name + 'effect_sparcles2',
+                                m_offset:om_EA1,                                                     
+                              })) 
+                                        
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.r)+rad(135))
+
+  bodies.push(new body_build({ ...oEffectsA,     
+                                name: opts.name + 'effect_sparcles3',
+                                m_offset:om_EA1,                                                       
+                              })) 
+
+  return bodies                              
+}
+
+
+
+export function build_effects_particles_shapes(opts)
+{
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+
+  let opts_collision_no_interaction = {
+    collision_category: utils.collision_category.none,
+    collision_mask: utils.collision_category.none
+  }   
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }  
+  ////////////////////////////////////////////////////////////////////////////////
+
+  let bodies = []
+
+  let m_shape = new Matrix()
+  m_shape.set_row(0,m_shape.get_row(0).getMult(2*opts.scale_shape))
+  m_shape.set_row(1,m_shape.get_row(1).getMult(2*opts.scale_shape))
+
+  let oEffectsA = {
+    ...opts_global,
+    ...opts_collision_no_interaction,
+    ...opts_debug,
+
+    parent:opts.parent,
+    m_shape: m_shape,
+    z:opts.z_depth, 
+    type: utils.shape.rectangle,
+
+    do_shape: false,
+    do_line:true,           
+    color: utils.color.white,
+    color_line: utils.color.white,
+    //texture_three: text_checker_three,
+    
+    density:0.001,               
+  } 
+
+  let om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.r)+rad(90))                                       
+
+  bodies.push(new body_build({ ...oEffectsA, 
+                                name: opts.name + 'effect_particle_shape1',
+                                m_offset:om_EA1,                                                
+                              }))                                             
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.r)+rad(45))                                       
+
+  bodies.push(new body_build({ ...oEffectsA, 
+                                name: opts.name + 'effect_particle_shape2',
+                                m_offset:om_EA1,                                                     
+                              }))                                             
+
+  om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y())
+  om_EA1.setRotation(rad(opts.r)+rad(135))                                         
+
+  bodies.push(new body_build({ ...oEffectsA, 
+                                name: opts.name + 'effect_particle_shape3',
+                                m_offset:om_EA1,                                                   
+                              }))                                             
+
+
+  return bodies                              
+}
+
+
+
+export function build_effects_wall(opts)
+{
+  let opts_global = {
+    screen_dims: opts.screen_dims,
+    matter_engine: opts.matter_engine, 
+    mouse_constraint: opts.mouse_constraint,
+  }
+
+  let opts_collision_no_interaction = {
+    collision_category: utils.collision_category.none,
+    collision_mask: utils.collision_category.none
+  }   
+  let opts_debug = {
+    debug_matrix_info: false,
+    debug_matrix_axes: opts.debug_matrix_axes,  
+    debug_cns_axes: opts.debug_cns_axes,   
+    debug_force_visibility: opts.debug_force_visibility,             
+  }    
+
+  ////////////////////////////////////////////////////////////////////////////////
+                                      
+  let m_shape = new Matrix()
+  m_shape.set_row(0,m_shape.get_row(0).getMult(55*opts.scale_shape))
+  m_shape.set_row(1,m_shape.get_row(1).getMult(1.*opts.scale_shape))
+
+  let om_EA1 = new Matrix()
+  om_EA1.setTranslation(opts.p.x(),opts.p.y()-1)
+  om_EA1.setRotation(rad(opts.r)+rad(0))                                       
+  let body = new body_build({   ...opts_global,
+                                ...opts_collision_no_interaction,    
+                                ...opts_debug,
+
+                                name: opts.name+'effect_wall',     
+
+                                parent:opts.parent,                                    
+                                m_offset:om_EA1,
+                                m_shape:m_shape,
+                                z:opts.z_depth,
+                                type : utils.shape.rectangle,
+
+                                do_shape: true,
+                                do_line:false,                                       
+                                color:utils.color.white,
+                                color_line: utils.color.black,
+                                //texture_three: text_checker_three_grey, 
+
+                                density:0.01,                                                                                
+                              }) 
+                              
+
+  return body                              
+}
+
+/*
+anim_effect({
+  count:this.state.steps[step].update_count,
+  sparcles:this.bodies.effects.colA_sparcles,
+  shapes:this.bodies.effects.colA_shapes,
+  wall:this.bodies.effects.colA_wall,
+  trails:this.bodies.effects.movA_trails,
+})
+*/
+
+
+
+export function anim_effect(opts)
+{
+  if(opts.count == 0)  
+  {      
+    for( let i=0; i < opts.sparcles.length; i++)
+    {
+      let force = new Vector(0.001, 0)
+      force = force.rotate(opts.sparcles[i].get_rotation())
+      let pos = opts.sparcles[i].get_position()
+
+      opts.sparcles[i].apply_force( pos, force )
+      opts.shapes[i].apply_force( pos, force.getMult(0.1) )
+    }
+  }
+
+  if( opts.count < 10) 
+  {
+    if( opts.wall != null)
+    {
+      opts.wall.enable(1)
+
+      let m = new Matrix(opts.wall.m_shape_init)
+      m = m.scale(0.01+opts.count*0.1,1)
+      opts.wall.update_shape_coords(m)
+    }
+  }
+
+
+  if( opts.count < 20) 
+  {
+    for( let i=0; i < opts.sparcles.length; i++)
+    opts.sparcles[i].enable(1)       
+  }
+
+
+  if( opts.count < 40) 
+  {
+    for( let i=0; i < opts.shapes.length; i++)
+      opts.shapes[i].enable(1)   
+      
+    for( let i=0; i < opts.trails.length; i++)
+      opts.trails[i].enable(1)    
+              
+  }    
+}
+
+
+
+
+

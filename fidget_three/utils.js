@@ -672,10 +672,3 @@ export function create_physics_engine_runner(matter_engine)
 
 
 
-
-
-
-
-
-
-

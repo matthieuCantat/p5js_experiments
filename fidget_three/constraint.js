@@ -315,8 +315,8 @@ export class cns_axe{
         else
           this.vLineBase = new Vector(0,1)
   
-        if( this.Follower.rot != null)
-          this.vLineBase.rotate(this.Follower.rot)
+        //if( this.Follower.rot != null)
+        //  this.vLineBase.rotate(this.Follower.rot)
       }
   
       if( ( this.pLineBase == null )&&( this.Follower != null) )
@@ -415,7 +415,8 @@ export class cns_axe{
       if( this.fix_angle == true )
       {
         this.Follower.set_angle(rad(this.extra_rotation)+m_init.getRotation())
-        this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
+        //this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
+        this.Follower.set_anglular_velocity((this.Follower.body.angle)*0.01)
       }
   
       // get limit
@@ -787,7 +788,11 @@ export class connect{
       if( this.attr == 'scale' )
         this.obj.scale = value
       if( this.attr == 'r' )
-        this.obj.m_transform.setRotation(rad(value))  
+        this.obj.set_angle(rad(value), false)  
+      if( this.attr == 'tx' )
+        this.obj.set_position(new Vector(value,0), 'in', 'parent')  
+      if( this.attr == 'ty' )
+        this.obj.set_position(new Vector(0,value), 'in', 'parent')  
 
 
       return true

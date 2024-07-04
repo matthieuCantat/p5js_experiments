@@ -1,7 +1,7 @@
 
 import fidget from './fidget.js';
 import { utils,clamp,rad,deg,userIsInteracting,mouseX, mouseY } from './utils.js';
-import body_build from './body.js';
+import { body_build }from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import * as ut from './utils_three.js';
