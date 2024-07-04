@@ -167,7 +167,7 @@ export default class fidgets_sequence
       if( anim != null )
       {
         for( let i = 0; i < this.fidgets_nbr; i++ )
-          this.fidgets[i].bodies_enable(true)
+          this.fidgets[i].enable(true)
 
         let anim_global = anim * this.fidgets_nbr
       
@@ -181,9 +181,9 @@ export default class fidgets_sequence
           
           if( anim_local <=1)
           {
-            this.fidgets[i_max-i].bodies_enable(true)
+            this.fidgets[i_max-i].enable(true)
             if( i_max-i+1 < this.fidgets.length)
-              this.fidgets[i_max-i+1].bodies_enable(true)
+              this.fidgets[i_max-i+1].enable(true)
           }
             
   
@@ -320,9 +320,9 @@ export default class fidgets_sequence
           if( this.fidgets_do_computation_last[i] != do_computation )
           {
             if(do_computation == true)
-              this.fidgets[i].bodies_enable(true)
+              this.fidgets[i].enable(true)
             else
-              this.fidgets[i].bodies_enable(false)
+              this.fidgets[i].enable(false)
           }
           this.fidgets_do_computation_last[i] = do_computation
 

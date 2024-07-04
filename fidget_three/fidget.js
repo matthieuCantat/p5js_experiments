@@ -670,23 +670,19 @@ export default class fidget{
     } 
   }  
 
-  bodies_enable( value, body_type_filter = [] )
+  enable(value)
+  {
+    this.matter_engine_runner.enabled = value
+    this.bodies_enable(value)
+    this.bodies_do_update( value)
+
+  }
+
+
+  bodies_do_update( value, body_type_filter = [] )
   {
 
-    if( body_type_filter.length == 0)
-    {
-      this.matter_engine_runner.enabled = value 
-      
-      //console.log('enable',value)
-    }
-
-    //if(value)
-    //  this.bodies_set_visibility( null ,body_type_filter )
-    //else
-    //  this.bodies_set_visibility( false ,body_type_filter )
-
-
-    
+  
 
     for( let i =0; i < this.bodies_draw_order.length; i+=2)
     {   
@@ -700,21 +696,39 @@ export default class fidget{
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            this.bodies[b_type][key][i].enable(value)
-            
-    
-            if(body_type_filter.length == 0)
-              this.bodies[b_type][key][i].do_update = value            
+            this.bodies[b_type][key][i].do_update = value
+           
           }
             
         }
         else
-          this.bodies[b_type][key].enable(value)
-          
-          
-          if(body_type_filter.length == 0)
-            this.bodies[b_type][key].do_update = value
+        this.bodies[b_type][key].do_update = value
+
+      } 
+    } 
+  }
+
+  bodies_enable( value, body_type_filter = [] )
+  {
+
+
+    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    {   
+      let b_type = this.bodies_draw_order[i+0]
+      let key = this.bodies_draw_order[i+1]
+       
+      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      {
+
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            this.bodies[b_type][key][i].enable(value)          
         
+        }
+        else
+          this.bodies[b_type][key].enable(value)
+
       } 
     } 
   }

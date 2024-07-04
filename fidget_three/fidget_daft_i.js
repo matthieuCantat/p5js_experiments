@@ -1181,32 +1181,28 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_enable( 0,  ['inters'] )  
-        this.bodies_enable( 0,  ['geos'] )  
+ 
 
         this.bodies_axe_clean_override()
         this.bodies_rot_clean_override()
 
+        this.bodies_enable( 0)  
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1) 
-   
+
+        // constraint enable
+        this.bodies.geos.circle.constraints.connectA.enable(true)
+        this.bodies.geos.circle.constraints.connectC.enable(false)
+        this.bodies.geos.rectangle.constraints.connectA.enable(false)
+        for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+        {
+          this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+          this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
+          this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
+        }          
       }
-      //_________________________________________________________________Clean Other
-      /*
-      this.bodies.geos.rectangle.constraints.axe.pos_override = -1
-      for( let i=0; i < this.bodies.geos.rectangles.length; i++)
-          this.bodies.geos.rectangles[i].constraints.axe.pos_override = -1
-          */
-      //_________________________________________________________________Control
-      this.bodies.geos.circle.constraints.connectA.enable(true)
-      this.bodies.geos.circle.constraints.connectC.enable(false)
-      this.bodies.geos.rectangle.constraints.connectA.enable(false)
-      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-      {
-        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-        this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
-        this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
-      }
+
+
       
       if(  this.anim_mode )   
       {
@@ -1229,39 +1225,29 @@ export default class fidget_daft_i extends fidget{
     {      
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_enable( 0,  ['inters'] )  
-        this.bodies_enable( 0,  ['geos'] )  
 
         this.bodies_axe_clean_override()
         this.bodies_rot_clean_override()
 
+        this.bodies_enable( 0 )  
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
-          this.steps_info[step].bodies_enable[i].enable(1)     
-      }      
-
-      this.bodies.geos.circle.constraints.connectA.enable(false)
-      this.bodies.geos.circle.constraints.connectC.enable(false)
-      this.bodies.geos.rectangle.constraints.connectA.enable(true)
-      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-      {
-        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-        this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
-        this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
-      }
-        
+          this.steps_info[step].bodies_enable[i].enable(1) 
+          
+        // constraint enable
+        this.bodies.geos.circle.constraints.connectA.enable(false)
+        this.bodies.geos.circle.constraints.connectC.enable(false)
+        this.bodies.geos.rectangle.constraints.connectA.enable(true)
+        for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+        {
+          this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+          this.bodies.bones.rectangles[i].constraints.connectB.enable(true)
+          this.bodies.bones.rectangles[i].constraints.connectC.enable(false)
+        }          
+      }       
 
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
       this.bodies.inters.C.constraints.axe.pos_override = 0      
-      //this.bodies.geos.rectangle.pos_override = 0
 
-      //_________________________________________________________________Control
-      
-
-      /*
-      var pos_override = (res_coef )*1.63
-      for( let i=0; i < this.bodies.geos.rectangles.length; i++)
-          this.bodies.geos.rectangles[i].constraints.axe.pos_override = -1+pos_override   
-      */
 
       let m = new Matrix(this.bodies.inters.circle.m_shape_init)
       m.scale(1.85,1.85)
@@ -1306,34 +1292,29 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_enable( 0,  ['inters'] )  
-        this.bodies_enable( 0,  ['geos'] )  
-
         this.bodies_axe_clean_override()
         this.bodies_rot_clean_override()
 
+        this.bodies_enable( 0 ) 
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
-          this.steps_info[step].bodies_enable[i].enable(1)     
+          this.steps_info[step].bodies_enable[i].enable(1)   
+          
+        // constraint enable
+        this.bodies.geos.circle.constraints.connectA.enable(false)
+        this.bodies.geos.circle.constraints.connectC.enable(true)
+  
+        this.bodies.geos.rectangle.constraints.connectA.enable(true)
+        for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
+        {
+          this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
+          this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
+          this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
+        }
       }   
-      this.bodies.geos.circle.constraints.connectA.enable(false)
-      this.bodies.geos.circle.constraints.connectC.enable(true)
 
-      this.bodies.geos.rectangle.constraints.connectA.enable(true)
-      for( let i = 0; i < this.bodies.bones.rectangles.length; i++ )
-      {
-        this.bodies.bones.rectangles[i].constraints.connectA.enable(true)
-        this.bodies.bones.rectangles[i].constraints.connectB.enable(false)
-        this.bodies.bones.rectangles[i].constraints.connectC.enable(true)
-      }
       //_________________________________________________________________Control
       this.bodies.inters.A.constraints.axe.pos_override = 1//rad(-36)
-      //this.bodies.geos.rectangle.m_transform.setRotation(rad(90))
-      /*
-      this.bodies.geos.rectangle.constraints.axe.pos_override = res_coef
-      for( let i=0; i < this.bodies.geos.rectangles.length; i++)
-          this.bodies.geos.rectangles[i].constraints.axe.pos_override = 0.63+0.37*res_coef*1.1
-      */
-      //this.bodies.geos.circle.scale = 1.85 - 1.42*res_coef*1.1
+
 
       if(  this.anim_mode )   
       {
