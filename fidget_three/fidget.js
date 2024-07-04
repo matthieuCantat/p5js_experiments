@@ -73,7 +73,7 @@ export default class fidget{
       inters : {},
       geos : {},
     }
-    this.bodies_draw_order = {
+    this.bodies_eval_order = {
       inters : [], 
       geos : [],         
     }
@@ -271,10 +271,10 @@ export default class fidget{
 
   bodies_log_body_ids( body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
 
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -294,10 +294,10 @@ export default class fidget{
 
   bodies_update_matrix( m, body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
  
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -316,10 +316,10 @@ export default class fidget{
 
   bodies_update( body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
  
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -341,10 +341,10 @@ export default class fidget{
   
     this.group_three = new THREE.Group();
 
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
     
@@ -367,10 +367,10 @@ export default class fidget{
   bodies_animate_three( body_type_filter = [] )
   {
 
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
    
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -398,7 +398,7 @@ export default class fidget{
     {   
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
-        for( let key of this.bodies_draw_order[b_type])
+        for( let key of this.bodies_eval_order[b_type])
         {      
           if( this.bodies[b_type][key].constructor === Array)
           {
@@ -416,10 +416,10 @@ export default class fidget{
   bodies_override_color(new_color = null,body_type_filter = [] )
   {
 
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
    
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -443,10 +443,10 @@ export default class fidget{
   }
   bodies_color_update_three( body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
      
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -465,10 +465,10 @@ export default class fidget{
   /*
   bodies_axe_clean_override( body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
      
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -490,10 +490,10 @@ export default class fidget{
 
   bodies_constraints_enable(value,body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
      
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -523,10 +523,10 @@ export default class fidget{
   /*
   bodies_rot_clean_override( body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
      
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -548,10 +548,10 @@ export default class fidget{
 
   bodies_set_debug( value,body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
       
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {   
@@ -570,10 +570,10 @@ export default class fidget{
   bodies_set_visibility_secondary( value,body_type_filter = [] )
   {
     
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -593,10 +593,10 @@ export default class fidget{
   bodies_set_visibility_override( value,body_type_filter = [] )
   {
     
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -617,10 +617,10 @@ export default class fidget{
   bodies_set_visibility( value = null ,body_type_filter = [] )
   {
     
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -653,10 +653,10 @@ export default class fidget{
   bodies_init_out_matrix( body_type_filter = [] )
   {
     
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -687,10 +687,10 @@ export default class fidget{
 
   
 
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -715,10 +715,10 @@ export default class fidget{
   {
 
 
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -738,10 +738,10 @@ export default class fidget{
 
   get_selected_body(body_type_filter = [] )
   {
-    for( let i =0; i < this.bodies_draw_order.length; i+=2)
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
-      let b_type = this.bodies_draw_order[i+0]
-      let key = this.bodies_draw_order[i+1]
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
        
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -775,10 +775,10 @@ export default class fidget{
 
     let body_to_highlight = []
     let body_to_reduce    = []
-    for( let k =0; k < this.bodies_draw_order.length; k+=2)
+    for( let k =0; k < this.bodies_eval_order.length; k+=2)
     {   
-      let b_type = this.bodies_draw_order[k+0]
-      let key = this.bodies_draw_order[k+1]
+      let b_type = this.bodies_eval_order[k+0]
+      let key = this.bodies_eval_order[k+1]
         
       if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
       {

@@ -81,78 +81,7 @@ export default class fidget_daft_i extends fidget{
             stepC:null,
           },          
         }
-        this.bodies_draw_order = [
-            
-            'geos','backgrounds', 
-            'inters','background',
-            'inters','circle',
-            'inters','rectangle',
-            'inters','rectangles',
-            'inters_step','steps',    
-            'geos','circle',
-            'effects','movB_trails',
-            'geos','rectangle',  
-            'effects','movA_trails',       
-            'geos','rectangles',
-            //'helpers','stepA',
-            //'helpers','stepB',
-            //'helpers','stepC', 
-            'effects','colA_sparcles',       
-            'effects','colA_shapes',
-            'effects','colA_wall',           
-            'effects','colB_sparcles', 
-            'effects','colB_shapes', 
-            'effects','colB_wall', 
-            'effects','colC_sparcles', 
-            'effects','colC_shapes',
-            'effects','colC_wall',  
-            'bones','rectangles', 
-            'bones','rectangles_pivots',  
-            'bones','rectangles_center',
-            'bones','rectangle',    
-            'bones','circle',
-            'bones','traj', 
-            'bones','root',
-            'bones','world',                                   
-            ] 
-            /*  
-        this.bodies_eval_order = [
-          //'bones','world',   
-          //'bones','traj', 
-          //'bones','rectangles_center',
-          //'bones','rectangle',    
-          //'bones','circle',    
-          'bones','rectangles_pivots',        
-          'bones','rectangles', 
-          'bones','rectangles_pivots',  
-
-           
-            'geos','backgrounds', 
-            'inters','background',
-            'inters','circle',
-            'inters','rectangle',
-            'inters','rectangles',
-            'inters_step','steps',    
-            'geos','circle',
-            'effects','movB_trails',
-            'geos','rectangle',  
-            'effects','movA_trails',       
-            'geos','rectangles',
-            //'helpers','stepA',
-            //'helpers','stepB',
-            //'helpers','stepC', 
-            'effects','colA_sparcles',       
-            'effects','colA_shapes',
-            'effects','colA_wall',           
-            'effects','colB_sparcles', 
-            'effects','colB_shapes', 
-            'effects','colB_wall', 
-            'effects','colC_sparcles', 
-            'effects','colC_shapes',
-            'effects','colC_wall',  
-                                   
-            ]    
-            */
+ 
       
         this.end_step = 4
 
@@ -232,8 +161,7 @@ export default class fidget_daft_i extends fidget{
       }
 
 
-      let z_depth = 0
-      let z_depth_incr = 0.1
+
     /////////////////////////////////////////////////////  
     
 
@@ -257,7 +185,7 @@ export default class fidget_daft_i extends fidget{
       //parent:this.bodies.inters.background,
       //m_offset:om_rA_bones,
       m_shape:m_shape_bones_main,
-      z:z_depth, 
+      //z:z_depth, 
       density:0.2, 
 
     })   
@@ -277,7 +205,7 @@ export default class fidget_daft_i extends fidget{
       m:this.m,
       parent:this.bodies.bones.world,
       m_offset:new Matrix(),      
-      z:z_depth, 
+      //z:z_depth, 
       m_shape: m_shape,
       type: utils.shape.rectangle,
 
@@ -290,7 +218,7 @@ export default class fidget_daft_i extends fidget{
       collision:false, 
       //texture_three: text_checker_three_grey,
     } 
-    z_depth += z_depth_incr
+    //z_depth += z_depth_incr
 
     let mo_background_L = new Matrix()                                    
     mo_background_L.setTranslation(this.screen_dims.x/4,this.screen_dims.y/2)   
@@ -322,7 +250,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.bones.world,
       m_offset:this.m,
       m_shape:m_shape_bones_main,
-      z:z_depth, 
+      //z:z_depth, 
 
       constraints:[      
         { name:'point' ,type:'kin_point' ,target:this.bodies.bones.world},
@@ -352,7 +280,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.bones.traj,
       m_offset:new Matrix(),
       m_shape:m_shape,
-      z:z_depth,
+      //z:z_depth,
       type : utils.shape.rectangle,
 
       constraints:[
@@ -379,7 +307,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.inters.background,
       //m_offset:om_rA_bones,
       m_shape:m_shape_bones_main,
-      z:z_depth, 
+      //z:z_depth, 
 
       constraints:[      
         { name:'point' ,type:'kin_point' ,target:this.bodies.inters.background},
@@ -412,15 +340,15 @@ export default class fidget_daft_i extends fidget{
                                     selection_break_length:300.0,
 
                                     m:this.m,
-                                    parent:this.bodies.bones.root,                                    
+                                    parent:this.bodies.inters.background,                                    
                                     m_offset:om_iA,
                                     m_shape:m_shape,
-                                    z:z_depth,
+                                    //z:z_depth,
                                     type : utils.shape.circle,
 
                                     constraints:[
-                                      { name:'point' ,type:'dyn_point',target:this.bodies.bones.root,stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
-                                      { name:'orient',type:'kin_orient',target:this.bodies.bones.root}, 
+                                      { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
+                                      { name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ], 
 
@@ -451,7 +379,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.inters.background,
       m_offset:new Matrix(),
       m_shape:m_shape,
-      z:z_depth,
+      //z:z_depth,
       type:utils.shape.circle,
 
       constraints:[
@@ -479,15 +407,15 @@ export default class fidget_daft_i extends fidget{
                                         selection_break_length:300.0, 
 
                                         m:this.m,
-                                        parent:this.bodies.bones.root,
+                                        parent:this.bodies.inters.background,
                                         m_offset:new Matrix(),
                                         m_shape:m_shape,
-                                        z:z_depth,
+                                        //z:z_depth,
                                         type : utils.shape.rectangle,
 
                                         constraints:[
-                                          { name:'point' ,type:'dyn_point',target:this.bodies.bones.root,stiffness: 0.999,damping:0.1,length:0.01},
-                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.bones.root, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.01,length:0.01},                 
+                                          { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,stiffness: 0.999,damping:0.1,length:0.01},
+                                          { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.01,length:0.01},                 
                                           { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
                                         ],      
 
@@ -517,7 +445,7 @@ export default class fidget_daft_i extends fidget{
         parent:this.bodies.inters.background,
         m_offset:new Matrix(),
         m_shape: m_shape,
-        z:z_depth,
+        //z:z_depth,
         type : utils.shape.rectangle,
  
         constraints:[
@@ -534,7 +462,7 @@ export default class fidget_daft_i extends fidget{
       // other
 
 
-      z_depth += z_depth_incr            
+      //z_depth += z_depth_incr            
 
       
       
@@ -588,14 +516,14 @@ export default class fidget_daft_i extends fidget{
                                       m:this.m,
                                       m_offset:new Matrix(),
                                       m_shape:m_shape,
-                                      parent:this.bodies.bones.root,
-                                      z:z_depth,
+                                      parent:this.bodies.inters.background,
+                                      //z:z_depth,
                                       
                                       type : utils.shape.rectangle,
 
                                       constraints:[
-                                        { name:'point' ,type:'dyn_point',target:this.bodies.bones.root, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
-                                        { name:'orient',type:'kin_orient',target:this.bodies.bones.root},                                         
+                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 1.0,stiffness_at_selection:0.0,damping:0.1,length:0.01},
+                                        { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
                                         { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001 },
                                       ], 
 
@@ -605,7 +533,7 @@ export default class fidget_daft_i extends fidget{
     this.bodies.inters_step.steps[2].get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }
     this.bodies.inters_step.steps[2].set_resolution_coef = function(res = null){ this.constraints.axe.current_pos = res }
  
-    z_depth += z_depth_incr
+    //z_depth += z_depth_incr
 
 
 
@@ -621,7 +549,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.bones.root,
       //m_offset:om_rA_bones,
       m_shape:m_shape_bones,
-      z:z_depth, 
+      //z:z_depth, 
 
       constraints:[      
         { name:'point' ,type:'kin_point' ,target:this.bodies.bones.root},
@@ -648,7 +576,7 @@ export default class fidget_daft_i extends fidget{
                                     parent:this.bodies.bones.circle,
                                     m_offset:new Matrix(),
                                     m_shape: m_shape,
-                                    z:z_depth,
+                                    //z:z_depth,
                                     type:utils.shape.circle,
 
                                     do_shape: true,
@@ -691,7 +619,7 @@ export default class fidget_daft_i extends fidget{
         //m:this.m,
         //parent:this.bodies.inters.background,
         m_shape: m_shape,
-        z:z_depth, 
+        //z:z_depth, 
         type: utils.shape.rectangle,
 
         do_shape: true,
@@ -707,7 +635,7 @@ export default class fidget_daft_i extends fidget{
         density:0.001, 
                         
       } 
-      z_depth += z_depth_incr
+      //z_depth += z_depth_incr
   
 
 
@@ -727,7 +655,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.root,
                                               //m_offset:om_rA_bones,
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.root, stiffness: 1.0,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.root, stiffness: 1.0,damping:0.1,length:0.01}, 
@@ -772,7 +700,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_center,
                                               m_offset:om_rA_bones,
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
 
                                               
                                               constraints:[
@@ -814,7 +742,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_pivots[0],
                                               m_offset:om_rA, 
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
                                               
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[0], stiffness: 1.0,damping:0.1,length:0.01},
@@ -889,7 +817,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_center,
                                               m_offset:om_rB_bones,
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
                                               
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
@@ -928,7 +856,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_pivots[1],
                                               m_offset:om_rB, 
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
                                               
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[1], stiffness: 1.0,damping:0.1,length:0.01},
@@ -999,7 +927,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_center,
                                               m_offset:om_rC_bones,
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
 
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
@@ -1039,7 +967,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_pivots[2],
                                               m_offset:om_rC, 
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
                                               
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[2], stiffness: 1.0,damping:0.1,length:0.01},
@@ -1110,7 +1038,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_center,
                                               m_offset:om_rD_bones,
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
 
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
@@ -1150,7 +1078,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles_pivots[3],
                                               m_offset:om_rD, 
                                               m_shape:m_shape_bones,
-                                              z:z_depth, 
+                                              //z:z_depth, 
                                               
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[3], stiffness: 1.0,damping:0.1,length:0.01},
@@ -1196,7 +1124,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.bones.root,
       //m_offset:om_rA_bones,
       m_shape:m_shape_bones,
-      z:z_depth, 
+      //z:z_depth, 
 
       constraints:[      
         { name:'point' ,type:'kin_point' ,target:this.bodies.bones.root},
@@ -1222,7 +1150,7 @@ export default class fidget_daft_i extends fidget{
       parent:this.bodies.bones.rectangle,
       m_offset:new Matrix(),
       m_shape:m_shape,
-      z:z_depth,
+      //z:z_depth,
       type : utils.shape.rectangle,
 
       do_shape: true,
@@ -1299,7 +1227,7 @@ export default class fidget_daft_i extends fidget{
       let opts_sparcles = {
         ...opts_global,
         ...opts_debug,
-        z_depth:z_depth,
+        //z_depth:z_depth,
         scale_shape:s,
         parent:this.bodies.inters.background      
       }  
@@ -1335,7 +1263,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.effects.colC_wall = build_effects_wall(opts_colC_sparcles)
 
 
-    z_depth += z_depth_incr
+    //z_depth += z_depth_incr
 
     let mo_iAh = new Matrix()                                    
     mo_iAh.setTranslation(-130,-50+25*s/2.)    
@@ -1366,6 +1294,153 @@ export default class fidget_daft_i extends fidget{
                                                   density:0.01,  
                                                   })      
      
+       this.bodies_draw_order = [
+                      this.bodies.geos.backgrounds[0],
+                      this.bodies.geos.backgrounds[1],        
+                      this.bodies.inters.background,
+                      this.bodies.inters.circle,
+                      this.bodies.inters.rectangle,
+                      this.bodies.inters.rectangles[0],
+                      this.bodies.inters.rectangles[1],
+                      this.bodies.inters.rectangles[2],
+                      //this.bodies.inters.rectangles[3],
+                      this.bodies.inters_step.steps[0], 
+                      this.bodies.inters_step.steps[1],
+                      this.bodies.inters_step.steps[2],                      
+                      this.bodies.geos.circle,
+                      this.bodies.geos.rectangle,                      
+                      this.bodies.geos.rectangles[0],
+                      this.bodies.geos.rectangles[1],
+                      this.bodies.geos.rectangles[2],
+                      this.bodies.geos.rectangles[3],
+                      this.bodies.effects.colA_sparcles,      
+                      this.bodies.effects.colA_shapes,
+                      this.bodies.effects.colA_wall,          
+                      this.bodies.effects.colB_sparcles,
+                      this.bodies.effects.colB_shapes,
+                      this.bodies.effects.colB_wall,
+                      this.bodies.effects.colC_sparcles, 
+                      this.bodies.effects.colC_shapes,
+                      this.bodies.effects.colC_wall,                       
+                      this.bodies.bones.world,
+                      this.bodies.bones.traj, 
+                      this.bodies.bones.root,
+                      this.bodies.bones.circle,
+                      this.bodies.bones.rectangle,
+                      this.bodies.bones.rectangles_center,
+                      this.bodies.bones.rectangles_pivots[0],
+                      this.bodies.bones.rectangles_pivots[1],
+                      this.bodies.bones.rectangles_pivots[2],
+                      this.bodies.bones.rectangles_pivots[3],      
+                      this.bodies.bones.rectangles[0],
+                      this.bodies.bones.rectangles[1],
+                      this.bodies.bones.rectangles[2],
+                      this.bodies.bones.rectangles[3],                                                               
+            ] 
+        let z_depth = 0
+        let z_depth_incr = 0.1
+        for(let i = 0 ; i < this.bodies_draw_order.length; i++)
+        {
+          this.bodies_draw_order[i].z_depth = z_depth
+          z_depth += z_depth_incr
+
+        }
+
+            /*
+        this.bodies_eval_order = [
+          this.bodies.bones.world,
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],
+
+          this.bodies.bones.traj, 
+
+          this.bodies.inters.background,
+          this.bodies.inters.circle,
+          this.bodies.inters.rectangle,
+          this.bodies.inters.rectangles[0],
+          this.bodies.inters.rectangles[1],
+          this.bodies.inters.rectangles[2],
+          //this.bodies.inters.rectangles[3],
+
+          this.bodies.bones.root,
+
+          this.bodies.inters_step.steps[0], 
+          this.bodies.inters_step.steps[1],
+          this.bodies.inters_step.steps[2],   
+
+          this.bodies.bones.circle,
+          this.bodies.bones.rectangle,
+          this.bodies.bones.rectangles_center,
+          this.bodies.bones.rectangles_pivots[0],
+          this.bodies.bones.rectangles_pivots[1],
+          this.bodies.bones.rectangles_pivots[2],
+          this.bodies.bones.rectangles_pivots[3],      
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],
+  
+          this.bodies.geos.circle,
+          this.bodies.geos.rectangle,                      
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
+          this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
+
+          this.bodies.effects.colA_sparcles,      
+          this.bodies.effects.colA_shapes,
+          this.bodies.effects.colA_wall,          
+          this.bodies.effects.colB_sparcles,
+          this.bodies.effects.colB_shapes,
+          this.bodies.effects.colB_wall,
+          this.bodies.effects.colC_sparcles, 
+          this.bodies.effects.colC_shapes,
+          this.bodies.effects.colC_wall,                                            
+            ]   
+            */ 
+ 
+
+        this.bodies_eval_order = [
+          'bones','world',
+          'geos','backgrounds',
+
+          'bones','traj', 
+
+          'inters','background',
+          'inters','circle',
+          'inters','rectangle',
+          'inters','rectangles',
+          'inters_step','steps', 
+
+
+          'bones','root',
+
+          
+
+
+          'bones','circle',
+          'bones','rectangle',
+          'bones','rectangles_center',
+          'bones','rectangles_pivots',     
+          'bones','rectangles',
+
+  
+          'geos','circle',
+          'geos','rectangle',                      
+          'geos','rectangles',
+
+
+          'effects','colA_sparcles',      
+          'effects','colA_shapes',
+          'effects','colA_wall',          
+          'effects','colB_sparcles',
+          'effects','colB_shapes',
+          'effects','colB_wall',
+          'effects','colC_sparcles', 
+          'effects','colC_shapes',
+          'effects','colC_wall',                                            
+            ]    
+ 
 
 
     this.steps_info = [
