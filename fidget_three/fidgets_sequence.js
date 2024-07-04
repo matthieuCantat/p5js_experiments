@@ -34,11 +34,12 @@ export default class fidgets_sequence
         this.shaders = shaders
         this.screen_dims = screen_dims
 
-        
+        let z_depth = 0
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
             //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,this.shaders,this.debug_mode)
-            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,this.shaders,this.debug_mode)
+            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,z_depth,this.shaders,this.debug_mode)
+            z_depth = fidget.z_depth_end
             //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1

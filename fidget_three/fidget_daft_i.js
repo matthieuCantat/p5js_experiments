@@ -30,7 +30,7 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-    constructor(m,s,screen_dims,shaders = [],debug=false,random_color = true)
+    constructor(m,s,screen_dims, z_depth_start,shaders = [],debug=false,random_color = true)
     {
         super(m, s, screen_dims,shaders, debug)
 
@@ -1355,7 +1355,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.bones.rectangles[2],
                       this.bodies.bones.rectangles[3],                                                               
             ] 
-        let z_depth = 0
+        let z_depth = z_depth_start
         let z_depth_incr = 0.1
         for(let i = 0 ; i < this.bodies_draw_order.length; i++)
         {
@@ -1363,6 +1363,7 @@ export default class fidget_daft_i extends fidget{
           z_depth += z_depth_incr
 
         }
+        this.z_depth_end = z_depth
 
             /*
         this.bodies_eval_order = [
@@ -1832,7 +1833,7 @@ export default class fidget_daft_i extends fidget{
       },   
     ]                                              
 
-
+      
     }
   ////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
@@ -2110,6 +2111,7 @@ export default class fidget_daft_i extends fidget{
 
   do_explode(step)
   {
+    this.bodies_enable(false,['effects'])
     this.bodies_constraints_enable(false, ['geos'])
     
     
