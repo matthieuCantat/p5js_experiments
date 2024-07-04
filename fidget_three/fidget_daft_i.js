@@ -423,7 +423,7 @@ export default class fidget_daft_i extends fidget{
                                                                                     
                                       }))
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_local_rotation())/90.0     ,0,1) }  
-      this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_angle(rad(res*90.0),false) }                     
+      this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_angle(rad(res*95.0),true) }                     
 
 
       scale_inter = 10.0                                      
@@ -1338,10 +1338,10 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.bones.rectangles[3],                                                               
             ] 
         let z_depth = 0
-        let z_depth_incr = 0.1
+        let z_depth_incr = 1.
         for(let i = 0 ; i < this.bodies_draw_order.length; i++)
         {
-          this.bodies_draw_order[i].z_depth = z_depth
+          this.bodies_draw_order[i].z = z_depth
           z_depth += z_depth_incr
 
         }
@@ -1722,7 +1722,7 @@ export default class fidget_daft_i extends fidget{
       }, ///////////////////////////////////////////////////////////////////////////////////// 3
       {
         bodies_enable:[
-          this.bodies.inters_step.steps[2],
+          //this.bodies.inters_step.steps[2],
           this.bodies.inters.background,
           this.bodies.inters.circle,
           //this.bodies.inters.rectangle,
@@ -1910,7 +1910,19 @@ export default class fidget_daft_i extends fidget{
         
         let m = new Matrix(this.bodies.inters.circle.m_shape_init)
         m.scale(1.85,1.85)
-        this.bodies.inters.circle.update_shape_coords(m)        
+        this.bodies.inters.circle.update_shape_coords(m)
+        
+        //_________________________________________________________________Mouse
+        if(this.debug_mode.switch_selected_inter_help)
+        {
+          console.log('switch')
+          this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[0], this.bodies.inters_step.steps[1])
+        }
+        else
+        {
+          //if( (this.bodies.inters_step.steps[0].is_selected == true) &&(userIsInteracting == false) )
+          //  switch_selection( this.mouse_constraint, null)  
+        }        
       }       
    
       //_________________________________________________________________effects
@@ -1922,16 +1934,7 @@ export default class fidget_daft_i extends fidget{
         trails:this.bodies.effects.movA_trails,
       })
        
-      //_________________________________________________________________Mouse
-      if(this.debug_mode.switch_selected_inter_help)
-      {
-        this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[0], this.bodies.inters_step.steps[1])
-      }
-      else
-      {
-        //if( (this.bodies.inters_step.steps[0].is_selected == true) &&(userIsInteracting == false) )
-        //  switch_selection( this.mouse_constraint, null)  
-      }
+
 
           
       //_________________________________________________________________Update
@@ -1958,6 +1961,17 @@ export default class fidget_daft_i extends fidget{
         this.bodies.inters_step.steps[0].set_resolution_coef(1)
         this.bodies.inters_step.steps[1].set_resolution_coef(1)
         this.bodies.inters_step.steps[2].set_resolution_coef(null)  
+        console.log('switch2')
+        //_________________________________________________________________Mouse
+        if(this.debug_mode.switch_selected_inter_help)
+        {      
+          this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[1], this.bodies.inters_step.steps[2]) 
+        }      
+        else
+        {
+          //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
+          //  switch_selection( this.mouse_constraint, null)
+        }          
       }   
       //_________________________________________________________________Control
       //_________________________________________________________________effects
@@ -1969,16 +1983,7 @@ export default class fidget_daft_i extends fidget{
         trails:this.bodies.effects.movB_trails,
       })
       
-      //_________________________________________________________________Mouse
-      if(this.debug_mode.switch_selected_inter_help)
-      {      
-        this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[1], this.bodies.inters_step.steps[2]) 
-      }      
-      else
-      {
-        //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
-        //  switch_selection( this.mouse_constraint, null)
-      }    
+  
       
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
@@ -2026,15 +2031,15 @@ export default class fidget_daft_i extends fidget{
      
       //_________________________________________________________________Mouse
       
-      if(this.debug_mode.switch_selected_inter_help)
-      {
-        this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[1], this.bodies.inters_step.steps[2]) 
-      }
-      else
-      {
-        //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
-        //  switch_selection( this.mouse_constraint, null)  
-      }
+      //if(this.debug_mode.switch_selected_inter_help)
+      //{
+      //  this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[1], this.bodies.inters_step.steps[2]) 
+      //}
+      //else
+      //{
+      //  //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
+      //  //  switch_selection( this.mouse_constraint, null)  
+      //}
         
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step

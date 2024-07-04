@@ -794,7 +794,7 @@ export class body_build{
       let converted_pos = convert_coords_matter_to_three(pos,this.screen_dims)
       this.mesh_three.group.position.x = converted_pos.x()
       this.mesh_three.group.position.y = converted_pos.y()
-      //this.mesh_three.group.position.z = this.z
+      this.mesh_three.group.position.z = this.z
       this.mesh_three.group.rotation.z = rot*-1
       this.mesh_three.group.visible = this.get_visibility() == 1   
       this.mesh_three.group.scale.x = scale  

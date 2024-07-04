@@ -101,6 +101,10 @@ function init() {
 
     camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
     camera.position.set( 0, 0, 500 );
+    //camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+    //camera.position.set( 0, 0, 1000 );
+    //camera.rotation.set( 0.0, 0, 0 );
+    
     scene.add( camera );
 
     const light = new THREE.PointLight( 0xffffff, 2.5, 0, 0 );
