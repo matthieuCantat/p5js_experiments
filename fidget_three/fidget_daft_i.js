@@ -1306,22 +1306,40 @@ export default class fidget_daft_i extends fidget{
                       //this.bodies.inters.rectangles[3],
                       this.bodies.inters_step.steps[0], 
                       this.bodies.inters_step.steps[1],
-                      this.bodies.inters_step.steps[2],                      
+                      this.bodies.inters_step.steps[2],                                                               
                       this.bodies.geos.circle,
+                      this.bodies.effects.movA_trails[0],      
+                      this.bodies.effects.movA_trails[1], 
+                      this.bodies.effects.movA_trails[2], 
+                      this.bodies.effects.movB_trails[0],
+                      this.bodies.effects.movB_trails[1],
+                      this.bodies.effects.movB_trails[2],                         
                       this.bodies.geos.rectangle,                      
                       this.bodies.geos.rectangles[0],
                       this.bodies.geos.rectangles[1],
                       this.bodies.geos.rectangles[2],
                       this.bodies.geos.rectangles[3],
-                      this.bodies.effects.colA_sparcles,      
-                      this.bodies.effects.colA_shapes,
-                      this.bodies.effects.colA_wall,          
-                      this.bodies.effects.colB_sparcles,
-                      this.bodies.effects.colB_shapes,
+                      this.bodies.effects.colA_sparcles[0], 
+                      this.bodies.effects.colA_sparcles[1],          
+                      this.bodies.effects.colA_sparcles[2],
+                      this.bodies.effects.colA_shapes[0],
+                      this.bodies.effects.colA_shapes[1],
+                      this.bodies.effects.colA_shapes[2],
+                      this.bodies.effects.colA_wall, 
+                      this.bodies.effects.colB_sparcles[0],
+                      this.bodies.effects.colB_sparcles[1],
+                      this.bodies.effects.colB_sparcles[2],
+                      this.bodies.effects.colB_shapes[0],
+                      this.bodies.effects.colB_shapes[1],
+                      this.bodies.effects.colB_shapes[2],
                       this.bodies.effects.colB_wall,
-                      this.bodies.effects.colC_sparcles, 
-                      this.bodies.effects.colC_shapes,
-                      this.bodies.effects.colC_wall,                       
+                      this.bodies.effects.colC_sparcles[0], 
+                      this.bodies.effects.colC_sparcles[1],
+                      this.bodies.effects.colC_sparcles[2],
+                      this.bodies.effects.colC_shapes[0],
+                      this.bodies.effects.colC_shapes[1],
+                      this.bodies.effects.colC_shapes[2],
+                      this.bodies.effects.colC_wall,                      
                       this.bodies.bones.world,
                       this.bodies.bones.traj, 
                       this.bodies.bones.root,
@@ -1338,7 +1356,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.bones.rectangles[3],                                                               
             ] 
         let z_depth = 0
-        let z_depth_incr = 1.
+        let z_depth_incr = 0.1
         for(let i = 0 ; i < this.bodies_draw_order.length; i++)
         {
           this.bodies_draw_order[i].z = z_depth
@@ -1432,10 +1450,12 @@ export default class fidget_daft_i extends fidget{
 
           'effects','colA_sparcles',      
           'effects','colA_shapes',
-          'effects','colA_wall',          
+          'effects','colA_wall',    
+          'effects','movA_trails',       
           'effects','colB_sparcles',
           'effects','colB_shapes',
           'effects','colB_wall',
+          'effects','movB_trails', 
           'effects','colC_sparcles', 
           'effects','colC_shapes',
           'effects','colC_wall',                                            
@@ -1861,6 +1881,7 @@ export default class fidget_daft_i extends fidget{
 
   set_step_resolution()
   {
+    //this.bodies_enable(1,['effects'])
 
     let step = 0
     let res_coef = this.state.steps[step].resoluton_coef
@@ -1869,7 +1890,8 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_enable( 0)  
+       
+        this.bodies_enable( 0 )  
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1) 
 
@@ -2001,7 +2023,7 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {
-        this.bodies_enable( 0 ) 
+        this.bodies_enable( 0 )
         for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
           this.steps_info[step].bodies_enable[i].enable(1)   
           
@@ -2024,7 +2046,7 @@ export default class fidget_daft_i extends fidget{
         sparcles:this.bodies.effects.colC_sparcles,
         shapes:this.bodies.effects.colC_shapes,
         wall:this.bodies.effects.colC_wall,
-        trails:[],
+        trails:this.bodies.effects.movB_trails,
       })
      
       //_________________________________________________________________Mouse

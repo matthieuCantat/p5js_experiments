@@ -1197,6 +1197,15 @@ anim_effect({
 
 export function anim_effect(opts)
 {
+  opts.wall.enable(0)
+  for( let i=0; i < opts.sparcles.length; i++)
+    opts.sparcles[i].enable(0) 
+
+  for( let i=0; i < opts.shapes.length; i++)
+    opts.shapes[i].enable(0)
+  for( let i=0; i < opts.trails.length; i++)
+    opts.trails[i].enable(0)
+
   if(opts.count == 0)  
   {      
     for( let i=0; i < opts.sparcles.length; i++)
@@ -1226,12 +1235,13 @@ export function anim_effect(opts)
   if( opts.count < 20) 
   {
     for( let i=0; i < opts.sparcles.length; i++)
-    opts.sparcles[i].enable(1)       
+      opts.sparcles[i].enable(1)       
   }
 
 
   if( opts.count < 40) 
   {
+
     for( let i=0; i < opts.shapes.length; i++)
       opts.shapes[i].enable(1)   
       
