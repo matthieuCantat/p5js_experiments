@@ -30,9 +30,24 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-    constructor(m,s,screen_dims, z_depth_start,shaders = [],debug=false,random_color = true)
+    constructor( 
+      m,
+      s,
+      screen_dims, 
+      z_depth_start,
+      do_background, 
+      shaders = [],
+      debug=false,
+      random_color = true)
     {
-        super(m, s, screen_dims,shaders, debug)
+        super(
+          m, 
+          s, 
+          screen_dims,
+          do_background,
+          shaders, 
+          debug)
+
 
         this.title = 'dafti'
 
@@ -186,7 +201,7 @@ export default class fidget_daft_i extends fidget{
       //m_offset:om_rA_bones,
       m_shape:m_shape_bones_main,
       //z:z_depth, 
-      density:0.2, 
+      density:0.2/(s/2.2), 
 
     })   
      
@@ -214,8 +229,9 @@ export default class fidget_daft_i extends fidget{
       color: this.color_background,
       color_line: utils.color.black,
 
-      density:0.01, 
+      density:0.01/(s/2.2), 
       collision:false, 
+      visibility:this.do_background
       //texture_three: text_checker_three_grey,
     } 
     //z_depth += z_depth_incr
@@ -227,7 +243,7 @@ export default class fidget_daft_i extends fidget{
                 
                                                 name:'geo_background_L',
                                                 m_offset:mo_background_L, 
-                                       
+                                      
                                               })) 
     let mo_background_R = new Matrix()                                    
     mo_background_R.setTranslation(this.screen_dims.x/4*3,this.screen_dims.y/2)    
@@ -235,9 +251,10 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
                                                 name:'geo_background_R', 
                                                 m_offset:mo_background_R,
-                                                                                                 
+                                                                                                
                                               })) 
-                                            
+          
+
     this.bodies.bones.traj = new body_build({ 
       ...opts_global,
       ...opts_collision_no_interaction,
@@ -257,7 +274,7 @@ export default class fidget_daft_i extends fidget{
         { name:'orient',type:'kin_orient',target:this.bodies.bones.world},  
       ],
 
-      density:0.2, 
+      density:0.2/(s/2.2), 
 
     }) 
     /////////////////////////////////////////////////////  
@@ -289,8 +306,9 @@ export default class fidget_daft_i extends fidget{
         { name:'rot_limit',type:'kin_limit',target:this.bodies.bones.traj, x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
       ],    
 
-      density:0.01, 
+      density:0.01/(s/2.2), 
       frictionAir:0.3,  
+      selection_break_length: 60.*(s/2.2),
                                                  
     })
 
@@ -314,7 +332,7 @@ export default class fidget_daft_i extends fidget{
         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},  
       ],
 
-      density:0.2, 
+      density:0.2/(s/2.2), 
 
     })  
 
@@ -323,7 +341,7 @@ export default class fidget_daft_i extends fidget{
     let scale_inter = 40.0 
 
     var om_iA = new Matrix()
-    om_iA.setTranslation(-130,-50)
+    om_iA.setTranslation(-130*(s/2.2),-50*(s/2.2))
 
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(100/2.4*s))
@@ -352,7 +370,8 @@ export default class fidget_daft_i extends fidget{
                                       { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
                                     ], 
 
-                                    density:0.01, 
+                                    density:0.01/(s/2.2), 
+                                    selection_break_length: 60.*(s/2.2),
                                                                              
                                   }) )
     this.bodies.inters_step.steps[0].get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }
@@ -386,7 +405,8 @@ export default class fidget_daft_i extends fidget{
         {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
         {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01},                                          
       ],                                      
-      density:0.01,     
+      density:0.01/(s/2.2), 
+      selection_break_length: 60.*(s/2.2),    
                                                                                       
       })
 
@@ -419,7 +439,8 @@ export default class fidget_daft_i extends fidget{
                                           { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
                                         ],      
 
-                                        density:0.01, 
+                                        density:0.01/(s/2.2), 
+                                        selection_break_length: 60.*(s/2.2),
                                                                                     
                                       }))
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_local_rotation())/90.0     ,0,1) }  
@@ -453,7 +474,8 @@ export default class fidget_daft_i extends fidget{
           {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
         ],
 
-        density:0.01,                                                                                
+        density:0.01/(s/2.2),   
+        selection_break_length: 60.*(s/2.2),                                                                             
       })
 
 
@@ -494,7 +516,7 @@ export default class fidget_daft_i extends fidget{
                                                     transparency_activate: true,
                                                     transparency_line:1.0,                                                  
                                                  
-                                                    density:0.01,    
+                                                    density:0.01/(s/2.2),    
                                                     }) 
 
 
@@ -527,7 +549,8 @@ export default class fidget_daft_i extends fidget{
                                         { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001 },
                                       ], 
 
-                                      density:0.01, 
+                                      density:0.01/(s/2.2), 
+                                      selection_break_length: 60.*(s/2.2),
                                                                               
                                     }))
     this.bodies.inters_step.steps[2].get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }
@@ -556,7 +579,7 @@ export default class fidget_daft_i extends fidget{
         { name:'orient',type:'kin_orient',target:this.bodies.bones.root},  
       ],
 
-      density:0.2, 
+      density:0.2/(s/2.2), 
 
     })      
 
@@ -592,14 +615,14 @@ export default class fidget_daft_i extends fidget{
                                         attr:'scale',
                                         target_attr:'ty', 
                                         target_space:'local',
-                                        target_remap:[0,55,1,1.82] },  
+                                        target_remap:[0,55*(s/2.2),1,1.82] },  
                                       { name:'connect_scale_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                         attr:'scale',
                                         target_attr:'ty', 
                                         target_space:'local',
-                                        target_remap:[0,110,1.82,0.45] },
+                                        target_remap:[0,110*(s/2.2),1.82,0.45] },
                                     ],                                      
-                                    density:0.001,     
+                                    density:0.001/(s/2.2),     
                                                                                
                                     })
       this.bodies.inters.circle.highlight_selection = [this.bodies.geos.circle]
@@ -632,7 +655,7 @@ export default class fidget_daft_i extends fidget{
         //  { name:'axe'   ,type:'kin_axe', axe:0, distPos: 66.1*s, distNeg: 0.001 },
         //],         
 
-        density:0.001, 
+        density:0.001/(s/2.2), 
                         
       } 
       //z_depth += z_depth_incr
@@ -660,7 +683,7 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.root, stiffness: 1.0,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.root, stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ], 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
 
                                             })   
 
@@ -672,7 +695,7 @@ export default class fidget_daft_i extends fidget{
 
 
 
-      let ray_tmp = 80
+      let ray_tmp = 80*(s/2.2)
       let rot_tmp = 0 
       let offset_from_center = new Vector(0,0)
   
@@ -685,7 +708,7 @@ export default class fidget_daft_i extends fidget{
 
 
       var om_rA_bones = new Matrix()
-      om_rA_bones.setTranslation(65,0)
+      om_rA_bones.setTranslation(65*(s/2.2),0)
       om_rA_bones.setRotation(rad(rot_tmp+180))  
 
       this.bodies.bones.rectangles_pivots.push(new body_build({ 
@@ -710,19 +733,19 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,55,0,35] },  
+                                                  target_remap:[0,55*(s/2.2),0,35] },  
                                                 { name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
-                                                  target_remap:[0,90,0,-85] },    
+                                                  target_remap:[0,90,0,-85*(s/2.2)] },    
                                                 { name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110,-85,-145] },                                                                                                                                                     
+                                                  target_remap:[0,110*(s/2.2),-85*(s/2.2),-145*(s/2.2)] },                                                                                                                                                     
                                               ],
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
 
                                             }))     
 
@@ -749,7 +772,7 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[0], stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],  
 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
 
                                             }))     
 
@@ -789,7 +812,8 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
+                                              selection_break_length: 60.*(s/2.2),
                                                     
                                             })) 
                                             
@@ -802,7 +826,7 @@ export default class fidget_daft_i extends fidget{
       m_shape_bones.setScale(s*4)
 
       var om_rB_bones = new Matrix()
-      om_rB_bones.setTranslation(65,0)
+      om_rB_bones.setTranslation(65*(s/2.2),0)
       om_rB_bones.setRotation(rad(rot_tmp+180))  
 
       this.bodies.bones.rectangles_pivots.push(new body_build({ 
@@ -826,19 +850,19 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,55,0,-35] },   
+                                                  target_remap:[0,55*(s/2.2),0,-35] },   
                                                 { name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
-                                                  target_remap:[0,90,0,-85] },   
+                                                  target_remap:[0,90,0,-85*(s/2.2)] },   
                                                 { name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110,-85,-145] },                                                                                                                                                       
+                                                  target_remap:[0,110*(s/2.2),-85*(s/2.2),-145*(s/2.2)] },                                                                                                                                                       
                                               ],
-                                              density:0.2,                                                     
+                                              density:0.2/(s/2.2),                                                     
                                             })) 
 
       var om_rB = new Matrix()
@@ -863,7 +887,7 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[1], stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],  
 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
 
                                             }))    
 
@@ -899,7 +923,8 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],
 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
+                                              selection_break_length: 60.*(s/2.2),
                                                        
                                             }))  
 
@@ -912,7 +937,7 @@ export default class fidget_daft_i extends fidget{
       m_shape_bones.setScale(s*4)
 
       var om_rC_bones = new Matrix()
-      om_rC_bones.setTranslation(-65,0)
+      om_rC_bones.setTranslation(-65*(s/2.2),0)
       om_rC_bones.setRotation(rad(rot_tmp+180))  
 
       this.bodies.bones.rectangles_pivots.push(new body_build({ 
@@ -936,19 +961,19 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,55,0,35] },  
+                                                  target_remap:[0,55*(s/2.2),0,35] },  
                                                 { name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
-                                                  target_remap:[0,90,0,85] },  
+                                                  target_remap:[0,90,0,85*(s/2.2)] },  
                                                 { name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110,85,145] },                                                                                                                                                          
+                                                  target_remap:[0,110*(s/2.2),85*(s/2.2),145*(s/2.2)] },                                                                                                                                                          
                                               ],
-                                              density:0.2,                                               
+                                              density:0.2/(s/2.2),                                               
                                                     
                                             })) 
 
@@ -974,7 +999,7 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[2], stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],  
 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
 
                                             }))   
 
@@ -1009,7 +1034,8 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],
 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
+                                              selection_break_length: 60.*(s/2.2),
                                                         
                                             }))      
                                             
@@ -1023,7 +1049,7 @@ export default class fidget_daft_i extends fidget{
       m_shape_bones.setScale(s*4)
 
       var om_rD_bones = new Matrix()
-      om_rD_bones.setTranslation(-65,0)
+      om_rD_bones.setTranslation( -65*(s/2.2), 0)
       om_rD_bones.setRotation(rad(rot_tmp+180))  
 
       this.bodies.bones.rectangles_pivots.push(new body_build({ 
@@ -1047,19 +1073,19 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'r',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,55,0,-35] },  
+                                                  target_remap:[0,55*(s/2.2),0,-35] },  
                                                 { name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
-                                                  target_remap:[0,90,0,85] },
+                                                  target_remap:[0,90,0,85*(s/2.2)] },
                                                 { name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110,85,145] },                                                                                                                                                            
+                                                  target_remap:[0,110*(s/2.2),85*(s/2.2),145*(s/2.2)] },                                                                                                                                                            
                                               ],
-                                              density:0.2,                                               
+                                              density:0.2/(s/2.2),                                               
                                                     
                                             })) 
 
@@ -1085,7 +1111,7 @@ export default class fidget_daft_i extends fidget{
                                                 {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[3], stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],  
 
-                                              density:0.2, 
+                                              density:0.2/(s/2.2), 
 
                                             })) 
 
@@ -1131,7 +1157,7 @@ export default class fidget_daft_i extends fidget{
         { name:'orient',type:'kin_orient',target:this.bodies.bones.root},  
       ],
 
-      density:0.2, 
+      density:0.2/(s/2.2), 
 
     })          
 
@@ -1175,7 +1201,7 @@ export default class fidget_daft_i extends fidget{
           target_remap: null },                
       ],                                         
 
-      density:0.001,                                                                                 
+      density:0.001/(s/2.2),                                                                                 
     }
     
 
@@ -1194,7 +1220,7 @@ export default class fidget_daft_i extends fidget{
 
 
     let mo_iCh = new Matrix()                                    
-    mo_iCh.setTranslation(0.,-59*s/2.)      
+    mo_iCh.setTranslation(0.,-59*(s/2.2))      
     
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(1))
@@ -1219,7 +1245,7 @@ export default class fidget_daft_i extends fidget{
                                                   transparency_line:1.0,     
                                                   //texture_three: text_checker_three,                                              
                                                   
-                                                  density:0.01, 
+                                                  density:0.01/(s/2.2), 
 
                                                   }) 
 
@@ -1235,7 +1261,7 @@ export default class fidget_daft_i extends fidget{
       let opts_colA_sparcles = {
         ...opts_sparcles,
         name:'colA',
-        p:new Vector(-145,15),
+        p:new Vector(-145*(s/2.2),15*(s/2.2)),
         r:0,      
       }                            
       this.bodies.effects.colA_sparcles = build_effects_particles_sparcles(opts_colA_sparcles) 
@@ -1245,7 +1271,7 @@ export default class fidget_daft_i extends fidget{
       let opts_colB_sparcles = {
         ...opts_sparcles,       
         name:'colB',
-        p:new Vector(15,-80),
+        p:new Vector(15*(s/2.2),-80*(s/2.2)),
         r:-90,     
       }                            
       this.bodies.effects.colB_sparcles = build_effects_particles_sparcles(opts_colB_sparcles) 
@@ -1255,7 +1281,7 @@ export default class fidget_daft_i extends fidget{
       let opts_colC_sparcles = {
         ...opts_sparcles,        
         name:'colC',
-        p:new Vector(0,200),
+        p:new Vector(0,200*(s/2.2)),
         r:0,        
       }                            
       this.bodies.effects.colC_sparcles = build_effects_particles_sparcles(opts_colC_sparcles) 
@@ -1266,7 +1292,7 @@ export default class fidget_daft_i extends fidget{
     //z_depth += z_depth_incr
 
     let mo_iAh = new Matrix()                                    
-    mo_iAh.setTranslation(-130,-50+25*s/2.)    
+    mo_iAh.setTranslation(-130*(s/2.2),(-50+25)*(s/2.2))    
 
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(1))
@@ -1291,7 +1317,7 @@ export default class fidget_daft_i extends fidget{
                                                   transparency_line:1.0,
                                                   //texture_three: text_checker_three,
 
-                                                  density:0.01,  
+                                                  density:0.01/(s/2.2),  
                                                   })      
      
        this.bodies_draw_order = [

@@ -6,14 +6,12 @@ import fidget_daft_i from './fidget_daft_i.js';
 import fidget_windmill from './fidget_windmill.js';
 
 
-export default class fidgets_sequence
+export default class fidgets_grid
 {
-    constructor( nbr, m, s, screen_dims, shaders = [], debug=false)
+    constructor( nbr, nbr_of_columns, screen_dims, shaders = [], debug=false)
     {
         //option
         this.fidgets_nbr = nbr
-        this.m = m
-        this.s = s
         this.debug_mode = debug
         this.force_way = 1
 
@@ -35,16 +33,38 @@ export default class fidgets_sequence
         this.screen_dims = screen_dims
 
         let z_depth = 0
-        for( let i = 0; i < this.fidgets_nbr; i++)
+
+        
+        let fidget_height = this.screen_dims.x/nbr_of_columns
+        let nbr_of_possible_rows = clamp(Math.round(this.screen_dims.y / fidget_height),1,999999)
+        let nbr_of_rows = Math.min(nbr_of_possible_rows, Math.round(this.fidgets_nbr/nbr_of_columns) )
+        this.nbr_to_display = nbr_of_columns*nbr_of_rows
+
+        console.log(nbr_of_columns,fidget_height,nbr_of_rows)
+
+        
+
+        let x = fidget_height/2
+        let y = fidget_height/2
+        let s = fidget_height/455*2.2*1.2
+        for( let i = 0; i < nbr_of_columns; i++)
         {
+          for( let j = 0; j < nbr_of_rows; j++)
+          {
+            let m = new Matrix()
+            m.setTranslation( x+i*fidget_height, y+j*fidget_height )
+
+
             let do_background = false
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
-            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
+            //var fidget = new fidget_windmill(m,s,this.screen_dims,z_depth,this.shaders,this.debug_mode)
+            var fidget = new fidget_daft_i(m,s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
             z_depth = fidget.z_depth_end
-            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
+            //var fidget = this.get_random_fidget(m,s,this.screen_dims,z_depth,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = i + 1
-            this.fidgets.push(fidget)
+
+            this.fidgets.push(fidget)            
+          }          
         }
     
         this.draw_text_debug = null
@@ -69,10 +89,10 @@ export default class fidgets_sequence
 
     setup()
     {
-      console.log('setup : fidgets_sequence')
+      console.log('setup : fidgets_grid')
       // setup
           
-      for( let i = 0; i < this.fidgets_nbr; i++)
+      for( let i = 0; i < this.nbr_to_display; i++)
       {
         this.fidgets[i].setup();
         this.fidgets_do_computation.push(null)
@@ -99,8 +119,8 @@ export default class fidgets_sequence
     setup_shapes_fidgets_three(scene_three)
     {
       var rez = this.get_resolution_coef_info()
-      var rez_step = rez*this.fidgets_nbr
-      var i_max = this.fidgets_nbr
+      var rez_step = rez*this.nbr_to_display
+      var i_max = this.nbr_to_display
       var coef = i_max-rez_step
       
       for( let i = 0; i < this.fidgets.length; i++ )
@@ -168,13 +188,13 @@ export default class fidgets_sequence
     {
       if( anim != null )
       {
-        for( let i = 0; i < this.fidgets_nbr; i++ )
+        for( let i = 0; i < this.nbr_to_display; i++ )
           this.fidgets[i].enable(true)
 
-        let anim_global = anim * this.fidgets_nbr
+        let anim_global = anim * this.nbr_to_display
       
-        let i_max = this.fidgets_nbr-1
-        for( let i = 0; i < this.fidgets_nbr; i++ )
+        let i_max = this.nbr_to_display-1
+        for( let i = 0; i < this.nbr_to_display; i++ )
         {
           let anim_local = clamp(anim_global-i,0,1)
           
@@ -196,7 +216,7 @@ export default class fidgets_sequence
       {
         
         this.anim_mode = false
-        for( let i = 0; i < this.fidgets_nbr; i++ )
+        for( let i = 0; i < this.nbr_to_display; i++ )
           this.fidgets[i].do_anim_override(null)
 
       }
@@ -205,12 +225,12 @@ export default class fidgets_sequence
     get_resolution_coef_info()
     {   
       var coef = 0
-      for( let i = 0; i < this.fidgets_nbr; i++ )
+      for( let i = 0; i < this.nbr_to_display; i++ )
       {
         coef += this.fidgets[i].state.resolution_coef / (this.fidgets[i].end_step-1)
       }
 
-      return coef / this.fidgets_nbr
+      return coef / this.nbr_to_display
             
     }
 
@@ -302,12 +322,16 @@ export default class fidgets_sequence
 
     do_fidget_computation(i)
     {
+      /*
       var rez = this.resolution_coef
       
-      var rez_step = rez*this.fidgets_nbr
-      var coef = this.fidgets_nbr-rez_step
+      var rez_step = rez*this.nbr_to_display
+      var coef = this.nbr_to_display-rez_step
 
       return ((  i-1< coef  )&&(  coef <= i+1 ))
+      */
+
+      return true
     }
 
     draw_fidgets_updates_only()

@@ -28,7 +28,13 @@ export default class fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, shaders = [],debug=false)
+  constructor( 
+    m, 
+    s, 
+    screen_dims, 
+    do_background, 
+    shaders = [],
+    debug=false)
   {
     let matter_engine        = create_physics_engine()
     let matter_engine_runner = create_physics_engine_runner(matter_engine)
@@ -67,6 +73,7 @@ export default class fidget{
     this.matter_engine_runner = matter_engine_runner 
     this.mouse_constraint = mouse_constraint
     this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, this.debug_mode.mouse_info)
+    this.do_background = do_background
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
