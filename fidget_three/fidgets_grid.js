@@ -40,7 +40,7 @@ export default class fidgets_grid
         let nbr_of_rows = Math.min(nbr_of_possible_rows, Math.round(this.fidgets_nbr/nbr_of_columns) )
         this.nbr_to_display = nbr_of_columns*nbr_of_rows
 
-        console.log(nbr_of_columns,fidget_height,nbr_of_rows)
+        
 
         
 
