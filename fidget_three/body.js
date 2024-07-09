@@ -49,13 +49,15 @@ export class body_build{
         screen_dims:null,
         matter_engine:null,
         mouse_constraint:null,
+        fidget:null, 
         texture_three:null,
         arc_limites:[0,3.14*2],
         debug_matrix_info: false,
         debug_matrix_axes: false,  
         debug_cns_axes: false,     
         debug_force_visibility: false, 
-        selection_break_length: 60.,              
+        selection_break_length: 60.,  
+                   
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -102,6 +104,7 @@ export class body_build{
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
       this.mouse_constraint = args.mouse_constraint
+      this.fidget = args.fidget
       this.texture_three = args.texture_three
       this.arc_limites = args.arc_limites
       this.debug_matrix_info = args.debug_matrix_info
@@ -557,7 +560,49 @@ export class body_build{
     {          
       Matter.Body.applyForce(this.body, p.get_value(), v.get_value())
     }
+
+ 
+    apply_vector_transform( piv, v_move, rot_friction = 0.)
+    {          
+      if(v_move.mag()<0.001)
+        return false
+
+      let m = this.get_out_matrix()
+      let p = m.get_row(2)
+
+      let v_rot_start_axe = piv.getSub(p)
+      let start_axe_length = v_rot_start_axe.mag()
+      v_rot_start_axe.normalize()
+      let v_rot_start_axe_normal = v_rot_start_axe.getNormal()
+      v_rot_start_axe_normal.normalize()
+
+      // get translate start
+      let v_translate_start = v_rot_start_axe.getMult(v_move.dot(v_rot_start_axe))
     
+      // get rotation
+      let v_rotate_start = v_rot_start_axe_normal.getMult(v_move.dot(v_rot_start_axe_normal))
+      let rot = Math.tan(v_rotate_start.mag()/start_axe_length)
+
+      // get translate end
+      let v_axe_after_rotate = v_rotate_start.getAdd(piv).getSub(p)
+      let v_axe_after_rotate_length = v_axe_after_rotate.length
+      let v_translate_end = v_axe_after_rotate.getNormalized()
+      v_translate_end.mult(v_axe_after_rotate_length-start_axe_length)
+
+      // get translate
+      let v_translate = v_translate_end.getAdd(v_translate_start)
+
+      // apply to matrix
+      m.setTranslation(p.getAdd(v_translate) )
+      m.setRotation(m.getRotation()+rot)
+
+      // apply to body
+      this.set_out_matrix(m)
+
+      return true
+
+    }   
+
     set_angle(a, override = true)
     {
     
@@ -606,13 +651,12 @@ export class body_build{
         
       if( !this.do_update )
         return false
-  
 
       for( let i = 0; i < this.constraints_order.length; i++)
       {
         this.constraints[this.constraints_order[i]].apply()
       }
-      
+
       if(this.rot_override!=null)
         this.set_angle(this.rot_override,true)
 
@@ -787,6 +831,7 @@ export class body_build{
 
     animate_three()
     {
+
       let pos = this.get_position()
       let rot = this.get_rotation()
       let scale = this.scale
@@ -846,7 +891,6 @@ export class body_build{
       
       // mouse cns
       
-
     }
 
     update_color_three()
