@@ -47,6 +47,8 @@ export default class fidgets_grid
         let x = fidget_height/2
         let y = fidget_height/2
         let s = fidget_height/455*2.2*1.2
+
+        
         for( let i = 0; i < nbr_of_columns; i++)
         {
           for( let j = 0; j < nbr_of_rows; j++)
@@ -61,7 +63,7 @@ export default class fidgets_grid
             z_depth = fidget.z_depth_end
             //var fidget = this.get_random_fidget(m,s,this.screen_dims,z_depth,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
-            fidget.fidget_sequence_i = i + 1
+            fidget.fidget_sequence_i = this.fidgets.length + 1
 
             this.fidgets.push(fidget)            
           }          

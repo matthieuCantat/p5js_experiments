@@ -224,7 +224,7 @@ export class Mouse_manager
 
         this.draw_text_debug = null
         this.debug = debug
-        if(this.debug)
+        if(this.debug != false)
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             this.draw_text_debug.mouse_cns = this.mouse_constraint
@@ -249,7 +249,7 @@ export class Mouse_manager
     
         scene.add( this.mesh_line )
 
-        if(this.debug)
+        if(this.debug != false)
             this.draw_text_debug.setup_three(scene)        
     
     }
@@ -337,8 +337,14 @@ export class Mouse_manager
             convert_coords_matter_to_three(p_mouse_current,this.screen_dims) );        
         this.mesh_line.geometry.setFromPoints(shape_coords.getPoints());
 
-       
-        if(this.debug)
+        
+        
+        let fidget_skip = false
+        if((this.debug !== true)&&(this.debug !== false)&&(this.debug !== this.fidget.fidget_sequence_i))
+            fidget_skip = true
+
+
+        if( (this.debug !== false)&&(fidget_skip === false) )
         {
           let p_mouse_grap_from_body = {x:0,y:0}
           if(this.p_mouse_grap_from_body != null)
@@ -355,6 +361,9 @@ export class Mouse_manager
             
 
           let texts_to_draw = [
+                'selected_fidget : ' + this.fidget.fidget_sequence_i,
+                'selected_body : ' + body_name,
+
                 'update_count :' + this.update_count,
                 'isMousePressed : ' + isMousePressed,
                 'isScreenTouched : ' + isScreenTouched,
@@ -363,7 +372,6 @@ export class Mouse_manager
                 'p_mouse_current : ' + Math.round(p_mouse_current.x()) + ' | ' + Math.round(p_mouse_current.y()),
                 'p_mouse_current_coef : ' + Math.round(p_mouse_current.x()/this.screen_dims.x*100) + ' | ' + Math.round(p_mouse_current.y()/this.screen_dims.y*100),
 
-                'selected_body : ' + body_name,
                 'm_selected_body : ' + Math.round(m_selected_body.a) + ' | ' + Math.round(m_selected_body.b) + ' | ' +Math.round(m_selected_body.c) + ' | ' +Math.round(m_selected_body.d) + ' | ' +Math.round(m_selected_body.e) + ' | ' +Math.round(m_selected_body.f),
                 'p_selected_body : ' + Math.round(m_selected_body.e) + ' | ' +Math.round(m_selected_body.f),
                 'p_selected_body_coef : ' + Math.round(m_selected_body.e/this.screen_dims.x*100) + ' | ' +Math.round(m_selected_body.f/this.screen_dims.y*100),
