@@ -37,7 +37,7 @@ export default class fidgets_sequence
         let z_depth = 0
         for( let i = 0; i < this.fidgets_nbr; i++)
         {
-            let do_background = false
+            let do_background = true
             //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
             var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
             z_depth = fidget.z_depth_end

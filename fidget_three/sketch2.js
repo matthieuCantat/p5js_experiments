@@ -44,7 +44,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 4
+var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
@@ -73,9 +73,9 @@ var shdrs = []
 let m = new Matrix()
 m.setTranslation(width/2, height/2 )
 
-let s = 1.0//2.2
-//F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
-F_sequence = new fidgets_grid(nbr, 2, screen_dims, shdrs, debug)
+let s = 2.2
+F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
+//F_sequence = new fidgets_grid(nbr, 2, screen_dims, shdrs, debug)
 F_sequence.setup()
 
 
