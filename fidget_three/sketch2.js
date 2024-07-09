@@ -44,7 +44,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 15
+var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
@@ -57,6 +57,7 @@ var debug = { disable_animation:true,
               cns_axes:false,
               fidget_steps_info:false,
               mouse_info:false,
+              show_warning_log:false,
                 }
 
 
@@ -74,7 +75,7 @@ m.setTranslation(width/2, height/2 )
 
 let s = 1.0//2.2
 //F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
-F_sequence = new fidgets_grid(nbr, 1, screen_dims, shdrs, debug)
+F_sequence = new fidgets_grid(nbr, 2, screen_dims, shdrs, debug)
 F_sequence.setup()
 
 
@@ -175,11 +176,13 @@ function onWindowResize() {
 
 function animate() {
 
+
     F_sequence.update()
     F_sequence.animate_three()
     uniforms[ 'time' ].value = performance.now() / 1000;
     renderer.render( scene, camera );
     stats.update();
+
     
 
 }
