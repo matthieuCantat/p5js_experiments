@@ -125,6 +125,7 @@ export default class fidget_daft_i extends fidget{
         screen_dims: this.screen_dims,
         matter_engine: this.matter_engine, 
         mouse_constraint: this.mouse_constraint,
+        fidget: this,
       }
 
       let opts_collision_no_interaction = {
@@ -376,10 +377,8 @@ export default class fidget_daft_i extends fidget{
                                   }) )
     this.bodies.inters_step.steps[0].get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }
     this.bodies.inters_step.steps[0].set_resolution_coef = function(res = null){ this.constraints.axe.current_pos = res }
+    
 
-
-
-      
     // build
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(50*s+scale_inter))
@@ -1319,7 +1318,7 @@ export default class fidget_daft_i extends fidget{
 
                                                   density:0.01/(s/2.2),  
                                                   })    
-                                                   
+                                           
      
        this.bodies_draw_order = [
                       this.bodies.geos.backgrounds[0],
@@ -1388,7 +1387,7 @@ export default class fidget_daft_i extends fidget{
         {
           if(this.bodies_draw_order[i] == null)
           {
-            console.log(' z_order - this.bodies_draw_order['+i+'] doesnt exists')
+            if(this.debug_mode.show_warning_log)console.log(' z_order - this.bodies_draw_order['+i+'] doesnt exists')
             continue
           }
           this.bodies_draw_order[i].z = z_depth
@@ -2247,15 +2246,17 @@ export default class fidget_daft_i extends fidget{
 
   update()
   {
+
     this.anim_mode =  this.resolution_coef_override != null
     // resolution
     this.state.resolution_coef_last = this.state.resolution_coef
     this.get_resolution_coef_info( this.resolution_coef_override )
     this.set_step_resolution()
     this.track_user_drag_error()
+    
     this.bodies_update()
+    
     this.draw_background()
-
 
     this.state.update_count += 1
   }
@@ -2308,6 +2309,7 @@ export default class fidget_daft_i extends fidget{
   {
     this.bodies_animate_three()
     //this.draw_help_three()
+
   }  
 }
   
