@@ -284,7 +284,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_log_body_ids - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_log_body_ids - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -312,7 +312,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_update_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_update_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -339,7 +339,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -369,7 +369,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_setup_shapes_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_setup_shapes_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -402,7 +402,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_animate_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_animate_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -456,7 +456,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_override_color - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_override_color - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -488,7 +488,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_color_update_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_color_update_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -545,7 +545,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_constraints_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_constraints_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -586,7 +586,7 @@ export default class fidget{
 
       if( (this.bodies[b_type][key] === null)||(this.bodies[b_type][key].length === 0))
       {
-        console.log('constraint enable - '+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('constraint enable - '+b_type+'.'+key+' doesnt exists')
         continue
       }      
       if( j === null)
@@ -638,7 +638,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_set_debug - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_set_debug - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
       
@@ -665,7 +665,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_set_visibility_secondary - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_set_visibility_secondary - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -693,7 +693,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_set_visibility_override - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_set_visibility_override - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -722,7 +722,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_set_visibility - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_set_visibility - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -763,7 +763,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_init_out_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_init_out_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -800,7 +800,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_do_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_do_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -833,7 +833,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
       
@@ -858,7 +858,7 @@ export default class fidget{
   {
     if(bodies_list[i] == null)
     {
-      console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
+      if(this.debug_mode.show_warning_log)console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
       continue
     }
     bodies_list[i].enable(value) 
@@ -873,7 +873,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('get_selected_body - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('get_selected_body - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -915,7 +915,7 @@ export default class fidget{
       let key = this.bodies_eval_order[k+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        console.log('mouse_select_highlight - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('mouse_select_highlight - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
