@@ -289,19 +289,19 @@ export class cns_axe{
       
       const args = { ...defaultOptions, ...in_options };
   
-      this.Follower      = args.Follower
-      this.target         = args.target
-      this.is_enable        = args.enable
-      this.vLineBase     = args.vLineBase 
-      this.pLineBase     = args.pLineBase 
-      this.distPos       = args.distPos
-      this.distNeg       = args.distNeg
-      this.fix_angle     = args.fix_angle
-      this.extra_rotation= args.extra_rotation
-      this.pos_override  = args.pos_override 
-      this.Follower_axe      = args.axe
+      this.Follower        = args.Follower
+      this.target          = args.target
+      this.is_enable       = args.enable
+      this.vLineBase       = args.vLineBase 
+      this.pLineBase       = args.pLineBase 
+      this.distPos         = args.distPos
+      this.distNeg         = args.distNeg
+      this.fix_angle       = args.fix_angle
+      this.extra_rotation  = args.extra_rotation
+      this.pos_override    = args.pos_override 
+      this.Follower_axe    = args.axe
       this.extra_rotation  = args.extra_rotation 
-      this.extra_rotation_center  = args.extra_rotation_center 
+      this.extra_rotation_center = args.extra_rotation_center 
       this.debug = true  
       this.debug_pts = [null,null]
       this.current_pos = 0
@@ -380,7 +380,7 @@ export class cns_axe{
       let p_init       = m_init.get_row(2)
   
       let m_out        = this.Follower.get_out_matrix()
-      let p_out_before        = m_out.get_row(2)
+      let p_out_before = m_out.get_row(2)
       let p_out = new Vector(p_out_before)
   
       
@@ -402,10 +402,13 @@ export class cns_axe{
   
       if( p_out_clst.is_equal_to( p_out) == false )
       {
+
+
         this.Follower.set_position(p_out_clst)
+
         p_out = p_out_clst
       }
-  
+      
       let vel_current  = this.Follower.get_velocity();
       if( ( 0 < vel_current.length )&&( Math.abs(vel_current.dot(vLine)) < 1 ))
         this.Follower.set_velocity(proj_vector_on_line(vLine, vel_current))
@@ -418,7 +421,7 @@ export class cns_axe{
         //this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
         this.Follower.set_anglular_velocity((this.Follower.body.angle)*0.01)
       }
-  
+      
       // get limit
       var pLimitPos = new Vector()
       if( this.distPos != null )
@@ -455,6 +458,7 @@ export class cns_axe{
           p_out = pLimitNeg
         }
       }
+      
       
   
       // Position override
@@ -505,13 +509,26 @@ export class cns_axe{
         
       }
 
-
-      if((this.transfer_delta_as_parent_force)&&(userIsInteracting))
+    
+      if((this.transfer_delta_as_parent_force)&&(this.Follower.is_selected))
       {
         let v_delta = p_out_before.getSub(p_out)
-        this.Follower.parent.apply_force(p_out,v_delta)
-      }
 
+        //let m = this.Follower.get_out_matrix()
+        //let m_parent = this.Follower.parent.get_out_matrix()
+        //let m_delta = m.getMult(m_parent.getInverse())
+
+        this.Follower.parent.apply_force(p_out,v_delta)
+        /*
+        m_parent = this.Follower.parent.get_out_matrix()
+        m = m_delta.getMult(m_parent)
+
+        this.Follower.set_out_matrix(m)
+        */
+
+
+      }
+      
       
       return true
     }
