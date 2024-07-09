@@ -272,8 +272,10 @@ export function switch_selection( mouse_cns, next_elem = null , hack = false)
 {
   if ( next_elem == null)
   {
+    mouse_cns.body = null
     mouse_cns.constraint.bodyB = null
-    mouse_cns.constraint.pointB = {x: 0 , y: 0}   
+    mouse_cns.constraint.pointB = null
+    mouse_cns.constraint.angleB = 0  
     return; 
   }
   
@@ -281,6 +283,7 @@ export function switch_selection( mouse_cns, next_elem = null , hack = false)
     mouse_cns.constraint.pointA.x - next_elem.body.position.x,
     mouse_cns.constraint.pointA.y - next_elem.body.position.y)
   
+  mouse_cns.body = next_elem.body
   mouse_cns.constraint.bodyB = next_elem.body
   mouse_cns.constraint.pointB = {x: p.x() , y: p.y()}
   if(hack)
