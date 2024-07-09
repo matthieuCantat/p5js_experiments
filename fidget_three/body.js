@@ -1197,7 +1197,9 @@ anim_effect({
 
 export function anim_effect(opts)
 {
-  opts.wall.enable(0)
+  if( opts.wall != null)
+    opts.wall.enable(0)
+
   for( let i=0; i < opts.sparcles.length; i++)
     opts.sparcles[i].enable(0) 
 

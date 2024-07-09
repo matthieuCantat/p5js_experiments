@@ -282,8 +282,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_log_body_ids - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
 
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
         if( this.bodies[b_type][key].constructor === Array)
         {
@@ -305,8 +310,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
- 
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_update_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -327,8 +337,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
- 
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -352,7 +367,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_setup_shapes_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
     
         if( this.bodies[b_type][key].constructor === Array)
@@ -374,12 +395,18 @@ export default class fidget{
   bodies_animate_three( body_type_filter = [] )
   {
 
+
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-   
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_animate_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
     
         if( this.bodies[b_type][key].constructor === Array)
@@ -403,7 +430,7 @@ export default class fidget{
   {
     for( let b_type in this.bodies)
     {   
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
         for( let key of this.bodies_eval_order[b_type])
         {      
@@ -427,8 +454,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-   
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_override_color - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -454,8 +486,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-     
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_color_update_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
     
         if( this.bodies[b_type][key].constructor === Array)
@@ -476,8 +513,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-     
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_axe_clean_override - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -501,8 +543,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-     
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_constraints_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -527,6 +574,36 @@ export default class fidget{
        
     }   
   }
+
+  constraints_enable(value, body_cns_list = [] )
+  {
+    for( let i = 0; i < body_cns_list.length; i+=4 )
+    {
+      let b_type = body_cns_list[i+0]
+      let key    = body_cns_list[i+1]
+      let j      = body_cns_list[i+2]
+      let cns    = body_cns_list[i+3]
+
+      if( (this.bodies[b_type][key] === null)||(this.bodies[b_type][key].length === 0))
+      {
+        console.log('constraint enable - '+b_type+'.'+key+' doesnt exists')
+        continue
+      }      
+      if( j === null)
+      {
+        this.bodies[b_type][key]['constraints'][cns].enable(value)
+      }
+      else 
+      {
+        this.bodies[b_type][key][j]['constraints'][cns].enable(value)
+      }
+        
+    }
+
+  }
+
+
+
   /*
   bodies_rot_clean_override( body_type_filter = [] )
   {
@@ -535,7 +612,7 @@ export default class fidget{
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
      
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -559,8 +636,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_set_debug - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {   
         if( this.bodies[b_type][key].constructor === Array)
         {
@@ -581,8 +663,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_set_visibility_secondary - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -604,8 +691,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_set_visibility_override - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -628,8 +720,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_set_visibility - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -664,8 +761,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_init_out_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
      
         if( this.bodies[b_type][key].constructor === Array)
@@ -692,14 +794,17 @@ export default class fidget{
   bodies_do_update( value, body_type_filter = [] )
   {
 
-  
-
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_do_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -726,8 +831,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+      
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -742,6 +852,18 @@ export default class fidget{
       } 
     } 
   }
+  bodies_list_enable( value, bodies_list = [] )
+  {
+  for( let i = 0; i < bodies_list.length; i++ )
+  {
+    if(bodies_list[i] == null)
+    {
+      console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
+      continue
+    }
+    bodies_list[i].enable(value) 
+  }
+}
 
   get_selected_body(body_type_filter = [] )
   {
@@ -749,8 +871,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[i+0]
       let key = this.bodies_eval_order[i+1]
-       
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('get_selected_body - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -786,8 +913,13 @@ export default class fidget{
     {   
       let b_type = this.bodies_eval_order[k+0]
       let key = this.bodies_eval_order[k+1]
-        
-      if( (body_type_filter.length == 0)||( body_type_filter.includes(b_type) ) )
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        console.log('mouse_select_highlight - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
 
         if( this.bodies[b_type][key].constructor === Array)
@@ -859,7 +991,31 @@ export default class fidget{
   }
 
 
+  set_resolution_coef_from_step(step)
+  {
+    for( let i = 0; i < this.bodies.inters_step.steps.length; i++)
+    {
+      if( this.bodies.inters_step.steps[step] == null )
+        continue 
+        
+      if(i < step)
+        this.bodies.inters_step.steps[step].set_resolution_coef(1)
+      else if(step < i)
+        this.bodies.inters_step.steps[step].set_resolution_coef(0)
+      else
+        this.bodies.inters_step.steps[step].set_resolution_coef(null)
+    }      
+  }
 
+  get_selected_step()
+  {
+    for( let i = 0; i < this.bodies.inters_step.steps.length; i++)
+    {
+      if( this.bodies.inters_step.steps[i].is_selected)
+        return i
+    }    
+    return null
+  }
 
 
 }

@@ -446,7 +446,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_local_rotation())/90.0     ,0,1) }  
       this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_angle(rad(res*95.0),true) }                     
 
-
+                                      
       scale_inter = 10.0                                      
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
@@ -1318,7 +1318,8 @@ export default class fidget_daft_i extends fidget{
                                                   //texture_three: text_checker_three,
 
                                                   density:0.01/(s/2.2),  
-                                                  })      
+                                                  })    
+                                                   
      
        this.bodies_draw_order = [
                       this.bodies.geos.backgrounds[0],
@@ -1385,6 +1386,11 @@ export default class fidget_daft_i extends fidget{
         let z_depth_incr = 0.1
         for(let i = 0 ; i < this.bodies_draw_order.length; i++)
         {
+          if(this.bodies_draw_order[i] == null)
+          {
+            console.log(' z_order - this.bodies_draw_order['+i+'] doesnt exists')
+            continue
+          }
           this.bodies_draw_order[i].z = z_depth
           z_depth += z_depth_incr
 
@@ -1524,6 +1530,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.bones.rectangles_pivots[2],
                       this.bodies.bones.rectangles_pivots[3],                    
                     ],
+
         constraints_disable:[
           //this.bodies.inters.background.constraints.point,
           //this.bodies.inters.background.constraints.orient,
@@ -1544,12 +1551,12 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.geos.circle.constraints.point,
           //this.bodies.geos.circle.constraints.orient,
           //this.bodies.geos.circle.constraints.connect_scale_iA,
-          this.bodies.geos.circle.constraints.connect_scale_iC,
+          'geos','circle',null,'connect_scale_iC',
           //this.bodies.bones.rectangles_pivots[0].constraints.point,
           //this.bodies.bones.rectangles_pivots[0].constraints.orient,
           //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
-          this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',0,'connect_tx_iB',
+          'bones','rectangles_pivots',0,'connect_tx_iC',
           //this.bodies.geos.rectangles[0].constraints.point,
           //this.bodies.geos.rectangles[0].constraints.orient,
           //this.bodies.inters.rectangles[0].constraints.point,
@@ -1557,8 +1564,8 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.bones.rectangles_pivots[1].constraints.point,
           //this.bodies.bones.rectangles_pivots[1].constraints.orient,
           //this.bodies.bones.rectangles_pivots[1].constraints.connect_rot_iA,
-          this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',1,'connect_tx_iB',
+          'bones','rectangles_pivots',1,'connect_tx_iC',
           //this.bodies.geos.rectangles[1].constraints.point,
           //this.bodies.geos.rectangles[1].constraints.orient,
           //this.bodies.inters.rectangles[1].constraints.point,
@@ -1566,8 +1573,8 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.bones.rectangles_pivots[2].constraints.point,
           //this.bodies.bones.rectangles_pivots[2].constraints.orient,
           //this.bodies.bones.rectangles_pivots[2].constraints.connect_rot_iA,
-          this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',2,'connect_tx_iB',
+          'bones','rectangles_pivots',2,'connect_tx_iC',
           //this.bodies.geos.rectangles[2].constraints.point,
           //this.bodies.geos.rectangles[2].constraints.orient,
           //this.bodies.inters.rectangles[3].constraints.point,
@@ -1575,14 +1582,14 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.bones.rectangles_pivots[3].constraints.point,
           //this.bodies.bones.rectangles_pivots[3].constraints.orient,
           //this.bodies.bones.rectangles_pivots[3].constraints.connect_rot_iA,
-          this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',3,'connect_tx_iB',
+          'bones','rectangles_pivots',3,'connect_tx_iC',
           //this.bodies.geos.rectangles[3].constraints.point,
           //this.bodies.geos.rectangles[3].constraints.orient,
           //this.bodies.geos.rectangle.constraints.point,
           //this.bodies.geos.rectangle.constraints.orient,
-          this.bodies.geos.rectangle.constraints.connect_rot_iB,
-          this.bodies.geos.rectangle.constraints.connect_ty_iC,
+          'geos','rectangle',null,'connect_rot_iB',
+          'geos','rectangle',null,'connect_ty_iC',
         ],
 
                   
@@ -1636,12 +1643,12 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.geos.circle.constraints.point,
           //this.bodies.geos.circle.constraints.orient,
           //this.bodies.geos.circle.constraints.connect_scale_iA,
-          this.bodies.geos.circle.constraints.connect_scale_iC,
+          'geos','circle',null,'connect_scale_iC',
           //this.bodies.bones.rectangles_pivots[0].constraints.point,
           //this.bodies.bones.rectangles_pivots[0].constraints.orient,
           //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
           //this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',0,'connect_tx_iC',
           //this.bodies.geos.rectangles[0].constraints.point,
           //this.bodies.geos.rectangles[0].constraints.orient,
           //this.bodies.inters.rectangles[0].constraints.point,
@@ -1650,7 +1657,7 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.bones.rectangles_pivots[1].constraints.orient,
           //this.bodies.bones.rectangles_pivots[1].constraints.connect_rot_iA,
           //this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',1,'connect_tx_iC',
           //this.bodies.geos.rectangles[1].constraints.point,
           //this.bodies.geos.rectangles[1].constraints.orient,
           //this.bodies.inters.rectangles[1].constraints.point,
@@ -1659,7 +1666,7 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.bones.rectangles_pivots[2].constraints.orient,
           //this.bodies.bones.rectangles_pivots[2].constraints.connect_rot_iA,
           //this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',2,'connect_tx_iC',
           //this.bodies.geos.rectangles[2].constraints.point,
           //this.bodies.geos.rectangles[2].constraints.orient,
           //this.bodies.inters.rectangles[3].constraints.point,
@@ -1668,13 +1675,13 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.bones.rectangles_pivots[3].constraints.orient,
           //this.bodies.bones.rectangles_pivots[3].constraints.connect_rot_iA,
           //this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iB,
-          this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iC,
+          'bones','rectangles_pivots',3,'connect_tx_iC',
           //this.bodies.geos.rectangles[3].constraints.point,
           //this.bodies.geos.rectangles[3].constraints.orient,
           //this.bodies.geos.rectangle.constraints.point,
           //this.bodies.geos.rectangle.constraints.orient,
-          //this.bodies.geos.rectangle.constraints.connect_rot_iB,
-          this.bodies.geos.rectangle.constraints.connect_ty_iC,    
+          //this.bodies.geos.rectangle.constraints.connect_rot_iB,    
+          'geos','rectangle',null,'connect_ty_iC',
         ],
       }, ///////////////////////////////////////////////////////////////////////////////////// 2 
       {
@@ -1867,12 +1874,22 @@ export default class fidget_daft_i extends fidget{
 
   get_resolution_coef_info( )
   {   
+    // init
+    this.state.resolution_coef = 0
+    for( let i = 0 ; i < this.state.steps.length; i++)
+      this.state.steps[i].resoluton_coef = 0
+    this.state.current_step = 0
 
-    let A = this.bodies.inters_step.steps[0].get_resolution_coef() //clamp(this.bodies.inters_step.steps[0].constraints.axe.current_pos ,0,1)//clamp(deg(this.bodies.inters_step.steps[0].body.angle)*-1/35.0     ,0,1)
-    let B = this.bodies.inters_step.steps[1].get_resolution_coef() //clamp(deg(this.bodies.inters_step.steps[1].get_local_rotation())/90.0     ,0,1)
-    let C = this.bodies.inters_step.steps[2].get_resolution_coef() //clamp(this.bodies.inters_step.steps[2].constraints.axe.current_pos ,0,1) 
-    let D = 0
-    
+    // compute info
+    for( let i = 0 ; i < this.bodies.inters_step.steps.length; i++)
+    {
+      this.state.steps[i].resoluton_coef = this.bodies.inters_step.steps[i].get_resolution_coef()
+      this.state.resolution_coef += this.state.steps[i].resoluton_coef
+      if(this.state.steps[i].resoluton_coef == 1)
+        this.state.current_step = i +1
+    }
+
+    /*
     if ( this.anim_mode )
     {
       let s = [0,1,2,3]   
@@ -1882,26 +1899,8 @@ export default class fidget_daft_i extends fidget{
       D = clamp(this.resolution_coef_override ,s[3],s[3]+1)-s[3]
 
     }
-    let coef = A + B + C+ D
-    
+    */
 
-    // fill resolution coef info
-    this.state.resolution_coef = coef
-    this.state.steps[0].resoluton_coef = A
-    this.state.steps[1].resoluton_coef = B
-    this.state.steps[2].resoluton_coef = C
-    this.state.steps[3].resoluton_coef = D
-
-    this.state.current_step = 0
-    if(A==1)
-      this.state.current_step = 1
-    if(B==1)
-      this.state.current_step = 2   
-    if(C==1)
-      this.state.current_step = 3 
-    if((D==1)&&(!this.anim_mode))
-      this.state.current_step = 4    
-      
 
   }
   
@@ -1909,6 +1908,17 @@ export default class fidget_daft_i extends fidget{
   set_step_resolution()
   {
     //this.bodies_enable(1,['effects'])
+    /*
+    let debug_body = this.get_selected_body()
+    console.log(this.mouse_constraint.constraint.pointA,this.mouse_constraint.constraint.pointB)
+    if( debug_body != null )
+    {
+      console.log(this.fidget_sequence_i,debug_body.name)
+    }
+    else{
+      console.log(this.fidget_sequence_i,null)
+    }
+    */
 
     let step = 0
     let res_coef = this.state.steps[step].resoluton_coef
@@ -1916,19 +1926,14 @@ export default class fidget_daft_i extends fidget{
     if( do_it )
     {
       if(this.state.steps[step].update_count == 0 )
-      {
-       
+      {    
         this.bodies_enable( 0 )  
-        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
-          this.steps_info[step].bodies_enable[i].enable(1) 
+        this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
 
         this.bodies_constraints_enable( true ) 
-        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
-          this.steps_info[step].constraints_disable[i].enable(false) 
+        this.constraints_enable(false, this.steps_info[step].constraints_disable )
 
-        this.bodies.inters_step.steps[0].set_resolution_coef(null)
-        this.bodies.inters_step.steps[1].set_resolution_coef(0)
-        this.bodies.inters_step.steps[2].set_resolution_coef(0)       
+        this.set_resolution_coef_from_step(step)    
       }
 
       //_________________________________________________________________Update
@@ -1946,17 +1951,13 @@ export default class fidget_daft_i extends fidget{
       if(this.state.steps[step].update_count == 0 )
       {
         this.bodies_enable( 0 )  
-        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
-          this.steps_info[step].bodies_enable[i].enable(1) 
+        this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
           
         this.bodies_constraints_enable( true ) 
-        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
-          this.steps_info[step].constraints_disable[i].enable(false) 
-  
-        this.bodies.inters_step.steps[0].set_resolution_coef(1)
-        this.bodies.inters_step.steps[1].set_resolution_coef(null)
-        this.bodies.inters_step.steps[2].set_resolution_coef(0)      
-        
+        this.constraints_enable(false, this.steps_info[step].constraints_disable )
+
+        this.set_resolution_coef_from_step(step)
+
         let m = new Matrix(this.bodies.inters.circle.m_shape_init)
         m.scale(1.85,1.85)
         this.bodies.inters.circle.update_shape_coords(m)
@@ -1999,16 +2000,13 @@ export default class fidget_daft_i extends fidget{
       if(this.state.steps[step].update_count == 0 )
       {
         this.bodies_enable( 0 ) 
-        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
-          this.steps_info[step].bodies_enable[i].enable(1)   
+        this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
           
         this.bodies_constraints_enable( true ) 
-        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
-          this.steps_info[step].constraints_disable[i].enable(false) 
+        this.constraints_enable(false, this.steps_info[step].constraints_disable )
 
-        this.bodies.inters_step.steps[0].set_resolution_coef(1)
-        this.bodies.inters_step.steps[1].set_resolution_coef(1)
-        this.bodies.inters_step.steps[2].set_resolution_coef(null)  
+        this.set_resolution_coef_from_step(step)
+
         //_________________________________________________________________Mouse
         if(this.debug_mode.switch_selected_inter_help)
         {      
@@ -2051,16 +2049,13 @@ export default class fidget_daft_i extends fidget{
       if(this.state.steps[step].update_count == 0 )
       {
         this.bodies_enable( 0 )
-        for( let i = 0; i < this.steps_info[step].bodies_enable.length; i++ )
-          this.steps_info[step].bodies_enable[i].enable(1)   
+        this.bodies_list_enable( 1, this.steps_info[step].bodies_enable )
           
         this.bodies_constraints_enable( true ) 
-        for( let i = 0; i < this.steps_info[step].constraints_disable.length; i++ )
-          this.steps_info[step].constraints_disable[i].enable(false)    
-          
-          this.bodies.inters_step.steps[0].set_resolution_coef(1)
-          this.bodies.inters_step.steps[1].set_resolution_coef(1)
-          this.bodies.inters_step.steps[2].set_resolution_coef(1) 
+        this.constraints_enable(false, this.steps_info[step].constraints_disable )
+
+        this.set_resolution_coef_from_step(step)
+
       }      
 
       //_________________________________________________________________Clean Inter
@@ -2194,7 +2189,7 @@ export default class fidget_daft_i extends fidget{
     //for( let i = 0; i < this.show_step_helpers.length; i++)
     //  this.show_step_helpers[i] = 0
 
-
+    
     if ( this.touch_enable == false )
       return 
 
@@ -2212,26 +2207,24 @@ export default class fidget_daft_i extends fidget{
         if( 0.01 < v_delta.mag() )
         {
 
-          let A = this.bodies.inters_step.steps[0].is_selected
-          let B = this.bodies.inters_step.steps[1].is_selected
-          let C = this.bodies.inters_step.steps[2].is_selected
-          if( (A == false)&&
-              (B == false)&&
-              (C == false))
+          let selected_step = this.get_selected_step()
+          if( selected_step == null )
           {
             this.bodies_override_color(utils.color.black, ['geos'])
             this.bodies_override_color_three(utils.color.black, ['geos'])
-            this.bodies.geos.backgrounds[0].color = utils.color.red
-            this.bodies.geos.backgrounds[1].color = utils.color.red
-            this.bodies.geos.backgrounds[0].update_color_three()
-            this.bodies.geos.backgrounds[1].update_color_three()
+            if( this.bodies.geos.backgrounds.length !== 0 )
+            {
+              this.bodies.geos.backgrounds[0].color = utils.color.red
+              this.bodies.geos.backgrounds[1].color = utils.color.red
+              this.bodies.geos.backgrounds[0].update_color_three()
+              this.bodies.geos.backgrounds[1].update_color_three()
+            }
+
            
           }
           else
           {
-            if(A && this.state.current_step == 0)this.show_step_helpers[0] = 100
-            if(B && this.state.current_step == 1)this.show_step_helpers[1] = 100
-            if(C && this.state.current_step == 2)this.show_step_helpers[2] = 100
+            if(this.state.current_step == selected_step)this.show_step_helpers[selected_step] = 100
           }
               
         }
@@ -2248,6 +2241,7 @@ export default class fidget_daft_i extends fidget{
     {
       this.mouse_pressed_positions_at_update = []
     }
+    
   }
 
 
@@ -2261,6 +2255,8 @@ export default class fidget_daft_i extends fidget{
     this.track_user_drag_error()
     this.bodies_update()
     this.draw_background()
+
+
     this.state.update_count += 1
   }
 
