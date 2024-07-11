@@ -218,7 +218,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,
-      dynamic: true,
+      dynamic: false,
 
       m:this.m,
       parent:this.bodies.bones.world,
@@ -323,7 +323,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones_main,
-      dynamic: true,
+      dynamic: false,
 
       name:'bones_root',
       
@@ -501,7 +501,7 @@ export default class fidget_daft_i extends fidget{
 
       this.bodies.helpers.stepB = new body_build({  ...opts_global,
                                                     ...opts_collision_no_interaction,
-                                                    dynamic: true,
+                                                    dynamic: false,
 
                                                     name:'helper_B', 
 
@@ -570,7 +570,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones,
-      dynamic: true,
+      dynamic: false,
 
       name:'bones_circle',
       
@@ -677,7 +677,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_center',
                                               
@@ -723,7 +723,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_pivot_TR',
                                               
@@ -766,7 +766,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -843,7 +843,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_pivot_BR',
                                               
@@ -883,7 +883,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -956,7 +956,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_pivot_BL',
                                               
@@ -997,7 +997,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -1070,7 +1070,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_pivot_TL',
                                               
@@ -1111,7 +1111,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
-                                              dynamic: true,
+                                              dynamic: false,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -1158,7 +1158,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones,
-      dynamic: true,
+      dynamic: false,
 
       name:'bones_rectangle',
       
@@ -1244,7 +1244,7 @@ export default class fidget_daft_i extends fidget{
 
     this.bodies.helpers.stepC = new body_build({  ...opts_global,
                                                   ...opts_collision_no_interaction,
-                                                  dynamic: true,
+                                                  dynamic: false,
 
                                                   name:'helper_C',   
 
@@ -1317,7 +1317,7 @@ export default class fidget_daft_i extends fidget{
 
     this.bodies.helpers.stepA = new body_build({  ...opts_global,
                                                   ...opts_collision_no_interaction,
-                                                  dynamic: true,
+                                                  dynamic: false,
 
                                                   name:'helper_A',  
 
