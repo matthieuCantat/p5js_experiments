@@ -129,7 +129,7 @@ export function apply_force_to_all( bodies, pCenter, toggle )
       v.normalize()
       v.mult(0.02)
 
-      B.apply_force(B.get_position(),v)
+      B.apply_force(B.get_out_position('world'),v)
 
     }
   }
@@ -165,7 +165,7 @@ export function create_boundary_wall_collision(matter_engine, width, height, gro
 export function change_selected_obj(mouse_cns,obj)
 {
 
-  let p_body = obj.get_position()
+  let p_body = obj.get_out_position('world')
   let p_mouse = new Vector( 
     mouse_cns.constraint.pointA.x,
     mouse_cns.constraint.pointA.y)

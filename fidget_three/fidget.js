@@ -181,7 +181,7 @@ export default class fidget{
     // a 0-->200
     let pA = new Vector(this.screen_dims.x/4,this.screen_dims.y/2)
     pA.v.x -= a
-    this.bodies.geos.backgrounds[0].set_position(pA)
+    this.bodies.geos.backgrounds[0].set_out_position(pA, 'world', 'override')
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[0].color = [50,140,50]
@@ -192,7 +192,7 @@ export default class fidget{
 
     let pB = new Vector(this.screen_dims.x/4*3,this.screen_dims.y/2)
     pB.v.x += a
-    this.bodies.geos.backgrounds[1].set_position(pB)  
+    this.bodies.geos.backgrounds[1].set_out_position(pB,'world', 'override')  
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[1].color = [50,140,50] 

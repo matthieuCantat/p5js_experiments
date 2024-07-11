@@ -131,7 +131,8 @@ export default class fidget_daft_i extends fidget{
       let opts_collision_no_interaction = {
         collision_category: utils.collision_category.none,
         collision_mask: utils.collision_category.none
-      }      
+      }    
+
       let opts_collision_activate = {      
         collision_category: utils.collision_category.blue,
         collision_mask: utils.collision_category.default , 
@@ -217,6 +218,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,
+      dynamic: true,
 
       m:this.m,
       parent:this.bodies.bones.world,
@@ -232,8 +234,9 @@ export default class fidget_daft_i extends fidget{
 
       density:0.01/(s/2.2), 
       collision:false, 
-      visibility:this.do_background
+      visibility:this.do_background,
       //texture_three: text_checker_three_grey,
+
     } 
     //z_depth += z_depth_incr
 
@@ -261,6 +264,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones_main,
+      dynamic: true,
 
       name:'bones_traj',
       
@@ -279,7 +283,7 @@ export default class fidget_daft_i extends fidget{
 
     }) 
     /////////////////////////////////////////////////////  
-
+    
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(350/2.4*s))
     m_shape.set_row(1,m_shape.get_row(1).getMult(220/2.4*s))
@@ -313,12 +317,13 @@ export default class fidget_daft_i extends fidget{
                                                  
     })
 
-
+     
     this.bodies.bones.root = new body_build({ 
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones_main,
+      dynamic: true,
 
       name:'bones_root',
       
@@ -336,9 +341,9 @@ export default class fidget_daft_i extends fidget{
       density:0.2/(s/2.2), 
 
     })  
-
     
     
+   
     let scale_inter = 40.0 
 
     var om_iA = new Matrix()
@@ -442,8 +447,8 @@ export default class fidget_daft_i extends fidget{
                                         selection_break_length: 60.*(s/2.2),
                                                                                     
                                       }))
-      this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_local_rotation())/90.0     ,0,1) }  
-      this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_angle(rad(res*95.0),true) }                     
+      this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_out_rotation('base'))/90.0     ,0,1) }  
+      this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_out_rotation(rad(res*95.0),'world', 'override') }                     
 
                                       
       scale_inter = 10.0                                      
@@ -496,6 +501,7 @@ export default class fidget_daft_i extends fidget{
 
       this.bodies.helpers.stepB = new body_build({  ...opts_global,
                                                     ...opts_collision_no_interaction,
+                                                    dynamic: true,
 
                                                     name:'helper_B', 
 
@@ -564,6 +570,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones,
+      dynamic: true,
 
       name:'bones_circle',
       
@@ -627,7 +634,7 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters.circle.highlight_selection = [this.bodies.geos.circle]
 
 
-
+                                   
 
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(16.21*s))
@@ -670,6 +677,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_center',
                                               
@@ -715,6 +723,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_pivot_TR',
                                               
@@ -737,12 +746,12 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
-                                                  target_remap:[0,90,0,-85*(s/2.2)] },    
+                                                  target_remap:[0,90,0,85*(s/2.2)] },    
                                                 { name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110*(s/2.2),-85*(s/2.2),-145*(s/2.2)] },                                                                                                                                                     
+                                                  target_remap:[0,110*(s/2.2),0,60*(s/2.2)] },                                                                                                                                                     
                                               ],
                                               density:0.2/(s/2.2), 
 
@@ -757,6 +766,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -833,6 +843,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_pivot_BR',
                                               
@@ -854,12 +865,12 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'tx',
                                                   target_attr:'r', 
                                                   target_space:'local',
-                                                  target_remap:[0,90,0,-85*(s/2.2)] },   
+                                                  target_remap:[0,90,0,85*(s/2.2)] },   
                                                 { name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110*(s/2.2),-85*(s/2.2),-145*(s/2.2)] },                                                                                                                                                       
+                                                  target_remap:[0,110*(s/2.2),0,60*(s/2.2)] },                                                                                                                                                       
                                               ],
                                               density:0.2/(s/2.2),                                                     
                                             })) 
@@ -872,6 +883,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -944,6 +956,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_pivot_BL',
                                               
@@ -970,7 +983,7 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110*(s/2.2),85*(s/2.2),145*(s/2.2)] },                                                                                                                                                          
+                                                  target_remap:[0,110*(s/2.2),0,60*(s/2.2)] },                                                                                                                                                          
                                               ],
                                               density:0.2/(s/2.2),                                               
                                                     
@@ -984,6 +997,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -1056,6 +1070,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_pivot_TL',
                                               
@@ -1082,7 +1097,7 @@ export default class fidget_daft_i extends fidget{
                                                   attr:'tx',
                                                   target_attr:'ty', 
                                                   target_space:'local',
-                                                  target_remap:[0,110*(s/2.2),85*(s/2.2),145*(s/2.2)] },                                                                                                                                                            
+                                                  target_remap:[0,110*(s/2.2) , 0,60*(s/2.2) ] },                                                                                                                                                            
                                               ],
                                               density:0.2/(s/2.2),                                               
                                                     
@@ -1096,6 +1111,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_no_interaction,
                                               ...opts_debug,
                                               ...opts_visual_bones,
+                                              dynamic: true,
 
                                               name:'bones_rectangle_TR',
                                               
@@ -1142,6 +1158,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_no_interaction,
       ...opts_debug,
       ...opts_visual_bones,
+      dynamic: true,
 
       name:'bones_rectangle',
       
@@ -1194,7 +1211,7 @@ export default class fidget_daft_i extends fidget{
           target_space:'local',
           target_remap: null },          
         { name:'connect_ty_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
-          attr:'ty',
+          attr:'tx',
           target_attr:'ty', 
           target_space:'local',
           target_remap: null },                
@@ -1227,6 +1244,7 @@ export default class fidget_daft_i extends fidget{
 
     this.bodies.helpers.stepC = new body_build({  ...opts_global,
                                                   ...opts_collision_no_interaction,
+                                                  dynamic: true,
 
                                                   name:'helper_C',   
 
@@ -1299,6 +1317,7 @@ export default class fidget_daft_i extends fidget{
 
     this.bodies.helpers.stepA = new body_build({  ...opts_global,
                                                   ...opts_collision_no_interaction,
+                                                  dynamic: true,
 
                                                   name:'helper_A',  
 
@@ -1318,7 +1337,7 @@ export default class fidget_daft_i extends fidget{
 
                                                   density:0.01/(s/2.2),  
                                                   })    
-                                           
+                                                  
      
        this.bodies_draw_order = [
                       this.bodies.geos.backgrounds[0],
@@ -2142,17 +2161,17 @@ export default class fidget_daft_i extends fidget{
     this.bodies_override_color(null, ['geos'])
     this.bodies_override_color_three(null, ['geos'])
 
-    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_position(),
+    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_out_position('world'),
                                         new Vector(0,0.05*1.9))
     
-    this.bodies.geos.rectangle.apply_force( this.bodies.geos.rectangle.get_position(),
+    this.bodies.geos.rectangle.apply_force( this.bodies.geos.rectangle.get_out_position('world'),
                                         new Vector(0,0.05*0.4))
     
-    this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_position(),
+    this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_out_position('world'),
                                         new Vector(0,0.05*0.01))
 
 
-    this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_position(),
+    this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_out_position('world'),
                                         new Vector(0,0.05*0.01))
     
         
@@ -2170,11 +2189,11 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangle.apply_force( p_force,
                                           v_force)
       
-      this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_position(),
+      this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_out_position('world'),
                                           new Vector(-0.05*0.35, 0))
 
                                           
-      this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_position(),
+      this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_out_position('world'),
                                           new Vector(0.05*0.35, 0))
 
       this.state.steps[step].apply_force_happened = true

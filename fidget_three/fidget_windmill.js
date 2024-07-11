@@ -790,17 +790,17 @@ export default class fidget_windmill extends fidget{
 
 
     //gravity
-    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_position(),
+    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_out_position('world'),
                                           new Vector(0, 0.05*0.13) )
 
 
     for( let i=0; i < this.bodies.geos.rectangles.length; i++ )
-      this.bodies.geos.rectangles[i].apply_force( this.bodies.geos.rectangles[i].get_position(),
+      this.bodies.geos.rectangles[i].apply_force( this.bodies.geos.rectangles[i].get_out_position('world'),
                                                   new Vector(0, 0.05*0.03) )  
 
 
     for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
-      this.bodies.geos.trapezoids[i].apply_force( this.bodies.geos.trapezoids[i].get_position(),
+      this.bodies.geos.trapezoids[i].apply_force( this.bodies.geos.trapezoids[i].get_out_position('world'),
                                                   new Vector(0, 0.05*0.03) )  
 
 

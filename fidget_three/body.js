@@ -29,6 +29,7 @@ export class body_build{
         h: 1,
         slop: 0,
         type: -1,
+        dynamic:true,
         collision: true,
         collision_category: utils.collision_category.default,
         collision_mask: utils.collision_category.default,
@@ -89,6 +90,7 @@ export class body_build{
       this.transparency = args.transparency,
       this.transparency_line = args.transparency_line,     
       this.shader = args.shader
+      this.dynamic = args.dynamic
       this.collision = args.collision
       this.collision_category = args.collision_category
       this.collision_mask = args.collision_mask
@@ -199,8 +201,13 @@ export class body_build{
       this.geo = null
       this.shape_three = null
       this.mesh_three = null
+      
+      if(this.dynamic)
+        this.init_physics()
 
-      this.init_physics()
+      this.set_out_matrix(this.get_init_matrix())
+      this.init_constraints()
+      
     }
 
     matter_get_shape(m)
@@ -269,6 +276,7 @@ export class body_build{
         return body
     }
 
+
     init_physics()
     {
       this.body = this.matter_get_shape(this.m_shape)
@@ -279,6 +287,30 @@ export class body_build{
 
       this.body.frictionAir = this.frictionAir
   
+      if( this.collision )
+      {
+        this.body.collisionFilter = {
+          category:this.collision_category,
+          group:0,
+          mask:this.collision_mask ,
+        }
+      }
+      else
+      {
+        this.body.collisionFilter = {
+          category:0,
+          group:-1,
+          mask:-1,     
+        }      
+      }
+  
+  
+      Matter.Composite.add( this.matter_engine.world, this.body)    
+
+    }
+
+    init_constraints()
+    {
 
       for( let i = 0; i < this.constraints_args.length; i++)
       {
@@ -323,30 +355,7 @@ export class body_build{
 
         this.constraints[this.constraints_args[i].name] = cns
 
-      }
-
-  
-      if( this.collision )
-      {
-        this.body.collisionFilter = {
-          category:this.collision_category,
-          group:0,
-          mask:this.collision_mask ,
-        }
-      }
-      else
-      {
-        this.body.collisionFilter = {
-          category:0,
-          group:-1,
-          mask:-1,     
-        }      
-      }
-  
-  
-      Matter.Composite.add( this.matter_engine.world, this.body)    
-      
-      this.set_out_matrix(this.get_init_matrix())
+      }      
     }
 
     matter_update_shape_coords(m)
@@ -360,7 +369,8 @@ export class body_build{
     apply_scale( value )
     {
       this.scale = this.scale*value
-      Matter.Body.scale( this.body, value, value, { x : this.body.position.x, y : this.body.position.y })
+      if(this.dynamic)
+        Matter.Body.scale( this.body, value, value, { x : this.body.position.x, y : this.body.position.y })
   
     }
   
@@ -372,12 +382,16 @@ export class body_build{
         this.visibility = false
       //this.do_update = value
       //Matter.Sleeping.set(this.body, value==false)
-      if(value)
-        this.body.collisionFilter.category = this.collision_category
-      else
-        this.body.collisionFilter.category = utils.collision_category.none
-    }
+      if(this.dynamic)
+      {
+        if(value)
+          this.body.collisionFilter.category = this.collision_category
+        else
+          this.body.collisionFilter.category = utils.collision_category.none
+      }
 
+    }
+    //////////////////////////////////////////////////////////////////////////////// m_transform parent
     get_parent_matrix()
     {
       /*
@@ -402,7 +416,7 @@ export class body_build{
       let m_parent = null
       if(this.parent != null)
       {
-        m_parent = this.parent.get_in_matrix()
+        m_parent = this.parent.m_transform.getMult(this.parent.m_offset.getMult(this.parent.get_parent_in_matrix()))
       }
       else{
         m_parent = this.m
@@ -415,51 +429,365 @@ export class body_build{
       return m
     }
 
-    get_in_matrix( )
+
+    //////////////////////////////////////////////////////////////////////////////// all
+
+    get_matrix( matrix_layer = 'dyn', space = 'world')
     {
-      let m = this.m_transform.getMult(this.m_offset.getMult(this.get_parent_matrix()))
+      let m = null
+      if(matrix_layer == 'parent')
+      {
+        if(space =='world')
+          m = this.get_parent_matrix()
+      }
+      else if(matrix_layer == 'base' )
+      {
+        if(space =='world')
+          m = this.m_offset.getMult(this.get_parent_matrix())
+        else if(space=='parent')
+          m = this.m_offset       
+      }
+      else if(matrix_layer == 'anim')
+      {
+        if(space =='world')
+          m = this.m_transform.getMult(this.m_offset.getMult(this.get_parent_matrix()))        
+        if( space =='parent')
+          m = this.m_transform.getMult(this.m_offset)
+        else if(space =='base'  )
+          m = this.m_transform
+
+      }
+      else if(matrix_layer == 'dyn')
+      {
+        let m_dyn_world = new Matrix()
+        m_dyn_world.setTranslation(new Vector( this.body.position.x, this.body.position.y))
+        m_dyn_world.setRotation(this.body.angle)
+
+        if(space =='world')
+          m = m_dyn_world 
+        if( space =='parent')
+          m = m_dyn_world.getMult(this.get_parent_matrix().getInverse())
+        else if(space =='base'  )
+          m = m_dyn_world.getMult(this.m_offset.getMult(this.get_parent_matrix()).getInverse())
+        else if(space =='anim'  )
+          m = m_dyn_world.getMult( this.m_transform.getMult(this.m_offset.getMult(this.get_parent_matrix())).getInverse()  )
+      }
+      
       return m
     }
+
+    get_position( type = 'dyn', space = 'world')
+    {
+      return this.get_matrix( type, space).get_row(2)
+    }
+    get_rotation( type = 'dyn', space = 'world')
+    {
+      return this.get_matrix( type, space).getRotation()
+    }
+
+    set_matrix(m_transform, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
+    {
+
+      if(transform_space == 'self')
+        transform_space = matrix_layer
+
+      if((matrix_layer == 'base' )&&(transform_space =='world'))
+      {
+        if(add_mode == 'override')
+        {
+          this.m_offset = m_transform.getMult(this.get_parent_matrix().getInverse())
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('base','world')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_offset space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed.getMult(this.get_parent_matrix().getInverse())  
+          // update class 
+          this.m_offset = m_current_transformed      
+        }
+      }
+      else if((matrix_layer == 'base' )&&(transform_space =='parent'))
+      {
+        if(add_mode == 'override')
+        {
+          this.m_offset = m_transform
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.m_offset
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_offset space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed
+          // update class 
+          this.m_offset = m_current_transformed              
+        }
+      }
+      else if((matrix_layer == 'base' )&&(transform_space =='base'))//self
+      {
+        this.m_offset = m_transform.getMult(this.m_offset)                     
+      }
+
+
+
+      if((matrix_layer == 'anim' )&&(transform_space =='world'))
+      {
+        if(add_mode == 'override')
+        {
+          this.m_transform = m_transform.getMult(this.get_matrix('base','world').getInverse())
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('anim','world')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed.getMult(this.get_matrix('base','world').getInverse())  
+          // update class 
+          this.m_transform = m_current_transformed      
+        }
+      }
+      else if((matrix_layer == 'anim' )&&(transform_space =='parent'))
+      {
+        if(add_mode == 'override')
+        {
+          this.m_transform = m_transform.getMult(this.get_matrix('base','parent').getInverse())
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('anim','parent')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed.getMult(this.get_matrix('base','parent').getInverse())  
+          // update class 
+          this.m_transform = m_current_transformed      
+        }
+      }
+      else if((matrix_layer == 'anim' )&&(transform_space =='base'))
+      {
+        if(add_mode == 'override')
+        {
+          this.m_transform = m_transform
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.m_transform
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed  
+          // update class 
+          this.m_transform = m_current_transformed      
+        }
+      }
+      else if((matrix_layer == 'anim' )&&(transform_space =='anim'))//self
+      {
+        this.m_transform = m_transform.getMult(this.m_transform)     
+      }
+
+
+
+
+      // dyn is special: it is save as world space
+      if((matrix_layer == 'dyn' )&&(transform_space =='world'))
+      {
+        if(add_mode == 'override')
+        {
+          let m_dyn = m_transform
+
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('dyn','world')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed
+          // update class 
+          let m_dyn = m_current_transformed    
+          
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+      }
+      else if((matrix_layer == 'dyn' )&&(transform_space =='parent'))
+      {
+        if(add_mode == 'override')
+        {
+          let m_dyn = m_transform.getMult(this.get_parent_matrix())
+
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('dyn','parent')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed.getMult(this.get_parent_matrix())  
+          // update class 
+          let m_dyn = m_current_transformed 
+          
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+      }
+      else if((matrix_layer == 'dyn' )&&(transform_space =='base'))
+      {
+        if(add_mode == 'override')
+        {
+          let m_dyn = m_transform.getMult(this.get_matrix('base','world'))
+
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('dyn','base')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed.getMult(this.get_matrix('base','world'))  
+          // update class 
+          let m_dyn = m_current_transformed  
+          
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+      }
+      else if((matrix_layer == 'dyn' )&&(transform_space =='anim'))
+      {
+        if(add_mode == 'override')
+        {
+          let m_dyn = m_transform.getMult(this.get_matrix('anim','world'))
+
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+        else if(add_mode == 'add')
+        {
+          // convert in transform space
+          let m_current_in_transform_space = this.get_matrix('dyn','anim')
+          // transform
+          let mt_pos = m_transform.extractPositionMatrix()// pos in transform_space space
+          let mt_rot = m_transform.extractRotationMatrix()// rot in m_transform space
+          let m_current_in_transform_space_transformed = mt_rot.getMult(m_current_in_transform_space.getMult(mt_pos)) 
+          // convert from transform space
+          let m_current_transformed =  m_current_in_transform_space_transformed.getMult(this.get_matrix('anim','world'))   
+          // update class 
+          let m_dyn = m_current_transformed   
+          
+          Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+          Matter.Body.setAngle(this.body, m_dyn.getRotation())          
+        }
+      }      
+      else if((matrix_layer == 'dyn' )&&(transform_space =='dyn'))//self
+      {
+        let m_dyn = m_transform.getMult(this.get_matrix('dyn','world')) 
+        
+        Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
+        Matter.Body.setAngle(this.body, m_dyn.getRotation())        
+      }
+
+    }
+
+    set_position(p, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
+    {
+      let m_transform = new Matrix()
+      if(add_mode == 'override')
+        m_transform = this.get_matrix(matrix_layer,transform_space)
+      m_transform.set_row(2,p)
+      this.set_matrix(m_transform, matrix_layer, transform_space, add_mode)    
+    }
+
+    set_rotation(r, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
+    {
+      let m_transform = new Matrix()
+      if(add_mode == 'override')
+        m_transform = this.get_matrix(matrix_layer,transform_space)      
+      m_transform.setRotation(r)
+      this.set_matrix(m_transform, matrix_layer, transform_space, add_mode)    
+    } 
+
+    //////////////////////////////////////////////////////////////////////////////// out
+    get_out_matrix( space = 'world')
+    {
+      let m = null
+      if(this.dynamic)
+        m = this.get_matrix('dyn',space)
+      else
+        m = this.get_matrix('anim',space)
+      return m
+    }
+    get_out_position(space = 'world')
+    {
+      let m = this.get_out_matrix(space)
+      return m.get_row(2)
+    }
+    get_out_rotation(space = 'world')
+    {
+      let m = this.get_out_matrix(space)
+      return m.getRotation()
+    }    
+    set_out_matrix(m,transform_space = 'world', add_mode = 'override')
+    {
+      if(this.dynamic)
+        this.set_matrix(m,'dyn', transform_space, add_mode )
+      else
+        this.set_matrix(m,'anim', transform_space, add_mode )
+    }
+    set_out_position(p,transform_space = 'world', add_mode = 'override')
+    {
+      if(this.dynamic)
+        this.set_position(p,'dyn', transform_space, add_mode )
+      else
+        this.set_position(p,'anim', transform_space, add_mode )
+    }
+    set_out_rotation(r,transform_space = 'world', add_mode = 'override')
+    {
+      if(this.dynamic)
+        this.set_rotation(r,'dyn', transform_space, add_mode )
+      else
+        this.set_rotation(r,'anim', transform_space, add_mode )
+    }      
 
     init_out_matrix()
     {
       let m_init = this.get_init_matrix()
       this.set_out_matrix(m_init)
-    }
+    }    
 
-    get_out_matrix()
-    {
-      let pos = new Vector( this.body.position.x, this.body.position.y)
-      let rot = this.body.angle
-      let m = new Matrix()
-      m.setTranslation(pos)
-      m.setRotation(rot)
-      return m
-    }
-
-    get_position()
-    {
-      let m = this.get_out_matrix()
-      let p = m.get_row(2)
-      return p
-    }
-
-    get_local_rotation()
-    {
-      let m = this.get_out_matrix()
-      let m_in = this.get_in_matrix()
-      let m_local = m.getMult(m_in.getInverse())
-      let r = m_local.getRotation()
-      return r
-    }
-
-    get_rotation()
-    {
-      let m = this.get_out_matrix()
-      let r = m.getRotation()
-      return r
-    }
-
+    ////////////////////////////////////////////////////////////////////////////////// dyn specific
     get_velocity()
     {
       let v = new Vector( this.body.velocity.x, this.body.velocity.y)     
@@ -474,82 +802,6 @@ export class body_build{
         return 1
       return 0
     }
-   
-    set_position_input(v)
-    {
-      let m_in = this.m_offset.getMult(this.get_parent_matrix())
-      let p_transform_target = v.mult(m_in.getInverse())
-      this.m_transform.set_row(2,p_transform_target)
-    }
-
-    set_position( in_position, position_space = null, orient_space = null)
-    {
-
-      let in_vector_processed = null
-      if( orient_space== 'parent' )
-      {
-        let m_parent_orient = this.parent.get_out_matrix()
-        m_parent_orient.set_row(2,new Vector())
-        in_vector_processed = in_position.mult(m_parent_orient)        
-      }
-      if( orient_space == 'in' )
-      {
-        let m_in_orient = this.get_in_matrix()
-        m_in_orient.set_row(2,new Vector())
-        in_vector_processed = in_position.mult(m_in_orient)        
-      }
-
-      if( orient_space == 'out' )
-      {
-        let m_out_orient = this.get_in_matrix()
-        m_out_orient.set_row(2,new Vector())
-        in_vector_processed = in_position.mult(m_out_orient)        
-      }
-
-      ///////////////
-      let in_position_processed = in_position
-      if( position_space == 'parent' )
-      {
-        let m_parent = this.parent.get_out_matrix()
-        if(in_vector_processed != null)
-        {
-          in_position_processed = m_parent.get_row(2).getAdd(in_vector_processed)
-        }
-        else
-        {
-          in_position_processed = in_position.mult(m_parent)  
-        }
-
-      }
-      if( position_space == 'in' )
-      {
-        let m_in = this.get_in_matrix()
-        if(in_vector_processed != null)
-        {
-          in_position_processed = m_in.get_row(2).getAdd(in_vector_processed)
-        }
-        else
-        {
-          in_position_processed = in_position.mult(m_in)      
-        }   
-      }
-      if( position_space == 'out' )
-      {
-        let m_out = this.get_out_matrix()
-        if(in_vector_processed != null)
-        {
-          in_position_processed = m_out.get_row(2).getAdd(in_vector_processed)
-        }
-        else
-        {
-          in_position_processed = in_position.mult(m_out)    
-        }     
-      }
-
-
-      Matter.Body.setPosition(this.body, in_position_processed.get_value())
-    }
-
   
     set_velocity(v,update_input = false)
     {
@@ -561,7 +813,7 @@ export class body_build{
       Matter.Body.applyForce(this.body, p.get_value(), v.get_value())
     }
 
- 
+    /*
     apply_vector_transform( piv, v_move, rot_friction = 0.)
     {          
       if(v_move.mag()<0.001)
@@ -602,50 +854,22 @@ export class body_build{
       return true
 
     }   
-
-    set_angle(a, override = true)
-    {
-    
-      let angle = null
-      if(override)
-        angle = a
-      else
-      {
-        angle = this.get_in_matrix().getRotation()+a
-      }
-           
-
-      Matter.Body.setAngle(this.body, angle)
-    }
-
-    set_angle_input(a)
-    {
-      let m_in = this.m_offset.getMult(this.get_parent_matrix())
-      let m_current = new Matrix()
-      m_current.setRotation(a)
-      let m_delta = m_current.getMult(m_in.getInverse())
-      this.m_transform.setRotation(m_delta.getRotation())
-    }
+    */
 
     set_anglular_velocity(a)
     {
       Matter.Body.setAngularVelocity(this.body, a)
     }
 
-    set_out_matrix(m)
-    {
-      this.set_position(m.get_row(2))
-      this.set_angle(m.getRotation())
-    }
-  
-
-  
     clean_velocity()
     {
       Matter.Body.setVelocity(this.body, {x:0,y:0}) 
       Matter.Body.setAngularVelocity(this.body, 0)    
     }
   
+
+
+
     update()
     {
         
@@ -658,8 +882,7 @@ export class body_build{
       }
 
       if(this.rot_override!=null)
-        this.set_angle(this.rot_override,true)
-
+        this.set_out_rotation(this.rot_override, 'world', 'override')
       return true
      
     }
@@ -832,8 +1055,8 @@ export class body_build{
     animate_three()
     {
 
-      let pos = this.get_position()
-      let rot = this.get_rotation()
+      let pos = this.get_out_position('world')
+      let rot = this.get_out_rotation('world')
       let scale = this.scale
       
       let converted_pos = convert_coords_matter_to_three(pos,this.screen_dims)
@@ -856,10 +1079,10 @@ export class body_build{
         let m_parent = this.get_parent_matrix()
         let m_offset = this.m_offset
         let m_transform = this.m_transform
-        let m_in = this.get_in_matrix( )
+        let m_in = this.get_matrix('anim','world')
         let m_out = this.get_out_matrix()    
-        let p_out = this.get_position()
-        let r_out = this.get_rotation()    
+        let p_out = this.get_out_position('world')
+        let r_out = this.get_out_rotation('world')    
         let vel_out = this.get_velocity()
 
 
@@ -1257,8 +1480,8 @@ export function anim_effect(opts)
     for( let i=0; i < opts.sparcles.length; i++)
     {
       let force = new Vector(0.001, 0)
-      force = force.rotate(opts.sparcles[i].get_rotation())
-      let pos = opts.sparcles[i].get_position()
+      force = force.rotate(opts.sparcles[i].get_out_rotation('world'))
+      let pos = opts.sparcles[i].get_out_position('world')
 
       opts.sparcles[i].apply_force( pos, force )
       opts.shapes[i].apply_force( pos, force.getMult(0.1) )

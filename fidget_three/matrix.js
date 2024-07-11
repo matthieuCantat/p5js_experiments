@@ -254,6 +254,18 @@ Matrix.prototype = {
 		return new_m;
 	},
 
+
+	extractPositionMatrix: function(m) {
+
+		var new_m = new Matrix()
+		new_m.transform(1, 0, 0, 1, this.e, this.f) 
+		return new_m;
+	},	
+	extractRotationMatrix: function(m) {
+		var new_m = new Matrix()
+		new_m.transform(this.a, this.b, this.c, this.d, 0, 0) 
+		return new_m;
+	},	
 	///////////////////////////////////////////////////////////////////////////////////////////new end
 	
 

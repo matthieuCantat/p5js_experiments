@@ -92,7 +92,7 @@ export class dyn_constraint_build_custom_orient{
       }
       if( stiffness == 1.0)
       {
-        this.obj.set_angle(m_target.getRotation())
+        this.obj.set_out_rotation(m_target.getRotation(),'world', 'override')
       }
       else if( 0.0 < stiffness )
       {
@@ -320,7 +320,7 @@ export class cns_axe{
       }
   
       if( ( this.pLineBase == null )&&( this.Follower != null) )
-        this.pLineBase = this.Follower.get_in_matrix().get_row(2)
+        this.pLineBase = this.Follower.get_matrix('anim','world').get_row(2)
   
     }
   
@@ -376,7 +376,7 @@ export class cns_axe{
   
       let m_parent       = this.Follower.get_parent_matrix()
   
-      let m_init       = this.Follower.get_in_matrix()
+      let m_init       = this.Follower.get_matrix('anim','world')
       let p_init       = m_init.get_row(2)
   
       let m_out        = this.Follower.get_out_matrix()
@@ -404,7 +404,7 @@ export class cns_axe{
       {
 
 
-        this.Follower.set_position(p_out_clst)
+        this.Follower.set_out_position(p_out_clst,'world', 'override')
 
         p_out = p_out_clst
       }
@@ -417,7 +417,7 @@ export class cns_axe{
       // Angle
       if( this.fix_angle == true )
       {
-        this.Follower.set_angle(rad(this.extra_rotation)+m_init.getRotation())
+        this.Follower.set_out_rotation(rad(this.extra_rotation)+m_init.getRotation(), 'world', 'override')
         //this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
         this.Follower.set_anglular_velocity((this.Follower.body.angle)*0.01)
       }
@@ -446,7 +446,7 @@ export class cns_axe{
       {
         if( ( this.distPos != null )&&(this.distPos<= vDelta_from_line.mag()) )
         {
-          this.Follower.set_position(pLimitPos)
+          this.Follower.set_out_position(pLimitPos,'world', 'override')
           p_out = pLimitPos
         }
       }
@@ -454,7 +454,7 @@ export class cns_axe{
       {
         if( ( this.distNeg != null )&&(this.distNeg<= vDelta_from_line.mag()) )
         {
-          this.Follower.set_position(pLimitNeg)
+          this.Follower.set_out_position(pLimitNeg,'world', 'override')
           p_out = pLimitNeg
         }
       }
@@ -478,7 +478,7 @@ export class cns_axe{
           let v_tmp = pLimitNeg.getSub(pLine).mult(this.pos_override*-1)
           p_override.add(v_tmp)
         }
-        this.Follower.set_position(p_override)
+        this.Follower.set_out_position(p_override,'world', 'override')
         this.Follower.set_velocity(new Vector())
       }
       else{
@@ -581,28 +581,28 @@ export class limit{
         {
             p.v.x = p_parent.x()+this.x_min
             v.v.x = 0
-            this.obj.set_position(p)
+            this.obj.set_out_position(p,'dyn', 'world', 'override')
             this.obj.set_velocity(v) 
         }  
         if((this.x_max!=null)&&( p_parent.x()+this.x_max < p.x() ))
         {
             p.v.x = p_parent.x()+this.x_max
             v.v.x = 0
-            this.obj.set_position(p)
+            this.obj.set_out_position(p,'world', 'override')
             this.obj.set_velocity(v) 
         }  
         if((this.y_min!=null)&&( p.y() < p_parent.y()+this.y_min ))
         {
             p.v.y = p_parent.y()+this.y_min
             v.v.y = 0
-            this.obj.set_position(p)
+            this.obj.set_out_position(p,'world', 'override')
             this.obj.set_velocity(v) 
         } 
         if((this.y_max!=null)&&( p_parent.y()+this.y_max < p.y() ))
         {
             p.v.y = p_parent.y()+this.y_max
             v.v.y = 0
-            this.obj.set_position(p)
+            this.obj.set_out_position(p,'world', 'override')
             this.obj.set_velocity(v) 
         } 
         */
@@ -613,7 +613,7 @@ export class limit{
             let m_limit_local = new Matrix()
             m_limit_local.setRotation(a)
             let m_limit = m_limit_local.getMult(m_parent)
-            this.obj.set_angle(m_limit.getRotation())
+            this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
             this.obj.set_anglular_velocity(0)
 
         }    
@@ -623,7 +623,7 @@ export class limit{
             let m_limit_local = new Matrix()
             m_limit_local.setRotation(a)
             let m_limit = m_limit_local.getMult(m_parent)            
-            this.obj.set_angle(m_limit.getRotation())
+            this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
             this.obj.set_anglular_velocity(0)     
         }    
         return true
@@ -687,9 +687,9 @@ export class constraint_build{
         if(this.apply_on_input)
         {
           if(this.do_position)
-              this.obj.set_position_input(m.get_row(2))
+            this.obj.set_position(m.get_row(2), 'anim', 'world','override')
           if(this.do_orientation)
-              this.obj.set_angle_input(m.getRotation())
+            this.obj.set_rotation(m.getRotation(),'anim', 'world','override')
         }
         else
         {
@@ -697,14 +697,14 @@ export class constraint_build{
           {
             if( this.stiffness == 1.0 )
             {
-              this.obj.set_position(m.get_row(2))
+              this.obj.set_out_position(m.get_row(2),'world', 'override')
             }
             else
             {
               let p_current = this.obj.get_out_matrix().get_row(2)
               let p_target = m.get_row(2)
               let p_mix = p_target.getMult(this.stiffness ).getAdd( p_current.getMult(1.0-this.stiffness ) )
-              this.obj.set_position(p_mix)
+              this.obj.set_out_position(p_mix,'world', 'override')
             }
 
           }
@@ -713,13 +713,13 @@ export class constraint_build{
           {
             if( this.stiffness == 1.0 )
             {       
-              this.obj.set_angle(m.getRotation())     
+              this.obj.set_out_rotation(m.getRotation(),'world', 'override')    
             }
             else{
               let r_current = this.obj.get_out_matrix().getRotation()
               let r_target = m.getRotation()    
               let r_mix = r_target * this.stiffness +r_current * (1.0-this.stiffness )        
-              this.obj.set_angle(r_mix)
+              this.obj.set_out_rotation(r_mix,'world', 'override')   
             }
 
           }
@@ -805,11 +805,11 @@ export class connect{
       if( this.attr == 'scale' )
         this.obj.scale = value
       if( this.attr == 'r' )
-        this.obj.set_angle(rad(value), false)  
+        this.obj.set_out_rotation(rad(value),'world', 'add')  
       if( this.attr == 'tx' )
-        this.obj.set_position(new Vector(value,0), 'in', 'parent')  
+        this.obj.set_out_position(new Vector(value,0) ,'self', 'add')  
       if( this.attr == 'ty' )
-        this.obj.set_position(new Vector(0,value), 'in', 'parent')  
+        this.obj.set_out_position(new Vector(0,value) ,'self', 'add')  
 
 
       return true
