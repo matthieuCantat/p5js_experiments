@@ -74,8 +74,8 @@ let m = new Matrix()
 m.setTranslation(width/2, height/2 )
 
 let s = 2.2
-F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
-//F_sequence = new fidgets_grid(nbr, 2, screen_dims, shdrs, debug)
+//F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
+F_sequence = new fidgets_grid(nbr, 2, screen_dims, shdrs, debug)
 F_sequence.setup()
 
 
