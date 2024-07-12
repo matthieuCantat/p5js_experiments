@@ -91,6 +91,7 @@ export class body_build{
       this.transparency_line = args.transparency_line,     
       this.shader = args.shader
       this.dynamic = args.dynamic
+      this.dynamic_default = args.dynamic
       this.collision = args.collision
       this.collision_category = args.collision_category
       this.collision_mask = args.collision_mask
@@ -365,7 +366,7 @@ export class body_build{
       Matter.Body.setVertices(this.body, new_body.vertices)
 
     }
-
+    /*
     apply_scale( value )
     {
       this.scale = this.scale*value
@@ -373,6 +374,7 @@ export class body_build{
         Matter.Body.scale( this.body, value, value, { x : this.body.position.x, y : this.body.position.y })
   
     }
+    */
   
     enable(value)
     {
@@ -615,6 +617,7 @@ export class body_build{
 
           Matter.Body.setPosition(this.body, m_dyn.get_row(2).get_value())
           Matter.Body.setAngle(this.body, m_dyn.getRotation())
+
         }
         else if(add_mode == 'add')
         {
@@ -739,6 +742,11 @@ export class body_build{
       this.set_matrix(m_transform, matrix_layer, transform_space, add_mode)    
     } 
 
+    set_scale(s, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
+    {
+      this.scale = s   
+    }     
+
     //////////////////////////////////////////////////////////////////////////////// out
     get_out_matrix( space = 'world')
     {
@@ -758,7 +766,12 @@ export class body_build{
     {
       let m = this.get_out_matrix(space)
       return m.getRotation()
-    }    
+    }   
+    get_out_scale(space = 'world')
+    {
+      return this.scale
+    }      
+    
     set_out_matrix(m,transform_space = 'world', add_mode = 'override')
     {
       if(this.dynamic)
@@ -780,7 +793,10 @@ export class body_build{
       else
         this.set_rotation(r,'anim', transform_space, add_mode )
     }      
-
+    set_out_scale(s,transform_space = 'world', add_mode = 'override')
+    {
+      this.scale = s
+    }   
     init_out_matrix()
     {
       let m_init = this.get_init_matrix()
