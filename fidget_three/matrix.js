@@ -211,6 +211,9 @@ Matrix.prototype = {
 
 		return this;
 	},
+	getScale: function() {
+		return this.get_row(0).mag();
+	},
 
 	setScale: function(x,y) {
 
