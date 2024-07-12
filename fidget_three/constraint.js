@@ -790,6 +790,9 @@ export class connect{
         value = m.get_row(2).y()
       if( this.target_attr == 'r' )
         value = deg(m.getRotation())
+      if( this.target_attr == 's' )
+        value = this.target.scale
+
 
       //console.log(value)
       
@@ -802,8 +805,8 @@ export class connect{
       
       
 
-      if( this.attr == 'scale' )
-        this.obj.scale = value
+      if( this.attr == 's' )
+        this.obj.scale = value 
       if( this.attr == 'r' )
         this.obj.set_out_rotation(rad(value),'world', 'add')  
       if( this.attr == 'tx' )
