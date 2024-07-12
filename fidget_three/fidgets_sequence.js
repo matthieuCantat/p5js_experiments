@@ -338,8 +338,10 @@ export default class fidgets_sequence
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
         this.fidgets[i].update()
+        
         if(userInteractionChange)
           this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
+        
       }
 
 

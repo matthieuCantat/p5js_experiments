@@ -2415,7 +2415,7 @@ export default class fidget_daft_i extends fidget{
       this.state.resolution_coef_last = this.state.resolution_coef
       this.get_resolution_coef_info( this.resolution_coef_override )
       this.set_step_resolution()
-      this.track_user_drag_error()  
+      //this.track_user_drag_error()  
     }
 
     this.bodies_update()

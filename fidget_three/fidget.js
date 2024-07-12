@@ -86,7 +86,7 @@ export default class fidget{
     }
     this.end_step = 0
 
-    this.color_background = utils.color.dark
+    //this.color_background = utils.color.dark
     this.show_step_helpers = [ 0, 0, 0 ]  
     
 
@@ -182,22 +182,26 @@ export default class fidget{
     let pA = new Vector(this.screen_dims.x/4,this.screen_dims.y/2)
     pA.v.x -= a
     this.bodies.geos.backgrounds[0].set_out_position(pA, 'world', 'override')
+    /*
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[0].color = [50,140,50]
       this.bodies.geos.backgrounds[0].update_color_three()
     }
+    */
       
 
 
     let pB = new Vector(this.screen_dims.x/4*3,this.screen_dims.y/2)
     pB.v.x += a
     this.bodies.geos.backgrounds[1].set_out_position(pB,'world', 'override')  
+    /*
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[1].color = [50,140,50] 
       this.bodies.geos.backgrounds[1].update_color_three()      
     }
+    */
   }
 
 
@@ -984,7 +988,7 @@ export default class fidget{
           {
             if( this.bodies[b_type][key][i].body == mouse_cns.constraint.bodyB )
             {
-              this.bodies[b_type][key][i].color = utils.color.redLight
+              //this.bodies[b_type][key][i].color = utils.color.redLight
               this.bodies[b_type][key][i].is_selected = true
 
               for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
@@ -993,7 +997,7 @@ export default class fidget{
             }
             else
             {
-              this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
+              //this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
               this.bodies[b_type][key][i].is_selected = false
 
               for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)

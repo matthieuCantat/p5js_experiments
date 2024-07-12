@@ -36,7 +36,7 @@ export class body_build{
         constraints:[],
         do_shape:true,
         do_line:false,
-        color:utils.color.grey,
+        color:utils.color.white,
         color_line:utils.color.black,
         transparency_activate:false,
         transparency:255,
