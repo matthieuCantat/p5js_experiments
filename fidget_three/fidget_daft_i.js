@@ -8,7 +8,9 @@ import {
   deg,
   userIsInteracting,
   mouseX, 
-  mouseY, } from './utils.js';
+  mouseY,
+  anim_vectors,
+  anim_values } from './utils.js';
 import { body_build,
   build_effects_trail,
   build_effects_particles_sparcles,
@@ -583,6 +585,16 @@ export default class fidget_daft_i extends fidget{
       constraints:[      
         { name:'point' ,type:'kin_point' ,target:this.bodies.bones.root},
         { name:'orient',type:'kin_orient',target:this.bodies.bones.root},  
+        { name:'connect_scale_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
+          attr:'s',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap:[0,55*(s/2.2),1,1.82] },  
+        { name:'connect_scale_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
+          attr:'s',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap:[0,110*(s/2.2),1.82,0.45] },        
       ],
 
       density:0.2/(s/2.2), 
@@ -617,16 +629,9 @@ export default class fidget_daft_i extends fidget{
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.bones.circle},
                                       { name:'orient',type:'kin_orient',target:this.bodies.bones.circle},  
-                                      { name:'connect_scale_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
-                                        attr:'scale',
-                                        target_attr:'ty', 
-                                        target_space:'local',
-                                        target_remap:[0,55*(s/2.2),1,1.82] },  
-                                      { name:'connect_scale_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
-                                        attr:'scale',
-                                        target_attr:'ty', 
-                                        target_space:'local',
-                                        target_remap:[0,110*(s/2.2),1.82,0.45] },
+                                      { name:'connect_scale_bone', type:'connect', target:this.bodies.bones.circle, 
+                                        attr:'s',
+                                        target_attr:'s'},
                                     ],                                      
                                     density:0.001/(s/2.2),     
                                                                                
@@ -1569,7 +1574,7 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.geos.circle.constraints.point,
           //this.bodies.geos.circle.constraints.orient,
           //this.bodies.geos.circle.constraints.connect_scale_iA,
-          'geos','circle',null,'connect_scale_iC',
+          'bones','circle',null,'connect_scale_iC',
           //this.bodies.bones.rectangles_pivots[0].constraints.point,
           //this.bodies.bones.rectangles_pivots[0].constraints.orient,
           //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
@@ -1661,7 +1666,7 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.geos.circle.constraints.point,
           //this.bodies.geos.circle.constraints.orient,
           //this.bodies.geos.circle.constraints.connect_scale_iA,
-          'geos','circle',null,'connect_scale_iC',
+          'bones','circle',null,'connect_scale_iC',
           //this.bodies.bones.rectangles_pivots[0].constraints.point,
           //this.bodies.bones.rectangles_pivots[0].constraints.orient,
           //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
@@ -2265,7 +2270,19 @@ export default class fidget_daft_i extends fidget{
 
   update()
   {
+    
+    this.state.update_count += 1
 
+   
+    let animation_ends = true
+    if(true)
+    {
+      this.override_with_animation_reverse_build(0)
+    }
+
+
+    
+    
     this.anim_mode =  this.resolution_coef_override != null
     // resolution
     this.state.resolution_coef_last = this.state.resolution_coef
@@ -2277,8 +2294,11 @@ export default class fidget_daft_i extends fidget{
     
     this.draw_background()
 
-    this.state.update_count += 1
+    
+
+    return true
   }
+
 
   
 
@@ -2330,7 +2350,100 @@ export default class fidget_daft_i extends fidget{
     //this.draw_help_three()
 
   }  
+
+
+  override_with_idle()
+  {  
+    this.bodies_set_dynamic(false)
+    this.bodies_constraints_enable(false,['bones'])
+    let t = this.state.update_count
+
+    this.bodies.bones.traj.set_out_position(new Vector(Math.sin(t*0.01)*10 ,Math.sin(t*0.05)*10),'base','override')
+    this.bodies.bones.traj.set_out_rotation(Math.sin(t*0.03)*0.1,'base','override')
+
+    this.bodies.bones.rectangles_pivots[0].set_out_rotation(Math.sin(t*0.04)*rad(-10),'base','override')
+    this.bodies.bones.rectangles_pivots[1].set_out_rotation(Math.sin(t*0.04)*rad(10),'base','override')
+    this.bodies.bones.rectangles_pivots[2].set_out_rotation(Math.sin(t*0.04)*rad(-10),'base','override')
+    this.bodies.bones.rectangles_pivots[3].set_out_rotation(Math.sin(t*0.04)*rad(10),'base','override')
+
+  }
+
+  override_with_animation_reverse_build( start_time )
+  {  
+    let t = this.state.update_count
+    let anim_duration = 100
+
+    if( start_time+anim_duration == t)
+    {
+      this.bodies_set_dynamic()
+      this.bodies_constraints_enable(true,['bones'])  
+      this.constraints_enable(false, this.steps_info[0].constraints_disable )
+      return false
+    }     
+    if( start_time+anim_duration < t)
+    {
+      return false
+    }
+      
+
+    this.bodies_set_dynamic(false)
+    this.bodies_constraints_enable(false,['bones'])
+    
+    let times       = [     start_time+0,  start_time+20  , ]
+    let positions   = [new Vector(0,500),new Vector(0,0), ]
+    let rotations   = []
+    let scales      = []
+    let interp_modes = [               'linear'         , ]
+
+    this.bodies.bones.traj.set_out_position( anim_vectors( t, times, positions,interp_modes),'base','override')
+
+    times        = [     start_time+20,    start_time+30,     start_time+50, ]
+    positions    = [new Vector(0,110),  new Vector(0,0), new Vector(0,0), ]
+    rotations    = [          rad(90),          rad(90),          rad(0), ]
+    scales      = []
+    interp_modes = [                          'linear',        'smooth', ]
+
+    this.bodies.bones.rectangle.set_out_position( anim_vectors( t, times, positions,interp_modes),'base','override')
+    this.bodies.bones.rectangle.set_out_rotation( anim_values( t, times, rotations,interp_modes),'base','override')
+
+
+    positions    = []
+    rotations    = []
+    scales       = [              0.45,               2,               1, ]
+    interp_modes = [                          'linear',        'smooth', ]
+
+    this.bodies.bones.circle.set_out_scale( anim_values( t, times, scales,interp_modes),'base','override')
+
+    
+    scales       = []
+    interp_modes = [                          'linear',        'smooth', ]
+    
+    rotations    = [          rad(35),          rad(35),          rad(0), ]
+    positions    = [    new Vector(-75,0),  new Vector(65,0), new Vector(65,0), ]
+    this.bodies.bones.rectangles_pivots[0].set_out_position( anim_vectors( t, times, positions, interp_modes),'parent','override')
+    this.bodies.bones.rectangles_pivots[0].set_out_rotation( anim_values( t, times, rotations, interp_modes),'base','override')
+
+    rotations    = [          rad(35),          rad(35),          rad(0), ]
+    positions    = [    new Vector(75,0),  new Vector(-65,0), new Vector(-65,0), ]
+    this.bodies.bones.rectangles_pivots[2].set_out_position( anim_vectors( t, times, positions, interp_modes),'parent','override')
+    this.bodies.bones.rectangles_pivots[2].set_out_rotation( anim_values( t, times, rotations, interp_modes),'base','override')
+    
+    rotations    = [          rad(-35),          rad(-35),          rad(0), ]
+    positions    = [    new Vector(-75,0),  new Vector(65,0), new Vector(65,0), ]
+    this.bodies.bones.rectangles_pivots[1].set_out_position( anim_vectors(  t, times, positions, interp_modes),'parent','override')
+    this.bodies.bones.rectangles_pivots[1].set_out_rotation( anim_values( t, times, rotations, interp_modes),'base','override')
+    
+    rotations    = [          rad(-35),          rad(-35),          rad(0), ]
+    positions    = [    new Vector(75,0),  new Vector(-65,0), new Vector(-65,0), ]
+    this.bodies.bones.rectangles_pivots[3].set_out_position( anim_vectors(  t, times, positions, interp_modes),'parent','override')  
+    this.bodies.bones.rectangles_pivots[3].set_out_rotation( anim_values( t, times, rotations, interp_modes),'base','override')
+    
+
+
+    return true
+
+  }
 }
-  
+
   
   

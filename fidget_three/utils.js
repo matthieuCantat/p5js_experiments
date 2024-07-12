@@ -673,5 +673,81 @@ export function create_physics_engine_runner(matter_engine)
 
 
 
+export function anim_vectors( t, times, positions, interp_modes)
+{
+  for( let i = 0; i < times.length;i++)
+  {
+    if( t < times[i])
+    {
+      if(i == 0)
+        return positions[0]
+      else
+      {
+        if( t == times[i] )
+          return positions[i]
+        else
+        {
+          let t_delta_interval = times[i] - times[i-1]
+          let avancement_ratio = (t - times[i-1]) / t_delta_interval
+          if( interp_modes[i-1] == 'smooth')
+          {
+            let x = avancement_ratio
+            avancement_ratio = x*x*(3-2*x)
+          }
+
+          let v_delta_pos = positions[i].getSub( positions[i-1] )
+          v_delta_pos.mult(avancement_ratio)
+          let new_pos = v_delta_pos.getAdd( positions[i-1] )
+          return new_pos
+          
+
+        }
+
+      }
+    }
+
+  }
+
+  return positions[positions.length-1]
+
+}
 
 
+export function anim_values( t, times, values, interp_modes)
+{
+  for( let i = 0; i < times.length;i++)
+  {
+    if( t < times[i])
+    {
+      if(i == 0)
+        return values[0]
+      else
+      {
+        if( t == times[i] )
+          return values[i]
+        else
+        {
+          let t_delta_interval = times[i] - times[i-1]
+          let avancement_ratio = (t - times[i-1]) / t_delta_interval
+          if( interp_modes[i-1] == 'smooth')
+          {
+            let x = avancement_ratio
+            avancement_ratio = x*x*(3-2*x)
+          }
+
+          let v_delta_pos = values[i] - values[i-1]
+          v_delta_pos *= avancement_ratio
+          let new_pos = v_delta_pos + values[i-1] 
+          return new_pos
+          
+
+        }
+
+      }
+    }
+
+  }
+
+  return values[values.length-1]
+
+}
