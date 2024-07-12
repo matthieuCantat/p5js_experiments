@@ -591,10 +591,20 @@ export default class fidget{
       }      
       if( j === null)
       {
+        if( this.bodies[b_type][key]['constraints'][cns] == null )
+        {
+          if(this.debug_mode.show_warning_log)console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'.constraints.'+cns+' doesnt exists')
+          continue
+        }        
         this.bodies[b_type][key]['constraints'][cns].enable(value)
       }
       else 
       {
+        if( this.bodies[b_type][key][j]['constraints'][cns] == null )
+        {
+          if(this.debug_mode.show_warning_log)console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'['+j+'].constraints.'+cns+' doesnt exists')
+          continue
+        }         
         this.bodies[b_type][key][j]['constraints'][cns].enable(value)
       }
         
@@ -713,6 +723,8 @@ export default class fidget{
   }  
 
 
+
+
   bodies_set_visibility( value = null ,body_type_filter = [] )
   {
     
@@ -752,6 +764,50 @@ export default class fidget{
       } 
     } 
   }  
+
+
+
+
+  bodies_set_dynamic( value = null ,body_type_filter = [] )
+  {
+    
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
+    {   
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        if(this.debug_mode.show_warning_log)console.log('bodies_set_dynamic - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+      {
+     
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
+            if(value==null)
+              this.bodies[b_type][key][i].dynamic = this.bodies[b_type][key][i].dynamic_default 
+            else
+              this.bodies[b_type][key][i].dynamic = value
+          }
+            
+        }
+        else
+        {
+          if(value==null)
+            this.bodies[b_type][key].dynamic = this.bodies[b_type][key].dynamic_default 
+          else
+            this.bodies[b_type][key].dynamic = value
+        }
+          
+        
+      } 
+    } 
+  }  
+
 
 
   bodies_init_out_matrix( body_type_filter = [] )
