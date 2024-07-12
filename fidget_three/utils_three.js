@@ -204,6 +204,30 @@ export function get_texture_grid_checker_grey()
 }
 
 
+export function get_texture(file_name)
+{
+    
+    const textureA = loader.load( 'textures/'+file_name+'.jpg' );
+    textureA.colorSpace = THREE.SRGBColorSpace;
+    textureA.wrapS = textureA.wrapT = THREE.RepeatWrapping;
+    textureA.repeat.set( 0.001, 0.001 );
+    return textureA
+}
+
+
+export function get_background(file_name)
+{
+    
+    const textureA = loader.load( 'textures/'+file_name+'.jpg' );
+    textureA.colorSpace = THREE.SRGBColorSpace;
+    textureA.wrapS = textureA.wrapT = THREE.RepeatWrapping;
+    textureA.repeat.set( 0.003, 0.003 );
+    return textureA
+}
+
+
+
+
 export function convert_to_three_color(color_array)
 {
     return new THREE.Color("rgb("+Math.floor(color_array[0])+", "+Math.floor(color_array[1])+", "+Math.floor(color_array[2])+")");

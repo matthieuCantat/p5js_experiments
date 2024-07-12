@@ -418,7 +418,6 @@ export class cns_axe{
       if( this.fix_angle == true )
       {
         this.Follower.set_out_rotation(rad(this.extra_rotation)+m_init.getRotation(), 'world', 'override')
-        //this.Follower.set_anglular_velocity((this.Follower.body.angle - this.Follower.rot)*0.01)
         this.Follower.set_anglular_velocity((this.Follower.body.angle)*0.01)
       }
       

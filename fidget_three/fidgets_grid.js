@@ -58,12 +58,15 @@ export default class fidgets_grid
 
 
             let do_background = false
+            let is_dynamic = false
             //var fidget = new fidget_windmill(m,s,this.screen_dims,z_depth,this.shaders,this.debug_mode)
-            var fidget = new fidget_daft_i(m,s,this.screen_dims,z_depth,do_background,this.shaders,this.debug_mode)
+            var fidget = new fidget_daft_i(m,s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
             z_depth = fidget.z_depth_end
             //var fidget = this.get_random_fidget(m,s,this.screen_dims,z_depth,this.shaders,this.debug_mode)
             fidget.force_way = this.force_way
             fidget.fidget_sequence_i = this.fidgets.length + 1
+            fidget.bodies_set_dynamic(false)
+            fidget.play_animation = 'idle'
 
             this.fidgets.push(fidget)            
           }          

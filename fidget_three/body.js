@@ -315,15 +315,14 @@ export class body_build{
 
       for( let i = 0; i < this.constraints_args.length; i++)
       {
-        this.constraints_order.push(this.constraints_args[i].name)
 
         let cns = null
-        if(this.constraints_args[i].type == 'dyn_point')
+        if((this.constraints_args[i].type == 'dyn_point')&&(this.dynamic))
         { 
           cns = new dyn_constraint_build({obj: this, ...this.constraints_args[i]})//build_constraint(this,this.constraints_args[i])          
         }
 
-        if(this.constraints_args[i].type == 'dyn_orient')
+        if((this.constraints_args[i].type == 'dyn_orient')&&(this.dynamic))
         {
           cns = new dyn_constraint_build_custom_orient({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
         }
@@ -339,7 +338,7 @@ export class body_build{
         }
 
         /////////////////// axe
-        if(this.constraints_args[i].type == 'kin_axe')
+        if((this.constraints_args[i].type == 'kin_axe')&&(this.dynamic))
         {
           cns =  new cns_axe({ Follower: this, ...this.constraints_args[i] })   
         }
@@ -354,7 +353,12 @@ export class body_build{
           cns =  new connect({ ...this.constraints_args[i], obj:this })   
         }
 
-        this.constraints[this.constraints_args[i].name] = cns
+        if( cns != null)
+        {
+          this.constraints_order.push(this.constraints_args[i].name)
+          this.constraints[this.constraints_args[i].name] = cns
+        }
+
 
       }      
     }
@@ -806,7 +810,13 @@ export class body_build{
     ////////////////////////////////////////////////////////////////////////////////// dyn specific
     get_velocity()
     {
-      let v = new Vector( this.body.velocity.x, this.body.velocity.y)     
+      let v = new Vector() 
+      if( this.dynamic )
+      {
+        v.v.x = this.body.velocity.x
+        v.v.y = this.body.velocity.y
+      }
+            
       return v
     }  
 
@@ -821,12 +831,14 @@ export class body_build{
   
     set_velocity(v,update_input = false)
     {
-      Matter.Body.setVelocity(this.body, v.get_value())
+      if( this.dynamic )
+        Matter.Body.setVelocity(this.body, v.get_value())
     }  
 
     apply_force(p,v)
-    {          
-      Matter.Body.applyForce(this.body, p.get_value(), v.get_value())
+    {   
+      if( this.dynamic )       
+        Matter.Body.applyForce(this.body, p.get_value(), v.get_value())
     }
 
     /*
@@ -874,13 +886,18 @@ export class body_build{
 
     set_anglular_velocity(a)
     {
-      Matter.Body.setAngularVelocity(this.body, a)
+      if( this.dynamic )
+        Matter.Body.setAngularVelocity(this.body, a)
     }
 
     clean_velocity()
     {
-      Matter.Body.setVelocity(this.body, {x:0,y:0}) 
-      Matter.Body.setAngularVelocity(this.body, 0)    
+      if( this.dynamic )
+      {
+        Matter.Body.setVelocity(this.body, {x:0,y:0}) 
+        Matter.Body.setAngularVelocity(this.body, 0) 
+      }
+   
     }
   
 
