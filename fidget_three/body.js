@@ -955,6 +955,9 @@ export class body_build{
     {
       let shape_points = this.three_get_shape_points(m)
 
+      //if( this.texture_three != null)
+      //  this.texture_three.repeat.set( m.get_row(0).mag()*0.00001, m.get_row(0).mag()*0.00001 );
+
       let out = {
         shape:null,
         line:null,
@@ -963,7 +966,10 @@ export class body_build{
       if(this.do_shape)
       {
         out.shape = ut.addShape_polygon( 
-          shape_points, 
+          shape_points,
+          this.type,
+          m,
+          this.scale, 
           this.texture_three, 
           this.color, 
           this.transparency_activate, 
@@ -1052,6 +1058,9 @@ export class body_build{
         mesh = ut.addShape_polygon(  
           shape, 
           null,
+          null,
+          null,
+          null,
           [255,0,0])
         this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
@@ -1065,6 +1074,9 @@ export class body_build{
         shape = ut.rect( wid, len )
         mesh = ut.addShape_polygon(   
           shape, 
+          null,
+          null,
+          null,          
           null,
           [0,255,0])
         this.mesh_three.group.add( mesh ) 

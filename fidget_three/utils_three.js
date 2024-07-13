@@ -142,7 +142,10 @@ export function arc( radius,min_angle,max_angle ) {
 
 
 export function addShape_polygon( 
-    shape, 
+    shape,
+    shape_type,
+    m_ref,
+    scale_ref, 
     texture = null, 
     color = null, 
     transparency_activate = false, 
@@ -150,6 +153,32 @@ export function addShape_polygon(
 
 
     let geometry = new THREE.ShapeGeometry( shape );
+
+    if( m_ref != null)
+    {
+        let scale_coef = 1.0
+        if( shape_type == 1)//'circle'))
+            scale_coef = 0.0099
+        if( shape_type == 0)//'rectangle')
+            scale_coef = 0.01
+
+        let x_length = m_ref.get_row(0).mag()*scale_ref*scale_coef
+        let y_length = m_ref.get_row(1).mag()*scale_ref*scale_coef
+        
+        let squash_to_fit = true
+        if( squash_to_fit == false)
+        {
+            if( x_length < y_length )
+                y_length = x_length
+            else
+                x_length = y_length
+        }
+
+        updateUVScale(geometry,new Vector(1/x_length,1/y_length))
+        updateUVPosition(geometry,new Vector(50,50))
+              //if( this.texture_three != null)
+          //  this.texture_three.repeat.set( m.get_row(0).mag()*0.00001, m.get_row(0).mag()*0.00001 );    
+    }
 
     let mat_opt = { side: THREE.DoubleSide, color: null, map: null, transparent:transparency_activate, opacity: 1.-transparency }
     if( color != null )
@@ -210,7 +239,7 @@ export function get_texture(file_name)
     const textureA = loader.load( 'textures/'+file_name+'.jpg' );
     textureA.colorSpace = THREE.SRGBColorSpace;
     textureA.wrapS = textureA.wrapT = THREE.RepeatWrapping;
-    textureA.repeat.set( 0.001, 0.001 );
+    textureA.repeat.set( 0.01, 0.01 );
     return textureA
 }
 
@@ -221,7 +250,7 @@ export function get_background(file_name)
     const textureA = loader.load( 'textures/'+file_name+'.jpg' );
     textureA.colorSpace = THREE.SRGBColorSpace;
     textureA.wrapS = textureA.wrapT = THREE.RepeatWrapping;
-    textureA.repeat.set( 0.003, 0.003 );
+    textureA.repeat.set( 0.01, 0.01 );
     return textureA
 }
 
@@ -423,4 +452,31 @@ export class Mouse_manager
     }
 }
 
+
+export const updateUVPosition = (geometry, v_to_move ) => {
+    const att_uv = geometry.getAttribute('uv');
+    let i = 0;
+    while(i < att_uv.count){
+        let p_init = new Vector( att_uv.getX(i), att_uv.getY(i) )
+        let p = p_init.getAdd(v_to_move)
+
+        att_uv.setXY( i, p.x(), p.y() );
+        i += 1;
+    }
+    att_uv.needsUpdate = true;
+};
+
+
+
+export const updateUVScale = (geometry, v_to_scale ) => {
+    const att_uv = geometry.getAttribute('uv');
+    let i = 0;
+    while(i < att_uv.count){
+        let p = new Vector( att_uv.getX(i)*v_to_scale.x(), att_uv.getY(i)*v_to_scale.y() )
+
+        att_uv.setXY( i, p.x(), p.y() );
+        i += 1;
+    }
+    att_uv.needsUpdate = true;
+};
 

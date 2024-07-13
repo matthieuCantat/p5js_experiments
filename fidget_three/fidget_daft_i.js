@@ -125,6 +125,7 @@ export default class fidget_daft_i extends fidget{
       var text_checker_three_grey = ut.get_texture_grid_checker_grey()  
       
       var textures = {
+        uv_grid_opengl: ut.get_texture('uv_grid_opengl'),
         cyan_grid: ut.get_texture('texture_cyan_grid'),
         gradient_blue_cyan_A: ut.get_texture('texture_gradient_blue_cyan_A'),
         gradient_blue_pink_A: ut.get_texture('texture_gradient_blue_pink_A'),
@@ -139,6 +140,7 @@ export default class fidget_daft_i extends fidget{
 
       
       var textures_background = {
+        uv_grid_opengl: ut.get_texture('uv_grid_opengl'),
         abstract_shape_grid : ut.get_background('background_abstract_shape_grid'),
         big_spheres_grid    : ut.get_background('background_big_spheres_grid'),
         coherence_the_set_generation: ut.get_background('background_coherence_the_set_generation'),
@@ -666,7 +668,7 @@ export default class fidget_daft_i extends fidget{
                                     do_line:false,                                         
                                     //color: this.colors[0],
                                     color_line: utils.color.black,
-                                    texture_three: textures.cyan_grid  ,
+                                    texture_three: textures.cyan_grid,//textures.cyan_grid  ,
   
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.bones.circle},
@@ -708,7 +710,7 @@ export default class fidget_daft_i extends fidget{
         do_line:false,           
         //color: this.colors[2],
         color_line: utils.color.black,
-        texture_three: textures.gradient_yellow_green_oblique_line_A,
+        texture_three: textures.gradient_yellow_green_oblique_line_A,//textures.gradient_yellow_green_oblique_line_A,
         //texture_three: text_checker_three,
 
         //constraints:[
@@ -1322,7 +1324,7 @@ export default class fidget_daft_i extends fidget{
       do_line:false,                                           
       //color : this.colors[1],
       color_line: utils.color.black,
-      texture_three: textures.gradient_gold_red_A,
+      texture_three: textures.gradient_gold_red_A,//
       //texture_three: text_checker_three, 
 
       constraints:[
