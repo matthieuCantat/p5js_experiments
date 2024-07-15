@@ -128,9 +128,9 @@ function init() {
     //const sphere = new THREE.SphereGeometry( 2.5, 16, 8 );
     //light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 
-    light1.position.x = 200
-    light1.position.y = 200
-    light1.position.z = 100
+    light1.position.x = 200*2
+    light1.position.y = 200*2
+    light1.position.z = 100*2
     light1.castShadow = true  
     
     scene.add( light1 );
@@ -140,11 +140,11 @@ function init() {
     light1.shadow.radius = 5;  
     //light1.shadow.blurSamples = 250
     light1.shadow.camera.near = 0.5; // default
-    light1.shadow.camera.far = 600; // default
-    light1.shadow.camera.top = 200;
-    light1.shadow.camera.bottom = -200;
-    light1.shadow.camera.left = -200;
-    light1.shadow.camera.right = 200;
+    light1.shadow.camera.far = 600*2; // default
+    light1.shadow.camera.top = 200*2;
+    light1.shadow.camera.bottom = -200*2;
+    light1.shadow.camera.left = -200*2;
+    light1.shadow.camera.right = 200*2;
     light1.shadow.mapSize.set( 2048, 2048 );
 
     let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
