@@ -269,6 +269,8 @@ export default class fidget_daft_i extends fidget{
       collision:false, 
       visibility:this.do_background,
       //texture_three: text_checker_three_grey,
+      castShadow: false,
+      receiveShadow: true,
 
     } 
     //z_depth += z_depth_incr
@@ -669,6 +671,8 @@ export default class fidget_daft_i extends fidget{
                                     //color: this.colors[0],
                                     color_line: utils.color.black,
                                     texture_three: textures.cyan_grid,//textures.cyan_grid  ,
+                                    castShadow: true,
+                                    receiveShadow: true,
   
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.bones.circle},
@@ -853,7 +857,9 @@ export default class fidget_daft_i extends fidget{
                                               name:'geo_rectangle_TR',
 
                                               parent:this.bodies.bones.rectangles[0],
-                                              //m_offset:new Matrix(),  
+                                              //m_offset:new Matrix(),
+                                              castShadow: true,
+                                              receiveShadow: false,
                                               
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01},
@@ -983,6 +989,8 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles[1],
                                               //m_offset:om_rB,
                                               m_shape:m_shape,
+                                              castShadow: true,
+                                              receiveShadow: false,
 
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01},
@@ -1109,6 +1117,8 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles[2],
                                               //m_offset:om_rC,
                                               m_shape:m_shape, 
+                                              castShadow: true,
+                                              receiveShadow: false,
                                                
                                               constraints:[
                                                 {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[2], stiffness: 1.0,damping:0.1,length:0.01},
@@ -1257,6 +1267,8 @@ export default class fidget_daft_i extends fidget{
         parent:this.bodies.bones.rectangles[3],
         //m_offset:om_rD,
         m_shape:m_shape,
+        castShadow: true,
+        receiveShadow: false,
              
         constraints:[
           {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[3], stiffness: 1.0,damping:0.1,length:0.01},
@@ -1326,6 +1338,8 @@ export default class fidget_daft_i extends fidget{
       color_line: utils.color.black,
       texture_three: textures.gradient_gold_red_A,//
       //texture_three: text_checker_three, 
+      castShadow: true,
+      receiveShadow: false,
 
       constraints:[
         { name:'point' ,type:'kin_point' ,target:this.bodies.bones.rectangle},
@@ -1536,7 +1550,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.bones.rectangles[3],                                                               
             ] 
         let z_depth = z_depth_start
-        let z_depth_incr = 0.1
+        let z_depth_incr = 0.5//0.1
         for(let i = 0 ; i < this.bodies_draw_order.length; i++)
         {
           if(this.bodies_draw_order[i] == null)

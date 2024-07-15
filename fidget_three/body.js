@@ -40,7 +40,9 @@ export class body_build{
         color_line:utils.color.black,
         transparency_activate:false,
         transparency:255,
-        transparency_line:255,        
+        transparency_line:255,
+        castShadow:false,       
+        receiveShadow:true,   
         shader:null,
         visibility:true,
         axe_constraint: null,
@@ -57,7 +59,8 @@ export class body_build{
         debug_matrix_axes: false,  
         debug_cns_axes: false,     
         debug_force_visibility: false, 
-        selection_break_length: 60.,  
+        selection_break_length: 60.,
+         
                    
       };
       const args = { ...defaultOptions, ...in_options };
@@ -90,6 +93,8 @@ export class body_build{
       this.transparency = args.transparency,
       this.transparency_line = args.transparency_line,     
       this.shader = args.shader
+      this.castShadow = args.castShadow
+      this.receiveShadow = args.receiveShadow
       this.dynamic = args.dynamic
       this.dynamic_default = args.dynamic
       this.collision = args.collision
@@ -973,7 +978,9 @@ export class body_build{
           this.texture_three, 
           this.color, 
           this.transparency_activate, 
-          this.transparency)  
+          this.transparency,
+          this.castShadow,
+          this.receiveShadow)  
 
         group.add( out.shape ) 
       }
@@ -984,7 +991,8 @@ export class body_build{
           this.texture_three, 
           this.color, 
           this.transparency_activate, 
-          this.transparency)  
+          this.transparency,
+          this.shadow,)  
 
         group.add( out.line ) 
       }
@@ -1061,7 +1069,10 @@ export class body_build{
           null,
           null,
           null,
-          [255,0,0])
+          [255,0,0],
+          0,
+          false,
+          false)
         this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
 
@@ -1078,7 +1089,10 @@ export class body_build{
           null,
           null,          
           null,
-          [0,255,0])
+          [0,255,0],
+          0,
+          false,
+          false)
         this.mesh_three.group.add( mesh ) 
         mesh.position.y =  len/2.0
 
@@ -1112,7 +1126,7 @@ export class body_build{
       this.mesh_three.group.visible = this.get_visibility() == 1   
       this.mesh_three.group.scale.x = scale  
       this.mesh_three.group.scale.y = scale  
-      this.mesh_three.group.scale.z = scale  
+      //this.mesh_three.group.scale.z = scale  
   
 
       if(this.debug_matrix_info)

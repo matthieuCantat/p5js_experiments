@@ -25,8 +25,20 @@ export function line( pA, pB ) {
 }
 
 export function rect( width, height ) {
+    let x = 0;
+    let y = 0;
+    let w = width/2.0;
+    let h = height/2.0;
 
-    return roundedRect( width, height, 0 )
+    let radius = 0
+    
+    let ctx = new THREE.Shape() 
+    ctx.moveTo( x-w, y-h + radius );
+    ctx.lineTo( x-w, y-h + height - radius );
+    ctx.lineTo( x-w + width - radius, y-h + height );
+    ctx.lineTo( x-w + width, y-h + radius );
+    ctx.lineTo( x-w + radius, y-h );
+    return ctx
   }
 
 export function roundedRect( width, height, radius ) {
@@ -149,10 +161,15 @@ export function addShape_polygon(
     texture = null, 
     color = null, 
     transparency_activate = false, 
-    transparency = 0.) {
+    transparency = 0.,
+    castShadow = false,
+    receiveShadow = false) {
 
+    
+    //let geometry = new THREE.ShapeGeometry( shape );
 
-    let geometry = new THREE.ShapeGeometry( shape );
+    const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelSegments: 1, steps: 1, bevelSize: 2, bevelThickness: 2.5 };
+    let geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
     if( m_ref != null)
     {
@@ -180,13 +197,28 @@ export function addShape_polygon(
           //  this.texture_three.repeat.set( m.get_row(0).mag()*0.00001, m.get_row(0).mag()*0.00001 );    
     }
 
-    let mat_opt = { side: THREE.DoubleSide, color: null, map: null, transparent:transparency_activate, opacity: 1.-transparency }
+    let mat_opt = { 
+        side: THREE.DoubleSide, 
+        color: null, 
+        map: null, 
+        transparent:transparency_activate, 
+        opacity: 1.-transparency,
+        shininess: 2030,//30
+        specular:utils.color.white,
+     }
     if( color != null )
         mat_opt.color = convert_to_three_color(color)
     if( texture != null )
         mat_opt.map = texture
     
     let mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+
+
+    mesh.castShadow = castShadow; //default is false
+    mesh.receiveShadow = receiveShadow; //default        
+
+
+    
 
     return mesh
 }

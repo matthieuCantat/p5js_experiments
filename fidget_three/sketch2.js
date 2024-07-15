@@ -18,6 +18,7 @@ import { utils,
 import fidgets_sequence from './fidgets_sequence.js'
 import fidgets_grid from './fidgets_grid.js'
 import shader_build from './shader.js';
+import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
 
 // prevents the mobile browser from processing some default
 // touch events, like swiping left for "back" or scrolling
@@ -86,7 +87,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 let container, stats;
 let camera, scene, renderer;
-let uniforms;
+let uniforms,light1;
 
 
 init();
@@ -100,29 +101,57 @@ function init() {
 
     //////////////// scene setup
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xf0f0f0 );
+    scene.background = new THREE.Color( 0x000 );
 
     camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-    camera.position.set( 0, 0, 500 );
-    //camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-    //camera.position.set( 0, 0, 1000 );
-    //camera.rotation.set( 0.0, 0, 0 );
+    camera.position.set( 0, 0, 500 );  
+    let camera_far_dist = 1000 
+    //camera = new THREE.PerspectiveCamera( 76, width / height, 1, camera_far_dist );
+    //camera.position.set( 0, 0, 500 );
+    //camera.rotation.set( 0, 0, 0 );
     
     scene.add( camera );
 
-    const light = new THREE.PointLight( 0xffffff, 2.5, 0, 0 );
-    camera.add( light );
+    //let light_group = new THREE.Group();
+    //const light = new THREE.PointLight( 0xffffff, 2.5, 0, 0 );
+    /*
+    light1 = new THREE.PointLight( 0xffffff, 3.5, 0, 0 );
+    const sphere = new THREE.SphereGeometry( 2.5, 16, 8 );
+    light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
+    light1.position.x = Math.sin(rad(45))*200
+    light1.position.y = Math.cos(rad(45))*200
+    light1.position.z = 100
+    light1.castShadow = true
+    */
 
+    light1 = new THREE.DirectionalLight( 0xffffff, 3.5 );
+    //const sphere = new THREE.SphereGeometry( 2.5, 16, 8 );
+    //light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 
-    ///////////////// fidgets
-    F_sequence.setup_shapes_fidgets_three(scene)
-    F_sequence.setup_chrono_three(scene)
-    F_sequence.setup_debug_three(scene)
-  
+    light1.position.x = 200
+    light1.position.y = 200
+    light1.position.z = 100
+    light1.castShadow = true  
+    
+    scene.add( light1 );
+    //light_group.add(light)
+    //light.position.set( Math.sin(0*0.01)*100, Math.cos(0*0.01)*100, -200)
+    //camera.add( light1 );
+    light1.shadow.radius = 5;  
+    //light1.shadow.blurSamples = 250
+    light1.shadow.camera.near = 0.5; // default
+    light1.shadow.camera.far = 600; // default
+    light1.shadow.camera.top = 200;
+    light1.shadow.camera.bottom = -200;
+    light1.shadow.camera.left = -200;
+    light1.shadow.camera.right = 200;
+    light1.shadow.mapSize.set( 2048, 2048 );
 
-
+    let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
+    scene.add( light2 );
 
     ///////////////// Background shader
+     /*
     uniforms = {
         time: { value: 1.0 }
     };
@@ -131,24 +160,38 @@ function init() {
     uniforms = {
         time: { value: 1.0 }
     };
-
+   
     const material = new THREE.ShaderMaterial( {
-
         uniforms: uniforms,
         vertexShader: document.getElementById( 'vertexShader' ).textContent,
         fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
     } );
+    
+    const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
 
     const mesh = new THREE.Mesh( geometry, material );
-    scene.add( mesh );	
+    camera.add( mesh );
+    mesh.position.set( 0, 0, camera_far_dist * .5)
+    */
+
+    ///////////////// fidgets
+    F_sequence.setup_shapes_fidgets_three(scene)
+    F_sequence.setup_chrono_three(scene)
+    F_sequence.setup_debug_three(scene)
+  
     
     ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( width, height );
     renderer.setAnimationLoop( animate );
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    //renderer.toneMapping = THREE.ReinhardToneMapping;
+
     container.appendChild( renderer.domElement );
+
 
     stats = new Stats();
     container.appendChild( stats.dom );
@@ -157,6 +200,20 @@ function init() {
     container.style.touchAction = 'none';
 
     window.addEventListener( 'resize', onWindowResize );
+
+
+    
+    /*
+    const controls = new OrbitControls( camera, renderer.domElement );
+    controls.maxPolarAngle = Math.PI * 0.5;
+    controls.minDistance = 1;
+    controls.maxDistance = 500;
+    */
+    
+    
+    
+    
+    
 
 }
 
@@ -174,17 +231,28 @@ function onWindowResize() {
 
 //
 
+var animate_count =0
 function animate() {
 
+    /*
+    // light - change position
+    light1.position.x = Math.sin(rad(45)+animate_count*0.01)*200
+    light1.position.y = Math.cos(rad(45)+animate_count*0.01)*200
+    */
 
+
+    // other
     F_sequence.update()
     F_sequence.animate_three()
-    uniforms[ 'time' ].value = performance.now() / 1000;
+    //uniforms[ 'time' ].value = performance.now() / 1000;
     renderer.render( scene, camera );
     stats.update();
 
     
 
+
+    
+    animate_count += 1
 }
 
 
