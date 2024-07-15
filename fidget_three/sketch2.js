@@ -19,7 +19,12 @@ import fidgets_sequence from './fidgets_sequence.js'
 import fidgets_grid from './fidgets_grid.js'
 import shader_build from './shader.js';
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
+import { RenderPass } from './libraries/jsm/postprocessing/RenderPass.js';
+import { OutputPass } from './libraries/jsm/postprocessing/OutputPass.js';
+import { EffectComposer } from './libraries/jsm/postprocessing/EffectComposer.js';
 
+import { UnrealBloomPass } from './libraries/jsm/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from './libraries/jsm/postprocessing/ShaderPass.js';
 // prevents the mobile browser from processing some default
 // touch events, like swiping left for "back" or scrolling
 // the page.
@@ -45,7 +50,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 10
+var nbr = 1
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
@@ -88,7 +93,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 let container, stats;
 let camera, scene, renderer;
 let uniforms,light1;
-
+let finalComposer;
 
 init();
 
@@ -189,10 +194,43 @@ function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     //renderer.toneMapping = THREE.ReinhardToneMapping;
-
     container.appendChild( renderer.domElement );
 
+    //render pass
+    const renderScene = new RenderPass( scene, camera );
+    const outputPass = new OutputPass();
 
+    const bloomPass = new UnrealBloomPass( new THREE.Vector2( width, height ), 1.5, 0.4, 0.85 );
+    bloomPass.threshold = 0;
+    bloomPass.strength = 1;
+    bloomPass.radius = 0.5;
+    
+    const bloomComposer = new EffectComposer( renderer );
+    bloomComposer.renderToScreen = false;
+    bloomComposer.addPass( renderScene );
+    bloomComposer.addPass( bloomPass );
+    
+    const mixPass = new ShaderPass(
+        new THREE.ShaderMaterial( {
+            uniforms: {
+                baseTexture: { value: null },
+                bloomTexture: { value: bloomComposer.renderTarget2.texture }
+            },
+            vertexShader: document.getElementById( 'bloom_mix_vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'bloom_mix_fragmentShader' ).textContent,
+            defines: {}
+        } ), 'baseTexture'
+    );
+    mixPass.needsSwap = true;
+
+
+    finalComposer = new EffectComposer( renderer );
+    finalComposer.addPass( renderScene );
+    finalComposer.addPass( bloomPass );
+    //finalComposer.addPass( mixPass );
+    //finalComposer.addPass( outputPass );
+
+    // stats
     stats = new Stats();
     container.appendChild( stats.dom );
 
@@ -225,6 +263,8 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize( width, height);
+    bloomComposer.setSize( width, height );
+    finalComposer.setSize( width, height );
 
 }
 
@@ -245,7 +285,8 @@ function animate() {
     F_sequence.update()
     F_sequence.animate_three()
     //uniforms[ 'time' ].value = performance.now() / 1000;
-    renderer.render( scene, camera );
+    //renderer.render( scene, camera );
+    finalComposer.render();
     stats.update();
 
     
