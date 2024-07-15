@@ -36,6 +36,7 @@ export class body_build{
         constraints:[],
         do_shape:true,
         do_line:false,
+        bevel: 0,
         color:utils.color.white,
         color_line:utils.color.black,
         transparency_activate:false,
@@ -85,7 +86,8 @@ export class body_build{
       this.scale = 1.0
       this.constraints_args = args.constraints
       this.do_shape= args.do_shape
-      this.do_line= args.do_line      
+      this.do_line= args.do_line   
+      this.bevel = args.bevel   
       this.color = args.color
       this.color_line = args.color_line
       this.color_base = args.color
@@ -980,7 +982,8 @@ export class body_build{
           this.transparency_activate, 
           this.transparency,
           this.castShadow,
-          this.receiveShadow)  
+          this.receiveShadow,
+          this.bevel,)  
 
         group.add( out.shape ) 
       }
@@ -1072,7 +1075,8 @@ export class body_build{
           [255,0,0],
           0,
           false,
-          false)
+          false,
+          0)
         this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
 
@@ -1092,7 +1096,8 @@ export class body_build{
           [0,255,0],
           0,
           false,
-          false)
+          false,
+          0)
         this.mesh_three.group.add( mesh ) 
         mesh.position.y =  len/2.0
 
@@ -1241,7 +1246,7 @@ function build_constraint(body,cns_opts,offset = 0)
 
 
 
-export function build_effects_trail(opts,body_target)
+export function build_effects_trail(opts, body_target)
 {
   let opts_global = {
     screen_dims: opts.screen_dims,
@@ -1271,7 +1276,7 @@ export function build_effects_trail(opts,body_target)
   let bodies = []
 
   bodies.push(new body_build({  ...opts_trail, 
-                                name: opts.name + 'effect_trails1',                                       
+                                name: body_target.name + 'effect_trails1',                                       
                                 color:utils.color.red,
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.15},
@@ -1280,7 +1285,7 @@ export function build_effects_trail(opts,body_target)
                               })) 
                                  
   bodies.push(new body_build({  ...opts_trail,                                 
-                                name: opts.name + 'effect_trails2',        
+                                name: body_target.name + 'effect_trails2',        
                                 color:utils.color.blue,              
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.2},
@@ -1289,7 +1294,7 @@ export function build_effects_trail(opts,body_target)
                               }))  
                                                                                     
   bodies.push(new body_build({  ...opts_trail, 
-                                name: opts.name + 'effect_trails3',    
+                                name: body_target.name + 'effect_trails3',    
                                 color:utils.color.green,          
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.3},
