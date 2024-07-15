@@ -260,7 +260,8 @@ export default class fidget_daft_i extends fidget{
       type: utils.shape.rectangle,
 
       do_shape: true,
-      do_line:false,         
+      do_line:false,  
+      bevel:0,       
       //color: this.color_background,
       texture_three: textures_background.space_grid  ,
       color_line: utils.color.black,
@@ -667,7 +668,8 @@ export default class fidget_daft_i extends fidget{
                                     type:utils.shape.circle,
 
                                     do_shape: true,
-                                    do_line:false,                                         
+                                    do_line:false,   
+                                    bevel:1,                                      
                                     //color: this.colors[0],
                                     color_line: utils.color.black,
                                     texture_three: textures.cyan_grid,//textures.cyan_grid  ,
@@ -858,6 +860,7 @@ export default class fidget_daft_i extends fidget{
 
                                               parent:this.bodies.bones.rectangles[0],
                                               //m_offset:new Matrix(),
+                                              bevel:1,
                                               castShadow: true,
                                               receiveShadow: false,
                                               
@@ -989,6 +992,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles[1],
                                               //m_offset:om_rB,
                                               m_shape:m_shape,
+                                              bevel:1,
                                               castShadow: true,
                                               receiveShadow: false,
 
@@ -1116,7 +1120,8 @@ export default class fidget_daft_i extends fidget{
 
                                               parent:this.bodies.bones.rectangles[2],
                                               //m_offset:om_rC,
-                                              m_shape:m_shape, 
+                                              m_shape:m_shape,
+                                              bevel:1, 
                                               castShadow: true,
                                               receiveShadow: false,
                                                
@@ -1189,6 +1194,7 @@ export default class fidget_daft_i extends fidget{
               
       }
 
+
       if(this.is_dynamic)
       {
         rectangle_pivot_opts.constraints.push({ name:'connect_rot_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
@@ -1196,7 +1202,7 @@ export default class fidget_daft_i extends fidget{
         target_attr:'ty', 
         target_space:'local',
         target_remap:[0,55*(s/2.2),0,-35] })
-
+        
         rectangle_pivot_opts.constraints.push({ name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
         attr:'tx',
         target_attr:'r', 
@@ -1208,31 +1214,11 @@ export default class fidget_daft_i extends fidget{
         target_attr:'ty', 
         target_space:'local',
         target_remap:[0,110*(s/2.2) , 0,60*(s/2.2) ] })
+        
       }
 
 
-      this.bodies.bones.rectangles_pivots.push(new body_build({ 
-                                              ...opts_global,
-                                              ...opts_collision_no_interaction,
-                                              ...opts_debug,
-                                              ...opts_visual_bones,
-                                              dynamic: false,
-
-                                              name:'bones_rectangle_pivot_TL',
-                                              
-                                              m:this.m,
-                                              parent:this.bodies.bones.rectangles_center,
-                                              m_offset:om_rD_bones,
-                                              m_shape:m_shape_bones,
-                                              //z:z_depth, 
-
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                            
-                                              ],
-                                              density:0.2/(s/2.2),                                               
-                                                    
-                                            })) 
+      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts)) 
 
       var om_rD = new Matrix()
       om_rD.setTranslation(ray_tmp*-1,0)   
@@ -1267,6 +1253,7 @@ export default class fidget_daft_i extends fidget{
         parent:this.bodies.bones.rectangles[3],
         //m_offset:om_rD,
         m_shape:m_shape,
+        bevel:1,
         castShadow: true,
         receiveShadow: false,
              
@@ -1277,11 +1264,27 @@ export default class fidget_daft_i extends fidget{
 
       }  
 
+
       this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
         
       if(this.is_dynamic)
       {  
-        this.bodies.effects.movA_trails = build_effects_trail(oRect_TL,this.bodies.geos.rectangles[3])                                
+        let oRect_trail = { 
+          ...opts_global,
+          ...opts_collision_no_interaction,
+          ...opts_debug,
+
+          parent:this.bodies.bones.rectangles[3],
+          m_shape: m_shape,
+          type: utils.shape.rectangle,
+  
+          do_shape: true,
+          do_line:false,           
+  
+          density:0.001/(s/2.2), 
+
+        }  
+        this.bodies.effects.movA_trails = build_effects_trail(oRect_trail,this.bodies.geos.rectangles[3])                                
 
         
         this.bodies.inters_step.steps[0].highlight_selection = [this.bodies.geos.rectangles[3]]
@@ -1333,7 +1336,8 @@ export default class fidget_daft_i extends fidget{
       type : utils.shape.rectangle,
 
       do_shape: true,
-      do_line:false,                                           
+      do_line:false, 
+      bevel:1,                                          
       //color : this.colors[1],
       color_line: utils.color.black,
       texture_three: textures.gradient_gold_red_A,//
