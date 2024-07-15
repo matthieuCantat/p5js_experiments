@@ -650,6 +650,7 @@ export class constraint_build{
             do_orientation: true,
             apply_on_input: false,
             stiffness: 1,
+            name:'null',
         };
         const args = { ...defaultOptions, ...in_options };
 
@@ -670,6 +671,7 @@ export class constraint_build{
 
         this.is_enable = true
         this.stiffness = args.stiffness
+        this.name = args.name
         
     
     }
@@ -678,6 +680,9 @@ export class constraint_build{
     {
         if(this.is_enable == false)
             return false
+
+        //if(this.target.name == 'geo_rectangle_TL')
+        //  console.log('constraint_build',this.name,this.target.name,this.obj.name)
 
         
         let m_target = this.target.get_out_matrix()
