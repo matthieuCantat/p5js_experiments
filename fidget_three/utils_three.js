@@ -163,13 +163,22 @@ export function addShape_polygon(
     transparency_activate = false, 
     transparency = 0.,
     castShadow = false,
-    receiveShadow = false) {
+    receiveShadow = false,
+    bevel = 0,) {
 
     
-    //let geometry = new THREE.ShapeGeometry( shape );
+    let geometry = null
+    
+    if( bevel == 0)
+    {
+        geometry = new THREE.ShapeGeometry( shape );
+    }
+    else
+    {
+        const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelSegments: 1, steps: 1, bevelSize: bevel*2, bevelThickness: bevel*2.5 };
+        geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+    }
 
-    const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelSegments: 1, steps: 1, bevelSize: 2, bevelThickness: 2.5 };
-    let geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
     if( m_ref != null)
     {
