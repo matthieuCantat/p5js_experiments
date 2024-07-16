@@ -250,7 +250,7 @@ function init() {
         const bloomPass = new UnrealBloomPass( new THREE.Vector2( width, height ), 1.5, 0.4, 0.85 );
         bloomPass.threshold = 0;
         bloomPass.strength = 1;
-        bloomPass.radius = 0.5;
+        bloomPass.radius = 0.1;
         
         bloomComposer = new EffectComposer( renderer );
         bloomComposer.renderToScreen = false;
