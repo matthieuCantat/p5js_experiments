@@ -173,18 +173,18 @@ function init() {
     if(debug.do_shadows)
     {
         light1.castShadow = true
-        light1.shadow.radius = 5;  
+        //light1.shadow.radius = 5;  
         //light1.shadow.blurSamples = 250
         light1.shadow.camera.near = 0.5; // default
-        light1.shadow.camera.far = 600*2; // default
-        light1.shadow.camera.top = 200*2;
-        light1.shadow.camera.bottom = -200*2;
-        light1.shadow.camera.left = -200*2;
-        light1.shadow.camera.right = 200*2;
-        light1.shadow.mapSize.set( 2048, 2048 );
+        light1.shadow.camera.far = 600*1.5; // default
+        light1.shadow.camera.top = 200;
+        light1.shadow.camera.bottom = -200;
+        light1.shadow.camera.left = -200*0.5;
+        light1.shadow.camera.right = 200*0.5;
+        light1.shadow.mapSize.set( 500, 500 );
 
-        let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
-        scene.add( light2 );
+        //let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
+        //scene.add( light2 );
     }
 
     if( debug.do_flare )
