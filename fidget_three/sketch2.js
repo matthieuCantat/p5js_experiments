@@ -288,11 +288,12 @@ function animate() {
     //uniforms[ 'time' ].value = performance.now() / 1000;
     //renderer.render( scene, camera );
 
-    for( let f of F_sequence.fidgets)
-        f.setup_bloom_pass()
+    let save_states = []
+    for( let i = 0 ; i < F_sequence.fidgets.length; i++)
+        save_states.push( F_sequence.fidgets[i].setup_bloom_pass() )
     bloomComposer.render()
-    for( let f of F_sequence.fidgets)
-        f.clean_bloom_pass()
+    for( let i = 0 ; i < F_sequence.fidgets.length; i++)
+        F_sequence.fidgets[i].clean_bloom_pass(save_states[i])
 
     finalComposer.render();
     stats.update();

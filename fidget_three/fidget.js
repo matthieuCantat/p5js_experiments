@@ -996,7 +996,7 @@ export default class fidget{
   }
 
 
-  bodies_get_list_filtered( attr, value, body_type_filter = [] )
+  bodies_get_list_filtered( body_type_filter = [] )
   {
 
     let bloomed_list = []
@@ -1017,20 +1017,65 @@ export default class fidget{
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            if( this.bodies[b_type][key][i][attr] == value)
-            {
-              bloomed_list.push(this.bodies[b_type][key][i])
-            }
-
+            bloomed_list.push(this.bodies[b_type][key][i])
           }
         }
         else
         {
-          if( this.bodies[b_type][key][attr] == value)
+          bloomed_list.push(this.bodies[b_type][key])       
+        }
+
+
+      } 
+    } 
+
+    return bloomed_list
+
+  }
+
+
+  bodies_get_list_attr_value_filtered( attr, value , body_type_filter = [] , inverse = false)
+  {
+
+    let bloomed_list = []
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
+    {   
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+      
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+      {
+
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
+
+            if((inverse == true)&&( this.bodies[b_type][key][i][attr] != value) )
+            {
+              bloomed_list.push(this.bodies[b_type][key][i])
+            }
+            if((inverse == false)&&( this.bodies[b_type][key][i][attr] == value) )
+            {
+              bloomed_list.push(this.bodies[b_type][key][i])
+            }
+          }
+        }
+        else
+        {
+          if((inverse == true)&&( this.bodies[b_type][key][attr] != value))
           {   
             bloomed_list.push(this.bodies[b_type][key])       
           }
-
+          if((inverse == false)&&( this.bodies[b_type][key][attr] == value))
+          {   
+            bloomed_list.push(this.bodies[b_type][key])       
+          }
         }
 
 
@@ -1092,7 +1137,7 @@ export default class fidget{
   }
 
 
-  mouse_select_highlight(mouse_cns,body_type_filter = [], bloom_pass = false )
+  mouse_select_highlight(mouse_cns,body_type_filter = [])
   {
     
 
@@ -1170,44 +1215,57 @@ export default class fidget{
 
     
     
-    if(bloom_pass)
+
+
+    for( let i = 0 ; i < body_to_reduce.length; i++)
     {
-      this.bodies_apply_material( this.darkMaterial, body_type_filter = ['geos'] )
-      for( let i = 0 ; i < body_to_highlight.length; i++)
-        body_to_highlight[i].reset_material()
+      body_to_reduce[i].color_line = [0,0,0]
+      body_to_reduce[i].update_color_three_line()
     }
-    else{
 
-      for( let i = 0 ; i < body_to_reduce.length; i++)
-      {
-        body_to_reduce[i].color_line = [0,0,0]
-        body_to_reduce[i].update_color_three_line()
-      }
-
-      for( let i = 0 ; i < body_to_highlight.length; i++)
-      {
-        body_to_highlight[i].color_line = [255,255,255]
-        body_to_highlight[i].update_color_three_line()
-      }
-
+    for( let i = 0 ; i < body_to_highlight.length; i++)
+    {
+      body_to_highlight[i].color_line = [255,255,255]
+      body_to_highlight[i].update_color_three_line()
     }
+
 
 
     //this.bodies_color_update_three(body_type_filter)
 
   }
 
-  clean_bloom_pass()
-  {
-    this.bodies_apply_material( null,['geos','effects'] )
-  }
-
   setup_bloom_pass()
   {
+
+    let bodies = this.bodies_get_list_filtered( ['geos','effects'] )
+    let color_lines = []
+    for( let i = 0 ; i < bodies.length; i++)
+    {
+      color_lines.push(bodies[i].color_line )
+      bodies[i].color_line = [0,0,0]
+      bodies[i].update_color_three_line()
+    }
     this.bodies_apply_material( this.darkMaterial,  ['geos','effects'] )
-    for( let b of this.bodies_get_list_filtered( 'bloom', true, ['geos','effects'] ) )
+    for( let b of this.bodies_get_list_attr_value_filtered( 'bloom', true, ['geos','effects'] ) )
       b.reset_material()
+
+      return {color_lines:color_lines}
   }
+
+  clean_bloom_pass( save_state )
+  {
+    this.bodies_apply_material( null,['geos','effects'] )
+
+    let bodies = this.bodies_get_list_filtered( ['geos','effects'] )
+    for( let i = 0 ; i < bodies.length; i++)
+    {
+      bodies[i].color_line = save_state.color_lines[i]
+      bodies[i].update_color_three_line()
+    }    
+  }
+
+
 
 
 
