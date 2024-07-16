@@ -93,7 +93,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 let container, stats;
 let camera, scene, renderer;
 let uniforms,light1;
-let finalComposer;
+let finalComposer,bloomComposer;
 
 init();
 
@@ -184,6 +184,7 @@ function init() {
     F_sequence.setup_shapes_fidgets_three(scene)
     F_sequence.setup_chrono_three(scene)
     F_sequence.setup_debug_three(scene)
+
   
     
     ///////////////// render
@@ -205,7 +206,7 @@ function init() {
     bloomPass.strength = 1;
     bloomPass.radius = 0.5;
     
-    const bloomComposer = new EffectComposer( renderer );
+    bloomComposer = new EffectComposer( renderer );
     bloomComposer.renderToScreen = false;
     bloomComposer.addPass( renderScene );
     bloomComposer.addPass( bloomPass );
@@ -226,9 +227,9 @@ function init() {
 
     finalComposer = new EffectComposer( renderer );
     finalComposer.addPass( renderScene );
-    finalComposer.addPass( bloomPass );
-    //finalComposer.addPass( mixPass );
-    //finalComposer.addPass( outputPass );
+    //finalComposer.addPass( bloomPass );
+    finalComposer.addPass( mixPass );
+    finalComposer.addPass( outputPass );
 
     // stats
     stats = new Stats();
@@ -280,12 +281,19 @@ function animate() {
     light1.position.y = Math.cos(rad(45)+animate_count*0.01)*200
     */
 
-
+    
     // other
     F_sequence.update()
     F_sequence.animate_three()
     //uniforms[ 'time' ].value = performance.now() / 1000;
     //renderer.render( scene, camera );
+
+    for( let f of F_sequence.fidgets)
+        f.setup_bloom_pass()
+    bloomComposer.render()
+    for( let f of F_sequence.fidgets)
+        f.clean_bloom_pass()
+
     finalComposer.render();
     stats.update();
 

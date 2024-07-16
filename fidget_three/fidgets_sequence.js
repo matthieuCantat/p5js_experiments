@@ -296,7 +296,7 @@ export default class fidgets_sequence
         this.chrono.p = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
         this.chrono.s = this.screen_dims.x * blendB
       }
-
+      
       this.draw_fidgets_updates_only()
       this.update_count += 1
     }
@@ -332,15 +332,20 @@ export default class fidgets_sequence
         }
 
       }
-
+      
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
         this.fidgets[i].update()
         
+
         if(userInteractionChange)
+        {
           this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
+        }
+        
+          
         
       }
 

@@ -226,9 +226,6 @@ export function addShape_polygon(
     mesh.castShadow = castShadow; //default is false
     mesh.receiveShadow = receiveShadow; //default        
 
-
-    
-
     return mesh
 }
 

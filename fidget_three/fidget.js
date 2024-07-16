@@ -95,6 +95,10 @@ export default class fidget{
      
       
     this.group_three = null
+
+
+    this.darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
+
   }
 
 
@@ -186,7 +190,7 @@ export default class fidget{
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[0].color = [50,140,50]
-      this.bodies.geos.backgrounds[0].update_color_three()
+      this.bodies.geos.backgrounds[0].update_color_three_shape()
     }
     */
       
@@ -199,7 +203,7 @@ export default class fidget{
     if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[1].color = [50,140,50] 
-      this.bodies.geos.backgrounds[1].update_color_three()      
+      this.bodies.geos.backgrounds[1].update_color_three_shape()      
     }
     */
   }
@@ -389,7 +393,10 @@ export default class fidget{
             
         }
         else
-          this.bodies[b_type][key].setup_shapes_three(this.group_three)
+        {
+          this.bodies[b_type][key].setup_shapes_three(this.group_three)        
+        }
+
         
       } 
     }
@@ -481,10 +488,10 @@ export default class fidget{
   bodies_override_color_three(new_color = null,body_type_filter = [] )
   {
     this.bodies_override_color(new_color, body_type_filter)
-    this.bodies_color_update_three(body_type_filter)
-
+    this.bodies_color_update_three_shape(body_type_filter)
   }
-  bodies_color_update_three( body_type_filter = [] )
+
+  bodies_color_update_three_line( body_type_filter = [] )
   {
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
@@ -492,7 +499,7 @@ export default class fidget{
       let key = this.bodies_eval_order[i+1]
       if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
       {
-        if(this.debug_mode.show_warning_log)console.log('bodies_color_update_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        if(this.debug_mode.show_warning_log)console.log('bodies_color_update_three_line - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
 
@@ -502,14 +509,41 @@ export default class fidget{
         if( this.bodies[b_type][key].constructor === Array)
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].update_color_three()
+            this.bodies[b_type][key][i].update_color_three_line()
         }
         else
-          this.bodies[b_type][key].update_color_three()
+          this.bodies[b_type][key].update_color_three_line()
         
       } 
     }
   }
+  bodies_color_update_three_shape( body_type_filter = [] )
+  {
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
+    {   
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        if(this.debug_mode.show_warning_log)console.log('bodies_color_update_three_shape - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+      {
+    
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            this.bodies[b_type][key][i].update_color_three_shape()
+        }
+        else
+          this.bodies[b_type][key].update_color_three_shape()
+        
+      } 
+    }
+  }
+
   /*
   bodies_axe_clean_override( body_type_filter = [] )
   {
@@ -912,18 +946,114 @@ export default class fidget{
       } 
     } 
   }
+
+  bodies_apply_material( material = null, body_type_filter = [] )
+  {
+
+
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
+    {   
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+      
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+      {
+
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
+            if( this.bodies[b_type][key][i].mesh_three.shape != null)
+            {
+              if( material == null )
+                this.bodies[b_type][key][i].mesh_three.shape.material = this.bodies[b_type][key][i].three_material
+              else    
+                this.bodies[b_type][key][i].mesh_three.shape.material = material
+            }
+
+          }
+        }
+        else
+        {
+          if( this.bodies[b_type][key].mesh_three.shape != null)
+          {          
+            if( material == null )
+              this.bodies[b_type][key].mesh_three.shape.material = this.bodies[b_type][key].three_material
+            else
+              this.bodies[b_type][key].mesh_three.shape.material = material
+          }
+
+        }
+
+
+      } 
+    } 
+  }
+
+
+  bodies_get_list_filtered( attr, value, body_type_filter = [] )
+  {
+
+    let bloomed_list = []
+    for( let i =0; i < this.bodies_eval_order.length; i+=2)
+    {   
+      let b_type = this.bodies_eval_order[i+0]
+      let key = this.bodies_eval_order[i+1]
+      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+      {
+        if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+        continue
+      }
+      
+      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+      {
+
+        if( this.bodies[b_type][key].constructor === Array)
+        {
+          for( let i = 0; i < this.bodies[b_type][key].length; i++)
+          {
+            if( this.bodies[b_type][key][i][attr] == value)
+            {
+              bloomed_list.push(this.bodies[b_type][key][i])
+            }
+
+          }
+        }
+        else
+        {
+          if( this.bodies[b_type][key][attr] == value)
+          {   
+            bloomed_list.push(this.bodies[b_type][key])       
+          }
+
+        }
+
+
+      } 
+    } 
+
+    return bloomed_list
+
+  }
+
+
   bodies_list_enable( value, bodies_list = [] )
   {
-  for( let i = 0; i < bodies_list.length; i++ )
-  {
-    if(bodies_list[i] == null)
+    for( let i = 0; i < bodies_list.length; i++ )
     {
-      if(this.debug_mode.show_warning_log)console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
-      continue
+      if(bodies_list[i] == null)
+      {
+        if(this.debug_mode.show_warning_log)console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
+        continue
+      }
+      bodies_list[i].enable(value) 
     }
-    bodies_list[i].enable(value) 
   }
-}
 
   get_selected_body(body_type_filter = [] )
   {
@@ -962,8 +1092,10 @@ export default class fidget{
   }
 
 
-  mouse_select_highlight(mouse_cns,body_type_filter = [] )
+  mouse_select_highlight(mouse_cns,body_type_filter = [], bloom_pass = false )
   {
+    
+
     if(this.Mouse.mouse_lock_selection)
       return
 
@@ -978,6 +1110,7 @@ export default class fidget{
         if(this.debug_mode.show_warning_log)console.log('mouse_select_highlight - this.bodies.'+b_type+'.'+key+' doesnt exists')
         continue
       }
+
 
       if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
       {
@@ -1032,23 +1165,50 @@ export default class fidget{
 
           
       } 
+      
+    }
+
     
+    
+    if(bloom_pass)
+    {
+      this.bodies_apply_material( this.darkMaterial, body_type_filter = ['geos'] )
+      for( let i = 0 ; i < body_to_highlight.length; i++)
+        body_to_highlight[i].reset_material()
+    }
+    else{
 
       for( let i = 0 ; i < body_to_reduce.length; i++)
       {
         body_to_reduce[i].color_line = [0,0,0]
-        body_to_reduce[i].update_color_three()
+        body_to_reduce[i].update_color_three_line()
       }
+
       for( let i = 0 ; i < body_to_highlight.length; i++)
       {
         body_to_highlight[i].color_line = [255,255,255]
-        body_to_highlight[i].update_color_three()
+        body_to_highlight[i].update_color_three_line()
       }
- 
-    } 
-    
-    this.bodies_color_update_three(body_type_filter)
+
+    }
+
+
+    //this.bodies_color_update_three(body_type_filter)
+
   }
+
+  clean_bloom_pass()
+  {
+    this.bodies_apply_material( null,['geos','effects'] )
+  }
+
+  setup_bloom_pass()
+  {
+    this.bodies_apply_material( this.darkMaterial,  ['geos','effects'] )
+    for( let b of this.bodies_get_list_filtered( 'bloom', true, ['geos','effects'] ) )
+      b.reset_material()
+  }
+
 
 
   set_resolution_coef_from_step(step)

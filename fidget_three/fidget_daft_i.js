@@ -668,13 +668,14 @@ export default class fidget_daft_i extends fidget{
                                     type:utils.shape.circle,
 
                                     do_shape: true,
-                                    do_line:false,   
-                                    bevel:1,                                      
+                                    do_line:true,   
+                                    bevel:0,                                      
                                     //color: this.colors[0],
                                     color_line: utils.color.black,
                                     texture_three: textures.cyan_grid,//textures.cyan_grid  ,
                                     castShadow: true,
                                     receiveShadow: true,
+                                    bloom: true,
   
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.bones.circle},
@@ -713,7 +714,7 @@ export default class fidget_daft_i extends fidget{
         type: utils.shape.rectangle,
 
         do_shape: true,
-        do_line:false,           
+        do_line:true,           
         //color: this.colors[2],
         color_line: utils.color.black,
         texture_three: textures.gradient_yellow_green_oblique_line_A,//textures.gradient_yellow_green_oblique_line_A,
@@ -860,7 +861,7 @@ export default class fidget_daft_i extends fidget{
 
                                               parent:this.bodies.bones.rectangles[0],
                                               //m_offset:new Matrix(),
-                                              bevel:1,
+                                              bevel:0,
                                               castShadow: true,
                                               receiveShadow: false,
                                               
@@ -992,7 +993,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles[1],
                                               //m_offset:om_rB,
                                               m_shape:m_shape,
-                                              bevel:1,
+                                              bevel:0,
                                               castShadow: true,
                                               receiveShadow: false,
 
@@ -1121,7 +1122,7 @@ export default class fidget_daft_i extends fidget{
                                               parent:this.bodies.bones.rectangles[2],
                                               //m_offset:om_rC,
                                               m_shape:m_shape,
-                                              bevel:1, 
+                                              bevel:0, 
                                               castShadow: true,
                                               receiveShadow: false,
                                                
@@ -1253,7 +1254,7 @@ export default class fidget_daft_i extends fidget{
         parent:this.bodies.bones.rectangles[3],
         //m_offset:om_rD,
         m_shape:m_shape,
-        bevel:1,
+        bevel:0,
         castShadow: true,
         receiveShadow: false,
              
@@ -1336,8 +1337,8 @@ export default class fidget_daft_i extends fidget{
       type : utils.shape.rectangle,
 
       do_shape: true,
-      do_line:false, 
-      bevel:1,                                          
+      do_line:true, 
+      bevel:0,                                          
       //color : this.colors[1],
       color_line: utils.color.black,
       texture_three: textures.gradient_gold_red_A,//
@@ -2387,8 +2388,8 @@ export default class fidget_daft_i extends fidget{
             {
               this.bodies.geos.backgrounds[0].color = utils.color.red
               this.bodies.geos.backgrounds[1].color = utils.color.red
-              this.bodies.geos.backgrounds[0].update_color_three()
-              this.bodies.geos.backgrounds[1].update_color_three()
+              this.bodies.geos.backgrounds[0].update_color_three_shape()
+              this.bodies.geos.backgrounds[1].update_color_three_shape()
             }
 
            
@@ -2464,7 +2465,7 @@ export default class fidget_daft_i extends fidget{
       let coef = this.show_step_helpers[0] / 100 
       this.bodies.helpers.stepA.transparency_line = 1.-coef
       this.show_step_helpers[0] -= 2
-      this.bodies.helpers.stepA.update_color_three()
+      this.bodies.helpers.stepA.update_color_three_line()
     }
 
     if(this.show_step_helpers[1] )
@@ -2472,7 +2473,7 @@ export default class fidget_daft_i extends fidget{
       let coef = this.show_step_helpers[1] / 100 
       this.bodies.helpers.stepB.transparency_line = 1.-coef
       this.show_step_helpers[1] -= 2
-      this.bodies.helpers.stepB.update_color_three()
+      this.bodies.helpers.stepB.update_color_three_line()
     }
 
     if(this.show_step_helpers[2] )
@@ -2480,7 +2481,7 @@ export default class fidget_daft_i extends fidget{
       let coef = this.show_step_helpers[2] / 100 
       this.bodies.helpers.stepC.transparency_line = 1.-coef
       this.show_step_helpers[2] -= 2
-      this.bodies.helpers.stepC.update_color_three()
+      this.bodies.helpers.stepC.update_color_three_line()
     }
     
 

@@ -42,6 +42,7 @@ export class body_build{
         transparency_activate:false,
         transparency:255,
         transparency_line:255,
+        bloom:false,
         castShadow:false,       
         receiveShadow:true,   
         shader:null,
@@ -93,7 +94,9 @@ export class body_build{
       this.color_base = args.color
       this.transparency_activate = args.transparency_activate,
       this.transparency = args.transparency,
-      this.transparency_line = args.transparency_line,     
+      this.transparency_line = args.transparency_line,   
+      this.bloom = args.bloom,  
+      this.bloom_default = args.bloom,  
       this.shader = args.shader
       this.castShadow = args.castShadow
       this.receiveShadow = args.receiveShadow
@@ -123,6 +126,7 @@ export class body_build{
       this.selection_break_length = args.selection_break_length
 
       this.is_selected = false
+      this.three_material = null
       
 
       this.draw_text_debug = null
@@ -927,7 +931,11 @@ export class body_build{
      
     }
     
-  
+    reset_material()
+    {
+      if( this.mesh_three.shape != null)
+        this.mesh_three.shape.material = this.three_material
+    }
 
 
     three_get_shape_points(m)
@@ -985,14 +993,15 @@ export class body_build{
           this.receiveShadow,
           this.bevel,)  
 
+        this.three_material = out.shape.material
+
         group.add( out.shape ) 
       }
       if(this.do_line)
       {
         out.line = ut.addShape_line( 
           shape_points, 
-          this.texture_three, 
-          this.color, 
+          this.color_line, 
           this.transparency_activate, 
           this.transparency,
           this.shadow,)  
@@ -1032,6 +1041,7 @@ export class body_build{
       let _out = this.three_fill_with_shapes( this.mesh_three.group, this.m_shape )
       this.mesh_three.shape = _out.shape
       this.mesh_three.line  = _out.line
+
 
       group_fidget.add(this.mesh_three.group)
       
@@ -1077,6 +1087,7 @@ export class body_build{
           false,
           false,
           0)
+
         this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
 
@@ -1098,6 +1109,7 @@ export class body_build{
           false,
           false,
           0)
+
         this.mesh_three.group.add( mesh ) 
         mesh.position.y =  len/2.0
 
@@ -1180,7 +1192,7 @@ export class body_build{
       
     }
 
-    update_color_three()
+    update_color_three_shape()
     {
       if(this.mesh_three.shape != null)
       {
@@ -1188,8 +1200,10 @@ export class body_build{
         if(this.transparency_activate)
           this.mesh_three.shape.material.opacity = 1. - this.transparency
       }
+    }
         
-      
+    update_color_three_line()
+    {      
       if(this.mesh_three.line != null)
       {
         this.mesh_three.line.material.color = ut.convert_to_three_color(this.color_line)

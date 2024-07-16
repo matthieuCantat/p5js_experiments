@@ -515,12 +515,17 @@ function handleMouseDown(event) {
 // Function to handle the mouseup event
 function handleMouseUp(event) {
     isMousePressed = false;
+    /*
     userIsInteracting_last = userIsInteracting
     userIsInteracting = isScreenTouched || isMousePressed
     if( userIsInteracting != userIsInteracting_last)
       userInteractionChange = true
     else
       userInteractionChange = false    
+    */
+    userIsInteracting = false
+    userIsInteracting_last = userIsInteracting
+    userInteractionChange = false
     //console.log('Mouse is pressed:', isMousePressed);
 }
 
@@ -548,12 +553,17 @@ function handleTouchDown(event) {
 
 function handleTouchUp(event) {
   isScreenTouched = false;
+  /*
   userIsInteracting_last = userIsInteracting
   userIsInteracting = isScreenTouched || isMousePressed
   if( userIsInteracting != userIsInteracting_last)
     userInteractionChange = true
   else
     userInteractionChange = false  
+  */
+  userIsInteracting = false
+  userIsInteracting_last = userIsInteracting
+  userInteractionChange = false
   //console.log('Mouse is pressed:', isMousePressed);
 }
 
