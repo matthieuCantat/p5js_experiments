@@ -181,7 +181,7 @@ function init() {
         light1.shadow.camera.bottom = -200;
         light1.shadow.camera.left = -200*0.5;
         light1.shadow.camera.right = 200*0.5;
-        light1.shadow.mapSize.set( 500, 500 );
+        light1.shadow.mapSize.set( 200, 200 );
 
         //let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
         //scene.add( light2 );
