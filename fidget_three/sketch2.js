@@ -91,8 +91,8 @@ var debug = { disable_animation:true,
               mouse_info:false,
               show_warning_log:false,
               do_bloom_selected: true,
-              do_bloom: false, 
-              do_shadows: true,         
+              do_bloom: true, 
+              do_shadows: false,         
               do_flare: true,     
                 }
 
