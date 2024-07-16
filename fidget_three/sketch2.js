@@ -93,7 +93,7 @@ var debug = { disable_animation:true,
               do_bloom_selected: true,
               do_bloom: false, 
               do_shadows: false,         
-              do_flare: true,     
+              do_flare: false,     
                 }
 
 
@@ -195,6 +195,17 @@ function init() {
 
 
 
+    const raw_shader_exemple_material = new THREE.RawShaderMaterial( {
+
+        uniforms: {
+            time: { value: 1.0 }
+        },
+        vertexShader: document.getElementById( 'raw_shader_exemple_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'raw_shader_exemple_fragmentShader' ).textContent,
+        side: THREE.DoubleSide,
+        transparent: true
+
+    } );
 
     ///////////////// Background shader
      /*
@@ -226,6 +237,32 @@ function init() {
     F_sequence.setup_chrono_three(scene)
     F_sequence.setup_debug_three(scene)
 
+    
+    
+    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material = raw_shader_exemple_material
+    let colors = []
+    for ( let i = 0; i < 4; i ++ ) {
+
+        // adding x,y,z
+        //positions.push( Math.random() - 0.5 );
+        //positions.push( Math.random() - 0.5 );
+        //positions.push( Math.random() - 0.5 );
+
+        // adding r,g,b,a
+        colors.push( Math.random() * 255 );
+        colors.push( Math.random() * 255 );
+        colors.push( Math.random() * 255 );
+        colors.push( Math.random() * 255 );
+
+    }
+
+    //const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+    const colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
+
+    colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
+
+    //geometry.setAttribute( 'position', positionAttribute );
+    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'color', colorAttribute );
   
     
     ///////////////// render
@@ -339,6 +376,7 @@ function animate() {
     F_sequence.update()
     F_sequence.animate_three()
     //uniforms[ 'time' ].value = performance.now() / 1000;
+    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
 
     if(debug.do_bloom)
     {
