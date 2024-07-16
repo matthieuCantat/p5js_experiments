@@ -1137,7 +1137,7 @@ export default class fidget{
   }
 
 
-  mouse_select_highlight(mouse_cns,body_type_filter = [])
+  mouse_select_highlight(mouse_cns,body_type_filter = [], bloom = true)
   {
     
 
@@ -1221,12 +1221,16 @@ export default class fidget{
     {
       body_to_reduce[i].color_line = [0,0,0]
       body_to_reduce[i].update_color_three_line()
+      if(bloom)
+        body_to_reduce[i].bloom = body_to_reduce[i].bloom_default
     }
 
     for( let i = 0 ; i < body_to_highlight.length; i++)
     {
       body_to_highlight[i].color_line = [255,255,255]
       body_to_highlight[i].update_color_three_line()
+      if(bloom)
+        body_to_highlight[i].bloom = true
     }
 
 
