@@ -675,7 +675,7 @@ export default class fidget_daft_i extends fidget{
                                     texture_three: textures.cyan_grid,//textures.cyan_grid  ,
                                     castShadow: true,
                                     receiveShadow: true,
-                                    bloom: true,
+                                    bloom: this.debug_mode.do_bloom ? true : false,
   
                                     constraints:[
                                       { name:'point' ,type:'kin_point' ,target:this.bodies.bones.circle},

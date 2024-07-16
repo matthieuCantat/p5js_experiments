@@ -25,10 +25,17 @@ import { EffectComposer } from './libraries/jsm/postprocessing/EffectComposer.js
 
 import { UnrealBloomPass } from './libraries/jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from './libraries/jsm/postprocessing/ShaderPass.js';
+
+import { Lensflare, LensflareElement } from './libraries/jsm/objects/Lensflare.js';
+
+import * as THREE from 'three';
+import Stats from 'three/addons/libs/stats.module.js';
+
+
+
 // prevents the mobile browser from processing some default
 // touch events, like swiping left for "back" or scrolling
 // the page.
-
 document.ontouchmove = function(event) {
   event.preventDefault();
 };
@@ -39,8 +46,27 @@ document.body.addEventListener('touchmove', function(event) {
 event.preventDefault();
 }, { passive: false });
 
+const loader = new THREE.TextureLoader();
+const textureFlare0 = loader.load( './textures/lensflare/lensflare0.png' );
+const textureFlare3 = loader.load( './textures/lensflare/lensflare3.png' );
 
+function addLight( h, s, l, x, y, z ) {
 
+    const light = new THREE.PointLight( 0xffffff, 1.5, 2000, 0 );
+    light.color.setHSL( h, s, l );
+    light.position.set( x, y, z );
+
+    const lensflare = new Lensflare();
+    lensflare.addElement( new LensflareElement( textureFlare0, 700*0.5, 0, light.color ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 60 *0.5, 0.6 ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 70 *0.5, 0.7 ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 120*0.5, 0.9 ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 70 *0.5, 1 ) );
+    light.add( lensflare );
+
+    return light
+
+}
 
 /////////////////////////////////////////// setup screen
 let width       = 400
@@ -64,6 +90,8 @@ var debug = { disable_animation:true,
               fidget_steps_info:false,
               mouse_info:false,
               show_warning_log:false,
+              do_bloom_selected: true,
+              do_bloom: false,              
                 }
 
 
@@ -86,14 +114,13 @@ F_sequence.setup()
 
 
 
-import * as THREE from 'three';
-import Stats from 'three/addons/libs/stats.module.js';
 
 
 let container, stats;
 let camera, scene, renderer;
 let uniforms,light1;
 let finalComposer,bloomComposer;
+let light_lens_flare;
 
 init();
 
@@ -108,12 +135,12 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000 );
 
-    camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-    camera.position.set( 0, 0, 500 );  
+    //camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+    //camera.position.set( 0, 0, 500 );  
     let camera_far_dist = 1000 
-    //camera = new THREE.PerspectiveCamera( 76, width / height, 1, camera_far_dist );
-    //camera.position.set( 0, 0, 500 );
-    //camera.rotation.set( 0, 0, 0 );
+    camera = new THREE.PerspectiveCamera( 76, width / height, 1, camera_far_dist );
+    camera.position.set( 0, 0, 500 );
+    camera.rotation.set( 0, 0, 0 );
     
     scene.add( camera );
 
@@ -154,6 +181,11 @@ function init() {
 
     let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
     scene.add( light2 );
+
+    light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
+    scene.add( light_lens_flare )
+
+
 
     ///////////////// Background shader
      /*
@@ -275,11 +307,11 @@ function onWindowResize() {
 var animate_count =0
 function animate() {
 
-    /*
+    
     // light - change position
-    light1.position.x = Math.sin(rad(45)+animate_count*0.01)*200
-    light1.position.y = Math.cos(rad(45)+animate_count*0.01)*200
-    */
+    light_lens_flare.position.x = Math.sin(rad(45)+animate_count*0.01)*120
+    light_lens_flare.position.y = Math.cos(rad(45)+animate_count*0.01)*120
+    
 
     
     // other

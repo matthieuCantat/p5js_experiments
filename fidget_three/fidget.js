@@ -74,6 +74,8 @@ export default class fidget{
     this.mouse_constraint = mouse_constraint
     this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, this.debug_mode.mouse_info)
     this.do_background = do_background
+    this.do_bloom_selected = this.debug_mode.do_bloom_selected
+    this.do_bloom = this.debug_mode.do_bloom
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
@@ -1221,7 +1223,7 @@ export default class fidget{
     {
       body_to_reduce[i].color_line = [0,0,0]
       body_to_reduce[i].update_color_three_line()
-      if(bloom)
+      if(this.do_bloom_selected)
         body_to_reduce[i].bloom = body_to_reduce[i].bloom_default
     }
 
@@ -1229,7 +1231,7 @@ export default class fidget{
     {
       body_to_highlight[i].color_line = [255,255,255]
       body_to_highlight[i].update_color_three_line()
-      if(bloom)
+      if(this.do_bloom_selected)
         body_to_highlight[i].bloom = true
     }
 
