@@ -91,7 +91,9 @@ var debug = { disable_animation:true,
               mouse_info:false,
               show_warning_log:false,
               do_bloom_selected: true,
-              do_bloom: false,              
+              do_bloom: false, 
+              do_shadows: false,         
+              do_flare: true,     
                 }
 
 
@@ -163,27 +165,34 @@ function init() {
     light1.position.x = 200*2
     light1.position.y = 200*2
     light1.position.z = 100*2
-    light1.castShadow = true  
-    
+
     scene.add( light1 );
     //light_group.add(light)
     //light.position.set( Math.sin(0*0.01)*100, Math.cos(0*0.01)*100, -200)
     //camera.add( light1 );
-    light1.shadow.radius = 5;  
-    //light1.shadow.blurSamples = 250
-    light1.shadow.camera.near = 0.5; // default
-    light1.shadow.camera.far = 600*2; // default
-    light1.shadow.camera.top = 200*2;
-    light1.shadow.camera.bottom = -200*2;
-    light1.shadow.camera.left = -200*2;
-    light1.shadow.camera.right = 200*2;
-    light1.shadow.mapSize.set( 2048, 2048 );
+    if(debug.do_shadows)
+    {
+        light1.castShadow = true
+        light1.shadow.radius = 5;  
+        //light1.shadow.blurSamples = 250
+        light1.shadow.camera.near = 0.5; // default
+        light1.shadow.camera.far = 600*2; // default
+        light1.shadow.camera.top = 200*2;
+        light1.shadow.camera.bottom = -200*2;
+        light1.shadow.camera.left = -200*2;
+        light1.shadow.camera.right = 200*2;
+        light1.shadow.mapSize.set( 2048, 2048 );
 
-    let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
-    scene.add( light2 );
+        let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
+        scene.add( light2 );
+    }
 
-    light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
-    scene.add( light_lens_flare )
+    if( debug.do_flare )
+    {
+        light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
+        scene.add( light_lens_flare )
+    }
+
 
 
 
@@ -224,44 +233,51 @@ function init() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( width, height );
     renderer.setAnimationLoop( animate );
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    if(debug.do_shadows)
+    {
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    }
     //renderer.toneMapping = THREE.ReinhardToneMapping;
     container.appendChild( renderer.domElement );
 
-    //render pass
-    const renderScene = new RenderPass( scene, camera );
-    const outputPass = new OutputPass();
+    if(debug.do_bloom)
+    {
+        //render pass
+        const renderScene = new RenderPass( scene, camera );
+        const outputPass = new OutputPass();
 
-    const bloomPass = new UnrealBloomPass( new THREE.Vector2( width, height ), 1.5, 0.4, 0.85 );
-    bloomPass.threshold = 0;
-    bloomPass.strength = 1;
-    bloomPass.radius = 0.5;
-    
-    bloomComposer = new EffectComposer( renderer );
-    bloomComposer.renderToScreen = false;
-    bloomComposer.addPass( renderScene );
-    bloomComposer.addPass( bloomPass );
-    
-    const mixPass = new ShaderPass(
-        new THREE.ShaderMaterial( {
-            uniforms: {
-                baseTexture: { value: null },
-                bloomTexture: { value: bloomComposer.renderTarget2.texture }
-            },
-            vertexShader: document.getElementById( 'bloom_mix_vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'bloom_mix_fragmentShader' ).textContent,
-            defines: {}
-        } ), 'baseTexture'
-    );
-    mixPass.needsSwap = true;
+        const bloomPass = new UnrealBloomPass( new THREE.Vector2( width, height ), 1.5, 0.4, 0.85 );
+        bloomPass.threshold = 0;
+        bloomPass.strength = 1;
+        bloomPass.radius = 0.5;
+        
+        bloomComposer = new EffectComposer( renderer );
+        bloomComposer.renderToScreen = false;
+        bloomComposer.addPass( renderScene );
+        bloomComposer.addPass( bloomPass );
+        
+        const mixPass = new ShaderPass(
+            new THREE.ShaderMaterial( {
+                uniforms: {
+                    baseTexture: { value: null },
+                    bloomTexture: { value: bloomComposer.renderTarget2.texture }
+                },
+                vertexShader: document.getElementById( 'bloom_mix_vertexShader' ).textContent,
+                fragmentShader: document.getElementById( 'bloom_mix_fragmentShader' ).textContent,
+                defines: {}
+            } ), 'baseTexture'
+        );
+        mixPass.needsSwap = true;
 
 
-    finalComposer = new EffectComposer( renderer );
-    finalComposer.addPass( renderScene );
-    //finalComposer.addPass( bloomPass );
-    finalComposer.addPass( mixPass );
-    finalComposer.addPass( outputPass );
+        finalComposer = new EffectComposer( renderer );
+        finalComposer.addPass( renderScene );
+        //finalComposer.addPass( bloomPass );
+        finalComposer.addPass( mixPass );
+        finalComposer.addPass( outputPass );
+    }
+
 
     // stats
     stats = new Stats();
@@ -296,8 +312,12 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize( width, height);
-    bloomComposer.setSize( width, height );
-    finalComposer.setSize( width, height );
+
+    if(debug.do_bloom)
+    {
+        bloomComposer.setSize( width, height );
+        finalComposer.setSize( width, height );
+    }
 
 }
 
@@ -307,27 +327,35 @@ function onWindowResize() {
 var animate_count =0
 function animate() {
 
-    
-    // light - change position
-    light_lens_flare.position.x = Math.sin(rad(45)+animate_count*0.01)*120
-    light_lens_flare.position.y = Math.cos(rad(45)+animate_count*0.01)*120
-    
+    if( debug.do_flare )
+    {
+        // light - change position
+        light_lens_flare.position.x = Math.sin(rad(45)+animate_count*0.01)*120
+        light_lens_flare.position.y = Math.cos(rad(45)+animate_count*0.01)*120
+    }        
 
     
     // other
     F_sequence.update()
     F_sequence.animate_three()
     //uniforms[ 'time' ].value = performance.now() / 1000;
-    //renderer.render( scene, camera );
 
-    let save_states = []
-    for( let i = 0 ; i < F_sequence.fidgets.length; i++)
-        save_states.push( F_sequence.fidgets[i].setup_bloom_pass() )
-    bloomComposer.render()
-    for( let i = 0 ; i < F_sequence.fidgets.length; i++)
-        F_sequence.fidgets[i].clean_bloom_pass(save_states[i])
+    if(debug.do_bloom)
+    {
+        let save_states = []
+        for( let i = 0 ; i < F_sequence.fidgets.length; i++)
+            save_states.push( F_sequence.fidgets[i].setup_bloom_pass() )
+        bloomComposer.render()
+        for( let i = 0 ; i < F_sequence.fidgets.length; i++)
+            F_sequence.fidgets[i].clean_bloom_pass(save_states[i])
 
-    finalComposer.render();
+        finalComposer.render();
+    }
+    else
+    {
+        renderer.render( scene, camera );
+    }
+
     stats.update();
 
     
