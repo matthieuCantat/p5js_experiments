@@ -92,7 +92,7 @@ var debug = { disable_animation:true,
               show_warning_log:false,
               do_bloom_selected: true,
               do_bloom: false, 
-              do_shadows: false,         
+              do_shadows: true,         
               do_flare: true,     
                 }
 
