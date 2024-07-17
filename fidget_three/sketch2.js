@@ -14,10 +14,12 @@ import { utils,
          create_mouse_constraint,
          create_physics_engine_runner} from './utils.js';
 
+import { three_utils,} from './utils_three.js';
+
          
 import fidgets_sequence from './fidgets_sequence.js'
 import fidgets_grid from './fidgets_grid.js'
-import shader_build from './shader.js';
+
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
 import { RenderPass } from './libraries/jsm/postprocessing/RenderPass.js';
 import { OutputPass } from './libraries/jsm/postprocessing/OutputPass.js';
@@ -193,31 +195,6 @@ function init() {
         scene.add( light_lens_flare )
     }
 
-
-
-    const raw_shader_exemple_material = new THREE.RawShaderMaterial( {
-
-        uniforms: {
-            time: { value: 1.0 }
-        },
-        vertexShader: document.getElementById( 'raw_shader_exemple_vertexShader' ).textContent,
-        //fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent,
-        fragmentShader: document.getElementById( 'raw_shader_exemple_fragmentShader' ).textContent,
-        side: THREE.DoubleSide,
-        transparent: true
-
-    } );
-
-    ///////////////// Background shader
-
-    const background_test_material = new THREE.ShaderMaterial( {
-        uniforms: {
-            time: { value: 1.0 }
-        },
-        vertexShader: document.getElementById( 'background_test_vertexShader' ).textContent,
-        fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent
-
-    } );
    
 
     ///////////////// fidgets
@@ -226,8 +203,8 @@ function init() {
     F_sequence.setup_debug_three(scene)
 
     
-    
-    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material = raw_shader_exemple_material
+    /*
+    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material = three_utils.material.background_test
     let colors = []
     let positions = []
     for ( let i = 0; i < 4; i ++ ) {
@@ -244,15 +221,12 @@ function init() {
         colors.push( Math.random() * 255 );
 
     }
-
     const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
     const colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
-
     colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
-
     //F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'position', positionAttribute ); // arleady in
     F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'color', colorAttribute );
-  
+    */
     
     ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -365,7 +339,7 @@ function animate() {
     F_sequence.update()
     F_sequence.animate_three()
     //uniforms[ 'time' ].value = performance.now() / 1000;
-    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
+    //F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
 
     if(debug.do_bloom)
     {

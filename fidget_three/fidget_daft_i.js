@@ -22,8 +22,8 @@ import Vector from './vector.js';
 import Matrix from './matrix.js';
 import * as ut from './utils_three.js';
 import { and } from './libraries/jsm/nodes/Nodes.js';
-
-
+import { three_utils,} from './utils_three.js';
+import { materials,} from './shader.js';
 
 
 export default class fidget_daft_i extends fidget{
@@ -125,6 +125,7 @@ export default class fidget_daft_i extends fidget{
       var text_checker_three_grey = ut.get_texture_grid_checker_grey()  
       
       var textures = {
+        uv_grid_opengl_grey: ut.get_texture('uv_grid_opengl_grey'),
         uv_grid_opengl: ut.get_texture('uv_grid_opengl'),
         cyan_grid: ut.get_texture('texture_cyan_grid'),
         gradient_blue_cyan_A: ut.get_texture('texture_gradient_blue_cyan_A'),
@@ -140,6 +141,7 @@ export default class fidget_daft_i extends fidget{
 
       
       var textures_background = {
+        uv_grid_opengl_grey: ut.get_texture('uv_grid_opengl_grey'),
         uv_grid_opengl: ut.get_texture('uv_grid_opengl'),
         abstract_shape_grid : ut.get_background('background_abstract_shape_grid'),
         big_spheres_grid    : ut.get_background('background_big_spheres_grid'),
@@ -181,6 +183,7 @@ export default class fidget_daft_i extends fidget{
         color:utils.color.grey,
         color_line: utils.color.black,
         texture_three: text_checker_three_grey, 
+        material_three: materials.simple.text_checker_three_grey ,
       }    
 
       let opts_visual_bones = {
@@ -264,6 +267,7 @@ export default class fidget_daft_i extends fidget{
       bevel:0,       
       //color: this.color_background,
       texture_three: textures_background.space_grid  ,
+      material_three: materials.background.space_grid ,
       color_line: utils.color.black,
 
       density:0.01/(s/2.2), 
@@ -673,6 +677,7 @@ export default class fidget_daft_i extends fidget{
                                     //color: this.colors[0],
                                     color_line: utils.color.black,
                                     texture_three: textures.cyan_grid,//textures.cyan_grid  ,
+                                    material_three: materials.raw_shader_exemple ,//three_utils.material.simple.cyan_grid ,
                                     castShadow: true,
                                     receiveShadow: true,
                                     bloom: this.debug_mode.do_bloom ? true : false,
@@ -718,6 +723,7 @@ export default class fidget_daft_i extends fidget{
         //color: this.colors[2],
         color_line: utils.color.black,
         texture_three: textures.gradient_yellow_green_oblique_line_A,//textures.gradient_yellow_green_oblique_line_A,
+        material_three: materials.raw_shader_exemple,//materials.simple.gradient_yellow_green_oblique_line_A ,
         //texture_three: text_checker_three,
 
         //constraints:[
@@ -1342,6 +1348,7 @@ export default class fidget_daft_i extends fidget{
       //color : this.colors[1],
       color_line: utils.color.black,
       texture_three: textures.gradient_gold_red_A,//
+      material_three: materials.background_test ,//materials.simple.gradient_gold_red_A ,
       //texture_three: text_checker_three, 
       castShadow: true,
       receiveShadow: false,

@@ -159,6 +159,7 @@ export function addShape_polygon(
     m_ref,
     scale_ref, 
     texture = null, 
+    material = null, 
     color = null, 
     transparency_activate = false, 
     transparency = 0.,
@@ -206,21 +207,30 @@ export function addShape_polygon(
           //  this.texture_three.repeat.set( m.get_row(0).mag()*0.00001, m.get_row(0).mag()*0.00001 );    
     }
 
-    let mat_opt = { 
-        side: THREE.DoubleSide, 
-        color: null, 
-        map: null, 
-        transparent:transparency_activate, 
-        opacity: 1.-transparency,
-        shininess: 2030,//30
-        specular:utils.color.white,
-     }
-    if( color != null )
-        mat_opt.color = convert_to_three_color(color)
-    if( texture != null )
-        mat_opt.map = texture
-    
-    let mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+    let mesh = null
+    if(material == null)
+    {  
+        let mat_opt = { 
+            side: THREE.DoubleSide, 
+            color: null, 
+            map: null, 
+            transparent:transparency_activate, 
+            opacity: 1.-transparency,
+            shininess: 2030,//30
+            specular:utils.color.white,
+        }
+        if( color != null )
+            mat_opt.color = convert_to_three_color(color)
+        if( texture != null )
+            mat_opt.map = texture
+        
+        mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
+    }
+    else
+    {
+        material.prepare_geometry(geometry)
+        mesh = new THREE.Mesh( geometry, material.material );
+    }
 
 
     mesh.castShadow = castShadow; //default is false
@@ -518,3 +528,100 @@ export const updateUVScale = (geometry, v_to_scale ) => {
     att_uv.needsUpdate = true;
 };
 
+
+export var three_utils = {
+    texture : {
+        simple : {
+            uv_grid_opengl_grey: get_texture('uv_grid_opengl_grey'),
+            uv_grid_opengl: get_texture('uv_grid_opengl'),
+            cyan_grid: get_texture('texture_cyan_grid'),
+            gradient_blue_cyan_A: get_texture('texture_gradient_blue_cyan_A'),
+            gradient_blue_pink_A: get_texture('texture_gradient_blue_pink_A'),
+            gradient_blue_pink_B: get_texture('texture_gradient_blue_pink_B'),
+            gradient_blue_pink_C: get_texture('texture_gradient_blue_pink_C'),
+            gradient_blue_pink_D: get_texture('texture_gradient_blue_pink_D'),
+            gradient_gold_red_A: get_texture('texture_gradient_gold_red_A'),
+            gradient_yellow_green_oblique_line_A: get_texture('texture_gradient_yellow_green_oblique_line_A'),
+            grainy_gradient_blue_cyan_A: get_texture('texture_grainy_gradient_blue_cyan_A'),
+            grainy_gradient_blue_cyan_B: get_texture('texture_grainy_gradient_blue_cyan_B'),
+        },
+        background:{
+            uv_grid_opengl_grey: get_texture('uv_grid_opengl_grey'),
+            uv_grid_opengl: get_texture('uv_grid_opengl'),
+            abstract_shape_grid : get_background('background_abstract_shape_grid'),
+            big_spheres_grid    : get_background('background_big_spheres_grid'),
+            coherence_the_set_generation: get_background('background_coherence_the_set_generation'),
+            football_field     : get_background('background_football_field'),
+            purple_sphere_grid : get_background('background_purple_sphere_grid'),
+            space_grid         : get_background('background_space_grid'),
+            squares_grey_blur  : get_background('background_squares_grey_blur'),            
+        }
+      },
+    material : {
+        black: new THREE.MeshBasicMaterial( { color: 'black' } ),
+        white: new THREE.MeshBasicMaterial( { color: 'white' } ),
+
+        raw_shader_exemple: new THREE.RawShaderMaterial( {
+
+            uniforms: {
+                time: { value: 1.0 }
+            },
+            vertexShader: document.getElementById( 'raw_shader_exemple_vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'raw_shader_exemple_fragmentShader' ).textContent,
+            side: THREE.DoubleSide,
+            transparent: true
+    
+        } ),
+
+        background_test : new THREE.ShaderMaterial( {
+            uniforms: {
+                time: { value: 1.0 }
+            },
+            vertexShader: document.getElementById( 'background_test_vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent
+    
+        } ),
+
+        phong_yellow: new THREE.MeshPhongMaterial(  { 
+                                            side: THREE.DoubleSide, 
+                                            color: convert_to_three_color('yellow'), 
+                                            map: null, 
+                                            transparent:0, 
+                                            opacity: 1,
+                                            shininess: 2030,//30
+                                            specular:utils.color.white,
+                                        } ),
+
+        simple : {
+            uv_grid_opengl_grey: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl_grey') } ),
+            uv_grid_opengl: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl') } ),
+            cyan_grid: new THREE.MeshBasicMaterial( { map: get_texture('texture_cyan_grid') } ),
+            gradient_blue_cyan_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_cyan_A') } ),
+            gradient_blue_pink_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_A') } ),
+            gradient_blue_pink_B: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_B') } ),
+            gradient_blue_pink_C: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_C') } ),
+            gradient_blue_pink_D: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_D') } ),
+            gradient_gold_red_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_gold_red_A') } ),
+            gradient_yellow_green_oblique_line_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_yellow_green_oblique_line_A') } ),
+            grainy_gradient_blue_cyan_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_grainy_gradient_blue_cyan_A') } ),
+            grainy_gradient_blue_cyan_B: new THREE.MeshBasicMaterial( { map: get_texture('texture_grainy_gradient_blue_cyan_B') } ),
+        },
+        background:{
+            uv_grid_opengl_grey: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl_grey') } ),
+            uv_grid_opengl: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl') } ),
+            abstract_shape_grid : new THREE.MeshBasicMaterial( { map: get_background('background_abstract_shape_grid') } ),
+            big_spheres_grid    : new THREE.MeshBasicMaterial( { map: get_background('background_big_spheres_grid') } ),
+            coherence_the_set_generation: new THREE.MeshBasicMaterial( { map: get_background('background_coherence_the_set_generation') } ),
+            football_field     : new THREE.MeshBasicMaterial( { map: get_background('background_football_field') } ),
+            purple_sphere_grid : new THREE.MeshBasicMaterial( { map: get_background('background_purple_sphere_grid') } ),
+            space_grid         : new THREE.MeshBasicMaterial( { map: get_background('background_space_grid') } ),
+            squares_grey_blur  : new THREE.MeshBasicMaterial( { map: get_background('background_squares_grey_blur') } ),            
+        },
+
+    }
+    
+ 
+}
+
+
+ 

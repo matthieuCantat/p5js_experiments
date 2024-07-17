@@ -1,7 +1,256 @@
 
+import * as THREE from 'three';
+import {
+  get_texture,
+  get_background,
+  convert_to_three_color,
+} from './utils_three.js';
+
+import {
+  utils,
+} from './utils.js';
+
+var materials = {
+    black: new THREE.MeshBasicMaterial( { color: 'black' } ),
+    white: new THREE.MeshBasicMaterial( { color: 'white' } ),
+
+    raw_shader_exemple: new THREE.RawShaderMaterial( {
+
+        uniforms: {
+            time: { value: 1.0 }
+        },
+        vertexShader: document.getElementById( 'raw_shader_exemple_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'raw_shader_exemple_fragmentShader' ).textContent,
+        side: THREE.DoubleSide,
+        transparent: true
+
+    } ),
+
+    background_test : new THREE.ShaderMaterial( {
+        uniforms: {
+            time: { value: 1.0 }
+        },
+        vertexShader: document.getElementById( 'background_test_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent
+
+    } ),
+
+    phong_yellow: new THREE.MeshPhongMaterial(  { 
+                                        side: THREE.DoubleSide, 
+                                        color: convert_to_three_color('yellow'), 
+                                        map: null, 
+                                        transparent:0, 
+                                        opacity: 1,
+                                        shininess: 2030,//30
+                                        specular:utils.color.white,
+                                    } ),
+
+    simple : {
+        uv_grid_opengl_grey: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl_grey') } ),
+        uv_grid_opengl: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl') } ),
+        cyan_grid: new THREE.MeshBasicMaterial( { map: get_texture('texture_cyan_grid') } ),
+        gradient_blue_cyan_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_cyan_A') } ),
+        gradient_blue_pink_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_A') } ),
+        gradient_blue_pink_B: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_B') } ),
+        gradient_blue_pink_C: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_C') } ),
+        gradient_blue_pink_D: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_D') } ),
+        gradient_gold_red_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_gold_red_A') } ),
+        gradient_yellow_green_oblique_line_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_yellow_green_oblique_line_A') } ),
+        grainy_gradient_blue_cyan_A: new THREE.MeshBasicMaterial( { map: get_texture('texture_grainy_gradient_blue_cyan_A') } ),
+        grainy_gradient_blue_cyan_B: new THREE.MeshBasicMaterial( { map: get_texture('texture_grainy_gradient_blue_cyan_B') } ),
+    },
+    background:{
+        uv_grid_opengl_grey: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl_grey') } ),
+        uv_grid_opengl: new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl') } ),
+        abstract_shape_grid : new THREE.MeshBasicMaterial( { map: get_background('background_abstract_shape_grid') } ),
+        big_spheres_grid    : new THREE.MeshBasicMaterial( { map: get_background('background_big_spheres_grid') } ),
+        coherence_the_set_generation: new THREE.MeshBasicMaterial( { map: get_background('background_coherence_the_set_generation') } ),
+        football_field     : new THREE.MeshBasicMaterial( { map: get_background('background_football_field') } ),
+        purple_sphere_grid : new THREE.MeshBasicMaterial( { map: get_background('background_purple_sphere_grid') } ),
+        space_grid         : new THREE.MeshBasicMaterial( { map: get_background('background_space_grid') } ),
+        squares_grey_blur  : new THREE.MeshBasicMaterial( { map: get_background('background_squares_grey_blur') } ),            
+    },
+
+}
+  
 
 
-export default class shader_build
+class three_material
+{
+  constructor( material = null)
+  {
+    this.material = material
+  }
+
+  prepare_geometry(geometry)
+  {
+  }  
+
+  set(mesh)
+  {
+    this.prepare_geometry(mesh.geometry)
+    mesh.material = this.material
+  }
+
+  update(mesh,count)
+  {
+  }
+
+}
+
+class material_raw_shader_exemple extends three_material
+{
+  constructor()
+  {
+    super(null)
+    this.material = new THREE.RawShaderMaterial( {
+
+        uniforms: {
+            time: { value: 1.0 }
+        },
+        vertexShader: document.getElementById( 'raw_shader_exemple_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'raw_shader_exemple_fragmentShader' ).textContent,
+        side: THREE.DoubleSide,
+        transparent: true
+
+    } )
+  }
+
+  prepare_geometry(geometry)
+  {
+    // add random color to geometry
+    let colors = []
+    for ( let i = 0; i < geometry.getAttribute('position').count; i ++ ) {
+        // adding r,g,b,a
+        colors.push( Math.random() * 255 );
+        colors.push( Math.random() * 255 );
+        colors.push( Math.random() * 255 );
+        colors.push( Math.random() * 255 );
+
+    }
+    //const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+    const colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
+    colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
+    //geometry.setAttribute( 'position', positionAttribute ); // arleady in
+    geometry.setAttribute( 'color', colorAttribute );
+  }  
+
+  set(mesh)
+  {
+    this.prepare_geometry(mesh.geometry)
+    mesh.material = this.material
+  }
+
+  update(mesh,count)
+  {
+    mesh.material.uniforms.time.value = count*0.01;
+  }
+
+}
+
+
+class material_background_test extends three_material
+{
+  constructor()
+  {
+    super(null)
+    this.material = new THREE.ShaderMaterial( {
+        uniforms: {
+            time: { value: 1.0 }
+        },
+        vertexShader: document.getElementById( 'background_test_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent
+
+    } )
+  }
+
+  prepare_geometry(geometry)
+  {
+  }  
+
+  set(mesh)
+  {
+    this.prepare_geometry(mesh.geometry)
+    mesh.material = this.material
+  }
+
+  update(mesh,count)
+  {
+    mesh.material.uniforms.time.value = count*0.01;
+  }
+
+}
+
+
+
+export var materials = {
+  black: new three_material(new THREE.MeshBasicMaterial( { color: 'black' } )),
+  white: new three_material(new THREE.MeshBasicMaterial( { color: 'white' } )),
+
+  raw_shader_exemple: new material_raw_shader_exemple(),
+  background_test : new material_background_test(),
+
+  phong_yellow: new three_material(new THREE.MeshPhongMaterial(  { 
+                                      side: THREE.DoubleSide, 
+                                      color: convert_to_three_color('yellow'), 
+                                      map: null, 
+                                      transparent:0, 
+                                      opacity: 1,
+                                      shininess: 2030,//30
+                                      specular:utils.color.white,
+                                  } )),
+
+  simple : {
+      uv_grid_opengl_grey: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl_grey') } )),
+      uv_grid_opengl: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl') } )),
+      cyan_grid: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_cyan_grid') } )),
+      gradient_blue_cyan_A: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_cyan_A') } )),
+      gradient_blue_pink_A: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_A') } )),
+      gradient_blue_pink_B: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_B') } )),
+      gradient_blue_pink_C: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_C') } )),
+      gradient_blue_pink_D: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_blue_pink_D') } )),
+      gradient_gold_red_A: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_gold_red_A') } )),
+      gradient_yellow_green_oblique_line_A: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_gradient_yellow_green_oblique_line_A') } )),
+      grainy_gradient_blue_cyan_A: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_grainy_gradient_blue_cyan_A') } )),
+      grainy_gradient_blue_cyan_B: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('texture_grainy_gradient_blue_cyan_B') } )),
+  },
+  background:{
+      uv_grid_opengl_grey: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl_grey') } )),
+      uv_grid_opengl: new three_material(new THREE.MeshBasicMaterial( { map: get_texture('uv_grid_opengl') } )),
+      abstract_shape_grid : new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_abstract_shape_grid') } )),
+      big_spheres_grid    : new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_big_spheres_grid') } )),
+      coherence_the_set_generation: new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_coherence_the_set_generation') } )),
+      football_field     : new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_football_field') } )),
+      purple_sphere_grid : new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_purple_sphere_grid') } )),
+      space_grid         : new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_space_grid') } )),
+      squares_grey_blur  : new three_material(new THREE.MeshBasicMaterial( { map: get_background('background_squares_grey_blur') } )),            
+  },
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class shader_build
 {
   constructor()
   {

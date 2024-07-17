@@ -56,6 +56,7 @@ export class body_build{
         mouse_constraint:null,
         fidget:null, 
         texture_three:null,
+        material_three:null,
         arc_limites:[0,3.14*2],
         debug_matrix_info: false,
         debug_matrix_axes: false,  
@@ -119,6 +120,7 @@ export class body_build{
       this.mouse_constraint = args.mouse_constraint
       this.fidget = args.fidget
       this.texture_three = args.texture_three
+      this.material_three = args.material_three
       this.arc_limites = args.arc_limites
       this.debug_matrix_info = args.debug_matrix_info
       this.debug_matrix_axes = args.debug_matrix_axes
@@ -986,6 +988,7 @@ export class body_build{
           m,
           this.scale, 
           this.texture_three, 
+          this.material_three,
           this.color, 
           this.transparency_activate, 
           this.transparency,
@@ -1082,6 +1085,7 @@ export class body_build{
           null,
           null,
           null,
+          null,
           [255,0,0],
           0,
           false,
@@ -1103,6 +1107,7 @@ export class body_build{
           null,
           null,
           null,          
+          null,
           null,
           [0,255,0],
           0,
@@ -1143,7 +1148,11 @@ export class body_build{
       this.mesh_three.group.visible = this.get_visibility() == 1   
       this.mesh_three.group.scale.x = scale  
       this.mesh_three.group.scale.y = scale  
-      //this.mesh_three.group.scale.z = scale  
+      //this.mesh_three.group.scale.z = scale 
+      
+      
+      if(this.material_three!=null)
+        this.material_three.update(this.mesh_three.shape,this.draw_count)
   
 
       if(this.debug_matrix_info)
@@ -1189,6 +1198,8 @@ export class body_build{
       
       
       // mouse cns
+
+      this.draw_count += 1
       
     }
 
