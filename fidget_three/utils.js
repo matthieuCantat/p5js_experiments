@@ -475,6 +475,17 @@ export function clamp(value,min_value,max_value)
   return Math.min(max_value,Math.max(min_value,value))
 }
 
+export function mix_value_function(value,pos,scale,max_loop)
+{
+  let input = (value%max_loop-pos)/scale;
+  let coef = clamp(Math.round(input+0.5),0.,1.)
+  let alternate_valueA = clamp( (1-coef)*input+coef*input*-1. + 1., 0.,1.);  
+  return alternate_valueA;
+}
+export function map_range(value, low1, high1, low2, high2) {
+  return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
 export function snap_point_on_line(p_line, v_line,p)
 {
   let vDelta = p.getSub(p_line);

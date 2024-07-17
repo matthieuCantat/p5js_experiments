@@ -8,6 +8,10 @@ import {
 
 import {
   utils,
+  mouseX,
+  mouseY,
+  mix_value_function,
+  map_range,
 } from './utils.js';
 
 var materials = {
@@ -182,6 +186,185 @@ class material_background_test extends three_material
 }
 
 
+class material_old_custom_exemple extends three_material
+{
+  constructor()
+  {
+    super(null)
+
+    this.iFrame = 0;
+    this.iTime = 0;
+    this.iResolution = {x:window.innerWidth,y:window.innerHeight};
+
+    this.iMouse = {x:0.,y:0.};
+    this.objCanvasRatio ={x:1.,y:1.};
+    this.uvRotatePivot ={x:0.5,y:0.5};
+    this.uvOffset ={x:0.,y:0.};
+    this.uvOffsetRotate =0.;
+   
+    this.text =null; 
+    this.text_glow = null; 
+    this.blur_background =0.; 
+    this.blur_background_samples = 35;
+    this.blur_background_samples_LOD =2;  
+  
+    this.glow_background_size =0.; 
+    this.glow_background =0.; 
+  
+    this.bg_transparency =0.; 
+    this.boder_size =0.0;
+    this.hatching_line =0.;
+  
+    this.bg_animation =0.0;
+    this.bg_animation_offset =0.0;
+    this.bg_grain =0.0;
+    this.bg_grain_scale =2.0;
+    this.bg_grid =0.0;
+    this.bg_grid_scale = 4.;
+    this.bg_grid_line_scale =1.0;
+    this.bg_grid_point_scale =1.0; 
+    this.bg_colorA =[255., 0., 114.];//vec3(.910, .510, .8,
+    this.bg_colorB =[197., 255., 80.];//vec3(.957, .804, .623,
+    this.bg_colorC =[48.96,97.92,237.915];//vec3(.192, .384, .933,
+    this.bg_colorD =[89.25,181.05,243.015];//vec3(0.350, .71, .953,
+    this.bg_typeA =0.0;
+    this.bg_typeB =0.0;
+    this.bg_typeC =0.0;
+    this.bg_typeD =0.0;
+    this.bg_type_discoTarget = 0.0;
+  
+    this.light_beam =0.;
+    this.glow_power = 0.;
+    this.debug =0;  
+
+    this.glow_remove_white_original = 0.;
+
+    this.shdr = null;
+    this.canvas = null
+
+    this.material = new THREE.RawShaderMaterial( {
+
+        uniforms: {
+          iFrame: { value: this.iFrame },
+          iTime: { value: this.iTime },
+          iResolution: { value: [this.iResolution.x,this.iResolution.y]},
+          iMouse: { value: [this.iMouse.x,this.iMouse.y] },
+          uvOffset: { value: [this.uvOffset.x,this.uvOffset.y] },
+          objCanvasRatio: { value: [this.objCanvasRatio.x,this.objCanvasRatio.y] },
+          uvRotatePivot: { value: [this.uvRotatePivot.x,this.uvRotatePivot.y] },
+          uvOffsetRotate: { value: this.uvOffsetRotate },
+          text: { value: this.text },
+          text_glow: { value: this.text_glow },
+          glow_power: { value: this.glow_power },
+          blur_background: { value: this.blur_background },
+          blur_background_samples: { value: this.blur_background_samples },
+          blur_background_samples_LOD: { value: this.blur_background_samples_LOD },
+          glow_background_size: { value: this.glow_background_size },
+          glow_background: { value: this.glow_background },
+          bg_transparency: { value: this.bg_transparency },
+
+          boder_size: { value: this.boder_size },
+          hatching_line: { value: this.hatching_line },
+
+          bg_animation: { value: this.bg_animation },
+          bg_animation_offset: { value: this.bg_animation_offset },
+          bg_grain: { value: this.bg_grain },
+          bg_grain_scale: { value: this.bg_grain_scale },
+          bg_grid: { value: this.bg_grid },
+          bg_grid_scale: { value: this.bg_grid_scale },
+          bg_grid_line_scale: { value: this.bg_grid_line_scale },
+          bg_grid_point_scale: { value: this.bg_grid_point_scale },
+
+          background_colorA: { value: this.bg_colorA },
+          background_colorB: { value: this.bg_colorB },
+          background_colorC: { value: this.bg_colorC },
+          background_colorD: { value: this.bg_colorD },
+
+          background_typeA: { value: this.bg_typeA },
+          background_typeB: { value: this.bg_typeB },
+          background_typeC: { value: this.bg_typeC },
+          background_typeD: { value: this.bg_typeD },
+          background_type_discoTarget: { value: this.bg_type_discoTarget },
+          light_beam: { value: this.light_beam },
+
+          glow_remove_white_original: { value: this.glow_remove_white_original },
+
+          debug: { value: this.debug },
+
+        },
+
+        vertexShader: document.getElementById( 'old_custom_exemple_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'old_custom_exemple_fragmentShader' ).textContent,
+        side: THREE.DoubleSide,
+        transparent: true,
+        glslVersion: THREE.GLSL3,
+
+    } )
+  }
+
+  prepare_geometry(geometry)
+  {
+    //this.material.objCanvasRatio.value = [this.objCanvasRatio.x,this.objCanvasRatio.y]
+    //this.material.text.value = this.text
+    //this.material.text_glow.value = this.text_glow
+  }  
+
+  set(mesh)
+  {
+    this.prepare_geometry(mesh.geometry)
+    mesh.material = this.material
+  }
+
+  update(mesh,count)
+  {
+    mesh.material.uniforms.iFrame.value = count*0.01;
+    mesh.material.uniforms.iTime.value = count*0.01;
+    mesh.material.uniforms.iMouse.value = { x: mouseX*2, y: map_range(mouseY, 0, this.iResolution.x, this.iResolution.y, 0)*2};
+    //mesh.material.uniforms.uvOffset.value = [this.uvOffset.x,this.uvOffset.y]
+    // mesh.material.uniforms.uvRotatePivot.value = [this.uvRotatePivot.x,this.uvRotatePivot.y]
+    // mesh.material.uniforms.uvOffsetRotate.value = this.uvOffsetRotate
+
+    // mesh.material.uniforms.glow_power.value = this.glow_power
+    // mesh.material.uniforms.blur_background.value = this.blur_background
+    // mesh.material.uniforms.blur_background_samples_LOD.value = this.blur_background_samples_LOD
+    // mesh.material.uniforms.glow_background_size.value = this.glow_background_size
+    // mesh.material.uniforms.glow_background.value = this.glow_background
+    // mesh.material.uniforms.bg_transparency.value = this.bg_transparency
+
+    // mesh.material.uniforms.boder_size.value = this.boder_size
+    // mesh.material.uniforms.hatching_line.value = this.hatching_line
+
+    mesh.material.uniforms.bg_animation.value = 1.
+    // mesh.material.uniforms.bg_animation_offset.value = this.bg_animation_offset
+    mesh.material.uniforms.bg_grain.value = 1.
+    mesh.material.uniforms.bg_grain_scale.value = 4.
+    mesh.material.uniforms.bg_grid.value = 1.0
+    mesh.material.uniforms.bg_grid_scale.value =  10.0
+    mesh.material.uniforms.bg_grid_line_scale.value =  2.0
+    mesh.material.uniforms.bg_grid_point_scale.value =  2.0
+
+    // mesh.material.uniforms.background_colorA.value = this.bg_colorA
+    // mesh.material.uniforms.background_colorB.value = this.bg_colorB
+    // mesh.material.uniforms.background_colorC.value = this.bg_colorC
+    // mesh.material.uniforms.background_colorD.value = this.bg_colorD
+
+
+    mesh.material.uniforms.background_typeA.value = mix_value_function(count*0.7,0  ,200,900);
+    mesh.material.uniforms.background_typeB.value = mix_value_function(count*0.7,200,200,900);
+    mesh.material.uniforms.background_typeC.value = mix_value_function(count*0.7,400,200,900);
+    mesh.material.uniforms.background_typeD.value = mix_value_function(count*0.7,600,200,900);
+
+    mesh.material.uniforms.background_type_discoTarget.value = mix_value_function(count*0.7,800,200,900);
+    mesh.material.uniforms.light_beam.value = 1.0
+
+    // mesh.material.uniforms.glow_remove_white_original.value = this.glow_remove_white_original
+
+    mesh.material.uniforms.debug.value = 0.0
+  }
+
+}
+
+
 
 export var materials = {
   black: new three_material(new THREE.MeshBasicMaterial( { color: 'black' } )),
@@ -189,6 +372,7 @@ export var materials = {
 
   raw_shader_exemple: new material_raw_shader_exemple(),
   background_test : new material_background_test(),
+  old_custom_exemple: new material_old_custom_exemple(),
 
   phong_yellow: new three_material(new THREE.MeshPhongMaterial(  { 
                                       side: THREE.DoubleSide, 
@@ -247,7 +431,7 @@ export var materials = {
 
 
 
-
+/*
 
 
 export class shader_build
@@ -422,3 +606,5 @@ export class shader_build
   }
 
 }
+
+*/

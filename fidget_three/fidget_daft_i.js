@@ -267,7 +267,7 @@ export default class fidget_daft_i extends fidget{
       bevel:0,       
       //color: this.color_background,
       texture_three: textures_background.space_grid  ,
-      material_three: materials.background.space_grid ,
+      material_three: materials.old_custom_exemple,//materials.background.space_grid ,
       color_line: utils.color.black,
 
       density:0.01/(s/2.2), 
