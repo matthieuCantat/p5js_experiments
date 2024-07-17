@@ -115,7 +115,7 @@
 			vPosition = position;
 			vColor = color;
 
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * modelViewMatrix*vec4( position, 1.0 );
 
 		}
 
@@ -131,10 +131,12 @@
 		varying vec3 vPosition;
 		varying vec4 vColor;
 
+		varying vec2 vUv;
+
 		void main()	{
 
 			vec4 color = vec4( vColor );
-			color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
+			color.r += sin( vPosition.y*0.1 + time*5. ) * 0.5;
 
 			gl_FragColor = color;
 		}

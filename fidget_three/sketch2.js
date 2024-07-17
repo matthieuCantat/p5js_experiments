@@ -201,6 +201,7 @@ function init() {
             time: { value: 1.0 }
         },
         vertexShader: document.getElementById( 'raw_shader_exemple_vertexShader' ).textContent,
+        //fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent,
         fragmentShader: document.getElementById( 'raw_shader_exemple_fragmentShader' ).textContent,
         side: THREE.DoubleSide,
         transparent: true
@@ -208,29 +209,16 @@ function init() {
     } );
 
     ///////////////// Background shader
-     /*
-    uniforms = {
-        time: { value: 1.0 }
-    };
 
-    const geometry = new THREE.PlaneGeometry( 2, 2 );
-    uniforms = {
-        time: { value: 1.0 }
-    };
-   
-    const material = new THREE.ShaderMaterial( {
-        uniforms: uniforms,
-        vertexShader: document.getElementById( 'vertexShader' ).textContent,
-        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+    const background_test_material = new THREE.ShaderMaterial( {
+        uniforms: {
+            time: { value: 1.0 }
+        },
+        vertexShader: document.getElementById( 'background_test_vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'background_test_fragmentShader' ).textContent
 
     } );
-    
-    const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-
-    const mesh = new THREE.Mesh( geometry, material );
-    camera.add( mesh );
-    mesh.position.set( 0, 0, camera_far_dist * .5)
-    */
+   
 
     ///////////////// fidgets
     F_sequence.setup_shapes_fidgets_three(scene)
@@ -241,12 +229,13 @@ function init() {
     
     F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material = raw_shader_exemple_material
     let colors = []
+    let positions = []
     for ( let i = 0; i < 4; i ++ ) {
 
         // adding x,y,z
-        //positions.push( Math.random() - 0.5 );
-        //positions.push( Math.random() - 0.5 );
-        //positions.push( Math.random() - 0.5 );
+        positions.push( Math.random()* 255 );
+        positions.push( Math.random()* 255 );
+        positions.push( Math.random()* 255 );
 
         // adding r,g,b,a
         colors.push( Math.random() * 255 );
@@ -256,12 +245,12 @@ function init() {
 
     }
 
-    //const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+    const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
     const colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
 
     colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
 
-    //geometry.setAttribute( 'position', positionAttribute );
+    //F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'position', positionAttribute ); // arleady in
     F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'color', colorAttribute );
   
     
