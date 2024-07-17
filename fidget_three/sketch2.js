@@ -78,7 +78,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 1
+var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
@@ -139,12 +139,12 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000 );
 
-    //camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-    //camera.position.set( 0, 0, 500 );  
-    let camera_far_dist = 1000 
-    camera = new THREE.PerspectiveCamera( 76, width / height, 1, camera_far_dist );
-    camera.position.set( 0, 0, 500 );
-    camera.rotation.set( 0, 0, 0 );
+    camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+    camera.position.set( 0, 0, 500 );  
+    //let camera_far_dist = 1000 
+    //camera = new THREE.PerspectiveCamera( 76, width / height, 1, camera_far_dist );
+    //camera.position.set( 0, 0, 500 );
+    //camera.rotation.set( 0, 0, 0 );
     
     scene.add( camera );
 
