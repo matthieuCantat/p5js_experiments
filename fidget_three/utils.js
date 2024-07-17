@@ -4,6 +4,7 @@ import Vector from './vector.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import * as THREE from "three";
 
+
 ////////////////////////////////////////////// utils
 export function rad(value)
 {
@@ -479,7 +480,8 @@ export function mix_value_function(value,pos,scale,max_loop)
 {
   let input = (value%max_loop-pos)/scale;
   let coef = clamp(Math.round(input+0.5),0.,1.)
-  let alternate_valueA = clamp( (1-coef)*input+coef*input*-1. + 1., 0.,1.);  
+  let coef_smoothStep = coef*coef*(3-2*coef)
+  let alternate_valueA = clamp( (1-coef_smoothStep)*input+coef_smoothStep*input*-1. + 1., 0.,1.);  
   return alternate_valueA;
 }
 export function map_range(value, low1, high1, low2, high2) {

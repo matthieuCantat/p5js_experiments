@@ -261,19 +261,19 @@ class material_old_custom_exemple extends three_material
           blur_background_samples_LOD: { value: this.blur_background_samples_LOD },
           glow_background_size: { value: this.glow_background_size },
           glow_background: { value: this.glow_background },
-          bg_transparency: { value: this.bg_transparency },
+          background_transparency: { value: this.bg_transparency },
 
           boder_size: { value: this.boder_size },
           hatching_line: { value: this.hatching_line },
 
-          bg_animation: { value: this.bg_animation },
-          bg_animation_offset: { value: this.bg_animation_offset },
-          bg_grain: { value: this.bg_grain },
-          bg_grain_scale: { value: this.bg_grain_scale },
-          bg_grid: { value: this.bg_grid },
-          bg_grid_scale: { value: this.bg_grid_scale },
-          bg_grid_line_scale: { value: this.bg_grid_line_scale },
-          bg_grid_point_scale: { value: this.bg_grid_point_scale },
+          background_animation: { value: this.bg_animation },
+          background_animation_offset: { value: this.bg_animation_offset },
+          background_grain: { value: this.bg_grain },
+          background_grain_scale: { value: this.bg_grain_scale },
+          background_grid: { value: this.bg_grid },
+          background_grid_scale: { value: this.bg_grid_scale },
+          background_grid_line_scale: { value: this.bg_grid_line_scale },
+          background_grid_point_scale: { value: this.bg_grid_point_scale },
 
           background_colorA: { value: this.bg_colorA },
           background_colorB: { value: this.bg_colorB },
@@ -329,19 +329,19 @@ class material_old_custom_exemple extends three_material
     // mesh.material.uniforms.blur_background_samples_LOD.value = this.blur_background_samples_LOD
     // mesh.material.uniforms.glow_background_size.value = this.glow_background_size
     // mesh.material.uniforms.glow_background.value = this.glow_background
-    // mesh.material.uniforms.bg_transparency.value = this.bg_transparency
+    // mesh.material.uniforms.background_transparency.value = this.bg_transparency
 
     // mesh.material.uniforms.boder_size.value = this.boder_size
     // mesh.material.uniforms.hatching_line.value = this.hatching_line
 
-    mesh.material.uniforms.bg_animation.value = 1.
-    // mesh.material.uniforms.bg_animation_offset.value = this.bg_animation_offset
-    mesh.material.uniforms.bg_grain.value = 1.
-    mesh.material.uniforms.bg_grain_scale.value = 4.
-    mesh.material.uniforms.bg_grid.value = 1.0
-    mesh.material.uniforms.bg_grid_scale.value =  10.0
-    mesh.material.uniforms.bg_grid_line_scale.value =  2.0
-    mesh.material.uniforms.bg_grid_point_scale.value =  2.0
+    mesh.material.uniforms.background_animation.value = 1.
+    // mesh.material.uniforms.background_animation_offset.value = this.bg_animation_offset
+    mesh.material.uniforms.background_grain.value = 1.
+    mesh.material.uniforms.background_grain_scale.value = 4.
+    mesh.material.uniforms.background_grid.value = 1.0
+    mesh.material.uniforms.background_grid_scale.value =  10.0
+    mesh.material.uniforms.background_grid_line_scale.value =  2.0
+    mesh.material.uniforms.background_grid_point_scale.value =  2.0
 
     // mesh.material.uniforms.background_colorA.value = this.bg_colorA
     // mesh.material.uniforms.background_colorB.value = this.bg_colorB
@@ -349,12 +349,12 @@ class material_old_custom_exemple extends three_material
     // mesh.material.uniforms.background_colorD.value = this.bg_colorD
 
 
-    mesh.material.uniforms.background_typeA.value = mix_value_function(count*0.7,0  ,200,900);
-    mesh.material.uniforms.background_typeB.value = mix_value_function(count*0.7,200,200,900);
-    mesh.material.uniforms.background_typeC.value = mix_value_function(count*0.7,400,200,900);
-    mesh.material.uniforms.background_typeD.value = mix_value_function(count*0.7,600,200,900);
+    mesh.material.uniforms.background_typeA.value = mix_value_function(count*0.7,0  ,200,1000);
+    mesh.material.uniforms.background_typeB.value = mix_value_function(count*0.7,200,200,1000);
+    mesh.material.uniforms.background_typeC.value = mix_value_function(count*0.7,400,200,1000);
+    mesh.material.uniforms.background_typeD.value = mix_value_function(count*0.7,600,200,1000);
 
-    mesh.material.uniforms.background_type_discoTarget.value = mix_value_function(count*0.7,800,200,900);
+    mesh.material.uniforms.background_type_discoTarget.value = mix_value_function(count*0.7,800,200,1000);
     mesh.material.uniforms.light_beam.value = 1.0
 
     // mesh.material.uniforms.glow_remove_white_original.value = this.glow_remove_white_original

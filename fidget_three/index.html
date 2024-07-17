@@ -806,7 +806,7 @@
 			}
 		
 
-			/*
+			
 			if(( 0. < background_grid )&&( 0. < background_grid_scale))
 			{
 				float S = background_grid_scale; // Scale
@@ -853,7 +853,7 @@
 				color += cross_path_point_mask * cross_path_point_color*cross_path_point_noise_mask*background_grid;
 		
 			}   
-		
+			
 			//----------------------------------------------------- palettes_background
 			
 			//---------------------------------------------------- vignetage
@@ -942,7 +942,7 @@
 				float max_dist = 1.5;
 				
 				
-				vec2 p_target = vec2(1.+cos(float(iFrame)*0.05),1.+cos(float(iFrame)*0.01));
+				vec2 p_target = vec2(1.+cos(float(iTime)*0.5),1.+cos(float(iTime)*0.1));
 				
 				vec2 p = vec2(1.,1.5);
 				float d = beam_mask(uv,p , p_target, size, falloff, max_dist, true );
@@ -988,7 +988,7 @@
 				}      
 				  
 			}
-			*/
+			
 		
 		
 		
