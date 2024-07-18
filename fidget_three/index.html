@@ -595,7 +595,7 @@
 			vec4 color = vec4(0.,0.,0.,1.);
 			
 			
-
+			/*
 			if( 0. < background_transparency )
 			{
 				color = texture(text, uv_move);
@@ -615,12 +615,13 @@
 				}
 				
 			}
+			*/
 		
 		
 		
 			
 			vec4 background_color = vec4(0.,0.,0.,0.);
-		
+			/*
 			if( 0.0 < background_typeA)
 			{
 				background_color = vec4(background_colorA/255.*background_typeA,1.);
@@ -663,7 +664,7 @@
 		  
 				background_color += vec4( b_color*background_typeB,0.0);
 			}
-			
+			*/
 		
 			
 			if( 0.0< background_typeC )// multi gradian
@@ -708,7 +709,7 @@
 			//----------------------------------------------------- moving_background
 			
 			//----------------------------------------------------- palettes_background
-			
+			/*
 			if(false)//( 1.0< background_typeD )// lines gradian
 			{
 				vec2 p = uv*0.5;
@@ -795,7 +796,7 @@
 				background_color = vec4(background_color.xyz+vec3(background_noise_mask*0.05*background_grain), 1.0);        
 			}        
 		
-			
+			*/
 			if( 0. < background_transparency )
 			{
 				color *= background_transparency;
@@ -806,7 +807,7 @@
 			}
 		
 
-			
+			/*
 			if(( 0. < background_grid )&&( 0. < background_grid_scale))
 			{
 				float S = background_grid_scale; // Scale
@@ -991,7 +992,7 @@
 			
 		
 		
-		
+			*/
 			//fragColor = vec4(background_color+vec3(background_noise_mask*0.05), 1.0)*vignetting+smoothedAlpha*t-hatching_line_alpha;	
 			fragColor = color; // ask for a value between 0 and 1
 			
