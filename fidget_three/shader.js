@@ -338,7 +338,7 @@ class material_old_custom_exemple extends three_material
     // mesh.material.uniforms.background_animation_offset.value = this.bg_animation_offset
     mesh.material.uniforms.background_grain.value = 1.
     mesh.material.uniforms.background_grain_scale.value = 4.
-    mesh.material.uniforms.background_grid.value = 1.0
+    mesh.material.uniforms.background_grid.value = 0.0
     mesh.material.uniforms.background_grid_scale.value =  10.0
     mesh.material.uniforms.background_grid_line_scale.value =  2.0
     mesh.material.uniforms.background_grid_point_scale.value =  2.0
