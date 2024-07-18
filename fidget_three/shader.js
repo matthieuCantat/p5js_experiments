@@ -320,6 +320,8 @@ class material_old_custom_exemple extends three_material
     mesh.material.uniforms.iFrame.value = count*0.01;
     mesh.material.uniforms.iTime.value = count*0.01;
     mesh.material.uniforms.iMouse.value = { x: mouseX*2, y: map_range(mouseY, 0, this.iResolution.x, this.iResolution.y, 0)*2};
+
+    /*
     //mesh.material.uniforms.uvOffset.value = [this.uvOffset.x,this.uvOffset.y]
     // mesh.material.uniforms.uvRotatePivot.value = [this.uvRotatePivot.x,this.uvRotatePivot.y]
     // mesh.material.uniforms.uvOffsetRotate.value = this.uvOffsetRotate
@@ -347,6 +349,7 @@ class material_old_custom_exemple extends three_material
     // mesh.material.uniforms.background_colorB.value = this.bg_colorB
     // mesh.material.uniforms.background_colorC.value = this.bg_colorC
     // mesh.material.uniforms.background_colorD.value = this.bg_colorD
+    */
 
 
     mesh.material.uniforms.background_typeA.value = mix_value_function(count*0.7,0  ,200,1000);
@@ -355,11 +358,13 @@ class material_old_custom_exemple extends three_material
     mesh.material.uniforms.background_typeD.value = mix_value_function(count*0.7,600,200,1000);
 
     mesh.material.uniforms.background_type_discoTarget.value = mix_value_function(count*0.7,800,200,1000);
+    /*
     mesh.material.uniforms.light_beam.value = 0.0
 
     // mesh.material.uniforms.glow_remove_white_original.value = this.glow_remove_white_original
 
     mesh.material.uniforms.debug.value = 0.0
+    */
   }
 
 }
