@@ -355,7 +355,7 @@ class material_old_custom_exemple extends three_material
     mesh.material.uniforms.background_typeD.value = mix_value_function(count*0.7,600,200,1000);
 
     mesh.material.uniforms.background_type_discoTarget.value = mix_value_function(count*0.7,800,200,1000);
-    mesh.material.uniforms.light_beam.value = 1.0
+    mesh.material.uniforms.light_beam.value = 0.0
 
     // mesh.material.uniforms.glow_remove_white_original.value = this.glow_remove_white_original
 
