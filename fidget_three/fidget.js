@@ -317,101 +317,19 @@ export default class fidget{
 
   bodies_update_matrix( m, body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_update_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].m = m
-        }
-        else
-          this.bodies[b_type][key].m = m
-      
-      } 
-    }
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.m = m
   }
 
   bodies_update( body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].update()
-        }
-        else
-          this.bodies[b_type][key].update()
-      
-      } 
-    }
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.update()
   }
 
   bodies_setup_shapes_three( body_type_filter = [] )
   {
-  
     this.group_three = new THREE.Group();
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_setup_shapes_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-    
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            this.bodies[b_type][key][i].setup_shapes_three(this.group_three)
-          }
-            
-        }
-        else
-        {
-          this.bodies[b_type][key].setup_shapes_three(this.group_three)        
-        }
-
-        
-      } 
-    }
-    */
 
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.setup_shapes_three(this.group_three)  
@@ -423,35 +341,6 @@ export default class fidget{
 
   bodies_animate_three( body_type_filter = [] )
   {
-
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_animate_three - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-    
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            this.bodies[b_type][key][i].animate_three()
-          }
-            
-        }
-        else
-          this.bodies[b_type][key].animate_three()
-        
-      } 
-    }
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.animate_three()
     this.Mouse.update()
@@ -480,31 +369,6 @@ export default class fidget{
 
   bodies_override_color(new_color = null,body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_override_color - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].color = new_color || this.bodies[b_type][key][i].color_base
-        }
-        else
-          this.bodies[b_type][key].color = new_color || this.bodies[b_type][key].color_base
-        
-      } 
-    }
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.color = new_color || body.color_base
   }
@@ -516,31 +380,6 @@ export default class fidget{
 
   bodies_color_update_three_line( body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_color_update_three_line - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-    
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].update_color_three_line()
-        }
-        else
-          this.bodies[b_type][key].update_color_three_line()
-        
-      } 
-    }
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.update_color_three_line()
   }
@@ -548,32 +387,6 @@ export default class fidget{
 
   bodies_color_update_three_shape( body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_color_update_three_shape - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-    
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].update_color_three_shape()
-        }
-        else
-          this.bodies[b_type][key].update_color_three_shape()
-        
-      } 
-    }
-    */
-
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.update_color_three_shape()
   }
@@ -611,44 +424,6 @@ export default class fidget{
 
   bodies_constraints_enable(value,body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_constraints_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            for( let cns of this.bodies[b_type][key][i].constraints )
-            {
-              this.bodies[b_type][key][i].constraints[cns].enable(value)
-            }
-
-          }
-
-        }
-        else      
-          for( let cns of this.bodies[b_type][key].constraints )
-          {
-            this.bodies[b_type][key].constraints[cns].enable(value)         
-          }
-  
-      }  
-       
-    } 
-    */
-    
-    
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       for( let cns in body.constraints )
         body.constraints[cns].enable(value) 
@@ -762,95 +537,19 @@ export default class fidget{
 
   bodies_set_debug( value, body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_set_debug - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-      
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {   
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].debug = value 
-        }
-        else
-          this.bodies[b_type][key].debug = value 
-        
-      } 
-    } 
-    */
-    
+
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.debug = value     
   }
 
   bodies_set_visibility_secondary( value,body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_set_visibility_secondary - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].visibility_secondary = value
-        }
-        else
-          this.bodies[b_type][key].visibility_secondary = value
-        
-      } 
-    } 
-    */
-
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.visibility_secondary = value    
   }  
 
   bodies_set_visibility_override( value,body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_set_visibility_override - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].debug_force_visibility = value
-        }
-        else
-          this.bodies[b_type][key].debug_force_visibility = value
-        
-      } 
-    } 
-    */
-
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.debug_force_visibility = value        
   }  
@@ -860,47 +559,8 @@ export default class fidget{
 
   bodies_set_visibility( value = null ,body_type_filter = [] )
   {
-        /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_set_visibility - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            if(value==null)
-              this.bodies[b_type][key][i].visibility = this.bodies[b_type][key][i].visibility_default 
-            else
-              this.bodies[b_type][key][i].visibility = value
-          }
-            
-        }
-        else
-        {
-          if(value==null)
-            this.bodies[b_type][key].visibility = this.bodies[b_type][key].visibility_default 
-          else
-            this.bodies[b_type][key].visibility = value
-        }
-          
-        
-      } 
-    } 
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.visibility = value || body.visibility_default 
-
-
   }  
 
 
@@ -908,43 +568,6 @@ export default class fidget{
 
   bodies_set_dynamic( value = null ,body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_set_dynamic - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            if(value==null)
-              this.bodies[b_type][key][i].dynamic = this.bodies[b_type][key][i].dynamic_default 
-            else
-              this.bodies[b_type][key][i].dynamic = value
-          }
-            
-        }
-        else
-        {
-          if(value==null)
-            this.bodies[b_type][key].dynamic = this.bodies[b_type][key].dynamic_default 
-          else
-            this.bodies[b_type][key].dynamic = value
-        }
-          
-        
-      } 
-    } 
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.dynamic = value || body.dynamic_default 
 
@@ -954,31 +577,6 @@ export default class fidget{
 
   bodies_init_out_matrix( body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_init_out_matrix - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-     
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].init_out_matrix()
-        }
-        else
-          this.bodies[b_type][key].init_out_matrix()
-        
-      } 
-    } 
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.init_out_matrix()
 
@@ -995,68 +593,12 @@ export default class fidget{
 
   bodies_do_update( value, body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_do_update - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            this.bodies[b_type][key][i].do_update = value
-           
-          }
-            
-        }
-        else
-        this.bodies[b_type][key].do_update = value
-
-      } 
-    } 
-    */
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.do_update = value
   }
 
   bodies_enable( value, body_type_filter = [] )
   {
-
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-      
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-            this.bodies[b_type][key][i].enable(value)          
-        
-        }
-        else
-          this.bodies[b_type][key].enable(value)
-
-      } 
-    } 
-    */
 
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.enable(value)
@@ -1065,95 +607,15 @@ export default class fidget{
 
   bodies_apply_material( material = null, body_type_filter = [] )
   {
-
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-      
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            if( this.bodies[b_type][key][i].mesh_three.shape != null)
-            {
-              if( material == null )
-                this.bodies[b_type][key][i].mesh_three.shape.material = this.bodies[b_type][key][i].three_material
-              else    
-                this.bodies[b_type][key][i].mesh_three.shape.material = material
-            }
-
-          }
-        }
-        else
-        {
-          if( this.bodies[b_type][key].mesh_three.shape != null)
-          {          
-            if( material == null )
-              this.bodies[b_type][key].mesh_three.shape.material = this.bodies[b_type][key].three_material
-            else
-              this.bodies[b_type][key].mesh_three.shape.material = material
-          }
-
-        }
-
-
-      } 
-    }
-    */
-    
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       if( body.mesh_three.shape != null)
         body.mesh_three.shape.material = material || body.three_material
-    
   }
 
 
   bodies_search_by_name( name, body_type_filter = [] )
   {
-
     let bodies_found = []
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-      
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            if(this.bodies[b_type][key][i].name.inculdes(name) )
-              bodies_found.push(this.bodies[b_type][key][i])
-          }
-        }
-        else
-        {
-          if(this.bodies[b_type][key].name.inculdes(name) )
-            bodies_found.push(this.bodies[b_type][key])       
-        }
-
-
-      } 
-    } 
-    */
 
     for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
     {
@@ -1259,53 +721,6 @@ export default class fidget{
 
   bodies_get_list_attr_value_filtered( attr, value , body_type_filter = [] , inverse = false)
   {
-    /*
-    let body_list = []
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-      
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-
-            if((inverse == true)&&( this.bodies[b_type][key][i][attr] != value) )
-            {
-              body_list.push(this.bodies[b_type][key][i])
-            }
-            if((inverse == false)&&( this.bodies[b_type][key][i][attr] == value) )
-            {
-              body_list.push(this.bodies[b_type][key][i])
-            }
-          }
-        }
-        else
-        {
-          if((inverse == true)&&( this.bodies[b_type][key][attr] != value))
-          {   
-            body_list.push(this.bodies[b_type][key])       
-          }
-          if((inverse == false)&&( this.bodies[b_type][key][attr] == value))
-          {   
-            body_list.push(this.bodies[b_type][key])       
-          }
-        }
-
-
-      } 
-    } 
-    */
-
     for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
     {
       if((inverse == true)&&( body[attr] != value))
@@ -1338,38 +753,6 @@ export default class fidget{
 
   get_selected_body(body_type_filter = [] )
   {
-    /*
-    for( let i =0; i < this.bodies_eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies_eval_order[i+0]
-      let key = this.bodies_eval_order[i+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('get_selected_body - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            if(this.bodies[b_type][key][i].is_selected)
-              return this.bodies[b_type][key][i]           
-          }
-            
-        }
-        else
-
-          if(this.bodies[b_type][key].is_selected)
-            return this.bodies[b_type][key]
-        
-      } 
-    }   
-    */
-    
     for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
       if(body.is_selected)
         return body
@@ -1410,80 +793,6 @@ export default class fidget{
 
       }      
     }
-
-
-    /*
-    for( let k =0; k < this.bodies_eval_order.length; k+=2)
-    {   
-      let b_type = this.bodies_eval_order[k+0]
-      let key = this.bodies_eval_order[k+1]
-      if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('mouse_select_highlight - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-
-        if( this.bodies[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies[b_type][key].length; i++)
-          {
-            if( this.bodies[b_type][key][i].body == mouse_cns.constraint.bodyB )
-            {
-              //this.bodies[b_type][key][i].color = utils.color.redLight
-              this.bodies[b_type][key][i].is_selected = true
-
-              for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
-                body_to_highlight.push(this.bodies[b_type][key][i].highlight_selection[j])
-              
-            }
-            else
-            {
-              //this.bodies[b_type][key][i].color = this.bodies[b_type][key][i].color_base 
-              this.bodies[b_type][key][i].is_selected = false
-
-              for( let j = 0; j < this.bodies[b_type][key][i].highlight_selection.length; j++)
-                body_to_reduce.push(this.bodies[b_type][key][i].highlight_selection[j])  
-
-            }
-        
-          }
-        }
-        else
-        {
-          if( this.bodies[b_type][key].body == mouse_cns.constraint.bodyB )
-          {
-            this.bodies[b_type][key].color = utils.color.redLight
-            this.bodies[b_type][key].is_selected = true
-
-            for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
-              body_to_highlight.push(this.bodies[b_type][key].highlight_selection[j])  
-
-          }
-          else
-          {
-            this.bodies[b_type][key].color = this.bodies[b_type][key].color_base 
-            this.bodies[b_type][key].is_selected = false
-
-            for( let j = 0; j < this.bodies[b_type][key].highlight_selection.length; j++)
-              body_to_reduce.push(this.bodies[b_type][key].highlight_selection[j])  
-
-          }
-
-        }
-
-          
-      } 
-      
-    }
-    */
- 
-    
-    
-
 
     for( let i = 0 ; i < body_to_reduce.length; i++)
     {
