@@ -11,6 +11,7 @@ import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 import * as THREE from 'three';
 
+var build_order = 0
 export class body_build{
   
     constructor( in_options ){
@@ -21,7 +22,6 @@ export class body_build{
         highlight_selection:[],
         m: new Matrix(),
         m_offset: new Matrix(),
-        m_transform: new Matrix(),
         m_shape: new Matrix(),
         parent:null,
         z: 0,
@@ -75,7 +75,7 @@ export class body_build{
       this.m = args.m
       this.parent = args.parent
       this.m_offset = args.m_offset
-      this.m_transform = args.m_transform
+      this.m_transform = new Matrix()
       this.z = args.z
       this.m_shape_init = args.m_shape
       this.m_shape = args.m_shape
@@ -129,6 +129,8 @@ export class body_build{
 
       this.is_selected = false
       this.three_material = null
+      this.build_order = build_order
+      build_order += 1
       
 
       this.draw_text_debug = null
@@ -215,14 +217,15 @@ export class body_build{
       this.geo = null
       this.shape_three = null
       this.mesh_three = null
-      
+      /*
       if(this.dynamic)
         this.init_physics()
-
       this.set_out_matrix(this.get_init_matrix())
       this.init_constraints()
-      
+      */
     }
+
+    
 
     matter_get_shape(m)
     {
@@ -293,6 +296,9 @@ export class body_build{
 
     init_physics()
     {
+      if(!this.dynamic)
+        return false
+
       this.body = this.matter_get_shape(this.m_shape)
   
       Matter.Body.setDensity(this.body, this.density)
@@ -320,7 +326,7 @@ export class body_build{
   
   
       Matter.Composite.add( this.matter_engine.world, this.body)    
-
+      return true
     }
 
     init_constraints()
@@ -1225,6 +1231,298 @@ export class body_build{
       }
 
     }
+
+
+    get_args()
+    {
+      let args = {
+
+        type:this.type,
+        name:this.name,
+        highlight_selection:this.highlight_selection,    
+        m:this.m,
+        parent:this.parent,
+        m_offset:this.m_offset,
+        z:this.z,
+        m_shape:this.m_shape,
+     
+        slop:this.slop,
+        extra_rotation:this.extra_rotation,
+        rot_override:this.rot_override,
+        scale:this.scale,
+        constraints_args:this.constraints_args,
+        do_shape:this.do_shape,
+        do_line:this.do_line,
+        bevel:this.bevel,
+        color:this.color,
+        color_line:this.color_line,
+        color_base:this.color_base,
+        transparency_activate:this.transparency_activate,
+        transparency:this.transparency,
+        transparency_line:this.transparency_line,   
+        bloom:this.bloom,  
+        shader:this.shader,
+        castShadow:this.castShadow,
+        receiveShadow:this.receiveShadow,
+        dynamic:this.dynamic,
+        collision:this.collision,
+        collision_category:this.collision_category,
+        collision_mask:this.collision_mask,
+        visibility:this.visibility,
+   
+        debug_force_visibility:this.debug_force_visibility,
+        density:this.density,
+        frictionAir:this.frictionAir,
+        mass:this.mass,
+        screen_dims:this.screen_dims,
+        matter_engine:this.matter_engine,
+        mouse_constraint:this.mouse_constraint,
+        fidget:this.fidget,
+        texture_three:this.texture_three,
+        material_three:this.material_three,
+        arc_limites:this.arc_limites,
+        debug_matrix_info:this.debug_matrix_info,
+        debug_matrix_axes:this.debug_matrix_axes,
+        debug_cns_axes:this.debug_cns_axes,
+        selection_break_length:this.selection_break_length,
+      }
+      return args
+
+    }
+
+
+    get_mirror(  axe_x = false, axe_y = true)
+    {
+      let args = this.get_args()
+
+      let name = args.name
+      let parent = args.parent
+      let parent_name = parent.name
+      let m_offset = args.m_offset
+      let m_shape = args.m_shape
+
+      let slop = args.slop
+      let extra_rotation = args.extra_rotation
+      let rot_override = args.rot_override
+
+      let highlight_selection = args.highlight_selection  
+      let highlight_selection_names = []
+      for( let i = 0 ; i < highlight_selection.length; i++)
+      {
+        highlight_selection_names.push( highlight_selection[i].name )   
+      }      
+
+      let constraints_args = args.constraints_args
+      let target_names = []
+      for( let i = 0 ; i < constraints_args.length; i++)
+      {
+        target_names.push( constraints_args[i]['target'].name )   
+      }
+         
+ 
+      let arc_limites = args.arc_limites
+    
+      let suffix_axeY = ['_L_','_R_']
+      let suffix_axeX = ['_T_','_B_']
+
+      let parent_is_sided = false
+      if(axe_y)
+      {
+        // name
+        if( name.includes(suffix_axeY[0]) )
+          name = name.replace(suffix_axeY[0],suffix_axeY[1])
+        else
+          console.error('no '+suffix_axeY[0]+' in name, cannot mirror')
+
+        // parent
+        if( parent_name.includes(suffix_axeY[0]) )
+        {
+          parent_name = parent_name.replace(suffix_axeY[0],suffix_axeY[1])
+
+          let bodies_found = this.fidget.bodies_search_by_name( parent_name )
+          if( 0 < bodies_found.length )
+          {
+            let mirrored_body = bodies_found[0]
+            parent = mirrored_body
+            parent_is_sided = true
+          }
+        }
+
+        //highlight_selection
+        let highlight_selection_mirrored = []
+        for( let i = 0 ; i < highlight_selection.length; i++)
+        {
+          if( highlight_selection_names[i].includes(suffix_axeY[0]) )
+          {
+            highlight_selection_names[i] = highlight_selection_names[i].replace(suffix_axeY[0],suffix_axeY[1])
+            let bodies_found = this.fidget.bodies_search_by_name( highlight_selection_names[i] )
+            if( 0 < bodies_found.length )
+            {
+              let mirrored_body = bodies_found[0]
+              highlight_selection_mirrored.push(mirrored_body)
+            }  
+            else
+              highlight_selection_mirrored.push(highlight_selection[i])
+          }  
+          else
+            highlight_selection_mirrored.push(highlight_selection[i])                
+        }
+        highlight_selection = highlight_selection_mirrored
+
+        // constraint 
+        const constraints_args_mirrored = []
+        for( let i = 0 ; i < constraints_args.length; i++)
+        {
+          let constraints_arg_mirrored = {}
+          for( let attr in constraints_args[i] )
+            constraints_arg_mirrored[attr] = constraints_args[i][attr]
+
+          if( target_names[i].includes(suffix_axeY[0]) )
+          {
+            target_names[i] = target_names[i].replace(suffix_axeY[0],suffix_axeY[1])
+            let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
+            if( 0 < bodies_found.length )
+            {
+              let mirrored_body = bodies_found[0]
+              constraints_arg_mirrored['target'] = mirrored_body 
+            } 
+          }     
+
+          
+          if( constraints_arg_mirrored.attr == 'tx' )
+            constraints_arg_mirrored['out_multiplier'] = 1     
+          if( constraints_arg_mirrored.attr == 'ty' )
+            constraints_arg_mirrored['out_multiplier'] = -1
+          if( constraints_arg_mirrored.attr == 'r' )
+            constraints_arg_mirrored['out_multiplier'] = -1
+          if( constraints_arg_mirrored.attr == 's' )
+            constraints_arg_mirrored['out_multiplier'] = -1    
+
+
+          constraints_args_mirrored.push(constraints_arg_mirrored)          
+   
+        }
+        constraints_args = constraints_args_mirrored
+        
+
+
+      }
+      
+      //axe_x = false
+      if(axe_x)
+      {
+        // name
+        if( name.includes(suffix_axeX[0]) )
+          name = name.replace(suffix_axeX[0],suffix_axeX[1])
+        else
+          console.error('no '+suffix_axeX[0]+' in name, cannot mirror')
+
+        // parent
+        if( parent_name.includes(suffix_axeX[0]) )
+        {
+          parent_name = parent_name.replace(suffix_axeX[0],suffix_axeX[1])
+
+          let bodies_found = this.fidget.bodies_search_by_name( parent_name )
+          if( 0 < bodies_found.length )
+          {
+            let mirrored_body = bodies_found[0]
+            parent = mirrored_body
+            parent_is_sided = true
+          }
+        }
+        //highlight_selection
+        let highlight_selection_mirrored = []
+        for( let i = 0 ; i < highlight_selection.length; i++)
+        {
+          if( highlight_selection_names[i].includes(suffix_axeX[0]) )
+          {
+            highlight_selection_names[i] = highlight_selection_names[i].replace(suffix_axeX[0],suffix_axeX[1])
+            let bodies_found = this.fidget.bodies_search_by_name( highlight_selection_names[i] )
+            if( 0 < bodies_found.length )
+            {
+              let mirrored_body = bodies_found[0]
+              highlight_selection_mirrored.push(mirrored_body)
+            }  
+            else
+              highlight_selection_mirrored.push(highlight_selection[i])
+          }  
+          else
+            highlight_selection_mirrored.push(highlight_selection[i])                
+        }
+        highlight_selection = highlight_selection_mirrored
+
+
+        // constraint 
+        const constraints_args_mirrored = []
+        for( let i = 0 ; i < constraints_args.length; i++)
+        {
+          let constraints_arg_mirrored = {}
+          for( let attr in constraints_args[i] )
+            constraints_arg_mirrored[attr] = constraints_args[i][attr]
+
+          if( target_names[i].includes(suffix_axeX[0]) )
+          {
+            target_names[i] = target_names[i].replace(suffix_axeX[0],suffix_axeX[1])
+            let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
+            if( 0 < bodies_found.length )
+            {
+              let mirrored_body = bodies_found[0]
+              constraints_arg_mirrored['target'] = mirrored_body 
+            } 
+          }       
+
+          if( constraints_arg_mirrored.attr == 'tx' )
+            constraints_arg_mirrored['out_multiplier'] = 1     
+          if( constraints_arg_mirrored.attr == 'ty' )
+            constraints_arg_mirrored['out_multiplier'] = -1
+          if( constraints_arg_mirrored.attr == 'r' )
+            constraints_arg_mirrored['out_multiplier'] = -1
+          if( constraints_arg_mirrored.attr == 's' )
+            constraints_arg_mirrored['out_multiplier'] = -1    
+
+          if(axe_y)
+            constraints_arg_mirrored['out_multiplier'] = 1
+          constraints_args_mirrored.push(constraints_arg_mirrored)          
+       
+        }
+        constraints_args = constraints_args_mirrored
+
+      }
+      
+      if( parent_is_sided == false)
+        m_offset = m_offset.get_mirror(axe_x,axe_y)
+
+      // m_shape mirrored
+      // constraint 
+      
+
+
+
+
+
+      // update args
+      args.name = name
+      args.parent = parent
+      args.m_offset = m_offset
+      args.m_shape = m_shape
+
+      args.slop = slop
+      args.extra_rotation = extra_rotation
+      args.rot_override = rot_override
+
+      args.highlight_selection = highlight_selection
+      args.constraints = constraints_args
+ 
+      args.arc_limites = arc_limites
+
+
+      
+
+      return new body_build(args)
+
+    }
+
+
   }
   
 

@@ -280,15 +280,19 @@ export default class fidget_daft_i extends fidget{
     } 
     //z_depth += z_depth_incr
 
+    /*
     let mo_background_L = new Matrix()                                    
     mo_background_L.setTranslation(this.screen_dims.x/4,this.screen_dims.y/2)   
+    */
 
-    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
-                
-                                                name:'geo_background_L',
-                                                m_offset:mo_background_L, 
-                                      
-                                              })) 
+    let background_L = new body_build({ ...oBackground,
+      name:'geo_background_L_',
+      m_offset:new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2), 
+    })
+    this.bodies.geos.backgrounds.push(background_L)
+    this.bodies.geos.backgrounds.push(background_L.get_mirror(false,true))
+    
+    /*
     let mo_background_R = new Matrix()                                    
     mo_background_R.setTranslation(this.screen_dims.x/4*3,this.screen_dims.y/2)    
 
@@ -297,6 +301,7 @@ export default class fidget_daft_i extends fidget{
                                                 m_offset:mo_background_R,
                                                                                                 
                                               })) 
+                                              */
           
 
     this.bodies.bones.traj = new body_build({ 
@@ -771,21 +776,55 @@ export default class fidget_daft_i extends fidget{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       let ray_tmp = 80*(s/2.2)
       let rot_tmp = 0 
       let offset_from_center = new Vector(0,0)
   
-       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // right 
-      rot_tmp = -35  
+      
 
 
 
+                                
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-      var om_rA_bones = new Matrix()
-      om_rA_bones.setTranslation(65*(s/2.2),0)
-      om_rA_bones.setRotation(rad(rot_tmp+180))  
+      rot_tmp = 180+35    
+
+      
+      m_shape_bones = new Matrix()
+      m_shape_bones.setScale(s*4)
+
+      var om_rD_bones = new Matrix()
+      om_rD_bones.setTranslation( -65*(s/2.2), 0)
+      om_rD_bones.setRotation(rad(rot_tmp+180))  
+
 
       let rectangle_pivot_opts = { 
         ...opts_global,
@@ -794,29 +833,30 @@ export default class fidget_daft_i extends fidget{
         ...opts_visual_bones,
         dynamic: false,
 
-        name:'bones_rectangle_pivot_TR',
+        name:'bones_rectangle_pivot_T__L_',
         
         m:this.m,
         parent:this.bodies.bones.rectangles_center,
-        m_offset:om_rA_bones,
+        m_offset:om_rD_bones,
         m_shape:m_shape_bones,
         //z:z_depth, 
 
-        
         constraints:[
           {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                      
+          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                           
         ],
-        density:0.2/(s/2.2), 
-      }    
-      
+        density:0.2/(s/2.2),                                               
+              
+      }
+
+
       if(this.is_dynamic)
       {
         rectangle_pivot_opts.constraints.push({ name:'connect_rot_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
         attr:'r',
         target_attr:'ty', 
         target_space:'local',
-        target_remap:[0,55*(s/2.2),0,35] })
+        target_remap:[0,55*(s/2.2),0,-35] })
         
         rectangle_pivot_opts.constraints.push({ name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
         attr:'tx',
@@ -828,15 +868,16 @@ export default class fidget_daft_i extends fidget{
         attr:'tx',
         target_attr:'ty', 
         target_space:'local',
-        target_remap:[0,110*(s/2.2),0,60*(s/2.2)] })
+        target_remap:[0,110*(s/2.2) , 0,60*(s/2.2) ] })
+        
       }
 
-      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))     
+      
+      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts)) 
 
-
-      var om_rA = new Matrix()
-      om_rA.setTranslation(ray_tmp*-1,0)
-
+      var om_rD = new Matrix()
+      om_rD.setTranslation(ray_tmp*-1,0)   
+      
       this.bodies.bones.rectangles.push(new body_build({ 
                                               ...opts_global,
                                               ...opts_collision_no_interaction,
@@ -844,11 +885,11 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_visual_bones,
                                               dynamic: false,
 
-                                              name:'bones_rectangle_TR',
+                                              name:'bones_rectangle_T__L_',
                                               
                                               m:this.m,
                                               parent:this.bodies.bones.rectangles_pivots[0],
-                                              m_offset:om_rA, 
+                                              m_offset:om_rD, 
                                               m_shape:m_shape_bones,
                                               //z:z_depth, 
                                               
@@ -859,184 +900,107 @@ export default class fidget_daft_i extends fidget{
 
                                               density:0.2/(s/2.2), 
 
-                                            }))     
-
-
-      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_TR',
-
-                                              parent:this.bodies.bones.rectangles[0],
-                                              //m_offset:new Matrix(),
-                                              bevel:0,
-                                              castShadow: true,
-                                              receiveShadow: false,
-                                              
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],                                              
                                             })) 
 
+      let oRect_TL = { ...oRect, 
+        name:'geo_rectangle_T__L_',
 
-      scale_inter = 40.0                                       
-      let m_shape_modif = new Matrix()
-      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
-      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
-   
-    if(this.is_dynamic)
-    {
-
-
-      this.bodies.inters.rectangles.push(new body_build({ 
-                                              ...oRect, 
-                                              ...opts_collision_mouse_interaction,
-                                              ...opts_visual_inter,
-
-                                              name:'inter_rectangle_TR',
-                                              highlight_selection:[this.bodies.geos.rectangles[0]],  
-
-                                              parent:this.bodies.bones.rectangles[0],
-                                              //m_offset:om_rA,
-                                              m_shape:m_shape_modif,
-
-                                              constraints:[
-                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-                                              density:0.2/(s/2.2), 
-                                              selection_break_length: 60.*(s/2.2),
-                                                    
-                                            })) 
-      }
-                                            
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////                                      
-
-      rot_tmp = 35  
-
-      m_shape_bones = new Matrix()
-      m_shape_bones.setScale(s*4)
-
-      var om_rB_bones = new Matrix()
-      om_rB_bones.setTranslation(65*(s/2.2),0)
-      om_rB_bones.setRotation(rad(rot_tmp+180)) 
-      
-      rectangle_pivot_opts = { 
-        ...opts_global,
-        ...opts_collision_no_interaction,
-        ...opts_debug,
-        ...opts_visual_bones,
-        dynamic: false,
-
-        name:'bones_rectangle_pivot_BR',
-        
-        m:this.m,
-        parent:this.bodies.bones.rectangles_center,
-        m_offset:om_rB_bones,
-        m_shape:m_shape_bones,
-        //z:z_depth, 
-        
+        parent:this.bodies.bones.rectangles[0],
+        //m_offset:om_rD,
+        m_shape:m_shape,
+        bevel:0,
+        castShadow: true,
+        receiveShadow: false,
+             
         constraints:[
-          {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                 
+          {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01},
+          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01}, 
         ],
-        density:0.2/(s/2.2),                                                     
-      }
 
+      }  
+
+
+      this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
+        
       if(this.is_dynamic)
-      {
-        rectangle_pivot_opts.constraints.push({ name:'connect_rot_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
-        attr:'r',
-        target_attr:'ty', 
-        target_space:'local',
-        target_remap:[0,55*(s/2.2),0,-35] })
+      {  
 
-        rectangle_pivot_opts.constraints.push({ name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
-        attr:'tx',
-        target_attr:'r', 
-        target_space:'local',
-        target_remap:[0,90,0,85*(s/2.2)] })
+        scale_inter = 40.0                                       
+        let m_shape_modif = new Matrix()
+        m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
+        m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
+     
 
-        rectangle_pivot_opts.constraints.push({ name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
-        attr:'tx',
-        target_attr:'ty', 
-        target_space:'local',
-        target_remap:[0,110*(s/2.2),0,60*(s/2.2)] })
-      }
+        this.bodies.inters.rectangles.push(new body_build({ 
+                                                ...oRect, 
+                                                ...opts_collision_mouse_interaction,
+                                                ...opts_visual_inter,
 
-      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts)) 
+                                                name:'inter_rectangle_T__L_',
+                                                highlight_selection:[this.bodies.geos.rectangles[0]],   
 
-      var om_rB = new Matrix()
-      om_rB.setTranslation(ray_tmp*-1,0)        
+                                                parent:this.bodies.bones.rectangles[0],
+                                                //m_offset:om_rC,
+                                                m_shape:m_shape_modif,
 
-      this.bodies.bones.rectangles.push(new body_build({ 
-                                              ...opts_global,
-                                              ...opts_collision_no_interaction,
-                                              ...opts_debug,
-                                              ...opts_visual_bones,
-                                              dynamic: false,
+                                                constraints:[
+                                                  {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                                  {  name:'orient',type:'kin_orient',target:this.bodies.inters.background,stiffness: 1.0,damping:0.1,length:0.01}, 
+                                                ],
 
-                                              name:'bones_rectangle_TR',
-                                              
-                                              m:this.m,
-                                              parent:this.bodies.bones.rectangles_pivots[1],
-                                              m_offset:om_rB, 
-                                              m_shape:m_shape_bones,
-                                              //z:z_depth, 
-                                              
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[1], stiffness: 1.0,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[1], stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],  
+                                                density:0.2/(s/2.2), 
+                                                selection_break_length: 60.*(s/2.2),
+                                                          
+                                              }))  
 
-                                              density:0.2/(s/2.2), 
 
-                                            }))    
+        let oRect_trail = { 
+          ...opts_global,
+          ...opts_collision_no_interaction,
+          ...opts_debug,
 
-      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
-                                              name:'geo_rectangle_BR', 
-                                              
-                                              parent:this.bodies.bones.rectangles[1],
-                                              //m_offset:om_rB,
-                                              m_shape:m_shape,
-                                              bevel:0,
-                                              castShadow: true,
-                                              receiveShadow: false,
-
-                                              constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-
-                                                   
-                                            })) 
-   
-    if(this.is_dynamic)
-    {
+          parent:this.bodies.bones.rectangles[0],
+          m_shape: m_shape,
+          type: utils.shape.rectangle,
   
-      this.bodies.inters.rectangles.push(new body_build({ 
-                                              ...oRect, 
-                                              ...opts_collision_mouse_interaction,
-                                              ...opts_visual_inter,
+          do_shape: true,
+          do_line:false,           
+  
+          density:0.001/(s/2.2), 
 
-                                              name:'inter_rectangle_BR',
-                                              highlight_selection:[this.bodies.geos.rectangles[1]],   
+        }  
+        this.bodies.effects.movA_trails = build_effects_trail(oRect_trail,this.bodies.geos.rectangles[0])                                
 
-                                              parent:this.bodies.bones.rectangles[1],
-                                              //m_offset:om_rB,
-                                              m_shape:m_shape_modif,
-       
-                                              constraints:[
-                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
-                                              ],
-
-                                              density:0.2/(s/2.2), 
-                                              selection_break_length: 60.*(s/2.2),
-                                                       
-                                            }))  
+        
+        this.bodies.inters_step.steps[0].highlight_selection = [this.bodies.geos.rectangles[0]]
       }
-      /////////////////////////////////////////////////////////////////////////////////////////////////////                                      
+
+      // TOP RIGHT
+      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror(false,true)) 
+      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror(false,true))
+      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror(false,true))
+      if(this.is_dynamic)                              
+        this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(false,true))
+
+      // BOTTOM LEFT
+      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror(true,false)) 
+      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror(true,false))
+      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror(true,false))
+      if(this.is_dynamic)                              
+        this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(true,false))
+
+      // BOTTOM RIGHT
+      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror(true,true)) 
+      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror(true,true))
+      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror(true,true))
+      if(this.is_dynamic)                              
+        this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(true,true))
+
+
+
+
+      /*
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // left
   
       rot_tmp = 180-35 
@@ -1055,7 +1019,7 @@ export default class fidget_daft_i extends fidget{
         ...opts_visual_bones,
         dynamic: false,
 
-        name:'bones_rectangle_pivot_BL',
+        name:'bones_rectangle_pivot_B__L_',
         
         m:this.m,
         parent:this.bodies.bones.rectangles_center,
@@ -1105,7 +1069,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_visual_bones,
                                               dynamic: false,
 
-                                              name:'bones_rectangle_TR',
+                                              name:'bones_rectangle_T__R_',
                                               
                                               m:this.m,
                                               parent:this.bodies.bones.rectangles_pivots[2],
@@ -1123,7 +1087,7 @@ export default class fidget_daft_i extends fidget{
                                             }))   
 
       this.bodies.geos.rectangles.push(new body_build({ ...oRect,
-                                              name:'geo_rectangle_BL',   
+                                              name:'geo_rectangle_B__L_',   
 
                                               parent:this.bodies.bones.rectangles[2],
                                               //m_offset:om_rC,
@@ -1147,7 +1111,7 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_collision_mouse_interaction,
                                               ...opts_visual_inter,
 
-                                              name:'inter_rectangle_BL',
+                                              name:'inter_rectangle_B__L_',
                                               highlight_selection:[this.bodies.geos.rectangles[2]],   
 
                                               parent:this.bodies.bones.rectangles[2],
@@ -1163,20 +1127,18 @@ export default class fidget_daft_i extends fidget{
                                               selection_break_length: 60.*(s/2.2),
                                                         
                                             }))      
-      }                                      
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      }      
+       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // right 
+      rot_tmp = -35  
 
 
-      rot_tmp = 180+35    
 
-      
-      m_shape_bones = new Matrix()
-      m_shape_bones.setScale(s*4)
 
-      var om_rD_bones = new Matrix()
-      om_rD_bones.setTranslation( -65*(s/2.2), 0)
-      om_rD_bones.setRotation(rad(rot_tmp+180))  
 
+      var om_rA_bones = new Matrix()
+      om_rA_bones.setTranslation(65*(s/2.2),0)
+      om_rA_bones.setRotation(rad(rot_tmp+180))  
 
       rectangle_pivot_opts = { 
         ...opts_global,
@@ -1185,30 +1147,29 @@ export default class fidget_daft_i extends fidget{
         ...opts_visual_bones,
         dynamic: false,
 
-        name:'bones_rectangle_pivot_TL',
+        name:'bones_rectangle_pivot_T__R_',
         
         m:this.m,
         parent:this.bodies.bones.rectangles_center,
-        m_offset:om_rD_bones,
+        m_offset:om_rA_bones,
         m_shape:m_shape_bones,
         //z:z_depth, 
 
+        
         constraints:[
           {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                           
+          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                      
         ],
-        density:0.2/(s/2.2),                                               
-              
-      }
-
-
+        density:0.2/(s/2.2), 
+      }    
+      
       if(this.is_dynamic)
       {
         rectangle_pivot_opts.constraints.push({ name:'connect_rot_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
         attr:'r',
         target_attr:'ty', 
         target_space:'local',
-        target_remap:[0,55*(s/2.2),0,-35] })
+        target_remap:[0,55*(s/2.2),0,35] })
         
         rectangle_pivot_opts.constraints.push({ name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
         attr:'tx',
@@ -1220,16 +1181,15 @@ export default class fidget_daft_i extends fidget{
         attr:'tx',
         target_attr:'ty', 
         target_space:'local',
-        target_remap:[0,110*(s/2.2) , 0,60*(s/2.2) ] })
-        
+        target_remap:[0,110*(s/2.2),0,60*(s/2.2)] })
       }
 
+      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))     
 
-      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts)) 
 
-      var om_rD = new Matrix()
-      om_rD.setTranslation(ray_tmp*-1,0)   
-      
+      var om_rA = new Matrix()
+      om_rA.setTranslation(ray_tmp*-1,0)
+
       this.bodies.bones.rectangles.push(new body_build({ 
                                               ...opts_global,
                                               ...opts_collision_no_interaction,
@@ -1237,65 +1197,237 @@ export default class fidget_daft_i extends fidget{
                                               ...opts_visual_bones,
                                               dynamic: false,
 
-                                              name:'bones_rectangle_TR',
+                                              name:'bones_rectangle_T__R_',
                                               
                                               m:this.m,
-                                              parent:this.bodies.bones.rectangles_pivots[3],
-                                              m_offset:om_rD, 
+                                              parent:this.bodies.bones.rectangles_pivots[0],
+                                              m_offset:om_rA, 
                                               m_shape:m_shape_bones,
                                               //z:z_depth, 
                                               
                                               constraints:[
-                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[3], stiffness: 1.0,damping:0.1,length:0.01},
-                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[3], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[0], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[0], stiffness: 1.0,damping:0.1,length:0.01}, 
                                               ],  
 
                                               density:0.2/(s/2.2), 
 
+                                            }))     
+
+
+      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+                                              name:'geo_rectangle_T__R_',
+
+                                              parent:this.bodies.bones.rectangles[0],
+                                              //m_offset:new Matrix(),
+                                              bevel:0,
+                                              castShadow: true,
+                                              receiveShadow: false,
+                                              
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[0], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],                                              
                                             })) 
 
-      let oRect_TL = { ...oRect, 
-        name:'geo_rectangle_TL',
 
-        parent:this.bodies.bones.rectangles[3],
-        //m_offset:om_rD,
-        m_shape:m_shape,
-        bevel:0,
-        castShadow: true,
-        receiveShadow: false,
-             
-        constraints:[
-          {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[3], stiffness: 1.0,damping:0.1,length:0.01},
-          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[3], stiffness: 1.0,damping:0.1,length:0.01}, 
-        ],
-
-      }  
+      scale_inter = 40.0                                       
+      let m_shape_modif = new Matrix()
+      m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
+      m_shape_modif.set_row(1,m_shape_modif.get_row(1).getMult(3.51*s+scale_inter))  
+   
+    if(this.is_dynamic)
+    {
 
 
-      this.bodies.geos.rectangles.push(new body_build(oRect_TL))    
-        
-      if(this.is_dynamic)
-      {  
-        let oRect_trail = { 
-          ...opts_global,
-          ...opts_collision_no_interaction,
-          ...opts_debug,
+      this.bodies.inters.rectangles.push(new body_build({ 
+                                              ...oRect, 
+                                              ...opts_collision_mouse_interaction,
+                                              ...opts_visual_inter,
 
-          parent:this.bodies.bones.rectangles[3],
-          m_shape: m_shape,
-          type: utils.shape.rectangle,
-  
-          do_shape: true,
-          do_line:false,           
-  
-          density:0.001/(s/2.2), 
+                                              name:'inter_rectangle_T__R_',
+                                              highlight_selection:[this.bodies.geos.rectangles[0]],  
 
-        }  
-        this.bodies.effects.movA_trails = build_effects_trail(oRect_trail,this.bodies.geos.rectangles[3])                                
+                                              parent:this.bodies.bones.rectangles[0],
+                                              //m_offset:om_rA,
+                                              m_shape:m_shape_modif,
 
-        
-        this.bodies.inters_step.steps[0].highlight_selection = [this.bodies.geos.rectangles[3]]
+                                              constraints:[
+                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+                                              density:0.2/(s/2.2), 
+                                              selection_break_length: 60.*(s/2.2),
+                                                    
+                                            })) 
       }
+                                            
+
+
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////                                      
+
+      rot_tmp = 35  
+
+      m_shape_bones = new Matrix()
+      m_shape_bones.setScale(s*4)
+
+      var om_rB_bones = new Matrix()
+      om_rB_bones.setTranslation(65*(s/2.2),0)
+      om_rB_bones.setRotation(rad(rot_tmp+180)) 
+      
+      rectangle_pivot_opts = { 
+        ...opts_global,
+        ...opts_collision_no_interaction,
+        ...opts_debug,
+        ...opts_visual_bones,
+        dynamic: false,
+
+        name:'bones_rectangle_pivot_B__R_',
+        
+        m:this.m,
+        parent:this.bodies.bones.rectangles_center,
+        m_offset:om_rB_bones,
+        m_shape:m_shape_bones,
+        //z:z_depth, 
+        
+        constraints:[
+          {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},
+          {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_center, stiffness: 1.0,damping:0.1,length:0.01},                                                                                                                                                 
+        ],
+        density:0.2/(s/2.2),                                                     
+      }
+
+      if(this.is_dynamic)
+      {
+        rectangle_pivot_opts.constraints.push({ name:'connect_rot_iA', type:'connect', target:this.bodies.inters_step.steps[0], 
+        attr:'r',
+        target_attr:'ty', 
+        target_space:'local',
+        target_remap:[0,55*(s/2.2),0,-35] })
+
+        rectangle_pivot_opts.constraints.push({ name:'connect_tx_iB', type:'connect', target:this.bodies.inters_step.steps[1], 
+        attr:'tx',
+        target_attr:'r', 
+        target_space:'local',
+        target_remap:[0,90,0,85*(s/2.2)] })
+
+        rectangle_pivot_opts.constraints.push({ name:'connect_tx_iC', type:'connect', target:this.bodies.inters_step.steps[2], 
+        attr:'tx',
+        target_attr:'ty', 
+        target_space:'local',
+        target_remap:[0,110*(s/2.2),0,60*(s/2.2)] })
+      }
+
+      this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts)) 
+
+      var om_rB = new Matrix()
+      om_rB.setTranslation(ray_tmp*-1,0)        
+
+      this.bodies.bones.rectangles.push(new body_build({ 
+                                              ...opts_global,
+                                              ...opts_collision_no_interaction,
+                                              ...opts_debug,
+                                              ...opts_visual_bones,
+                                              dynamic: false,
+
+                                              name:'bones_rectangle_T__R_',
+                                              
+                                              m:this.m,
+                                              parent:this.bodies.bones.rectangles_pivots[1],
+                                              m_offset:om_rB, 
+                                              m_shape:m_shape_bones,
+                                              //z:z_depth, 
+                                              
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles_pivots[1], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles_pivots[1], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],  
+
+                                              density:0.2/(s/2.2), 
+
+                                            }))    
+
+      this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+                                              name:'geo_rectangle_B__R_', 
+                                              
+                                              parent:this.bodies.bones.rectangles[1],
+                                              //m_offset:om_rB,
+                                              m_shape:m_shape,
+                                              bevel:0,
+                                              castShadow: true,
+                                              receiveShadow: false,
+
+                                              constraints:[
+                                                {  name:'point' ,type:'kin_point',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.bones.rectangles[1], stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+
+                                                   
+                                            })) 
+   
+    if(this.is_dynamic)
+    {
+  
+      this.bodies.inters.rectangles.push(new body_build({ 
+                                              ...oRect, 
+                                              ...opts_collision_mouse_interaction,
+                                              ...opts_visual_inter,
+
+                                              name:'inter_rectangle_B__R_',
+                                              highlight_selection:[this.bodies.geos.rectangles[1]],   
+
+                                              parent:this.bodies.bones.rectangles[1],
+                                              //m_offset:om_rB,
+                                              m_shape:m_shape_modif,
+       
+                                              constraints:[
+                                                {  name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                                {  name:'orient',type:'kin_orient',target:this.bodies.inters.background, stiffness: 1.0,damping:0.1,length:0.01}, 
+                                              ],
+
+                                              density:0.2/(s/2.2), 
+                                              selection_break_length: 60.*(s/2.2),
+                                                       
+                                            }))  
+      }
+      /////////////////////////////////////////////////////////////////////////////////////////////////////                                      
+
+      */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1509,7 +1641,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.inters.rectangles[0],
                       this.bodies.inters.rectangles[1],
                       this.bodies.inters.rectangles[2],
-                      //this.bodies.inters.rectangles[3],
+                      this.bodies.inters.rectangles[3],
                       this.bodies.inters_step.steps[0], 
                       this.bodies.inters_step.steps[1],
                       this.bodies.inters_step.steps[2],                                                               
@@ -1576,6 +1708,13 @@ export default class fidget_daft_i extends fidget{
         }
         this.z_depth_end = z_depth
 
+
+
+
+
+
+        this.bodies_build_order = this.bodies_get_build_order()    
+            
             /*
         this.bodies_eval_order = [
           this.bodies.bones.world,
@@ -1786,7 +1925,9 @@ export default class fidget_daft_i extends fidget{
           this.bodies.geos.circle,
           this.bodies.geos.rectangle,                      
           this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
           this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
           this.bodies.bones.rectangles[0],
           this.bodies.bones.rectangles[1],
           this.bodies.bones.rectangles[2],
@@ -1876,7 +2017,9 @@ export default class fidget_daft_i extends fidget{
           this.bodies.geos.circle,
           this.bodies.geos.rectangle,                      
           this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
           this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
           this.bodies.bones.rectangles[0],
           this.bodies.bones.rectangles[1],
           this.bodies.bones.rectangles[2],
@@ -1966,7 +2109,9 @@ export default class fidget_daft_i extends fidget{
           this.bodies.geos.circle,
           this.bodies.geos.rectangle,                      
           this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
           this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
           this.bodies.bones.rectangles[0],
           this.bodies.bones.rectangles[1],
           this.bodies.bones.rectangles[2],
@@ -2045,7 +2190,8 @@ export default class fidget_daft_i extends fidget{
       },   
     ]                                              
 
-      
+      this.bodies_init_physics()
+      this.bodies_init_constraints()
     }
   ////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
@@ -2331,11 +2477,15 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_out_position('world'),
                                         new Vector(0,0.05*0.01))
 
+    this.bodies.geos.rectangles[1].apply_force( this.bodies.geos.rectangles[1].get_out_position('world'),
+                                        new Vector(0,0.05*0.01))
 
     this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_out_position('world'),
                                         new Vector(0,0.05*0.01))
     
-        
+    this.bodies.geos.rectangles[3].apply_force( this.bodies.geos.rectangles[3].get_out_position('world'),
+                                        new Vector(0,0.05*0.01))
+            
         
     
     if( this.state.steps[step].apply_force_happened == false )
@@ -2353,9 +2503,14 @@ export default class fidget_daft_i extends fidget{
       this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_out_position('world'),
                                           new Vector(-0.05*0.35, 0))
 
-                                          
+      this.bodies.geos.rectangles[1].apply_force( this.bodies.geos.rectangles[1].get_out_position('world'),
+                                          new Vector(-0.05*0.35, -0.05*0.35))   
+
       this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_out_position('world'),
                                           new Vector(0.05*0.35, 0))
+
+      this.bodies.geos.rectangles[3].apply_force( this.bodies.geos.rectangles[3].get_out_position('world'),
+                                          new Vector(0.05*0.35, -0.05*0.35))
 
       this.state.steps[step].apply_force_happened = true
     }

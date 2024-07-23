@@ -752,7 +752,8 @@ export class connect{
       target:null, 
       target_attr:'ty', 
       target_space:'local',
-      target_remap:null,   
+      target_remap:null,  
+      out_multiplier:1, 
     };
     const args = { ...defaultOptions, ...in_options };
     
@@ -762,6 +763,8 @@ export class connect{
     this.target_attr  = args.target_attr
     this.target_space = args.target_space      
     this.target_remap = args.target_remap
+    this.out_multiplier = args.out_multiplier
+ 
 
   }
 
@@ -806,6 +809,8 @@ export class connect{
         value = value/(this.target_remap[1]-this.target_remap[0])
         value = value*(this.target_remap[3]-this.target_remap[2])+this.target_remap[2]
       }
+
+      value = value*this.out_multiplier
       
       
 

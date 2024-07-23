@@ -550,6 +550,58 @@ Matrix.prototype = {
 		}
 	},
 
+	get_mirror(axe_x = false, axe_y = true){
+		let m_mirrored = new Matrix(this)
+
+		// point
+        let p = this.get_row(2)
+        let p_mirrored = null
+		if( (axe_x == false)&&(axe_y == true))
+			p_mirrored = new Vector(p.x()*-1,p.y())
+		else if( (axe_x == true)&&(axe_y == false))
+			p_mirrored = new Vector(p.x(),p.y()*-1)
+		else if( (axe_x == true)&&(axe_y == true))
+			p_mirrored = new Vector(p.x()*-1,p.y()*-1)
+        m_mirrored.set_row(2,p_mirrored)
+
+		//orient	
+		
+		let vX = this.get_row(0)
+		let vY = this.get_row(1)
+
+		let vX_mirrored = null
+		let vY_mirrored = null		
+		if( (axe_x == false)&&(axe_y == true))
+		{
+			vX_mirrored = new Vector(vX.x()*-1,vX.y())
+			vY_mirrored = new Vector(vY.x()*-1,vY.y())
+
+			//vX_mirrored.mult(-1)
+		}
+		else if( (axe_x == true)&&(axe_y == false))
+		{
+			vX_mirrored = new Vector(vX.x(),vX.y()*-1)
+			vY_mirrored = new Vector(vY.x(),vY.y()*-1)
+
+			//vY_mirrored.mult(-1)
+		}
+		else if( (axe_x == true)&&(axe_y == true))
+		{
+			vX_mirrored = new Vector(vX.x()*-1,vX.y()*-1)
+			vY_mirrored = new Vector(vY.x()*-1,vY.y()*-1)
+
+			//vX_mirrored.mult(-1)
+		}
+
+		m_mirrored.set_row(0,vX_mirrored)
+		m_mirrored.set_row(1,vY_mirrored)
+		
+
+
+		return m_mirrored
+
+	},
+
 	log: function(title=null) {
 
 		if(title!=null)
@@ -573,6 +625,7 @@ Matrix.prototype = {
 		}
 
 	},
+	
 
 	draw: function(p5) {
 		// draw matrix

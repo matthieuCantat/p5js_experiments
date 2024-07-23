@@ -288,6 +288,7 @@ export default class fidget{
 
   bodies_log_body_ids( body_type_filter = [] )
   {
+    
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -316,6 +317,7 @@ export default class fidget{
 
   bodies_update_matrix( m, body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -339,10 +341,14 @@ export default class fidget{
       
       } 
     }
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.m = m
   }
 
   bodies_update( body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -366,13 +372,16 @@ export default class fidget{
       
       } 
     }
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.update()
   }
 
   bodies_setup_shapes_three( body_type_filter = [] )
   {
   
     this.group_three = new THREE.Group();
-
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -402,13 +411,20 @@ export default class fidget{
         
       } 
     }
+    */
+
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.setup_shapes_three(this.group_three)  
 
     this.Mouse.setup(this.group_three)
   }  
+
+
+
   bodies_animate_three( body_type_filter = [] )
   {
 
-
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -435,7 +451,9 @@ export default class fidget{
         
       } 
     }
-
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.animate_three()
     this.Mouse.update()
   }  
   /*
@@ -462,7 +480,7 @@ export default class fidget{
 
   bodies_override_color(new_color = null,body_type_filter = [] )
   {
-
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -486,6 +504,9 @@ export default class fidget{
         
       } 
     }
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.color = new_color || body.color_base
   }
   bodies_override_color_three(new_color = null,body_type_filter = [] )
   {
@@ -495,6 +516,7 @@ export default class fidget{
 
   bodies_color_update_three_line( body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -518,9 +540,15 @@ export default class fidget{
         
       } 
     }
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.update_color_three_line()
   }
+
+
   bodies_color_update_three_shape( body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -544,6 +572,10 @@ export default class fidget{
         
       } 
     }
+    */
+
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.update_color_three_shape()
   }
 
   /*
@@ -579,6 +611,7 @@ export default class fidget{
 
   bodies_constraints_enable(value,body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -596,7 +629,7 @@ export default class fidget{
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            for( var cns in this.bodies[b_type][key][i].constraints )
+            for( let cns of this.bodies[b_type][key][i].constraints )
             {
               this.bodies[b_type][key][i].constraints[cns].enable(value)
             }
@@ -605,14 +638,21 @@ export default class fidget{
 
         }
         else      
-          for( var cns in this.bodies[b_type][key].constraints )
+          for( let cns of this.bodies[b_type][key].constraints )
           {
             this.bodies[b_type][key].constraints[cns].enable(value)         
           }
   
       }  
        
-    }   
+    } 
+    */
+    
+    
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      for( let cns in body.constraints )
+        body.constraints[cns].enable(value) 
+
   }
 
   constraints_enable(value, body_cns_list = [] )
@@ -678,10 +718,51 @@ export default class fidget{
   }
   */
 
+  bodies_init_physics()
+  {   
+    for( let body of this.bodies_get_list_filtered( 'draw' ))
+    {
+      body.init_physics()   
+    }
+        
+  }
+
+  bodies_init_constraints()
+  {   
+    for( let body of this.bodies_get_list_filtered( 'build' ))
+    {
+      //console.log(body.name,body.build_order,body.constraints_args)
+      body.set_out_matrix(body.get_init_matrix())
+      body.init_constraints()
+    }
+    
+  }
+
+  bodies_get_build_order()
+  {
+    let default_list = this.bodies_get_list_filtered('default')
+    let indexes = []
+    let indexes_sorted = []
+    for( let b of default_list )
+    {
+      let i = b.build_order
+      indexes.push(i)
+      indexes_sorted.push(i)
+    }
+    indexes_sorted.sort(function (a, b) {  return a - b;  })
+
+    let build_order = []
+    for(let i of indexes_sorted)
+      build_order.push( default_list[indexes.indexOf(i)] )
+
+    return build_order
+  }
+
   
 
-  bodies_set_debug( value,body_type_filter = [] )
+  bodies_set_debug( value, body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -703,12 +784,16 @@ export default class fidget{
           this.bodies[b_type][key].debug = value 
         
       } 
-    }       
+    } 
+    */
+    
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.debug = value     
   }
 
   bodies_set_visibility_secondary( value,body_type_filter = [] )
   {
-    
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -732,11 +817,15 @@ export default class fidget{
         
       } 
     } 
+    */
+
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.visibility_secondary = value    
   }  
 
   bodies_set_visibility_override( value,body_type_filter = [] )
   {
-    
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -760,6 +849,10 @@ export default class fidget{
         
       } 
     } 
+    */
+
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.debug_force_visibility = value        
   }  
 
 
@@ -767,7 +860,7 @@ export default class fidget{
 
   bodies_set_visibility( value = null ,body_type_filter = [] )
   {
-    
+        /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -803,6 +896,11 @@ export default class fidget{
         
       } 
     } 
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.visibility = value || body.visibility_default 
+
+
   }  
 
 
@@ -810,7 +908,7 @@ export default class fidget{
 
   bodies_set_dynamic( value = null ,body_type_filter = [] )
   {
-    
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -846,13 +944,17 @@ export default class fidget{
         
       } 
     } 
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.dynamic = value || body.dynamic_default 
+
   }  
 
 
 
   bodies_init_out_matrix( body_type_filter = [] )
   {
-    
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -876,6 +978,10 @@ export default class fidget{
         
       } 
     } 
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.init_out_matrix()
+
   }  
 
   enable(value)
@@ -889,7 +995,7 @@ export default class fidget{
 
   bodies_do_update( value, body_type_filter = [] )
   {
-
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -917,12 +1023,15 @@ export default class fidget{
 
       } 
     } 
+    */
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.do_update = value
   }
 
   bodies_enable( value, body_type_filter = [] )
   {
 
-
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -947,12 +1056,17 @@ export default class fidget{
 
       } 
     } 
+    */
+
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.enable(value)
+
   }
 
   bodies_apply_material( material = null, body_type_filter = [] )
   {
 
-
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -994,14 +1108,21 @@ export default class fidget{
 
 
       } 
-    } 
+    }
+    */
+    
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      if( body.mesh_three.shape != null)
+        body.mesh_three.shape.material = material || body.three_material
+    
   }
 
 
-  bodies_get_list_filtered( body_type_filter = [] )
+  bodies_search_by_name( name, body_type_filter = [] )
   {
 
-    let bloomed_list = []
+    let bodies_found = []
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -1019,27 +1140,127 @@ export default class fidget{
         {
           for( let i = 0; i < this.bodies[b_type][key].length; i++)
           {
-            bloomed_list.push(this.bodies[b_type][key][i])
+            if(this.bodies[b_type][key][i].name.inculdes(name) )
+              bodies_found.push(this.bodies[b_type][key][i])
           }
         }
         else
         {
-          bloomed_list.push(this.bodies[b_type][key])       
+          if(this.bodies[b_type][key].name.inculdes(name) )
+            bodies_found.push(this.bodies[b_type][key])       
         }
 
 
       } 
     } 
+    */
 
-    return bloomed_list
+    for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
+    {
+      let body_name = body.name
+      if(body_name.indexOf(name) != -1 )
+        bodies_found.push(body)
+    }
+
+
+    return bodies_found
+
+  }
+
+
+
+  bodies_get_list_filtered( order = 'eval', body_type_filter = [] )//eval // draw
+  {
+
+    let bodies_list = []
+
+    if( order == 'eval' )
+    {
+      for( let i =0; i < this.bodies_eval_order.length; i+=2)
+      {   
+        let b_type = this.bodies_eval_order[i+0]
+        let key = this.bodies_eval_order[i+1]
+        if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+        {
+          if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+          continue
+        }
+        
+        if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+        {
+  
+          if( this.bodies[b_type][key].constructor === Array)
+          {
+            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+            {
+              bodies_list.push(this.bodies[b_type][key][i])
+            }
+          }
+          else
+          {
+            bodies_list.push(this.bodies[b_type][key])       
+          }
+  
+  
+        } 
+      } 
+
+    }
+   
+
+    if( order == 'draw' )
+    {
+      bodies_list = this.bodies_draw_order
+    }    
+
+    if( order == 'build' )
+    {
+      bodies_list = this.bodies_get_build_order()
+    }  
+
+    if( order == 'default' )
+    {
+      for( let b_type in this.bodies)
+      {   
+        for( let key in this.bodies[b_type])
+        {   
+          if( ( this.bodies[b_type][key] === null)||( this.bodies[b_type][key].length === 0))
+          {
+            if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
+            continue
+          }
+          
+          if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
+          {
+    
+            if( this.bodies[b_type][key].constructor === Array)
+            {
+              for( let i = 0; i < this.bodies[b_type][key].length; i++)
+              {
+                bodies_list.push(this.bodies[b_type][key][i])
+              }
+            }
+            else
+            {
+              bodies_list.push(this.bodies[b_type][key])       
+            }
+    
+    
+          }
+        } 
+      } 
+    }
+
+
+    return bodies_list
 
   }
 
 
   bodies_get_list_attr_value_filtered( attr, value , body_type_filter = [] , inverse = false)
   {
-
-    let bloomed_list = []
+    /*
+    let body_list = []
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -1060,11 +1281,11 @@ export default class fidget{
 
             if((inverse == true)&&( this.bodies[b_type][key][i][attr] != value) )
             {
-              bloomed_list.push(this.bodies[b_type][key][i])
+              body_list.push(this.bodies[b_type][key][i])
             }
             if((inverse == false)&&( this.bodies[b_type][key][i][attr] == value) )
             {
-              bloomed_list.push(this.bodies[b_type][key][i])
+              body_list.push(this.bodies[b_type][key][i])
             }
           }
         }
@@ -1072,19 +1293,32 @@ export default class fidget{
         {
           if((inverse == true)&&( this.bodies[b_type][key][attr] != value))
           {   
-            bloomed_list.push(this.bodies[b_type][key])       
+            body_list.push(this.bodies[b_type][key])       
           }
           if((inverse == false)&&( this.bodies[b_type][key][attr] == value))
           {   
-            bloomed_list.push(this.bodies[b_type][key])       
+            body_list.push(this.bodies[b_type][key])       
           }
         }
 
 
       } 
     } 
+    */
 
-    return bloomed_list
+    for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
+    {
+      if((inverse == true)&&( body[attr] != value))
+      {   
+        body_list.push(body)       
+      }
+      if((inverse == false)&&( body[attr] == value))
+      {   
+        body_list.push(body)       
+      }
+    }
+
+    return body_list
 
   }
 
@@ -1104,6 +1338,7 @@ export default class fidget{
 
   get_selected_body(body_type_filter = [] )
   {
+    /*
     for( let i =0; i < this.bodies_eval_order.length; i+=2)
     {   
       let b_type = this.bodies_eval_order[i+0]
@@ -1133,7 +1368,12 @@ export default class fidget{
         
       } 
     }   
+    */
     
+    for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
+      if(body.is_selected)
+        return body
+
     return null
     
   }
@@ -1148,6 +1388,31 @@ export default class fidget{
 
     let body_to_highlight = []
     let body_to_reduce    = []
+
+    for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
+    {
+      if( body.body == mouse_cns.constraint.bodyB )
+      {
+        body.color = utils.color.redLight
+        body.is_selected = true
+
+        for( let j = 0; j < body.highlight_selection.length; j++)
+          body_to_highlight.push(body.highlight_selection[j])  
+
+      }
+      else
+      {
+        body.color = body.color_base 
+        body.is_selected = false
+
+        for( let j = 0; j < body.highlight_selection.length; j++)
+          body_to_reduce.push(body.highlight_selection[j])  
+
+      }      
+    }
+
+
+    /*
     for( let k =0; k < this.bodies_eval_order.length; k+=2)
     {   
       let b_type = this.bodies_eval_order[k+0]
@@ -1214,7 +1479,8 @@ export default class fidget{
       } 
       
     }
-
+    */
+ 
     
     
 
