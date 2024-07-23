@@ -651,6 +651,7 @@ export class constraint_build{
             apply_on_input: false,
             stiffness: 1,
             name:'null',
+            out_multiplier:1.0,
         };
         const args = { ...defaultOptions, ...in_options };
 
@@ -672,6 +673,7 @@ export class constraint_build{
         this.is_enable = true
         this.stiffness = args.stiffness
         this.name = args.name
+        this.out_multiplier = args.out_multiplier
         
     
     }
@@ -687,6 +689,7 @@ export class constraint_build{
         
         let m_target = this.target.get_out_matrix()
         let m = this.target_pos_offset.getMult(m_target)
+
 
         if(this.apply_on_input)
         {
@@ -717,12 +720,24 @@ export class constraint_build{
           {
             if( this.stiffness == 1.0 )
             {       
-              this.obj.set_out_rotation(m.getRotation(),'world', 'override')    
+              let angle = m.getRotation()
+              if(this.obj.name == 'inter_rectangle_T__R_')
+              {
+                //console.log(this.obj.name, m_target.get_row(0).get_value(),deg(m_target.getRotation()),deg(this.target_pos_offset.getRotation()), m.get_row(0).get_value(),deg(angle)) 
+              }
+              if(this.obj.name == 'inter_rectangle_T__R_')
+              {
+                //m_target.log('m_target '+this.target.name )
+                //this.target_pos_offset.log('target_pos_offset')
+                //m.log('m')
+              }
+              this.obj.set_out_rotation(angle  ,'world', 'override')   
+               
             }
             else{
               let r_current = this.obj.get_out_matrix().getRotation()
               let r_target = m.getRotation()    
-              let r_mix = r_target * this.stiffness +r_current * (1.0-this.stiffness )        
+              let r_mix = r_target * this.stiffness + r_current * (1.0-this.stiffness )     
               this.obj.set_out_rotation(r_mix,'world', 'override')   
             }
 

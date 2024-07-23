@@ -123,9 +123,14 @@ export default class Vector
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////new
-	getRotation(v)
+	getRotation(vOther)
     {
-        return this.v.angleBetween(v.v)
+        //https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
+        let dot = this.v.x*vOther.v.x + this.v.y*vOther.v.y      // Dot product between [x1, y1] and [x2, y2]
+        let det = this.v.x*vOther.v.y - this.v.y*vOther.v.x      // Determinant
+        let angle = Math.atan2(det, dot)  // atan2(y, x) or atan2(sin, cos) 
+        //let angle = this.v.angleBetween(v.v)
+        return angle
     }
     
     rotate(angle) {

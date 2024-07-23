@@ -1083,7 +1083,9 @@ export class body_build{
         let wid = 2
   
         let shape = null
-        let mesh = null        
+        let mesh = null  
+        
+        // X
         shape = ut.rect( len, wid )
         mesh = ut.addShape_polygon(  
           shape, 
@@ -1107,6 +1109,7 @@ export class body_build{
         this.mesh_three.group.add( mesh ) 
         mesh.position.x =  len/2.0
 
+        // Y
         shape = ut.rect( wid, len )
         mesh = ut.addShape_polygon(   
           shape, 
@@ -1389,15 +1392,21 @@ export class body_build{
           }     
 
           
-          if( constraints_arg_mirrored.attr == 'tx' )
+          if(constraints_arg_mirrored.type == 'connect')
+          {
+            if( constraints_arg_mirrored.attr == 'tx' )
             constraints_arg_mirrored['out_multiplier'] = 1     
-          if( constraints_arg_mirrored.attr == 'ty' )
+            else if( constraints_arg_mirrored.attr == 'ty' )
+              constraints_arg_mirrored['out_multiplier'] = -1
+            else if( constraints_arg_mirrored.attr == 'r' )
+              constraints_arg_mirrored['out_multiplier'] = -1
+            else if( constraints_arg_mirrored.attr == 's' )
+              constraints_arg_mirrored['out_multiplier'] = -1    
+          }
+          else if(constraints_arg_mirrored.type == 'kin_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
-          if( constraints_arg_mirrored.attr == 'r' )
+          else if(constraints_arg_mirrored.type == 'dyn_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
-          if( constraints_arg_mirrored.attr == 's' )
-            constraints_arg_mirrored['out_multiplier'] = -1    
-
 
           constraints_args_mirrored.push(constraints_arg_mirrored)          
    
@@ -1471,14 +1480,21 @@ export class body_build{
             } 
           }       
 
-          if( constraints_arg_mirrored.attr == 'tx' )
+          if(constraints_arg_mirrored.type == 'connect')
+          {
+            if( constraints_arg_mirrored.attr == 'tx' )
             constraints_arg_mirrored['out_multiplier'] = 1     
-          if( constraints_arg_mirrored.attr == 'ty' )
+            else if( constraints_arg_mirrored.attr == 'ty' )
+              constraints_arg_mirrored['out_multiplier'] = -1
+            else if( constraints_arg_mirrored.attr == 'r' )
+              constraints_arg_mirrored['out_multiplier'] = -1
+            else if( constraints_arg_mirrored.attr == 's' )
+              constraints_arg_mirrored['out_multiplier'] = -1    
+          }
+          else if(constraints_arg_mirrored.type == 'kin_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
-          if( constraints_arg_mirrored.attr == 'r' )
-            constraints_arg_mirrored['out_multiplier'] = -1
-          if( constraints_arg_mirrored.attr == 's' )
-            constraints_arg_mirrored['out_multiplier'] = -1    
+          else if(constraints_arg_mirrored.type == 'dyn_orient')
+            constraints_arg_mirrored['out_multiplier'] = -1   
 
           if(axe_y)
             constraints_arg_mirrored['out_multiplier'] = 1

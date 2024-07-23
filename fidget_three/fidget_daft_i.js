@@ -1824,7 +1824,7 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.inters.rectangles[0],
                       this.bodies.inters.rectangles[1],
                       this.bodies.inters.rectangles[2],
-                      //this.bodies.inters.rectangles[3],
+                      this.bodies.inters.rectangles[3],
                       this.bodies.geos.backgrounds[0],
                       this.bodies.geos.backgrounds[1],
                       this.bodies.geos.circle,

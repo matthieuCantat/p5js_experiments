@@ -26,6 +26,16 @@ import Vector from './vector.js';
  * @prop {CanvasRenderingContext2D} [context] - set or get current canvas context
  * @constructor
  */
+
+
+ function rad(value)
+ {
+   return value*Math.PI/180
+ }
+ function deg(value)
+ {
+   return value/Math.PI*180
+ }
 export default function Matrix(m=null) {
 
 	this.a = 1;
@@ -576,14 +586,14 @@ Matrix.prototype = {
 			vX_mirrored = new Vector(vX.x()*-1,vX.y())
 			vY_mirrored = new Vector(vY.x()*-1,vY.y())
 
-			//vX_mirrored.mult(-1)
+			vY_mirrored.mult(-1)
 		}
 		else if( (axe_x == true)&&(axe_y == false))
 		{
 			vX_mirrored = new Vector(vX.x(),vX.y()*-1)
 			vY_mirrored = new Vector(vY.x(),vY.y()*-1)
 
-			//vY_mirrored.mult(-1)
+			vY_mirrored.mult(-1)
 		}
 		else if( (axe_x == true)&&(axe_y == true))
 		{
@@ -607,21 +617,24 @@ Matrix.prototype = {
 		if(title!=null)
 		{
 			console.log(title,
-			Math.round(this.a,2),
-			Math.round(this.b,2),
-			Math.round(this.c,2),
-			Math.round(this.d,2),
-			Math.round(this.e,2),
-			Math.round(this.f,2))
+			Math.round(this.a*100,2)/100,
+			Math.round(this.b*100,2)/100,
+			Math.round(this.c*100,2)/100,
+			Math.round(this.d*100,2)/100,
+			Math.round(this.e*100,2)/100,
+			Math.round(this.f*100,2)/100,
+			'rotation deg : '+ Math.round(deg(this.getRotation())*100,2)/100)
 		}
 		else
 		{
-			console.log(Math.round(this.a,2),
-			Math.round(this.b,2),
-			Math.round(this.c,2),
-			Math.round(this.d,2),
-			Math.round(this.e,2),
-			Math.round(this.f,2))
+			console.log(Math.round(this.a*100,2)/100,
+			Math.round(this.b*100,2)/100,
+			Math.round(this.c*100,2)/100,
+			Math.round(this.d*100,2)/100,
+			Math.round(this.e*100,2)/100,
+			Math.round(this.f*100,2)/100,
+			'rotation deg: '+ Math.round(deg(this.getRotation())*100,2)/100)
+		
 		}
 
 	},
