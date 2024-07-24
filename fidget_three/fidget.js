@@ -8,7 +8,11 @@ import { utils,
   create_physics_engine_runner,
   create_boundary_wall_collision} from './utils.js';
 import * as THREE from 'three';
-import { Mouse_manager } from './utils_three.js'
+import { Mouse_manager,  } from './utils_three.js'
+import { body_build } from './body.js';
+import { materials,} from './shader.js';
+import Matrix from './matrix.js';
+
 class state_step_tpl{
   constructor()
   {
@@ -468,6 +472,92 @@ export default class fidget{
   }
 
 
+  create_inter_from_geos( bodies_geos, inter_body_parent,scale)
+  {
+    
+
+    for( let i = 0 ; i < bodies_geos.length; i += 1 )
+    {
+      let n = bodies_geos[i]
+
+      if( this.bodies.geos[n].constructor === Array)
+      {
+        for( let j = 0 ; j < this.bodies.geos[n].length; j += 1 )
+          this.bodies.inters[n][j] = this.build_inter_from_geo( this.bodies.geos[n][j], inter_body_parent, scale)
+      }
+      else
+      {
+        this.bodies.inters[n] = this.build_inter_from_geo( this.bodies.geos[n], inter_body_parent, scale)
+      }
+    }
+
+  }
+
+
+  build_inter_from_geo(geo_body,inter_body_parent,scale)
+  {
+    // info
+    let opts_collision_mouse_interaction = {   
+      collision_category: utils.collision_category.inter,
+      collision_mask: utils.collision_category.mouse, 
+    }
+
+    let opts_visual_inter = {
+      visibility:true,
+      do_shape: true,
+      do_line:true,                                           
+      color:utils.color.grey,
+      color_line: utils.color.black,
+      material_three: materials.simple.text_checker_three_grey ,
+    }  
+
+    let scale_inter = 40.0 
+
+
+    // build inter
+    let geo_args = geo_body.get_args()
+
+    // m_shape
+    let vX = geo_args.m_shape.get_row(0)
+    let vY = geo_args.m_shape.get_row(1)
+    let vX_length = vX.mag()
+    let vY_length = vY.mag()
+    vX.normalize().mult(vX_length+scale_inter)
+    vY.normalize().mult(vY_length+scale_inter)
+
+    let m_shape = new Matrix(geo_args.m_shape)
+    m_shape.set_row(0,vX)
+    m_shape.set_row(1,vY)
+
+    // name
+    let name = geo_args.name.split('_')[1]
+
+    // m_offset
+    let m_geo_body   = geo_body.get_init_matrix()
+    let m_inter_body = inter_body_parent.get_init_matrix()
+
+    let inter_args = {
+      ...geo_args,
+      ...opts_collision_mouse_interaction,
+      ...opts_visual_inter,
+
+      name:'inters_'+name,
+      highlight_selection:[geo_body],  
+
+      parent: inter_body_parent,
+      m_offset: m_geo_body.getMult( m_inter_body.getInverse() ),//get_matrix('base', 'world'),
+      m_shape: m_shape,
+
+      constraints:[
+        {  name:'point' ,type:'dyn_point',target: inter_body_parent, stiffness: 0.999,damping:0.1,length:0.01},
+        {  name:'orient',type:'kin_orient',target: inter_body_parent,stiffness: 1.0,damping:0.1,length:0.01},                                          
+      ],                                      
+      density:0.01/(scale/2.2), 
+      selection_break_length: 60.*(scale/2.2),  
+    }    
+
+    return new body_build(inter_args)
+  }
 
   /*
   bodies_rot_clean_override( body_type_filter = [] )

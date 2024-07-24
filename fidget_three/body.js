@@ -1615,7 +1615,7 @@ export function build_effects_trail(opts, body_target)
   let bodies = []
 
   bodies.push(new body_build({  ...opts_trail, 
-                                name: body_target.name + 'effect_trails1',                                       
+                                name: body_target.name + 'effects_trails1',                                       
                                 color:utils.color.red,
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.15},
@@ -1624,7 +1624,7 @@ export function build_effects_trail(opts, body_target)
                               })) 
                                  
   bodies.push(new body_build({  ...opts_trail,                                 
-                                name: body_target.name + 'effect_trails2',        
+                                name: body_target.name + 'effects_trails2',        
                                 color:utils.color.blue,              
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.2},
@@ -1633,7 +1633,7 @@ export function build_effects_trail(opts, body_target)
                               }))  
                                                                                     
   bodies.push(new body_build({  ...opts_trail, 
-                                name: body_target.name + 'effect_trails3',    
+                                name: body_target.name + 'effects_trails3',    
                                 color:utils.color.green,          
                                 constraints:[
                                   {  name:'point' ,type:'kin_point',target:body_target,  stiffness: 0.3},
@@ -1695,7 +1695,7 @@ export function build_effects_particles_sparcles(opts)
   om_EA1.setRotation(rad(opts.r)+rad(90)) 
 
   bodies.push(new body_build({ ...oEffectsA,          
-                                name: opts.name + 'effect_sparcles1',
+                                name: opts.name + 'effects_sparcles1',
                                 m_offset:om_EA1,                                                        
                               }))                                            
 
@@ -1704,7 +1704,7 @@ export function build_effects_particles_sparcles(opts)
   om_EA1.setRotation(rad(opts.r)+rad(45))
 
   bodies.push(new body_build({ ...oEffectsA,   
-                                name: opts.name + 'effect_sparcles2',
+                                name: opts.name + 'effects_sparcles2',
                                 m_offset:om_EA1,                                                     
                               })) 
                                         
@@ -1713,7 +1713,7 @@ export function build_effects_particles_sparcles(opts)
   om_EA1.setRotation(rad(opts.r)+rad(135))
 
   bodies.push(new body_build({ ...oEffectsA,     
-                                name: opts.name + 'effect_sparcles3',
+                                name: opts.name + 'effects_sparcles3',
                                 m_offset:om_EA1,                                                       
                               })) 
 
@@ -1772,7 +1772,7 @@ export function build_effects_particles_shapes(opts)
   om_EA1.setRotation(rad(opts.r)+rad(90))                                       
 
   bodies.push(new body_build({ ...oEffectsA, 
-                                name: opts.name + 'effect_particle_shape1',
+                                name: opts.name + 'effects_particle_shape1',
                                 m_offset:om_EA1,                                                
                               }))                                             
 
@@ -1781,7 +1781,7 @@ export function build_effects_particles_shapes(opts)
   om_EA1.setRotation(rad(opts.r)+rad(45))                                       
 
   bodies.push(new body_build({ ...oEffectsA, 
-                                name: opts.name + 'effect_particle_shape2',
+                                name: opts.name + 'effects_particle_shape2',
                                 m_offset:om_EA1,                                                     
                               }))                                             
 
@@ -1790,7 +1790,7 @@ export function build_effects_particles_shapes(opts)
   om_EA1.setRotation(rad(opts.r)+rad(135))                                         
 
   bodies.push(new body_build({ ...oEffectsA, 
-                                name: opts.name + 'effect_particle_shape3',
+                                name: opts.name + 'effects_particle_shape3',
                                 m_offset:om_EA1,                                                   
                               }))                                             
 
@@ -1832,7 +1832,7 @@ export function build_effects_wall(opts)
                                 ...opts_collision_no_interaction,    
                                 ...opts_debug,
 
-                                name: opts.name+'effect_wall',     
+                                name: opts.name+'effects_wall',     
 
                                 parent:opts.parent,                                    
                                 m_offset:om_EA1,

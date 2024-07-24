@@ -286,7 +286,7 @@ export default class fidget_daft_i extends fidget{
     */
 
     let background_L = new body_build({ ...oBackground,
-      name:'geo_background_L_',
+      name:'geos_background_L_',
       m_offset:new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2), 
     })
     this.bodies.geos.backgrounds.push(background_L)
@@ -297,7 +297,7 @@ export default class fidget_daft_i extends fidget{
     mo_background_R.setTranslation(this.screen_dims.x/4*3,this.screen_dims.y/2)    
 
     this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
-                                                name:'geo_background_R', 
+                                                name:'geos_background_R', 
                                                 m_offset:mo_background_R,
                                                                                                 
                                               })) 
@@ -341,7 +341,7 @@ export default class fidget_daft_i extends fidget{
         ...opts_visual_inter,
         ...opts_debug,
 
-        name:'inter_background',
+        name:'inters_background',
         highlight_selection:[],  
         
         m:this.m,
@@ -411,7 +411,7 @@ export default class fidget_daft_i extends fidget{
                                       ...opts_visual_inter,
                                       ...opts_debug,
 
-                                      name:'inter_A',     
+                                      name:'inters_A',     
                                       //highlight_selection:[this.bodies.geos.rectangles[3]],  
                                       selection_break_length:300.0,
 
@@ -437,6 +437,7 @@ export default class fidget_daft_i extends fidget{
       
 
       // build
+      /*
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(50*s+scale_inter))
       m_shape.set_row(1,m_shape.get_row(1).getMult(50*s+scale_inter))
@@ -447,7 +448,7 @@ export default class fidget_daft_i extends fidget{
         ...opts_visual_inter,
         ...opts_debug,
 
-        name:'inter_circle',
+        name:'inters_circle',
         //highlight_selection:[this.bodies.geos.circle],  
 
         m:this.m,
@@ -465,6 +466,7 @@ export default class fidget_daft_i extends fidget{
         selection_break_length: 60.*(s/2.2),    
                                                                                         
         })
+        */
 
 
 
@@ -478,7 +480,7 @@ export default class fidget_daft_i extends fidget{
                                           ...opts_visual_inter,
                                           ...opts_debug,
 
-                                          name:'inter_B',   
+                                          name:'inters_B',   
                                           //highlight_selection:[this.bodies.geos.rectangle], 
                                           selection_break_length:300.0, 
 
@@ -502,7 +504,7 @@ export default class fidget_daft_i extends fidget{
         this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_out_rotation('base'))/90.0     ,0,1) }  
         this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_out_rotation(rad(res*95.0),'world', 'override') }                     
 
-                                        
+        /*                                
         scale_inter = 10.0                                      
         m_shape = new Matrix()
         m_shape.set_row(0,m_shape.get_row(0).getMult(74*s+scale_inter))
@@ -514,7 +516,7 @@ export default class fidget_daft_i extends fidget{
           ...opts_visual_inter,
           ...opts_debug,
 
-          name:'inter_rectangle',
+          name:'inters_rectangle',
           //highlight_selection:[this.bodies.geos.rectangle],  
           
 
@@ -533,6 +535,7 @@ export default class fidget_daft_i extends fidget{
           density:0.01/(s/2.2),   
           selection_break_length: 60.*(s/2.2),                                                                             
         })
+        */
 
       
       
@@ -588,7 +591,7 @@ export default class fidget_daft_i extends fidget{
                                         ...opts_visual_inter,
                                         ...opts_debug,
 
-                                        name:'inter_C', 
+                                        name:'inters_C', 
                                         //highlight_selection:[this.bodies.geos.rectangle], 
                                         selection_break_length:300.0,
 
@@ -656,18 +659,18 @@ export default class fidget_daft_i extends fidget{
     }
 
     this.bodies.bones.circle = new body_build(bone_circle_opts)      
-
-    // build
+  
+                                         
     m_shape = new Matrix()
     m_shape.set_row(0,m_shape.get_row(0).getMult(50*s))
     m_shape.set_row(1,m_shape.get_row(1).getMult(50*s))
-     
+
     this.bodies.geos.circle = new body_build({ 
                                     ...opts_global,
                                     ...opts_collision_activate,
                                     ...opts_debug,
 
-                                    name:'geo_circle',
+                                    name:'geos_circle',
 
                                     m:this.m,
                                     parent:this.bodies.bones.circle,
@@ -698,12 +701,13 @@ export default class fidget_daft_i extends fidget{
                                                                                
                                     })
 
-         
+    /*     
     if(this.is_dynamic)
     {
 
       this.bodies.inters.circle.highlight_selection = [this.bodies.geos.circle]
     }
+    */
 
 
                                    
@@ -742,10 +746,6 @@ export default class fidget_daft_i extends fidget{
   
 
 
-
-
-
-
       this.bodies.bones.rectangles_center = new body_build({ 
                                               ...opts_global,
                                               ...opts_collision_no_interaction,
@@ -774,35 +774,6 @@ export default class fidget_daft_i extends fidget{
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       let ray_tmp = 80*(s/2.2)
       let rot_tmp = 0 
       let offset_from_center = new Vector(0,0)
@@ -812,7 +783,7 @@ export default class fidget_daft_i extends fidget{
 
 
                                 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// RECTANGLES
 
 
       rot_tmp = 180+35    
@@ -903,7 +874,7 @@ export default class fidget_daft_i extends fidget{
                                             })) 
 
       let oRect_TL = { ...oRect, 
-        name:'geo_rectangle_T__L_',
+        name:'geos_rectangle_T__L_',
 
         parent:this.bodies.bones.rectangles[0],
         //m_offset:om_rD,
@@ -924,7 +895,7 @@ export default class fidget_daft_i extends fidget{
         
       if(this.is_dynamic)
       {  
-
+        /*
         scale_inter = 40.0                                       
         let m_shape_modif = new Matrix()
         m_shape_modif.set_row(0,m_shape_modif.get_row(0).getMult(16.21*s+scale_inter))
@@ -936,7 +907,7 @@ export default class fidget_daft_i extends fidget{
                                                 ...opts_collision_mouse_interaction,
                                                 ...opts_visual_inter,
 
-                                                name:'inter_rectangle_T__L_',
+                                                name:'inters_rectangle_T__L_',
                                                 highlight_selection:[this.bodies.geos.rectangles[0]],   
 
                                                 parent:this.bodies.bones.rectangles[0],
@@ -952,6 +923,7 @@ export default class fidget_daft_i extends fidget{
                                                 selection_break_length: 60.*(s/2.2),
                                                           
                                               }))  
+                                              */
 
 
         let oRect_trail = { 
@@ -979,23 +951,27 @@ export default class fidget_daft_i extends fidget{
       this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror(false,true)) 
       this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror(false,true))
       this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror(false,true))
+      /*
       if(this.is_dynamic)                              
         this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(false,true))
-
+      */
       // BOTTOM LEFT
       this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror(true,false)) 
       this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror(true,false))
       this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror(true,false))
+      /*
       if(this.is_dynamic)                              
         this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(true,false))
+        */
 
       // BOTTOM RIGHT
       this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror(true,true)) 
       this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror(true,true))
       this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror(true,true))
+      /*
       if(this.is_dynamic)                              
         this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(true,true))
-
+        */
 
 
 
@@ -1036,7 +1012,7 @@ export default class fidget_daft_i extends fidget{
       ...opts_collision_activate,
       ...opts_debug,
 
-      name:'geo_rectangle',
+      name:'geos_rectangle',
        
       m:this.m,
       parent:this.bodies.bones.rectangle,
@@ -1091,7 +1067,7 @@ export default class fidget_daft_i extends fidget{
     {  
       this.bodies.inters_step.steps[1].highlight_selection = [this.bodies.geos.rectangle]  
       this.bodies.inters_step.steps[2].highlight_selection = [this.bodies.geos.rectangle]       
-      this.bodies.inters.rectangle.highlight_selection = [this.bodies.geos.rectangle]   
+      //this.bodies.inters.rectangle.highlight_selection = [this.bodies.geos.rectangle]   
       this.bodies.effects.movB_trails = build_effects_trail(oRectangle,this.bodies.geos.rectangle)
     
 
@@ -1200,7 +1176,14 @@ export default class fidget_daft_i extends fidget{
 
                                                   density:0.01/(s/2.2),  
                                                   })    
+    
+      this.create_inter_from_geos(
+        ['circle',
+        'rectangle',
+        'rectangles'], this.bodies.inters.background, s ) 
                                                   
+
+
       }
 
        this.bodies_draw_order = [
