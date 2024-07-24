@@ -1288,7 +1288,7 @@ export class body_build{
     }
 
 
-    get_mirror(  axe_x = false, axe_y = true)
+    get_mirror(  axe_x = false, axe_y = true, instance = false)
     {
       let args = this.get_args()
 
@@ -1313,7 +1313,10 @@ export class body_build{
       let target_names = []
       for( let i = 0 ; i < constraints_args.length; i++)
       {
-        target_names.push( constraints_args[i]['target'].name )   
+        if( constraints_args[i]['target'] != null )
+          target_names.push( constraints_args[i]['target'].name )   
+        else
+          target_names.push( null )   
       }
          
  
@@ -1374,7 +1377,7 @@ export class body_build{
           for( let attr in constraints_args[i] )
             constraints_arg_mirrored[attr] = constraints_args[i][attr]
 
-          if( target_names[i].includes(suffix_axeY[0]) )
+          if( (target_names[i] != null)&&( target_names[i].includes(suffix_axeY[0]) ) )
           {
             target_names[i] = target_names[i].replace(suffix_axeY[0],suffix_axeY[1])
             let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
@@ -1385,17 +1388,54 @@ export class body_build{
             } 
           }     
 
+          if(constraints_arg_mirrored.type == 'kin_axe')
+          {       
+            let distPos = constraints_arg_mirrored.distPos
+            let distNeg = constraints_arg_mirrored.distNeg
+            constraints_arg_mirrored.distPos = distNeg
+            constraints_arg_mirrored.distNeg = distPos
+          }
+
+
           
           if(constraints_arg_mirrored.type == 'connect')
           {
+            
             if( constraints_arg_mirrored.attr == 'tx' )
-            constraints_arg_mirrored['out_multiplier'] = 1     
+              constraints_arg_mirrored['out_multiplier'] = 1     
             else if( constraints_arg_mirrored.attr == 'ty' )
               constraints_arg_mirrored['out_multiplier'] = -1
             else if( constraints_arg_mirrored.attr == 'r' )
               constraints_arg_mirrored['out_multiplier'] = -1
             else if( constraints_arg_mirrored.attr == 's' )
-              constraints_arg_mirrored['out_multiplier'] = -1    
+              constraints_arg_mirrored['out_multiplier'] = -1  
+              
+            
+
+            if(constraints_arg_mirrored['target_remap'] != null )
+            {
+              let r = constraints_arg_mirrored['target_remap']
+
+              if( constraints_arg_mirrored.attr == 'tx' )
+                r = [ r[0], r[1], r[2], r[3] ]   
+              else if( constraints_arg_mirrored.attr == 'ty' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+              else if( constraints_arg_mirrored.attr == 'r' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+              else if( constraints_arg_mirrored.attr == 's' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]    
+
+              if( constraints_arg_mirrored.target_attr == 'tx' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                 
+              else if( constraints_arg_mirrored.target_attr == 'ty' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]               
+              else if( constraints_arg_mirrored.target_attr == 'r' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                  
+              else if( constraints_arg_mirrored.target_attr == 's' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]     
+                
+                constraints_arg_mirrored['target_remap'] = r
+            }                
           }
           else if(constraints_arg_mirrored.type == 'kin_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
@@ -1463,7 +1503,7 @@ export class body_build{
           for( let attr in constraints_args[i] )
             constraints_arg_mirrored[attr] = constraints_args[i][attr]
 
-          if( target_names[i].includes(suffix_axeX[0]) )
+          if( (target_names[i] != null)&&( target_names[i].includes(suffix_axeX[0]) ) )
           {
             target_names[i] = target_names[i].replace(suffix_axeX[0],suffix_axeX[1])
             let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
@@ -1474,17 +1514,57 @@ export class body_build{
             } 
           }       
 
+
+          if(constraints_arg_mirrored.type == 'kin_axe')
+          {       
+            let distPos = constraints_arg_mirrored.distPos
+            let distNeg = constraints_arg_mirrored.distNeg
+            constraints_arg_mirrored.distPos = distNeg
+            constraints_arg_mirrored.distNeg = distPos
+          }
+          
+
+
           if(constraints_arg_mirrored.type == 'connect')
           {
             if( constraints_arg_mirrored.attr == 'tx' )
-            constraints_arg_mirrored['out_multiplier'] = 1     
+              constraints_arg_mirrored['out_multiplier'] = 1     
             else if( constraints_arg_mirrored.attr == 'ty' )
               constraints_arg_mirrored['out_multiplier'] = -1
             else if( constraints_arg_mirrored.attr == 'r' )
               constraints_arg_mirrored['out_multiplier'] = -1
             else if( constraints_arg_mirrored.attr == 's' )
               constraints_arg_mirrored['out_multiplier'] = -1    
+
+
+
+            if(constraints_arg_mirrored['target_remap'] != null )
+            {
+              let r = constraints_arg_mirrored['target_remap']
+
+              if( constraints_arg_mirrored.attr == 'tx' )
+                r = [ r[0], r[1], r[2], r[3] ]   
+              else if( constraints_arg_mirrored.attr == 'ty' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+              else if( constraints_arg_mirrored.attr == 'r' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+              else if( constraints_arg_mirrored.attr == 's' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]    
+
+              if( constraints_arg_mirrored.target_attr == 'tx' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                 
+              else if( constraints_arg_mirrored.target_attr == 'ty' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]               
+              else if( constraints_arg_mirrored.target_attr == 'r' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                  
+              else if( constraints_arg_mirrored.target_attr == 's' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]     
+                
+                constraints_arg_mirrored['target_remap'] = r
+            }      
+
           }
+
           else if(constraints_arg_mirrored.type == 'kin_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
           else if(constraints_arg_mirrored.type == 'dyn_orient')
@@ -1492,8 +1572,11 @@ export class body_build{
 
           if(axe_y)
             constraints_arg_mirrored['out_multiplier'] = 1
+
           constraints_args_mirrored.push(constraints_arg_mirrored)          
        
+
+
         }
         constraints_args = constraints_args_mirrored
 

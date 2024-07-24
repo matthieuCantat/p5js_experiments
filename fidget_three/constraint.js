@@ -820,8 +820,17 @@ export class connect{
       
       if( this.target_remap != null )
       {
-        value = clamp( value, this.target_remap[0], this.target_remap[1] ) 
-        value = value/(this.target_remap[1]-this.target_remap[0])
+        if(this.target_remap[0] < this.target_remap[1])
+        {
+          value = clamp( value, this.target_remap[0], this.target_remap[1] ) 
+          value = value/(this.target_remap[1]-this.target_remap[0])
+        }
+        else
+        {
+          value = clamp( value, this.target_remap[1], this.target_remap[0] ) 
+          value = value/(this.target_remap[0]-this.target_remap[1])          
+        }
+
         value = value*(this.target_remap[3]-this.target_remap[2])+this.target_remap[2]
       }
 
