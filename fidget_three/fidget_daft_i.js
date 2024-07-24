@@ -470,49 +470,8 @@ export default class fidget_daft_i extends fidget{
                                       }))
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_out_rotation('base'))/90.0     ,0,1) }  
       this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_out_rotation(rad(res*95.0),'world', 'override') }                     
-
-    
-                                                                                      
+                                                                             
       // other
-
-
-      //z_depth += z_depth_incr            
-
-      
-      
-      let mo_iBh = new Matrix()                                    
-      mo_iBh.setTranslation(0,0.)  
-
-      m_shape = new Matrix()
-      m_shape.set_row(0,m_shape.get_row(0).getMult(400/2.4*s*0.355))
-      m_shape.set_row(1,m_shape.get_row(1).getMult(1))   
-
-      this.bodies.helpers.stepB = new body_build({  ...opts_global,
-                                                    ...opts_collision_no_interaction,
-                                                    dynamic: false,
-
-                                                    name:'helper_B', 
-
-                                                    m:this.m,
-                                                    parent:this.bodies.bones.root,                                                      
-                                                    m_offset:mo_iBh,
-                                                    m_shape:m_shape,                                              
-                                                    
-                                                    type:utils.shape.arc,
-                                                    arc_limites : [0, 3.14*0.5],                                                     
-
-                                                    do_shape: false,
-                                                    do_line:true,         
-                                                    color: utils.color.yellow,
-                                                    color_line: utils.color.yellow,
-                                                    //texture_three: text_checker_three,
-                                                    transparency_activate: true,
-                                                    transparency_line:1.0,                                                  
-                                                
-                                                    density:0.01/(s/2.2),    
-                                                    }) 
-
-
 
       m_shape = new Matrix()
       m_shape.set_row(0,m_shape.get_row(0).getMult(50/2.4*s))
@@ -964,39 +923,6 @@ export default class fidget_daft_i extends fidget{
 
 
 
-
-    let mo_iCh = new Matrix()                                    
-    mo_iCh.setTranslation(0.,-59*(s/2.2))      
-    
-    m_shape = new Matrix()
-    m_shape.set_row(0,m_shape.get_row(0).getMult(1))
-    m_shape.set_row(1,m_shape.get_row(1).getMult(59*s))  
-
-    this.bodies.helpers.stepC = new body_build({  ...opts_global,
-                                                  ...opts_collision_no_interaction,
-                                                  dynamic: false,
-
-                                                  name:'helper_C',   
-
-                                                  m:this.m,
-                                                  parent:this.bodies.bones.root,                                                    
-                                                  m_offset:mo_iCh,  
-                                                  m_shape:m_shape,                                          
-                                                  type:utils.shape.rectangle,
-
-                                                  do_shape: false,
-                                                  do_line:true,         
-                                                  color: utils.color.yellow,
-                                                  color_line: utils.color.yellow,
-                                                  transparency_activate: true,
-                                                  transparency_line:1.0,     
-                                                  //texture_three: text_checker_three,                                              
-                                                  
-                                                  density:0.01/(s/2.2), 
-
-                                                  }) 
-
-
       let opts_sparcles = {
         ...opts_global,
         ...opts_debug,
@@ -1038,36 +964,6 @@ export default class fidget_daft_i extends fidget{
 
     //z_depth += z_depth_incr
 
-    let mo_iAh = new Matrix()                                    
-    mo_iAh.setTranslation(-130*(s/2.2),(-50+25)*(s/2.2))    
-
-    m_shape = new Matrix()
-    m_shape.set_row(0,m_shape.get_row(0).getMult(1))
-    m_shape.set_row(1,m_shape.get_row(1).getMult(25*s)) 
-
-    this.bodies.helpers.stepA = new body_build({  ...opts_global,
-                                                  ...opts_collision_no_interaction,
-                                                  dynamic: false,
-
-                                                  name:'helper_A',  
-
-                                                  m:this.m,
-                                                  m_offset:mo_iAh,
-                                                  m_shape:m_shape,
-                                                  parent:this.bodies.bones.root,                                               
-                                                  type:utils.shape.rectangle,
-
-                                                  do_shape: false,
-                                                  do_line:true,         
-                                                  color: utils.color.yellow,
-                                                  color_line: utils.color.yellow,
-                                                  transparency_activate: true,
-                                                  transparency_line:1.0,
-                                                  //texture_three: text_checker_three,
-
-                                                  density:0.01/(s/2.2),  
-                                                  })    
-      
       if(this.is_dynamic)   
       {
         this.create_inter_from_geos(
@@ -1076,10 +972,16 @@ export default class fidget_daft_i extends fidget{
           'rectangles'], this.bodies.inters.background, s ) 
       }                                         
 
-                                                  
+      /*
+      this.create_bones_from_geos(
+        ['circle',
+        'rectangle',
+        'rectangles'], s )        
+        */
+      }                                          
 
 
-      }
+      
 
        this.bodies_draw_order = [
                       this.bodies.geos.backgrounds[0],
