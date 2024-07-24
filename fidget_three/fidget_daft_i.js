@@ -792,11 +792,12 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters_step.steps[0].highlight_selection = [this.bodies.geos.rectangles[0]]
     }
 
+    
+
     // TOP RIGHT
     let axe_x = false
     let axe_y = true
-    let do_instance = true
-    this.bodies.inters_step.steps_instances.push(this.bodies.inters_step.steps[0].get_mirror( axe_x, axe_y, do_instance))
+    this.bodies.inters_step.steps_instances.push(this.bodies.inters_step.steps[0].get_mirror(  axe_x, axe_y))
     this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror( axe_x, axe_y)) 
     this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror( axe_x, axe_y))
     this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror( axe_x, axe_y))
@@ -807,7 +808,7 @@ export default class fidget_daft_i extends fidget{
     // BOTTOM LEFT
     axe_x = true
     axe_y = false
-    this.bodies.inters_step.steps_instances.push(this.bodies.inters_step.steps[0].get_mirror( axe_x, axe_y, do_instance))
+    this.bodies.inters_step.steps_instances.push(this.bodies.inters_step.steps[0].get_mirror( axe_x, axe_y))
     this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror( axe_x, axe_y)) 
     this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror( axe_x, axe_y))
     this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror( axe_x, axe_y))
@@ -819,7 +820,7 @@ export default class fidget_daft_i extends fidget{
     // BOTTOM RIGHT
     axe_x = true
     axe_y = true    
-    this.bodies.inters_step.steps_instances.push(this.bodies.inters_step.steps[0].get_mirror( axe_x, axe_y, do_instance))
+    this.bodies.inters_step.steps_instances.push(this.bodies.inters_step.steps[0].get_mirror( axe_x, axe_y))
     this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_mirror( axe_x, axe_y)) 
     this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_mirror( axe_x, axe_y))
     this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror( axe_x, axe_y))
@@ -827,8 +828,17 @@ export default class fidget_daft_i extends fidget{
     if(this.is_dynamic)                              
       this.bodies.inters.rectangles.push(this.bodies.inters.rectangles[0].get_mirror(true,true))
       */
-
-
+    /*
+    instance_each_others([ 
+      this.bodies.inters_step.steps[0],
+      this.bodies.inters_step.steps_instances[0],
+      this.bodies.inters_step.steps_instances[1],
+      this.bodies.inters_step.steps_instances[2]],
+      [false,false,
+       true,false,
+       false,true,
+       true,true])
+       */
 
 
 

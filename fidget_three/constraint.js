@@ -767,8 +767,9 @@ export class connect{
       target:null, 
       target_attr:'ty', 
       target_space:'local',
-      target_remap:null,  
-      out_multiplier:1, 
+      target_remap:null, 
+      activate_when_target_is_selected:false,  
+      out_multiplier:1,
     };
     const args = { ...defaultOptions, ...in_options };
     
@@ -779,6 +780,9 @@ export class connect{
     this.target_space = args.target_space      
     this.target_remap = args.target_remap
     this.out_multiplier = args.out_multiplier
+    this.activate_when_target_is_selected = args.activate_when_target_is_selected
+    
+    this.value_old = null
  
 
   }
@@ -823,12 +827,12 @@ export class connect{
         if(this.target_remap[0] < this.target_remap[1])
         {
           value = clamp( value, this.target_remap[0], this.target_remap[1] ) 
-          value = value/(this.target_remap[1]-this.target_remap[0])
+          value = (value-this.target_remap[0])/(this.target_remap[1]-this.target_remap[0])
         }
         else
         {
           value = clamp( value, this.target_remap[1], this.target_remap[0] ) 
-          value = value/(this.target_remap[0]-this.target_remap[1])          
+          value = (value-this.target_remap[1])/(this.target_remap[0]-this.target_remap[1])          
         }
 
         value = value*(this.target_remap[3]-this.target_remap[2])+this.target_remap[2]
@@ -837,6 +841,8 @@ export class connect{
       value = value*this.out_multiplier
       
       
+      if((this.activate_when_target_is_selected)&&(this.target.is_selected == false))
+        return false
 
       if( this.attr == 's' )
         this.obj.scale = value 
@@ -847,7 +853,7 @@ export class connect{
       if( this.attr == 'ty' )
         this.obj.set_out_position(new Vector(0,value) ,'self', 'add')  
 
-
+      
       return true
 
   }

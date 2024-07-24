@@ -1421,7 +1421,7 @@ export class body_build{
               else if( constraints_arg_mirrored.attr == 'ty' )
                 r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
               else if( constraints_arg_mirrored.attr == 'r' )
-                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+                r = [ r[0], r[1], r[3], r[2]  ]    
               else if( constraints_arg_mirrored.attr == 's' )
                 r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]    
 
@@ -1547,7 +1547,7 @@ export class body_build{
               else if( constraints_arg_mirrored.attr == 'ty' )
                 r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
               else if( constraints_arg_mirrored.attr == 'r' )
-                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+                r = [ r[0], r[1], r[3], r[2]  ]   
               else if( constraints_arg_mirrored.attr == 's' )
                 r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]    
 
@@ -1587,6 +1587,8 @@ export class body_build{
 
       // m_shape mirrored
       // constraint 
+
+
       
 
 
@@ -1609,9 +1611,102 @@ export class body_build{
       args.arc_limites = arc_limites
 
 
+      let body_duplicated = new body_build(args)
       
 
-      return new body_build(args)
+      
+
+      if(instance)
+      {
+        let connect_to_dupli_tx ={
+          name:'instance_A_to_B_tx', 
+          type:'connect', 
+          target:this, 
+          attr:'tx',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_orig_tx ={
+          name:'instance_B_to_A_tx', 
+          type:'connect', 
+          target:body_duplicated, 
+          attr:'tx',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_dupli_ty ={
+          name:'instance_A_to_B_ty', 
+          type:'connect', 
+          target:this, 
+          attr:'ty',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_orig_ty ={
+          name:'instance_B_to_A_ty', 
+          type:'connect', 
+          target:body_duplicated, 
+          attr:'ty',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_dupli_r ={
+          name:'instance_A_to_B_r', 
+          type:'connect', 
+          target:this, 
+          attr:'r',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_orig_r ={
+          name:'instance_B_to_A_r', 
+          type:'connect', 
+          target:body_duplicated, 
+          attr:'r',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        if((!axe_x)&&axe_y)
+        {
+          //connect_to_dupli_tx.target_remap = [-1000,1000,-1000,1000]
+          //connect_to_orig_tx.target_remap = [-1000,1000,-1000,1000]
+          connect_to_dupli_ty.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          connect_to_orig_ty.target_remap = [-1000*-1,1000*-1,-1000,1000]          
+          //connect_to_dupli_r.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          //connect_to_orig_r.target_remap = [-1000,1000,-1000*-1,1000*-1]  
+        }        
+        if(axe_x&&(!axe_y))
+        {
+          //connect_to_dupli_tx.target_remap = [-1000,1000,-1000,1000]
+          //connect_to_orig_tx.target_remap = [-1000,1000,-1000,1000]
+          connect_to_dupli_ty.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          connect_to_orig_ty.target_remap = [-1000*-1,1000*-1,-1000,1000]          
+          //connect_to_dupli_r.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          //connect_to_orig_r.target_remap = [-1000,1000,-1000*-1,1000*-1]  
+        }
+
+        //this.constraints_args.push(connect_to_orig_tx)
+        this.constraints_args.push(connect_to_orig_ty)
+        //this.constraints_args.push(connect_to_orig_r)
+
+        //body_duplicated.constraints_args.push(connect_to_dupli_tx)
+        body_duplicated.constraints_args.push(connect_to_dupli_ty)
+        //body_duplicated.constraints_args.push(connect_to_dupli_r)        
+      }
+
+      return body_duplicated
 
     }
 
