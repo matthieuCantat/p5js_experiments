@@ -182,7 +182,6 @@ export default class fidget_daft_i extends fidget{
         do_line:true,                                           
         color:utils.color.grey,
         color_line: utils.color.black,
-        texture_three: text_checker_three_grey, 
         material_three: materials.simple.text_checker_three_grey ,
       }    
 
@@ -266,14 +265,12 @@ export default class fidget_daft_i extends fidget{
       do_line:false,  
       bevel:0,       
       //color: this.color_background,
-      texture_three: textures_background.space_grid  ,
       material_three: materials.old_custom_exemple,//materials.background.space_grid ,
       color_line: utils.color.black,
 
       density:0.01/(s/2.2), 
       collision:false, 
       visibility:this.do_background,
-      //texture_three: text_checker_three_grey,
       castShadow: false,
       receiveShadow: true,
 
@@ -576,7 +573,6 @@ export default class fidget_daft_i extends fidget{
                                     bevel:0,                                      
                                     //color: this.colors[0],
                                     color_line: utils.color.black,
-                                    texture_three: textures.cyan_grid,//textures.cyan_grid  ,
                                     material_three: materials.raw_shader_exemple ,//three_utils.material.simple.cyan_grid ,
                                     castShadow: true,
                                     receiveShadow: true,
@@ -623,9 +619,7 @@ export default class fidget_daft_i extends fidget{
       do_line:true,           
       //color: this.colors[2],
       color_line: utils.color.black,
-      texture_three: textures.gradient_yellow_green_oblique_line_A,//textures.gradient_yellow_green_oblique_line_A,
       material_three: materials.raw_shader_exemple,//materials.simple.gradient_yellow_green_oblique_line_A ,
-      //texture_three: text_checker_three,
 
       //constraints:[
       //  { name:'axe'   ,type:'kin_axe', axe:0, distPos: 66.1*s, distNeg: 0.001 },
@@ -876,9 +870,7 @@ export default class fidget_daft_i extends fidget{
       bevel:0,                                          
       //color : this.colors[1],
       color_line: utils.color.black,
-      texture_three: textures.gradient_gold_red_A,//
       material_three: materials.background_test ,//materials.simple.gradient_gold_red_A ,
-      //texture_three: text_checker_three, 
       castShadow: true,
       receiveShadow: false,
 

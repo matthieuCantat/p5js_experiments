@@ -55,7 +55,6 @@ export class body_build{
         matter_engine:null,
         mouse_constraint:null,
         fidget:null, 
-        texture_three:null,
         material_three:null,
         arc_limites:[0,3.14*2],
         debug_matrix_info: false,
@@ -119,7 +118,6 @@ export class body_build{
       this.matter_engine = args.matter_engine
       this.mouse_constraint = args.mouse_constraint
       this.fidget = args.fidget
-      this.texture_three = args.texture_three
       this.material_three = args.material_three
       this.arc_limites = args.arc_limites
       this.debug_matrix_info = args.debug_matrix_info
@@ -978,8 +976,6 @@ export class body_build{
     {
       let shape_points = this.three_get_shape_points(m)
 
-      //if( this.texture_three != null)
-      //  this.texture_three.repeat.set( m.get_row(0).mag()*0.00001, m.get_row(0).mag()*0.00001 );
 
       let out = {
         shape:null,
@@ -993,7 +989,6 @@ export class body_build{
           this.type,
           m,
           this.scale, 
-          this.texture_three, 
           this.material_three,
           this.color, 
           this.transparency_activate, 
@@ -1281,7 +1276,6 @@ export class body_build{
         matter_engine:this.matter_engine,
         mouse_constraint:this.mouse_constraint,
         fidget:this.fidget,
-        texture_three:this.texture_three,
         material_three:this.material_three,
         arc_limites:this.arc_limites,
         debug_matrix_info:this.debug_matrix_info,
@@ -1683,8 +1677,7 @@ export function build_effects_particles_sparcles(opts)
     do_shape: true,
     do_line:false,           
     color: utils.color.white,
-    color_line: utils.color.white,
-    //texture_three: text_checker_three,,         
+    color_line: utils.color.white,        
 
     density:0.001, 
                     
@@ -1762,7 +1755,6 @@ export function build_effects_particles_shapes(opts)
     do_line:true,           
     color: utils.color.white,
     color_line: utils.color.white,
-    //texture_three: text_checker_three,
     
     density:0.001,               
   } 
@@ -1844,7 +1836,6 @@ export function build_effects_wall(opts)
                                 do_line:false,                                       
                                 color:utils.color.white,
                                 color_line: utils.color.black,
-                                //texture_three: text_checker_three_grey, 
 
                                 density:0.01,                                                                                
                               }) 

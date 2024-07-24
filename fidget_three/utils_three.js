@@ -158,7 +158,6 @@ export function addShape_polygon(
     shape_type,
     m_ref,
     scale_ref, 
-    texture = null, 
     material = null, 
     color = null, 
     transparency_activate = false, 
@@ -203,8 +202,7 @@ export function addShape_polygon(
 
         updateUVScale(geometry,new Vector(1/x_length,1/y_length))
         updateUVPosition(geometry,new Vector(50,50))
-              //if( this.texture_three != null)
-          //  this.texture_three.repeat.set( m.get_row(0).mag()*0.00001, m.get_row(0).mag()*0.00001 );    
+  
     }
 
     let mesh = null
@@ -221,8 +219,6 @@ export function addShape_polygon(
         }
         if( color != null )
             mat_opt.color = convert_to_three_color(color)
-        if( texture != null )
-            mat_opt.map = texture
         
         mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( mat_opt ) );
     }
