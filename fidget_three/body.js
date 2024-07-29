@@ -6,7 +6,8 @@ import {
   constraint_build, 
   cns_axe,limit,
   dyn_constraint_build_custom_orient,
-  connect} from './constraint.js';
+  connect,
+  connect_multi} from './constraint.js';
 import * as ut from './utils_three.js';
 import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
 import * as THREE from 'three';
@@ -333,55 +334,64 @@ export class body_build{
 
     init_constraints()
     {
-
-      for( let i = 0; i < this.constraints_args.length; i++)
+      for(let i = 0; i < this.constraints_args.length; i++)
       {
-
-        let cns = null
-        if((this.constraints_args[i].type == 'dyn_point')&&(this.dynamic))
-        { 
-          cns = new dyn_constraint_build({obj: this, ...this.constraints_args[i]})//build_constraint(this,this.constraints_args[i])          
-        }
-
-        if((this.constraints_args[i].type == 'dyn_orient')&&(this.dynamic))
-        {
-          cns = new dyn_constraint_build_custom_orient({obj: this, ...this.constraints_args[i], y_offset:300})//build_constraint(this,this.constraints_args[i],offset)                 
-        }
-
-        if(this.constraints_args[i].type == 'kin_point')
-        { 
-          cns = new constraint_build({obj: this, ...this.constraints_args[i],do_position:true,do_orientation:false})//build_constraint(this,this.constraints_args[i])          
-        }
-
-        if(this.constraints_args[i].type == 'kin_orient')
-        {
-          cns = new constraint_build({obj: this, ...this.constraints_args[i],do_position:false,do_orientation:true})//build_constraint(this,this.constraints_args[i],offset)                 
-        }
-
-        /////////////////// axe
-        if((this.constraints_args[i].type == 'kin_axe')&&(this.dynamic))
-        {
-          cns =  new cns_axe({ Follower: this, ...this.constraints_args[i] })   
-        }
-
-        if(this.constraints_args[i].type == 'kin_limit')
-        {
-          cns =  new limit({ Follower: this, ...this.constraints_args[i], obj:this })   
-        }
-
-        if(this.constraints_args[i].type == 'connect')
-        {
-          cns =  new connect({ ...this.constraints_args[i], obj:this })   
-        }
-
+        let cns = this.build_constraint(this.constraints_args[i])
         if( cns != null)
         {
           this.constraints_order.push(this.constraints_args[i].name)
           this.constraints[this.constraints_args[i].name] = cns
-        }
+        } 
+      }
+ 
+    }
+
+    build_constraint(args)
+    {
+      let cns = null
+      if((args.type == 'dyn_point')&&(this.dynamic))
+      { 
+        cns = new dyn_constraint_build({obj: this, ...args})//build_constraint(this,args)          
+      }
+
+      if((args.type == 'dyn_orient')&&(this.dynamic))
+      {
+        cns = new dyn_constraint_build_custom_orient({obj: this, ...args, y_offset:300})//build_constraint(this,args,offset)                 
+      }
+
+      if(args.type == 'kin_point')
+      { 
+        cns = new constraint_build({obj: this, ...args,do_position:true,do_orientation:false})//build_constraint(this,args)          
+      }
+
+      if(args.type == 'kin_orient')
+      {
+        cns = new constraint_build({obj: this, ...args,do_position:false,do_orientation:true})//build_constraint(this,args,offset)                 
+      }
+
+      /////////////////// axe
+      if((args.type == 'kin_axe')&&(this.dynamic))
+      {
+        cns =  new cns_axe({ Follower: this, ...args })   
+      }
+
+      if(args.type == 'kin_limit')
+      {
+        cns =  new limit({ Follower: this, ...args, obj:this })   
+      }
+
+      if(args.type == 'connect')
+      {
+        cns =  new connect({ ...args, obj:this })   
+      }
 
 
-      }      
+      if(args.type == 'connect_multi')
+      {
+        cns =  new connect_multi({ ...args, obj:this })   
+      }
+
+      return cns
     }
 
     matter_update_shape_coords(m)

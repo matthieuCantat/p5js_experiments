@@ -1004,3 +1004,109 @@ export class connect{
   }
 
 }
+
+
+
+
+export class connect_multi{
+  
+  constructor( in_options ){
+  // Default options
+    const defaultOptions = {
+      obj:null,
+      attr:'scale',
+      space:'base',
+      targets:[], 
+      targets_attr:[], 
+      targets_space:[],
+      targets_remap:[], 
+      activate_when_target_is_selected:false, 
+      instance_mode:false, 
+      out_multipliers:[],
+    };
+    const args = { ...defaultOptions, ...in_options };
+    
+    this.obj          = args.obj
+    this.attr         = args.attr
+    this.targets       = args.targets
+    this.space        = args.space
+    this.targets_attr  = args.targets_attr
+    this.targets_space = args.targets_space      
+    this.targets_remap = args.targets_remap
+    this.out_multipliers = args.out_multipliers
+    this.activate_when_target_is_selected = args.activate_when_target_is_selected
+    this.instance_mode = args.instance_mode
+
+    this.value_old = null
+
+    this.cns_list = []
+    for( let i = 0 ; i < this.targets.length; i++)
+    {
+
+      let args_cns = {
+        obj:this.obj,
+        attr:this.attr,
+        space:this.space,
+        target:this.targets[i], 
+        target_attr:this.targets_attr[i], 
+        target_space:this.targets_space[i],
+        target_remap:this.targets_remap[i], 
+        activate_when_target_is_selected:this.activate_when_target_is_selected, 
+        instance_mode:this.instance_mode, 
+        //out_multipliers:this.out_multipliers[],        
+      }
+      this.cns_list.push(new connect(args_cns) )
+    }
+ 
+  }
+
+  get_out_value()
+  {
+    let value = 0
+    for( let i = 0 ; i < this.cns_list.length; i++)
+    {
+      
+      //SET VALUE
+      if( (this.activate_when_target_is_selected)&&(this.targets[i].is_selected == false))
+        continue
+
+      if((this.instance_mode)&&(this.targets[i].is_last_instance_selected == false))
+        continue
+
+      value += this.cns_list[i].get_out_value()
+
+    }
+      
+    return value
+  }
+
+  apply()
+  {
+
+      if(this.is_enable == false)
+          return false
+
+      let value = this.get_out_value()   
+
+
+      if( this.attr == 's' )
+        this.obj.scale = value 
+      if( this.attr == 'r' )
+        this.obj.set_out_rotation(rad(value),this.space, 'override')  
+      if( this.attr == 'tx' )
+        this.obj.set_out_position_X(value ,this.space, 'override')  
+      if( this.attr == 'ty' )
+        this.obj.set_out_position_Y(value ,this.space, 'override')  
+      if( this.attr == 'is_selected' )
+        this.obj.instance_is_selected = value
+      
+      return true
+
+  }
+
+  enable(value)
+  {
+      this.is_enable = value
+  }
+
+}
