@@ -1417,8 +1417,8 @@ export default class fidget_daft_i extends fidget{
       {
         bodies_enable:[
           //this.bodies.inters_step.steps[2],
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
+          //this.bodies.inters.background,
+          //this.bodies.inters.circle,
           //this.bodies.inters.rectangle,
           //this.bodies.inters.rectangles[0],
           //this.bodies.inters.rectangles[2],
@@ -1430,20 +1430,20 @@ export default class fidget_daft_i extends fidget{
           this.bodies.geos.rectangles[1],
           this.bodies.geos.rectangles[2],
           this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj, 
-          this.bodies.bones.root,   
-          this.bodies.bones.circle,
-          this.bodies.bones.rectangle,                 
-          this.bodies.bones.rectangles_center,          
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3],            
+          //this.bodies.bones.rectangles[0],
+          //this.bodies.bones.rectangles[1],
+          //this.bodies.bones.rectangles[2],
+          //this.bodies.bones.rectangles[3],
+          //this.bodies.bones.world,
+          //this.bodies.bones.traj, 
+          //this.bodies.bones.root,   
+          //this.bodies.bones.circle,
+          //this.bodies.bones.rectangle,                 
+          //this.bodies.bones.rectangles_center,          
+          //this.bodies.bones.rectangles_pivots[0],
+          //this.bodies.bones.rectangles_pivots[1],
+          //this.bodies.bones.rectangles_pivots[2],
+          //this.bodies.bones.rectangles_pivots[3],            
         ],
         constraints_disable:[
           //this.bodies.inters.background.constraints.point,
@@ -1459,6 +1459,7 @@ export default class fidget_daft_i extends fidget{
           //this.bodies.inters_step.steps[1].constraints.rot_limit,
           //this.bodies.inters.rectangle.constraints.point, 
           //this.bodies.inters.rectangle.constraints.orient,
+          'inters_step','steps',2,'point',
           //this.bodies.inters_step.steps[2].constraints.point,
           //this.bodies.inters_step.steps[2].constraints.orient,
           //this.bodies.inters_step.steps[2].constraints.axe, 
@@ -1699,6 +1700,15 @@ export default class fidget_daft_i extends fidget{
 
         this.set_resolution_coef_from_step(step)
 
+        if(this.debug_mode.switch_selected_inter_help)
+        {      
+          switch_selection( this.mouse_constraint, null)
+        }      
+        else
+        {
+          //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
+          //  switch_selection( this.mouse_constraint, null)
+        }         
       }      
 
       //_________________________________________________________________Clean Inter
