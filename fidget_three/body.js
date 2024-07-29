@@ -22,6 +22,7 @@ export class body_build{
         highlight_selection:[],
         m: new Matrix(),
         m_offset: new Matrix(),
+        m_transform: new Matrix(),
         m_shape: new Matrix(),
         parent:null,
         z: 0,
@@ -74,7 +75,7 @@ export class body_build{
       this.m = args.m
       this.parent = args.parent
       this.m_offset = args.m_offset
-      this.m_transform = new Matrix()
+      this.m_transform = args.m_transform
       this.z = args.z
       this.m_shape_init = args.m_shape
       this.m_shape = args.m_shape
@@ -126,6 +127,9 @@ export class body_build{
       this.selection_break_length = args.selection_break_length
 
       this.is_selected = false
+      this.instance_is_selected = false
+      this.is_last_instance_selected = false
+      this.instances = []
       this.three_material = null
       this.build_order = build_order
       build_order += 1
@@ -754,6 +758,32 @@ export class body_build{
       this.set_matrix(m_transform, matrix_layer, transform_space, add_mode)    
     }
 
+    set_position_X(value, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
+    {
+      let m_transform = new Matrix()
+      if(add_mode == 'override')
+        m_transform = this.get_matrix(matrix_layer,transform_space)
+
+      let p = m_transform.get_row(2)  
+      p.v.x = value
+      m_transform.set_row(2,p)
+
+      this.set_matrix(m_transform, matrix_layer, transform_space, add_mode)    
+    }
+
+    set_position_Y(value, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
+    {
+      let m_transform = new Matrix()
+      if(add_mode == 'override')
+        m_transform = this.get_matrix(matrix_layer,transform_space)
+
+      let p = m_transform.get_row(2)  
+      p.v.y = value
+      m_transform.set_row(2,p)
+
+      this.set_matrix(m_transform, matrix_layer, transform_space, add_mode)    
+    }
+
     set_rotation(r, matrix_layer = 'dyn', transform_space = 'world', add_mode = 'override')
     {
       let m_transform = new Matrix()
@@ -806,6 +836,20 @@ export class body_build{
         this.set_position(p,'dyn', transform_space, add_mode )
       else
         this.set_position(p,'anim', transform_space, add_mode )
+    }
+    set_out_position_X( value ,transform_space = 'world', add_mode = 'override')
+    {
+      if(this.dynamic)
+        this.set_position_X(value,'dyn', transform_space, add_mode )
+      else
+        this.set_position_X(value,'anim', transform_space, add_mode )
+    }
+    set_out_position_Y( value ,transform_space = 'world', add_mode = 'override')
+    {
+      if(this.dynamic)
+        this.set_position_Y(value,'dyn', transform_space, add_mode )
+      else
+        this.set_position_Y(value,'anim', transform_space, add_mode )
     }
     set_out_rotation(r,transform_space = 'world', add_mode = 'override')
     {
@@ -1287,8 +1331,23 @@ export class body_build{
 
     }
 
+      
+    update_instance_is_selected_attr()
+    {
+      if( 0 < this.instances.length)
+      {
+        if(this.is_selected)
+        {
+          this.is_last_instance_selected = true
+          for(let inst of this.instances)
+            inst.is_last_instance_selected = false
+        }
+      }
+    }
 
-    get_mirror(  axe_x = false, axe_y = true, instance = false)
+
+
+    get_mirror(  axe_x = false, axe_y = true)
     {
       let args = this.get_args()
 
@@ -1387,7 +1446,7 @@ export class body_build{
               constraints_arg_mirrored['target'] = mirrored_body 
             } 
           }     
-
+          
           if(constraints_arg_mirrored.type == 'kin_axe')
           {       
             let distPos = constraints_arg_mirrored.distPos
@@ -1400,7 +1459,6 @@ export class body_build{
           
           if(constraints_arg_mirrored.type == 'connect')
           {
-            
             if( constraints_arg_mirrored.attr == 'tx' )
               constraints_arg_mirrored['out_multiplier'] = 1     
             else if( constraints_arg_mirrored.attr == 'ty' )
@@ -1411,11 +1469,11 @@ export class body_build{
               constraints_arg_mirrored['out_multiplier'] = -1  
               
             
-
+            
             if(constraints_arg_mirrored['target_remap'] != null )
             {
               let r = constraints_arg_mirrored['target_remap']
-
+              
               if( constraints_arg_mirrored.attr == 'tx' )
                 r = [ r[0], r[1], r[2], r[3] ]   
               else if( constraints_arg_mirrored.attr == 'ty' )
@@ -1424,24 +1482,24 @@ export class body_build{
                 r = [ r[0], r[1], r[3], r[2]  ]    
               else if( constraints_arg_mirrored.attr == 's' )
                 r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]    
-
+              
               if( constraints_arg_mirrored.target_attr == 'tx' )
                 r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                 
               else if( constraints_arg_mirrored.target_attr == 'ty' )
                 r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]               
               else if( constraints_arg_mirrored.target_attr == 'r' )
-                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                  
+                r = [ r[0], r[1], r[2], r[3] ]                  
               else if( constraints_arg_mirrored.target_attr == 's' )
                 r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]     
                 
                 constraints_arg_mirrored['target_remap'] = r
-            }                
+            }              
           }
           else if(constraints_arg_mirrored.type == 'kin_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
           else if(constraints_arg_mirrored.type == 'dyn_orient')
             constraints_arg_mirrored['out_multiplier'] = -1
-
+          
           constraints_args_mirrored.push(constraints_arg_mirrored)          
    
         }
@@ -1524,7 +1582,7 @@ export class body_build{
           }
           
 
-
+          
           if(constraints_arg_mirrored.type == 'connect')
           {
             if( constraints_arg_mirrored.attr == 'tx' )
@@ -1556,9 +1614,10 @@ export class body_build{
               else if( constraints_arg_mirrored.target_attr == 'ty' )
                 r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]               
               else if( constraints_arg_mirrored.target_attr == 'r' )
-                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                  
+                r = [ r[0], r[1], r[2], r[3] ]                  
               else if( constraints_arg_mirrored.target_attr == 's' )
-                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]     
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]    
+
                 
                 constraints_arg_mirrored['target_remap'] = r
             }      
@@ -1615,7 +1674,7 @@ export class body_build{
       
 
       
-
+      /*
       if(instance)
       {
         let connect_to_dupli_tx ={
@@ -1705,6 +1764,7 @@ export class body_build{
         body_duplicated.constraints_args.push(connect_to_dupli_ty)
         //body_duplicated.constraints_args.push(connect_to_dupli_r)        
       }
+      */
 
       return body_duplicated
 

@@ -18,6 +18,7 @@ export class dyn_constraint_build_custom_orient{
           target: null,
           stiffness: 0.001,
           stiffness_at_selection: null,
+          stiffness_after_selection: null,
           damping: 0.05,
       };
       const args = { ...defaultOptions, ...in_options };
@@ -28,6 +29,7 @@ export class dyn_constraint_build_custom_orient{
       this.target = args.target
       this.stiffness = args.stiffness
       this.stiffness_at_selection = args.stiffness_at_selection
+      this.stiffness_after_selection = args.stiffness_after_selection
       this.damping = args.damping
 
       let m_target = null
@@ -45,6 +47,7 @@ export class dyn_constraint_build_custom_orient{
 
       this.is_enable = true
       this.selection_change_do_rebind = false
+      this.selection_occured = false
       
   
   }
@@ -77,11 +80,13 @@ export class dyn_constraint_build_custom_orient{
       let stiffness = this.stiffness
       if(this.stiffness_at_selection != null)
       {
-        if(this.obj.is_selected)
+        if((this.obj.is_selected)||(this.obj.instance_is_selected))
         {
           stiffness = this.stiffness_at_selection
           if( stiffness == 0 )
             this.selection_change_do_rebind = true
+
+          this.selection_occured = true
         }
         else if(this.selection_change_do_rebind)
         {
@@ -89,7 +94,21 @@ export class dyn_constraint_build_custom_orient{
           this.selection_change_do_rebind = false
         }
 
+      
       }
+
+
+      if(this.stiffness_after_selection != null)
+      {
+        if((!this.obj.is_selected)&&(!this.obj.instance_is_selected))
+        {
+          if(this.selection_occured)
+            stiffness = this.stiffness_after_selection
+        }
+        
+      }
+      
+
       if( stiffness == 1.0)
       {
         this.obj.set_out_rotation(m_target.getRotation(),'world', 'override')
@@ -137,6 +156,7 @@ export class dyn_constraint_build{
             
             stiffness: 0.001,
             stiffness_at_selection: null,
+            stiffness_after_selection: null,
             damping: 0.05,
             length: null,
             y_offset:0,
@@ -152,6 +172,7 @@ export class dyn_constraint_build{
         
         this.stiffness = args.stiffness
         this.stiffness_at_selection = args.stiffness_at_selection
+        this.stiffness_after_selection = args.stiffness_after_selection
         this.damping = args.damping
         this.length = args.length
         this.y_offset = args.y_offset
@@ -198,6 +219,7 @@ export class dyn_constraint_build{
         Matter.Composite.add( this.matter_engine.world, [ this.cns ])
  
         this.selection_change_do_rebind = false        
+        this.selection_occured = false
 
 
 
@@ -216,7 +238,7 @@ export class dyn_constraint_build{
     {
       if(this.stiffness_at_selection != null)
       {
-        if(this.obj.is_selected)
+        if((this.obj.is_selected)||(this.obj.instance_is_selected))
         {
           //console.log(this.obj.name, 'is selected')
           this.cns.stiffness = this.stiffness_at_selection
@@ -225,6 +247,8 @@ export class dyn_constraint_build{
             this.enable(false)
             this.selection_change_do_rebind = true
           }
+
+          this.selection_occured = true
             
         }
         else
@@ -245,6 +269,19 @@ export class dyn_constraint_build{
                      
         }
       }
+
+
+      if(this.stiffness_after_selection != null)
+      {
+        if((!this.obj.is_selected)&&(!this.obj.instance_is_selected))
+        {
+          if(this.selection_occured)
+            this.cns.stiffness = this.stiffness_after_selection
+        }
+        
+      }
+
+
         //this.cns.pointB = this.pB
     }
 
@@ -366,6 +403,84 @@ export class cns_axe{
     {
       this.is_enable = value
     }
+
+    update_and_get_current_pos()
+    {
+      if( this.Follower == null)
+        return 0
+
+      let m_parent = this.Follower.get_parent_matrix()
+
+      let m_out = this.Follower.get_out_matrix()
+      let p_out = m_out.get_row(2)
+      
+
+      let m_init = this.Follower.get_matrix('base','world')
+      let p_init = m_init.get_row(2)
+
+  
+      let p_rotCenter  = this.extra_rotation_center.getMult(m_parent)
+
+      let pLine = p_init;
+      let vTmp = pLine.getSub(p_rotCenter)
+      vTmp.rotate(rad(this.extra_rotation))
+      pLine = p_rotCenter.getAdd(vTmp)
+
+      let vLine = m_init.get_row(0)
+      if( this.Follower_axe == 1 )
+        vLine = m_init.get_row(1)
+      vLine.rotate(rad(this.extra_rotation))      
+      
+      var pLimitPos = new Vector()
+      if( this.distPos != null )
+      {
+        let vToLimit = new Vector(vLine)
+        vToLimit.normalize().mult(this.distPos)
+        pLimitPos = vToLimit.getAdd(pLine)
+      }
+  
+      var pLimitNeg = new Vector()
+      if( this.distNeg != null )
+      {
+        let vToLimit = new Vector(vLine)
+        vToLimit.normalize().mult(this.distNeg*-1)
+        pLimitNeg = vToLimit.getAdd(pLine)
+      }
+  
+      let vDelta_from_line = p_out.getSub(pLine);
+      let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
+
+      if(0<dot)
+      {
+        let vRef = pLimitPos.getSub(pLine)
+        if( 0 < vRef.mag() )
+        {
+          let vCurrent = p_out.getSub(pLine)
+          this.current_pos = vCurrent.mag() / vRef.mag() 
+
+        }
+        else
+          this.current_pos = 0
+      
+      }
+      else
+      {
+        let vRef = pLimitNeg.getSub(pLine)
+        if( 0 < vRef.mag() )
+        {
+          let vCurrent = p_out.getSub(pLine)
+          this.current_pos = vCurrent.mag() / vRef.mag() *-1
+
+        }
+        else
+          this.current_pos = 0
+      }  
+
+
+
+      return this.current_pos
+
+    }
   
     apply()
     {
@@ -376,7 +491,7 @@ export class cns_axe{
   
       let m_parent       = this.Follower.get_parent_matrix()
   
-      let m_init       = this.Follower.get_matrix('anim','world')
+      let m_init       = this.Follower.get_matrix('base','world')
       let p_init       = m_init.get_row(2)
   
       let m_out        = this.Follower.get_out_matrix()
@@ -764,11 +879,13 @@ export class connect{
     const defaultOptions = {
       obj:null,
       attr:'scale',
+      space:'base',
       target:null, 
       target_attr:'ty', 
-      target_space:'local',
+      target_space:'base',
       target_remap:null, 
-      activate_when_target_is_selected:false,  
+      activate_when_target_is_selected:false, 
+      instance_mode:false, 
       out_multiplier:1,
     };
     const args = { ...defaultOptions, ...in_options };
@@ -776,52 +893,55 @@ export class connect{
     this.obj          = args.obj
     this.attr         = args.attr
     this.target       = args.target
+    this.space        = args.space
     this.target_attr  = args.target_attr
     this.target_space = args.target_space      
     this.target_remap = args.target_remap
     this.out_multiplier = args.out_multiplier
     this.activate_when_target_is_selected = args.activate_when_target_is_selected
-    
+    this.instance_mode = args.instance_mode
+
     this.value_old = null
  
-
   }
 
-  apply()
+  get_out_value()
   {
-      if(this.is_enable == false)
-          return false
 
-      let m_parent = this.target.parent.get_out_matrix()
-      let m_world = this.target.get_out_matrix().getMult(m_parent.getInverse())
-      
-
+      // GET VALUE
       let m = null
-      if(this.target_space == 'local')
+      if( ['tx','ty','r'].includes(this.target_attr) )
       {
-        let m_init_parent = this.target.parent.get_init_matrix()
-        let m_init = this.target.get_init_matrix().getMult(m_init_parent.getInverse())
-        m = m_world.getMult(m_init.getInverse())
-      }
-      else{
-        m = m_world
+        /*
+        let m_target_parent_world = this.target.parent.get_out_matrix()
+        let m_target_world = this.target.get_out_matrix()
+        let m_local = m_target_world.getMult(m_target_parent_world.getInverse())
+        
+        if(this.target_space == 'local')
+        {
+          let m_target_parent_world_init = this.target.parent.get_init_matrix()
+          let m_target_world_init = this.target.get_init_matrix()
+          let m_local_init = m_target_world_init.getMult(m_target_parent_world_init.getInverse())
+  
+          m = m_local.getMult(m_local_init.getInverse())
+        }
+        else{
+          m = m_local
+        }
+        */
+
+        m = this.target.get_out_matrix( this.target_space )
       }
 
-      
- 
       let value = null
-      if( this.target_attr == 'tx' )
-        value = m.get_row(2).x()      
-      if( this.target_attr == 'ty' )
-        value = m.get_row(2).y()
-      if( this.target_attr == 'r' )
-        value = deg(m.getRotation())
-      if( this.target_attr == 's' )
-        value = this.target.scale
+      if( this.target_attr == 'tx'          )value = m.get_row(2).x()      
+      if( this.target_attr == 'ty'          )value = m.get_row(2).y()
+      if( this.target_attr == 'r'           )value = deg(m.getRotation())
+      if( this.target_attr == 's'           )value = this.target.scale
+      if( this.target_attr == 'is_selected' )value = this.target.is_selected
 
 
-      //console.log(value)
-      
+      //REMAP
       if( this.target_remap != null )
       {
         if(this.target_remap[0] < this.target_remap[1])
@@ -838,21 +958,41 @@ export class connect{
         value = value*(this.target_remap[3]-this.target_remap[2])+this.target_remap[2]
       }
 
-      value = value*this.out_multiplier
+      if( this.out_multiplier != 1.0)
+        value = value*this.out_multiplier
       
+
+      ///////////////////////////////////////////////////////////////
       
-      if((this.activate_when_target_is_selected)&&(this.target.is_selected == false))
+      return value
+  }
+
+  apply()
+  {
+
+      if(this.is_enable == false)
+          return false
+
+      let value = this.get_out_value()   
+
+      //SET VALUE
+      if( (this.activate_when_target_is_selected)&&(this.target.is_selected == false))
         return false
+
+      if((this.instance_mode)&&(this.target.is_last_instance_selected == false))
+        return false
+
 
       if( this.attr == 's' )
         this.obj.scale = value 
       if( this.attr == 'r' )
-        this.obj.set_out_rotation(rad(value),'world', 'add')  
+        this.obj.set_out_rotation(rad(value),this.space, 'override')  
       if( this.attr == 'tx' )
-        this.obj.set_out_position(new Vector(value,0) ,'self', 'add')  
+        this.obj.set_out_position_X(value ,this.space, 'override')  
       if( this.attr == 'ty' )
-        this.obj.set_out_position(new Vector(0,value) ,'self', 'add')  
-
+        this.obj.set_out_position_Y(value ,this.space, 'override')  
+      if( this.attr == 'is_selected' )
+        this.obj.instance_is_selected = value
       
       return true
 

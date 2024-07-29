@@ -218,6 +218,93 @@ export default class fidget{
   ////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////// UTILS
   ////////////////////////////////////////////////////////////////////////////////////
+  instance_each_others( bodies, mirror_info )
+  {
+
+    //bA-->bB
+    for(let i = 0 ; i < bodies.length ; i++)
+    {
+      
+      let iA = [mirror_info[i*2],mirror_info[i*2+1]]
+      for(let j = 0 ; j < bodies.length ; j++)
+      {
+        if(i==j)
+          continue
+        let iB = [mirror_info[j*2],mirror_info[j*2+1]]
+
+        let connect_to_dupli_ty ={
+          name:'instance_ty_'+bodies[i].name+'_to_'+bodies[j].name, 
+          type:'connect', 
+          target:bodies[i], 
+          attr:'ty',
+          target_attr:'ty', 
+          target_space:'anim',
+          target_remap:[-1000,1000,-1000,1000],
+          instance_mode: true }
+          
+          // reciever
+          let reciever_axe_x = iB[0]
+          let reciever_axe_y = iB[1]
+          let emetor_axe_x = iA[0]
+          let emetor_axe_y = iA[1]
+
+          let r = connect_to_dupli_ty.target_remap
+          if(reciever_axe_y == emetor_axe_y)
+          {
+            r = [r[0], r[1], r[2]*-1, r[3]*-1]
+          }
+          if(reciever_axe_x == emetor_axe_x)
+          {
+            r = [r[0], r[1], r[2]*-1, r[3]*-1]
+          }
+
+          /*
+          
+          if((!reciever_axe_x)&&reciever_axe_y)
+          {
+            
+            connect_to_dupli_ty.target_remap = [r[0], r[1], r[2]*-1, r[3]*-1]
+          }        
+          if(reciever_axe_x&&(!reciever_axe_y))
+          {
+            let r = connect_to_dupli_ty.target_remap
+            connect_to_dupli_ty.target_remap = [r[0], r[1], r[2]*-1, r[3]*-1]        
+          }
+
+          // emmetor
+
+          if((!emetor_axe_x)&&emetor_axe_y)
+          {
+            let r = connect_to_dupli_ty.target_remap
+            connect_to_dupli_ty.target_remap = [r[0]*-1, r[1]*-1, r[2], r[3]]
+          }        
+          if(emetor_axe_x&&(!emetor_axe_y))
+          {
+            let r = connect_to_dupli_ty.target_remap
+            connect_to_dupli_ty.target_remap = [r[0]*-1, r[1]*-1, r[2], r[3]]        
+          }
+          */
+         
+          
+        connect_to_dupli_ty.target_remap = r
+        bodies[j].constraints_args.push(connect_to_dupli_ty)
+        //console.log(bodies[i].name,bodies[j].name)
+
+        let connect_to_dupli_is_selected ={
+          name:'instance_is_selected_'+bodies[i].name+'_to_'+bodies[j].name, 
+          type:'connect', 
+          target:bodies[i], 
+          attr:'is_selected',
+          target_attr:'is_selected', 
+          activate_when_target_is_selected: true }
+
+        bodies[j].constraints_args.push(connect_to_dupli_is_selected)
+        bodies[j].instances.push(bodies[i])
+        
+      }      
+    }
+
+  }
 
   do_anim_override( anim = null )
   {
@@ -238,6 +325,8 @@ export default class fidget{
     this.touch_enable = false
 
   }
+
+  
 
   update_step_count(step)
   {
@@ -881,7 +970,9 @@ export default class fidget{
         for( let j = 0; j < body.highlight_selection.length; j++)
           body_to_reduce.push(body.highlight_selection[j])  
 
-      }      
+      }    
+      
+      body.update_instance_is_selected_attr()
     }
 
     for( let i = 0 ; i < body_to_reduce.length; i++)
