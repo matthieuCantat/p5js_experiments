@@ -78,18 +78,18 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 1
+var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
               show_inters:false,
-              show_inters_steps:true,
+              show_inters_steps:false,
               show_bones:false,
               show_geos:true,
               show_effects:true,
               matrix_axes:false,
               cns_axes:false,
-              fidget_steps_info:true,
+              fidget_steps_info:false,
               mouse_info:false,
               show_warning_log:false,
               do_bloom_selected: true,
