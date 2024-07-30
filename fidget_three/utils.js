@@ -513,8 +513,25 @@ var userIsInteracting_last = null;
 export var userInteractionChange = false;
 export var mouseX = 0;
 export var mouseY = 0;
+
+let noEventTime = 0.05 * 1000;
+let eventTimer;
+// Function to be executed when no events occur
+function executeWhenNoEvent() {
+  //console.log('No events detected for 5 seconds.');
+  // Place your desired code here
+  userInteractionChange_update()
+}
+
+// Reset the timer whenever an event is detected
+function resetTimer() {
+    clearTimeout(eventTimer);
+    eventTimer = setTimeout(executeWhenNoEvent, noEventTime);
+}
+
 // Function to handle the mousedown event
 function handleMouseDown(event) {
+    //console.log('handleMouseDown')
     isMousePressed = true;
     userIsInteracting_last = userIsInteracting
     userIsInteracting = isScreenTouched || isMousePressed
@@ -523,10 +540,12 @@ function handleMouseDown(event) {
     else
       userInteractionChange = false
     //console.log('Mouse is pressed:', isMousePressed);
+    resetTimer()
 }
 
 // Function to handle the mouseup event
 function handleMouseUp(event) {
+    //console.log('handleMouseUp')
     isMousePressed = false;
     /*
     userIsInteracting_last = userIsInteracting
@@ -536,10 +555,14 @@ function handleMouseUp(event) {
     else
       userInteractionChange = false    
     */
-    userIsInteracting = false
     userIsInteracting_last = userIsInteracting
-    userInteractionChange = false
+    userIsInteracting = false
+    if( userIsInteracting != userIsInteracting_last)
+      userInteractionChange = true
+    else
+      userInteractionChange = false
     //console.log('Mouse is pressed:', isMousePressed);
+    resetTimer()
 }
 
 // Function to handle the mousemove event
@@ -550,6 +573,7 @@ function handleMouseMove(event) {
 }
 
 function handleTouchDown(event) {
+  //console.log('handleTouchDown')
   isScreenTouched = true;
   userIsInteracting_last = userIsInteracting
   userIsInteracting = isScreenTouched || isMousePressed
@@ -561,10 +585,12 @@ function handleTouchDown(event) {
   // mouse must be update sooner
   const touch = event.touches[0] || event.changedTouches[0]; 
   mouseX = touch.clientX;
-  mouseY = touch.clientY;  
+  mouseY = touch.clientY;
+  resetTimer()  
 }
 
 function handleTouchUp(event) {
+  console.log('handleTouchUp')
   isScreenTouched = false;
   /*
   userIsInteracting_last = userIsInteracting
@@ -574,12 +600,25 @@ function handleTouchUp(event) {
   else
     userInteractionChange = false  
   */
-  userIsInteracting = false
   userIsInteracting_last = userIsInteracting
-  userInteractionChange = false
+  userIsInteracting = false
+  if( userIsInteracting != userIsInteracting_last)
+    userInteractionChange = true
+  else
+    userInteractionChange = false
   //console.log('Mouse is pressed:', isMousePressed);
+  resetTimer()
 }
 
+function userInteractionChange_update()
+{
+  //console.log('userInteractionChange_update')
+  if( ( userInteractionChange == true))
+  {
+    userIsInteracting_last = userIsInteracting
+    userInteractionChange = false 
+  } 
+}
 
 function handleTouchMove(event) {
   const touch = event.touches[0] || event.changedTouches[0];

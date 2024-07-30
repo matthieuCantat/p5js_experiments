@@ -333,6 +333,7 @@ export default class fidgets_sequence
 
       }
       
+      //console.log(userInteractionChange)
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
@@ -340,7 +341,7 @@ export default class fidgets_sequence
         this.fidgets[i].update()
         
 
-        if(true)//(userInteractionChange)
+        if(userInteractionChange)
         {
           this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
         }
