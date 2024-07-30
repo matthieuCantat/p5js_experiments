@@ -624,8 +624,9 @@ export class cns_axe{
       }
 
     
-      if((this.transfer_delta_as_parent_force)&&(this.Follower.is_selected))
+      if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
       {
+
         let v_delta = p_out_before.getSub(p_out)
 
         //let m = this.Follower.get_out_matrix()

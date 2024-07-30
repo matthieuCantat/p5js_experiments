@@ -340,7 +340,7 @@ export default class fidgets_sequence
         this.fidgets[i].update()
         
 
-        if(userInteractionChange)
+        if(true)//(userInteractionChange)
         {
           this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
         }

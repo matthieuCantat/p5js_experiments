@@ -127,6 +127,7 @@ export class body_build{
       this.debug_cns_axes = args.debug_cns_axes  
       this.selection_break_length = args.selection_break_length
 
+      this.is_touch = false
       this.is_selected = false
       this.instance_is_selected = false
       this.is_last_instance_selected = false

@@ -6,7 +6,8 @@ import { utils,
   create_physics_engine,
   create_mouse_constraint,
   create_physics_engine_runner,
-  create_boundary_wall_collision} from './utils.js';
+  create_boundary_wall_collision,
+  userIsInteracting} from './utils.js';
 import * as THREE from 'three';
 import { Mouse_manager,  } from './utils_three.js'
 import { body_build } from './body.js';
@@ -951,12 +952,21 @@ export default class fidget{
     let body_to_highlight = []
     let body_to_reduce    = []
 
+    
     for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
     {
+      body.is_touch = false
+
       if( body.body == mouse_cns.constraint.bodyB )
       {
         body.color = utils.color.redLight
         body.is_selected = true
+        if(userIsInteracting)
+        {
+          body.is_touch = true
+        }
+          
+  
 
         for( let j = 0; j < body.highlight_selection.length; j++)
           body_to_highlight.push(body.highlight_selection[j])  
