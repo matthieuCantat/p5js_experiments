@@ -343,6 +343,9 @@ export class cns_axe{
       this.debug_pts = [null,null]
       this.current_pos = 0
       this.transfer_delta_as_parent_force = true
+
+      this.limit_lock = true
+      this.is_at_limit = 0
       
       if( ( this.vLine == null )&&( this.Follower_axe != null) )
       {
@@ -487,10 +490,10 @@ export class cns_axe{
   
       if(( this.Follower == null)||( this.is_enable == false))
         return false
-  
-  
+
+
       let m_parent       = this.Follower.get_parent_matrix()
-  
+
       let m_init       = this.Follower.get_matrix('base','world')
       let p_init       = m_init.get_row(2)
   
@@ -511,6 +514,55 @@ export class cns_axe{
       if( this.Follower_axe == 1 )
         vLine = m_init.get_row(1)
       vLine.rotate(rad(this.extra_rotation))
+      
+      // get limit
+      var pLimitPos = new Vector()
+      if( this.distPos != null )
+      {
+        let vToLimit = new Vector(vLine)
+        vToLimit.normalize().mult(this.distPos)
+        pLimitPos = vToLimit.getAdd(pLine)
+      }
+  
+      var pLimitNeg = new Vector()
+      if( this.distNeg != null )
+      {
+        let vToLimit = new Vector(vLine)
+        vToLimit.normalize().mult(this.distNeg*-1)
+        pLimitNeg = vToLimit.getAdd(pLine)
+      }
+
+      if((this.limit_lock)&&(this.is_at_limit == 1))
+      {
+        this.current_pos = 1
+        this.Follower.set_out_position(pLimitPos,'world', 'override')
+ 
+        if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
+        {
+          let v_delta = p_out_before.getSub(pLimitPos)
+          this.Follower.parent.apply_force(pLimitPos,v_delta)
+        }
+                
+        return true
+
+      }
+      /*
+      if((this.limit_lock)&&(this.is_at_limit == -1))
+      {
+        this.current_pos = 1
+        this.Follower.set_out_position(pLimitNeg,'world', 'override')
+
+ 
+        if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
+        {
+          let v_delta = p_out_before.getSub(pLimitNeg)
+          this.Follower.parent.apply_force(pLimitNeg,v_delta)
+        }
+                
+        return true
+      }  
+      */
+  
     
       // Set Follower on the line
       let p_out_clst = snap_point_on_line(pLine, vLine, p_out)
@@ -536,32 +588,20 @@ export class cns_axe{
         this.Follower.set_anglular_velocity((this.Follower.body.angle)*0.01)
       }
       
-      // get limit
-      var pLimitPos = new Vector()
-      if( this.distPos != null )
-      {
-        let vToLimit = new Vector(vLine)
-        vToLimit.normalize().mult(this.distPos)
-        pLimitPos = vToLimit.getAdd(pLine)
-      }
-  
-      var pLimitNeg = new Vector()
-      if( this.distNeg != null )
-      {
-        let vToLimit = new Vector(vLine)
-        vToLimit.normalize().mult(this.distNeg*-1)
-        pLimitNeg = vToLimit.getAdd(pLine)
-      }
+
   
       // apply limit
       let vDelta_from_line = p_out.getSub(pLine);
       let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
+
+      this.is_at_limit = 0
       if(0<dot)
       {
         if( ( this.distPos != null )&&(this.distPos<= vDelta_from_line.mag()) )
         {
           this.Follower.set_out_position(pLimitPos,'world', 'override')
           p_out = pLimitPos
+          this.is_at_limit = 1
         }
       }
       else
@@ -570,6 +610,7 @@ export class cns_axe{
         {
           this.Follower.set_out_position(pLimitNeg,'world', 'override')
           p_out = pLimitNeg
+          this.is_at_limit = -1
         }
       }
       
@@ -626,22 +667,8 @@ export class cns_axe{
     
       if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
       {
-
         let v_delta = p_out_before.getSub(p_out)
-
-        //let m = this.Follower.get_out_matrix()
-        //let m_parent = this.Follower.parent.get_out_matrix()
-        //let m_delta = m.getMult(m_parent.getInverse())
-
         this.Follower.parent.apply_force(p_out,v_delta)
-        /*
-        m_parent = this.Follower.parent.get_out_matrix()
-        m = m_delta.getMult(m_parent)
-
-        this.Follower.set_out_matrix(m)
-        */
-
-
       }
       
       
