@@ -465,7 +465,7 @@ export default class fidget_daft_i extends fidget{
                                           stiffness_at_selection:0.0,
                                           //stiffness_after_selection:0.0,
                                           damping:0.01,length:0.01},                 
-                                          { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(95)},
+                                          { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(90.5)},
                                         ],      
 
                                         density:0.01/(s/2.2), 
@@ -473,7 +473,7 @@ export default class fidget_daft_i extends fidget{
                                                                                     
                                       }))
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_out_rotation('base'))/90.0     ,0,1) }  
-      this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_out_rotation(rad(res*95.0),'world', 'override') }                     
+      this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_out_rotation(rad(res*90.5),'world', 'override') }                     
                                                                              
       // other
 

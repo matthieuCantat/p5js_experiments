@@ -450,6 +450,12 @@ export class cns_axe{
         pLimitNeg = vToLimit.getAdd(pLine)
       }
   
+      if((this.limit_lock)&&(this.is_at_limit == 1))
+      {
+        this.current_pos = 1
+        return this.current_pos
+      }
+      
       let vDelta_from_line = p_out.getSub(pLine);
       let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
 
@@ -702,6 +708,10 @@ export class limit{
       this.y_max   = args.y_max      
       this.rot_min = args.rot_min
       this.rot_max = args.rot_max
+
+
+      this.limit_lock = true
+      this.is_at_limit = 0
   
 
   
@@ -714,10 +724,23 @@ export class limit{
         
         let m_parent = this.obj.get_parent_matrix()
         let m        = this.obj.get_out_matrix()
-        let m_local = m.getMult(m_parent.getInverse())
+        let m_local = m.getMult(m_parent.getInverse())        
         let p = m_local.get_row(2)
         let v = this.obj.get_velocity()
         let a = m_local.getRotation()
+
+        if((this.limit_lock)&&(this.is_at_limit == 1))
+        {
+          a = this.rot_max
+          let m_limit_local = new Matrix()
+          m_limit_local.setRotation(a)
+          let m_limit = m_limit_local.getMult(m_parent)            
+          this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
+          this.obj.set_anglular_velocity(0) 
+          return true           
+        }
+
+
         /*
         if((this.x_min!=null)&&( p.x() < p_parent.x()+this.x_min ))
         {
@@ -748,6 +771,7 @@ export class limit{
             this.obj.set_velocity(v) 
         } 
         */
+ 
 
         if((this.rot_min!=null)&&( a < this.rot_min ))
         {
@@ -757,8 +781,10 @@ export class limit{
             let m_limit = m_limit_local.getMult(m_parent)
             this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
             this.obj.set_anglular_velocity(0)
+            this.is_at_limit = -1
 
-        }    
+        }  
+          
         if((this.rot_max!=null)&&( this.rot_max < a ))
         {
             a = this.rot_max
@@ -766,7 +792,8 @@ export class limit{
             m_limit_local.setRotation(a)
             let m_limit = m_limit_local.getMult(m_parent)            
             this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
-            this.obj.set_anglular_velocity(0)     
+            this.obj.set_anglular_velocity(0)  
+            this.is_at_limit = 1   
         }    
         return true
     }
