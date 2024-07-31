@@ -794,8 +794,7 @@ export default class fidget_daft_i extends fidget{
       }  
       this.bodies.effects.movA_trails = build_effects_trail(oRect_trail,this.bodies.geos.rectangles[0])                                
 
-      
-      this.bodies.inters_step.steps[0].highlight_selection = [this.bodies.geos.rectangles[0]]
+    
     }
 
     
@@ -826,7 +825,13 @@ export default class fidget_daft_i extends fidget{
     this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_mirror( axe_x, axe_y))
 
     
-
+    if(this.is_dynamic)
+    {
+      this.bodies.inters_step.steps[0].highlight_selection = [this.bodies.geos.rectangles[0]]
+      this.bodies.inters_step.steps_instances[0].highlight_selection = [this.bodies.geos.rectangles[1]]
+      this.bodies.inters_step.steps_instances[1].highlight_selection = [this.bodies.geos.rectangles[2]]
+      this.bodies.inters_step.steps_instances[2].highlight_selection = [this.bodies.geos.rectangles[3]]
+    }
 
 
 
