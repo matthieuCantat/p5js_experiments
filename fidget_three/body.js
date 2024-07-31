@@ -1464,7 +1464,10 @@ export class body_build{
             let distNeg = constraints_arg_mirrored.distNeg
             constraints_arg_mirrored.distPos = distNeg
             constraints_arg_mirrored.distNeg = distPos
+
+            constraints_arg_mirrored.limit_lock *= -1
           }
+          
 
 
           
@@ -1583,14 +1586,17 @@ export class body_build{
             } 
           }       
 
-
+          
           if(constraints_arg_mirrored.type == 'kin_axe')
           {       
             let distPos = constraints_arg_mirrored.distPos
             let distNeg = constraints_arg_mirrored.distNeg
             constraints_arg_mirrored.distPos = distNeg
             constraints_arg_mirrored.distNeg = distPos
+
+            constraints_arg_mirrored.limit_lock *= -1
           }
+          
           
 
           

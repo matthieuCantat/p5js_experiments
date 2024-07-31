@@ -425,7 +425,7 @@ export default class fidget_daft_i extends fidget{
                                         //stiffness_after_selection:0.0,
                                         damping:0.1,length:0.01},
                                         { name:'orient',type:'kin_orient',target:this.bodies.inters.background}, 
-                                        { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001 },
+                                        { name:'axe'   ,type:'kin_axe', axe:1, distPos: 25*s, distNeg: 0.001, limit_lock: 1 },
                                       ], 
 
                                       density:0.01/(s/2.2), 
@@ -505,7 +505,7 @@ export default class fidget_daft_i extends fidget{
                                         stiffness_after_selection:0.00,
                                         damping:0.1,length:0.01},
                                         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
-                                        { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001 },
+                                        { name:'axe'   ,type:'kin_axe', axe:1, distPos: 50*s, distNeg: 0.001, limit_lock: 1 },
                                       ], 
 
                                       density:0.01/(s/2.2), 
@@ -628,7 +628,7 @@ export default class fidget_daft_i extends fidget{
       material_three: materials.raw_shader_exemple,//materials.simple.gradient_yellow_green_oblique_line_A ,
 
       //constraints:[
-      //  { name:'axe'   ,type:'kin_axe', axe:0, distPos: 66.1*s, distNeg: 0.001 },
+      //  { name:'axe'   ,type:'kin_axe', axe:0, distPos: 66.1*s, distNeg: 0.001, limit_lock: 1 },
       //],         
 
       density:0.001/(s/2.2), 
@@ -890,7 +890,7 @@ export default class fidget_daft_i extends fidget{
       constraints:[
         { name:'point' ,type:'kin_point' ,target:this.bodies.bones.rectangle},
         { name:'orient',type:'kin_orient',target:this.bodies.bones.rectangle},                                                                                  
-        //{  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001 },               
+        //{  name:'axe'   ,type:'kin_axe', axe:0, distPos: 50.0*s, distNeg: 0.001, limit_lock: 1 },               
       ],                                         
 
       density:0.001/(s/2.2),                                                                                 

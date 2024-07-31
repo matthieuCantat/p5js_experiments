@@ -321,7 +321,8 @@ export class cns_axe{
         extra_rotation : 0, 
         pos_override : null, 
         extra_rotation: 0,
-        extra_rotation_center:new Vector(0,0),     
+        extra_rotation_center:new Vector(0,0), 
+        limit_lock: 0,    
       }   
       
       const args = { ...defaultOptions, ...in_options };
@@ -344,7 +345,7 @@ export class cns_axe{
       this.current_pos = 0
       this.transfer_delta_as_parent_force = true
 
-      this.limit_lock = true
+      this.limit_lock = args.limit_lock
       this.is_at_limit = 0
       
       if( ( this.vLine == null )&&( this.Follower_axe != null) )
@@ -450,12 +451,19 @@ export class cns_axe{
         pLimitNeg = vToLimit.getAdd(pLine)
       }
   
-      if((this.limit_lock)&&(this.is_at_limit == 1))
+      if((this.limit_lock == 1)&&(this.is_at_limit == 1))
       {
         this.current_pos = 1
         return this.current_pos
       }
+      if((this.limit_lock == -1)&&(this.is_at_limit == 1))
+      {
+        this.current_pos = -1
+        return this.current_pos
+      }
+    
       
+
       let vDelta_from_line = p_out.getSub(pLine);
       let dot = vDelta_from_line.getNormalized().dot(vLine.getNormalized())
 
@@ -538,7 +546,7 @@ export class cns_axe{
         pLimitNeg = vToLimit.getAdd(pLine)
       }
 
-      if((this.limit_lock)&&(this.is_at_limit == 1))
+      if((this.limit_lock == 1)&&(this.is_at_limit == 1))
       {
         this.current_pos = 1
         this.Follower.set_out_position(pLimitPos,'world', 'override')
@@ -552,8 +560,8 @@ export class cns_axe{
         return true
 
       }
-      /*
-      if((this.limit_lock)&&(this.is_at_limit == -1))
+      
+      if((this.limit_lock == -1)&&(this.is_at_limit == -1))
       {
         this.current_pos = 1
         this.Follower.set_out_position(pLimitNeg,'world', 'override')
@@ -567,7 +575,7 @@ export class cns_axe{
                 
         return true
       }  
-      */
+      
   
     
       // Set Follower on the line
@@ -607,7 +615,8 @@ export class cns_axe{
         {
           this.Follower.set_out_position(pLimitPos,'world', 'override')
           p_out = pLimitPos
-          this.is_at_limit = 1
+          if(this.limit_lock == 1)
+            this.is_at_limit = 1
         }
       }
       else
@@ -616,7 +625,8 @@ export class cns_axe{
         {
           this.Follower.set_out_position(pLimitNeg,'world', 'override')
           p_out = pLimitNeg
-          this.is_at_limit = -1
+          if(this.limit_lock == -1)
+            this.is_at_limit = -1
         }
       }
       
