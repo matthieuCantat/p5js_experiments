@@ -356,7 +356,7 @@ export default class fidget_daft_i extends fidget{
 
         density:0.01/(s/2.2), 
         frictionAir:0.3,  
-        selection_break_length: 60.*(s/2.2),
+        selection_break_length: this.debug_mode.mouse_selection_break_length*(s/2.2),
                                                   
       })
     }
@@ -433,7 +433,7 @@ export default class fidget_daft_i extends fidget{
                                       ], 
 
                                       density:0.01/(s/2.2), 
-                                      selection_break_length: 60.*(s/2.2),
+                                      selection_break_length: this.debug_mode.mouse_selection_break_length*(s/2.2),
                                                                               
                                     }) )
       this.bodies.inters_step.steps[0].get_resolution_coef = function(){ return clamp(this.constraints.axe.update_and_get_current_pos() ,0,1) }
@@ -453,7 +453,6 @@ export default class fidget_daft_i extends fidget{
 
                                         name:'inters_B',   
                                         //highlight_selection:[this.bodies.geos.rectangle], 
-                                        selection_break_length:300.0, 
 
                                         m:this.m,
                                         parent:this.bodies.inters.background,
@@ -469,11 +468,15 @@ export default class fidget_daft_i extends fidget{
                                           stiffness_at_selection:0.0,
                                           //stiffness_after_selection:0.0,
                                           damping:0.01,length:0.01},                 
-                                          { name:'rot_limit'   ,type:'kin_limit', obj:this, rot_min:rad(0),rot_max:rad(90.5)},
+                                          { name:'rot_limit', type:'kin_limit', 
+                                            obj:this, 
+                                            rot_min:rad(0),
+                                            rot_max:rad(90.5),
+                                            transfer_delta_as_parent_force: this.debug_mode.inter_step_physics },
                                         ],      
 
                                         density:0.01/(s/2.2), 
-                                        selection_break_length: 60.*(s/2.2),
+                                        selection_break_length: this.debug_mode.mouse_selection_break_length*(s/2.2),
                                                                                     
                                       }))
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_out_rotation('base'))/90.0     ,0,1) }  
@@ -518,7 +521,7 @@ export default class fidget_daft_i extends fidget{
                                       ], 
 
                                       density:0.01/(s/2.2), 
-                                      selection_break_length: 60.*(s/2.2),
+                                      selection_break_length: this.debug_mode.mouse_selection_break_length*(s/2.2),
                                                                               
                                     }))
       this.bodies.inters_step.steps[2].get_resolution_coef = function(){ return clamp(this.constraints.axe.current_pos ,0,1) }

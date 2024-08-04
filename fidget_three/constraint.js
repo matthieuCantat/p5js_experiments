@@ -1,7 +1,7 @@
 
 import Vector from './vector.js';
 import Matrix from './matrix.js';
-import { rad, deg, clamp, snap_point_on_line, proj_vector_on_line, userIsInteracting} from './utils.js';
+import { rad, deg, clamp, snap_point_on_line, proj_vector_on_line, userIsInteracting,mouseX,mouseY} from './utils.js';
 //import { join } from 'path';
 
 
@@ -709,6 +709,7 @@ export class limit{
         y_max: null,                 
         rot_min: null,
         rot_max: null,
+        transfer_delta_as_parent_force: true,
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -723,7 +724,9 @@ export class limit{
 
       this.limit_lock = true
       this.is_at_limit = 0
-  
+      this.transfer_delta_as_parent_force = args.transfer_delta_as_parent_force
+
+      this.p_touch_local = null
 
   
     }
@@ -740,14 +743,45 @@ export class limit{
         let v = this.obj.get_velocity()
         let a = m_local.getRotation()
 
+        
+        if( userIsInteracting == false )
+          this.p_touch_local = null
+
+        let p_out = null
+        let p_out_before = null
+        if( this.obj.is_touch )
+        {
+          if(this.p_touch_local==null)
+          {
+            let p_touch = new Vector(mouseX,mouseY)
+            this.p_touch_local = p_touch.getMult(m.getInverse())
+            p_out = p_touch
+            p_out_before = p_touch            
+          }
+          else
+          {
+            p_out = this.p_touch_local.getMult(m)
+            p_out_before = this.p_touch_local.getMult(m)
+          }
+        }
+  
+        let m_limit = m
         if((this.limit_lock)&&(this.is_at_limit == 1))
         {
           a = this.rot_max
           let m_limit_local = new Matrix()
           m_limit_local.setRotation(a)
-          let m_limit = m_limit_local.getMult(m_parent)            
+          m_limit = m_limit_local.getMult(m_parent)            
           this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
           this.obj.set_anglular_velocity(0) 
+
+          if((this.transfer_delta_as_parent_force)&&(this.obj.is_touch)&&(this.p_touch_local!=null) )
+          {
+            p_out = this.p_touch_local.getMult(m_limit)
+            let v_delta = p_out_before.getSub(p_out)
+            this.obj.parent.apply_force(p_out,v_delta)
+          }                
+
           return true           
         }
 
@@ -789,7 +823,7 @@ export class limit{
             a = this.rot_min
             let m_limit_local = new Matrix()
             m_limit_local.setRotation(a)
-            let m_limit = m_limit_local.getMult(m_parent)
+            m_limit = m_limit_local.getMult(m_parent)
             this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
             this.obj.set_anglular_velocity(0)
             this.is_at_limit = -1
@@ -801,11 +835,21 @@ export class limit{
             a = this.rot_max
             let m_limit_local = new Matrix()
             m_limit_local.setRotation(a)
-            let m_limit = m_limit_local.getMult(m_parent)            
+            m_limit = m_limit_local.getMult(m_parent)            
             this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
             this.obj.set_anglular_velocity(0)  
             this.is_at_limit = 1   
-        }    
+        }   
+
+
+        if((this.transfer_delta_as_parent_force)&&(this.obj.is_touch)&&(this.p_touch_local!=null))
+        {
+          p_out = this.p_touch_local.getMult(m_limit)
+          let v_delta = p_out_before.getSub(p_out)
+          this.obj.parent.apply_force(p_out,v_delta)
+        }                
+      
+    
         return true
     }
     enable(value)

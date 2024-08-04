@@ -97,6 +97,7 @@ var debug = { disable_animation:true,
               do_shadows: false,         
               do_flare: false,     
               inter_step_physics : true,
+              mouse_selection_break_length:260,
                 }
 
 
