@@ -2,7 +2,6 @@
 
 import Vector from './vector.js';
 import { utils, 
-  switch_selection, 
   create_physics_engine,
   create_mouse_constraint,
   create_physics_engine_runner,
@@ -357,23 +356,23 @@ export default class fidget{
           if(current_way == 1)
           {
             if(selected_body != obj_next.body)
-              switch_selection( this.mouse_constraint, obj_next)
+              this.Mouse.switch_selection( obj_next)
           }
           else
           {
             if(selected_body != obj_last.body)
-              switch_selection(this.mouse_constraint, obj_last)     
+              this.Mouse.switch_selection(obj_last)     
           }
         }
         else if(this.force_way == 1)
         {
           if(selected_body != obj_next.body)
-            switch_selection( this.mouse_constraint, obj_next)
+            this.Mouse.switch_selection( obj_next )
         }
         else if(this.force_way == -1)
         {
           if(selected_body != obj_last.body)
-            switch_selection(this.mouse_constraint, obj_last) 
+            this.Mouse.switch_selection(obj_last) 
         }
       }
       this.state.switch_selection_happened_step = current_step  
@@ -933,11 +932,17 @@ export default class fidget{
 
   get_selected_body(body_type_filter = [] )
   {
+    let selected_body = null
     for( let body of this.bodies_get_list_filtered( 'build', body_type_filter ))
+    {
       if(body.is_selected)
-        return body
-
-    return null
+      {
+        selected_body = body
+        break
+      }
+    }
+  
+    return selected_body
     
   }
 

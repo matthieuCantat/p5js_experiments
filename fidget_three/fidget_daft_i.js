@@ -2,7 +2,6 @@
 import fidget from './fidget.js';
 import { 
   utils,
-  switch_selection,
   clamp,
   rad,
   deg,
@@ -1719,7 +1718,7 @@ export default class fidget_daft_i extends fidget{
 
         if(this.debug_mode.switch_selected_inter_help)
         {      
-          switch_selection( this.mouse_constraint, null)
+          this.Mouse.switch_selection( null)
         }      
         else
         {

@@ -10,7 +10,6 @@ import {
     userIsInteracting, 
     mouseX, 
     mouseY, 
-    switch_selection,  
     Draw_text_debug} from './utils.js';
 
 
@@ -392,7 +391,7 @@ export class Mouse_manager
             if(userIsInteracting == false)
                 this.mouse_lock_selection = false
             else
-                switch_selection( this.mouse_constraint, null) 
+                this.switch_selection( null) 
         }
 
         let p_mouse_current = new Vector( mouseX, mouseY) 
@@ -433,7 +432,7 @@ export class Mouse_manager
                     if(do_break)
                     {
                         this.mouse_lock_selection = true
-                        switch_selection( this.mouse_constraint, null) 
+                        this.switch_selection( null ) 
                         p_mouse_grap = p_mouse_current
                         this.p_mouse_grap_from_body = null 
                     } 
@@ -533,6 +532,33 @@ export class Mouse_manager
         // next eval
         this.update_count += 1
     }
+
+
+    switch_selection( next_elem = null , hack = false)
+    {
+      if ( next_elem == null)
+      {
+        this.mouse_constraint.body = null
+        this.mouse_constraint.constraint.bodyB = null
+        this.mouse_constraint.constraint.pointB = null
+        this.mouse_constraint.constraint.angleB = 0  
+        return; 
+      }
+      
+      let p = new Vector( 
+        this.mouse_constraint.constraint.pointA.x - next_elem.body.position.x,
+        this.mouse_constraint.constraint.pointA.y - next_elem.body.position.y)
+    
+    this.mouse_constraint.body = next_elem.body
+    this.mouse_constraint.constraint.bodyB = next_elem.body
+    this.mouse_constraint.constraint.pointB = {x: p.x() , y: p.y()}
+      if(hack)
+        this.mouse_constraint.constraint.pointB = {x: - p.y(), y: p.x()}
+      this.mouse_constraint.constraint.angleB = 0
+      
+      this.fidget.mouse_select_highlight(this.mouse_constraint)
+    
+    }    
 }
 
 
