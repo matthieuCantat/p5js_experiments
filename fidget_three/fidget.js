@@ -766,6 +766,10 @@ export default class fidget{
     this.matter_engine_runner.enabled = value
     this.bodies_enable(value)
     this.bodies_do_update( value)
+    if( value == false )
+      this.bodies_set_visibility(false)
+    else
+      this.bodies_set_visibility()
 
   }
 
