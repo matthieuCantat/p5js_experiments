@@ -96,6 +96,7 @@ var debug = { disable_animation:true,
               do_bloom: false, 
               do_shadows: false,         
               do_flare: false,     
+              inter_step_physics : true,
                 }
 
 

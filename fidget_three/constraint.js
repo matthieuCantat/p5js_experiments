@@ -323,6 +323,7 @@ export class cns_axe{
         extra_rotation: 0,
         extra_rotation_center:new Vector(0,0), 
         limit_lock: 0,    
+        transfer_delta_as_parent_force: true,
       }   
       
       const args = { ...defaultOptions, ...in_options };
@@ -343,7 +344,7 @@ export class cns_axe{
       this.debug = true  
       this.debug_pts = [null,null]
       this.current_pos = 0
-      this.transfer_delta_as_parent_force = true
+      this.transfer_delta_as_parent_force = args.transfer_delta_as_parent_force
 
       this.limit_lock = args.limit_lock
       this.is_at_limit = 0
