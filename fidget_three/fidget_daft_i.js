@@ -1077,6 +1077,8 @@ export default class fidget_daft_i extends fidget{
         }
         this.z_depth_end = z_depth
 
+        this.Mouse.z = this.z_depth_end
+
 
 
 

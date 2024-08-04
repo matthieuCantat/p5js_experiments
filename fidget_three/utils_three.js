@@ -252,7 +252,6 @@ export function addShape_line(
 
     let mesh = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( mat_opt_line ) );       
 
-
     return mesh
 }
 
@@ -328,23 +327,56 @@ export class Mouse_manager
         }     
         this.update_count = 0 
         this.selected_body_last_eval_name = ''   
+        this.z = 0
+        this.circle_touch_radius = 20
+        this.cross_apply_radius = 10
     }
 
     setup(scene)
     {  
         let mouse_pos = new Vector( mouseX, mouseY) 
-
         let pos = new Vector( mouseX, mouseY) 
-  
         
         let shape_coords = line( 
             convert_coords_matter_to_three(pos,this.screen_dims), 
             convert_coords_matter_to_three(mouse_pos,this.screen_dims) );
         this.mesh_line = addShape_line(  
             shape_coords, 
-                [255,255,0])
-    
-        scene.add( this.mesh_line )
+            [255,255,0])
+
+        let shape_coords_touch = circle(this.circle_touch_radius)
+        let mesh_circle = addShape_line(  
+            shape_coords_touch, 
+            [255,255,0])   
+        this.group_circle = new THREE.Group();
+        this.group_circle.add(mesh_circle)
+
+        
+        let shape_coords_cross_line_A = line( 
+            new Vector(this.cross_apply_radius,this.cross_apply_radius), 
+            new Vector(this.cross_apply_radius*-1,this.cross_apply_radius*-1))
+        let mesh_cross_line_A = addShape_line(  
+            shape_coords_cross_line_A, 
+            [255,255,0])
+        let shape_coords_cross_line_B = line( 
+            new Vector(this.cross_apply_radius*-1,this.cross_apply_radius), 
+            new Vector(this.cross_apply_radius   ,this.cross_apply_radius*-1))
+        let mesh_cross_line_B = addShape_line(  
+            shape_coords_cross_line_B, 
+            [255,255,0])
+        this.group_cross = new THREE.Group();
+        this.group_cross.add(mesh_cross_line_A)
+        this.group_cross.add(mesh_cross_line_B)
+
+        this.group = new THREE.Group();
+
+        this.group.add( this.mesh_line )
+        this.group.add( this.group_circle )
+        this.group.add( this.group_cross )
+            
+        scene.add( this.group )
+
+        
 
         if(this.debug != false)
             this.draw_text_debug.setup_three(scene)        
@@ -353,15 +385,14 @@ export class Mouse_manager
 
     update()
     {
+        this.group.visible = false
+
         if(this.mouse_lock_selection)
         {
             if(userIsInteracting == false)
-            {
                 this.mouse_lock_selection = false
-            }
-            else{
+            else
                 switch_selection( this.mouse_constraint, null) 
-            }
         }
 
         let p_mouse_current = new Vector( mouseX, mouseY) 
@@ -379,7 +410,7 @@ export class Mouse_manager
         let do_save_p_mouse_grap_from_body = false
 
         let break_dist = 0
-        if(userIsInteracting)
+        if( userIsInteracting )
         {
             if( selected_body != null  )
             {
@@ -415,7 +446,7 @@ export class Mouse_manager
                     this.selected_body_last_eval_name = ''                   
                 } 
 
-                
+                this.group.visible = true
             }
             else{
                 this.mouse_lock_selection = true
@@ -428,13 +459,23 @@ export class Mouse_manager
             this.selected_body_last_eval_name = ''
         }
 
-
+        let p_mouse_grap_converted = convert_coords_matter_to_three(p_mouse_grap,this.screen_dims)
+        let p_mouse_current_converted = convert_coords_matter_to_three(p_mouse_current,this.screen_dims)
         let shape_coords = line( 
-            convert_coords_matter_to_three(p_mouse_grap,this.screen_dims), 
-            convert_coords_matter_to_three(p_mouse_current,this.screen_dims) );        
+            p_mouse_grap_converted, 
+            p_mouse_current_converted)       
         this.mesh_line.geometry.setFromPoints(shape_coords.getPoints());
 
+        this.group_cross.position.x = p_mouse_grap_converted.x()
+        this.group_cross.position.y = p_mouse_grap_converted.y()
+
+        this.group_circle.position.x = p_mouse_current_converted.x()
+        this.group_circle.position.y = p_mouse_current_converted.y()
+
+        this.group.position.z = this.z
         
+        
+
         
         let fidget_skip = false
         if((this.debug !== true)&&(this.debug !== false)&&(this.debug !== this.fidget.fidget_sequence_i))
@@ -489,10 +530,8 @@ export class Mouse_manager
           this.draw_text_debug.update_three(texts_to_draw)
         }  
         
-
         // next eval
         this.update_count += 1
-
     }
 }
 
