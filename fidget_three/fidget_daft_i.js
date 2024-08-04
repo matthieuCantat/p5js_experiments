@@ -349,9 +349,9 @@ export default class fidget_daft_i extends fidget{
         type : utils.shape.rectangle,
 
         constraints:[
-          { name:'point'    ,type:'dyn_point',target:this.bodies.bones.traj, stiffness: 0.05,damping:0.01,length:0.01},
-          { name:'orient'   ,type:'dyn_orient',target:this.bodies.bones.traj,stiffness: 0.2,damping:0.01,length:0.01},
-          { name:'rot_limit',type:'kin_limit',target:this.bodies.bones.traj, x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
+          { name:'point'    ,type:'dyn_point',target:this.bodies.bones.traj, stiffness: 0.05*4,damping:0.01,length:0.01},
+          { name:'orient'   ,type:'dyn_orient',target:this.bodies.bones.traj,stiffness: 0.2*2.,damping:0.01,length:0.01},
+          //{ name:'rot_limit',type:'kin_limit',target:this.bodies.bones.traj, x_min:-50,x_max:50,y_min:-50,y_max:50,rot_min:rad(-20),rot_max:rad(20)},
         ],    
 
         density:0.01/(s/2.2), 
@@ -462,7 +462,8 @@ export default class fidget_daft_i extends fidget{
                                         type : utils.shape.rectangle,
 
                                         constraints:[
-                                          { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,stiffness: 0.999,damping:0.1,length:0.01},
+                                          { name:'point' ,type:'dyn_point',
+                                          target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
                                           { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, 
                                           stiffness: 1.0,
                                           stiffness_at_selection:0.0,
@@ -506,11 +507,11 @@ export default class fidget_daft_i extends fidget{
                                       type : utils.shape.rectangle,
 
                                       constraints:[
-                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, 
+                                        { name:'point' ,type:'dyn_point',target:this.bodies.inters.background,
                                         stiffness: 1.0,
-                                        stiffness_at_selection:0.00,
-                                        stiffness_after_selection:0.00,
-                                        damping:0.1,length:0.01},
+                                        stiffness_at_selection:0.0,
+                                        //stiffness_after_selection:0.0,
+                                        damping:0.1,length:0.01},                                        
                                         { name:'orient',type:'kin_orient',target:this.bodies.inters.background},                                         
                                         { name:'axe'   ,type:'kin_axe', 
                                           axe:1, 

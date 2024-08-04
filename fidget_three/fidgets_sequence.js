@@ -221,7 +221,7 @@ export default class fidgets_sequence
       for( let i = 0; i < this.fidgets.length; i++ )
         this.fidgets_do_computation[i] = this.do_fidget_computation(i)
         
-
+      
 
       var user_interaction_start = 290
       if(this.debug_mode.disable_animation)
