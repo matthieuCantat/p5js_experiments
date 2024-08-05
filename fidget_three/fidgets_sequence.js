@@ -63,6 +63,7 @@ export default class fidgets_sequence
         this.fidgets_do_computation = []
         this.fidgets_do_computation_last = []
         this.resolution_coef = 0
+        this.resolution_coefs = []
   
 
     }
@@ -99,19 +100,10 @@ export default class fidgets_sequence
 
     setup_shapes_fidgets_three(scene_three)
     {
-      var rez = this.get_resolution_coef_info()
-      var rez_step = rez*this.fidgets_nbr
-      var i_max = this.fidgets_nbr
-      var coef = i_max-rez_step
-      
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
-
-        //this.fidgets[i].update(p5)
         this.fidgets[i].setup_shapes_three()
-        
         scene_three.add( this.fidgets[i].group_three )
-        //this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
       }
     }
 
@@ -203,21 +195,34 @@ export default class fidgets_sequence
       }
 
     }
+
+    get_fidgets_resolution_coefs_normalized()
+    {   
+      let fidgets_resolution_coef = []
+      for( let i = 0; i < this.fidgets_nbr; i++ )
+      {
+        let coef_normalized = this.fidgets[i].state.resolution_coef / (this.fidgets[i].end_step-1)
+        fidgets_resolution_coef.push(coef_normalized)
+      }
+
+      return fidgets_resolution_coef
+    }
+
     get_resolution_coef_info()
     {   
       var coef = 0
-      for( let i = 0; i < this.fidgets_nbr; i++ )
-      {
-        coef += this.fidgets[i].state.resolution_coef / (this.fidgets[i].end_step-1)
-      }
 
-      return coef / this.fidgets_nbr
-            
+      this.resolution_coefs = this.get_fidgets_resolution_coefs_normalized()
+      for( let i = 0; i < this.fidgets_nbr; i++ )
+        coef += this.resolution_coefs[i]
+      
+      this.resolution_coef = coef / this.fidgets_nbr
+
     }
 
     update()
     {
-      this.resolution_coef = this.get_resolution_coef_info()
+      this.get_resolution_coef_info()
       for( let i = 0; i < this.fidgets.length; i++ )
         this.fidgets_do_computation[i] = this.do_fidget_computation(i)
         
@@ -305,15 +310,38 @@ export default class fidgets_sequence
     {
       var rez = this.resolution_coef
       
+      // 
+      
       var rez_step = rez*this.fidgets_nbr
       var coef = this.fidgets_nbr-rez_step
+      var coef_cleaned = coef
+      coef_cleaned = Math.round(coef_cleaned*100)/100
+      coef_cleaned = Math.ceil(coef_cleaned) 
+      
 
-      return ((  i-1< coef  )&&(  coef <= i+1 ))
+      var result = ((  i-1< coef_cleaned )&&(  coef_cleaned <= i+1 ))
+      /*
+      result = true
+      if( (0 < i)&&
+      {
+        if((this.resolution_coefs[i] != 1)&&( this.resolution_coefs[i-1] == 1))
+          result = true
+        else if((this.resolution_coefs[i+1] != 1)&&( this.resolution_coefs[i] == 1)) 
+          result = true
+        else
+          result = false
+      }
+
+      */
+
+      
+
+
+      return result
     }
 
     draw_fidgets_updates_only()
     {
-    
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
         if(this.anim_mode == false)
@@ -323,9 +351,16 @@ export default class fidgets_sequence
           if( this.fidgets_do_computation_last[i] != do_computation )
           {
             if(do_computation == true)
+            {
               this.fidgets[i].enable(true)
+              
+            }
             else
+            {
               this.fidgets[i].enable(false)
+              
+            }
+              
           }
           this.fidgets_do_computation_last[i] = do_computation
 
