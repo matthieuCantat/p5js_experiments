@@ -358,7 +358,6 @@ export default class fidgets_sequence
             else
             {
               this.fidgets[i].enable(false)
-              
             }
               
           }

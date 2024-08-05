@@ -724,7 +724,12 @@ export default class fidget{
   bodies_set_visibility_secondary( value,body_type_filter = [] )
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
-      body.visibility_secondary = value    
+    {
+      body.visibility_secondary = value 
+    }
+      
+      
+      
   }  
 
   bodies_set_visibility_override( value,body_type_filter = [] )
@@ -739,7 +744,18 @@ export default class fidget{
   bodies_set_visibility( value = null ,body_type_filter = [] )
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
-      body.visibility = value || body.visibility_default 
+    {
+      if( value == null )
+      {
+        body.visibility = body.visibility_default
+      }
+      else
+      {
+        body.visibility = value
+      }
+      if( body.mesh_three != null )
+        body.mesh_three.group.visible = body.get_visibility() == 1       
+    }
   }  
 
 
@@ -748,8 +764,16 @@ export default class fidget{
   bodies_set_dynamic( value = null ,body_type_filter = [] )
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
-      body.dynamic = value || body.dynamic_default 
-
+    {
+      if( value == null )
+      {
+        body.dynamic = body.dynamic_default
+      }
+      else
+      {
+        body.dynamic = value
+      }      
+    }
   }  
 
 

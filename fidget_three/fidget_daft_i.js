@@ -1823,7 +1823,7 @@ export default class fidget_daft_i extends fidget{
     // custom color
     this.bodies_override_color(null, ['geos'])
     this.bodies_override_color_three(null, ['geos'])
-
+    
     this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_out_position('world'),
                                         new Vector(0,0.05*1.9))
     
@@ -1841,6 +1841,7 @@ export default class fidget_daft_i extends fidget{
     
     this.bodies.geos.rectangles[3].apply_force( this.bodies.geos.rectangles[3].get_out_position('world'),
                                         new Vector(0,0.05*0.01))
+                                        
             
         
     
