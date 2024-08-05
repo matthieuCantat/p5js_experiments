@@ -710,6 +710,7 @@ export class limit{
         rot_min: null,
         rot_max: null,
         transfer_delta_as_parent_force: true,
+        limit_lock: false,
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -722,7 +723,7 @@ export class limit{
       this.rot_max = args.rot_max
 
 
-      this.limit_lock = true
+      this.limit_lock = args.limit_lock
       this.is_at_limit = 0
       this.transfer_delta_as_parent_force = args.transfer_delta_as_parent_force
 
