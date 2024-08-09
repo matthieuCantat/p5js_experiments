@@ -10,70 +10,93 @@ export default class fidgets_sequence
 {
     constructor( nbr, m, s, screen_dims, shaders = [], debug=false)
     {
-        //option
+        // hard coded
+        this.chrono_appears_start = 250
+        this.chrono_appears_end   = 290  
+        this.chrono_appears_range = this.chrono_appears_end-this.chrono_appears_start
+        
+        // init memory
         this.fidgets_nbr = nbr
         this.m = m
         this.s = s
         this.debug_mode = debug
         this.force_way = 1
 
-        //utils    
-        this.fidgets = []
-        
-        this.fidgets_to_show = [0,null]
-        this.end_update_count = 0 
-
-        this.update_count = 0
-
-        this.anim_mode = false
-
-        this.chrono = new Chrono(screen_dims)  
-        this.chrono_end_time_show_start = 0
-        this.chrono_end_time_show_end = 0       
-
         this.shaders = shaders
         this.screen_dims = screen_dims
-
-        let z_depth = 0
-        for( let i = 0; i < this.fidgets_nbr; i++)
-        {
-            let do_background = true
-            let is_dynamic = true
-            //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
-            var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
-            z_depth = fidget.z_depth_end
-            //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
-            fidget.force_way = this.force_way
-            fidget.fidget_sequence_i = i + 1
-            this.fidgets.push(fidget)
-        }
-    
-        this.draw_text_debug = null
-        if(this.debug_mode.fidget_steps_info)
-        {
-            this.draw_text_debug = new Draw_text_debug(this.screen_dims)
-            this.draw_text_debug.mouse_cns = this.mouse_constraint
-        }   
-        
-        
-        this.chrono_appears_start = 250
-        this.chrono_appears_end   = 290  
-        this.chrono_appears_range = this.chrono_appears_end-this.chrono_appears_start
+     
+        // instance memory
+        this.anim_mode = false
+        this.fidgets_to_show = [0,null]
+        this.end_update_count = 0 
+        this.update_count = 0        
+        this.chrono_end_time_show_start = 0
+        this.chrono_end_time_show_end = 0       
 
         this.fidgets_do_computation = []
         this.fidgets_do_computation_last = []
         this.resolution_coef = 0
         this.resolution_coefs = []
-  
 
+        this.chrono_stopped = false
+  
+        this.chrono = null
+        this.fidgets = []
+        this.draw_text_debug = null
+        this.scene = null
     }
 
 
-    setup()
+    setup(scene = null)
     {
+      if(scene != null)
+        this.scene = scene
+      
       console.log('setup : fidgets_sequence')
+
+      //clean
+      this.anim_mode = false
+      this.fidgets_to_show = [0,null]
+      this.end_update_count = 0 
+      this.update_count = 0        
+      this.chrono_end_time_show_start = 0
+      this.chrono_end_time_show_end = 0       
+
+      this.fidgets_do_computation = []
+      this.fidgets_do_computation_last = []
+      this.resolution_coef = 0
+      this.resolution_coefs = []
+
+      this.chrono_stopped = false
+
+      this.chrono = null
+      this.fidgets = []
+      this.draw_text_debug = null
+
+      // build  
+      this.chrono = new Chrono(this.screen_dims)  
+        
+      let z_depth = 0
+      for( let i = 0; i < this.fidgets_nbr; i++)
+      {
+          let do_background = true
+          let is_dynamic = true
+          //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
+          var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
+          z_depth = fidget.z_depth_end
+          //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
+          fidget.force_way = this.force_way
+          fidget.fidget_sequence_i = i + 1
+          this.fidgets.push(fidget)
+      }
+  
+      if(this.debug_mode.fidget_steps_info)
+      {
+          this.draw_text_debug = new Draw_text_debug(this.screen_dims)
+          this.draw_text_debug.mouse_cns = this.mouse_constraint
+      }   
+         
       // setup
-          
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
         this.fidgets[i].setup();
@@ -81,10 +104,26 @@ export default class fidgets_sequence
         this.fidgets_do_computation_last.push(null)
       }
 
+      // add to scene
+      this.setup_shapes_fidgets_three(this.scene)
+      this.setup_chrono_three(this.scene)
+      this.setup_debug_three(this.scene)
+
     }
 
+    reset()
+    {
+      console.log('fidgets_sequence - reset')
+      this.clean_scene(this.scene)
+      this.setup(this.scene)
+    }
 
+    clean_scene(scene)
+    {
+      this.chrono.clean_scene(scene)
+      //
 
+    }
 
     get_random_fidget(p,s,sceen_dims,shaders,debug)
     {
@@ -278,14 +317,15 @@ export default class fidgets_sequence
       let fidget_sequence_ends = 0.99 < this.resolution_coef
       if(  fidget_sequence_ends )
       {
-        if(this.chrono.is_at_start() == false)
+        if((this.chrono_stopped == false)&&(this.chrono.is_at_start() == false))
         {
           this.chrono_end_time_show_start = this.update_count
           this.chrono_end_time_show_end   = this.update_count+40  
 
           this.chrono.update()
           this.chrono.update_three()
-          this.chrono.stop()          
+          this.chrono.stop()  
+          this.chrono_stopped = true        
         }
 
         
@@ -300,6 +340,16 @@ export default class fidgets_sequence
   
         this.chrono.p = new Vector(this.screen_dims.x * 0.5, this.screen_dims.y * blendA )
         this.chrono.s = this.screen_dims.x * blendB
+
+        
+        let reset_after_end_count = 100
+        if( reset_after_end_count < _count )
+        {
+          this.reset()
+        }
+          
+
+
       }
       
       this.draw_fidgets_updates_only()

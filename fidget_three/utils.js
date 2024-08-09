@@ -334,6 +334,14 @@ export class Chrono
     
 
   }
+  
+  clean_scene(scene_three)
+  {
+    scene_three.remove(Chrono.three_mesh);
+    //Chrono.three_mesh.geometry.dispose();
+    //Chrono.three_mesh.material.dispose();
+    Chrono.three_mesh = undefined;
+  }
 
   start()
   {

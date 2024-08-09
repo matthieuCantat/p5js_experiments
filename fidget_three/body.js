@@ -1090,6 +1090,19 @@ export class body_build{
         this.mesh_three.line.geometry.setFromPoints(shape_points.getPoints());
       }     
     }
+    
+    clean_three_scene(three_scene)
+    {
+      var children_to_remove = [];
+      three_scene.traverse(function(child){
+          if(child.name == "inscriptArc"){
+            children_to_remove.push(child);
+          }
+      });
+      children_to_remove.forEach(function(child){
+          scene.remove(child);
+      });
+    }
 
 
     setup_shapes_three(group_fidget){

@@ -118,7 +118,7 @@ m.setTranslation(width/2, height/2 )
 let s = 2.2
 F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
 //F_sequence = new fidgets_grid(nbr, 5, screen_dims, shdrs, debug)
-F_sequence.setup()
+
 
 
 
@@ -202,9 +202,8 @@ function init() {
    
 
     ///////////////// fidgets
-    F_sequence.setup_shapes_fidgets_three(scene)
-    F_sequence.setup_chrono_three(scene)
-    F_sequence.setup_debug_three(scene)
+
+    F_sequence.setup(scene)
 
     
     /*
