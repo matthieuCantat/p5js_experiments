@@ -120,6 +120,8 @@ export default class fidgets_sequence
 
     clean_scene(scene)
     {
+      for( let fidget of this.fidgets)
+        fidget.clean_shapes_three(scene)
       this.chrono.clean_scene(scene)
       //
 

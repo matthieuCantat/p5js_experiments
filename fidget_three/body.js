@@ -1091,8 +1091,29 @@ export class body_build{
       }     
     }
     
-    clean_three_scene(three_scene)
+
+    clean_shapes_three(group_fidget)
     {
+      if(this.do_shape)
+      {
+        this.mesh_three.group.remove(this.mesh_three.shape);
+        this.mesh_three.shape.geometry.dispose()
+        this.mesh_three.shape.material.dispose()
+        this.mesh_three.shape = null
+      }
+
+      if(this.do_line)
+      {
+        this.mesh_three.group.remove(this.mesh_three.line); 
+        this.mesh_three.line.geometry.dispose()
+        //this.mesh_three.line.material.dispose()
+        this.mesh_three.line = null            
+      }
+   
+      group_fidget.remove(this.mesh_three.group);
+      this.mesh_three.group = null
+      
+      /*
       var children_to_remove = [];
       three_scene.traverse(function(child){
           if(child.name == "inscriptArc"){
@@ -1102,8 +1123,8 @@ export class body_build{
       children_to_remove.forEach(function(child){
           scene.remove(child);
       });
+      */
     }
-
 
     setup_shapes_three(group_fidget){
       this.mesh_three = { group : null, shape : null, line : null}

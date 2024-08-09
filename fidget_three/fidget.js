@@ -435,6 +435,21 @@ export default class fidget{
 
 
 
+  bodies_clean_shapes_three(body_type_filter = [])
+  {
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.clean_shapes_three(this.group_three) 
+  }
+
+  clean_shapes_three(three_scene)
+  {
+    this.bodies_clean_shapes_three()
+    three_scene.remove(this.group_three)
+    this.group_three = null
+  }
+
+
+
   bodies_animate_three( body_type_filter = [] )
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
