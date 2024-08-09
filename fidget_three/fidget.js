@@ -813,6 +813,8 @@ export default class fidget{
     else
       this.bodies_set_visibility()
 
+    if(value == true)
+      this.update_step_count(-1)
   }
 
 

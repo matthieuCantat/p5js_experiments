@@ -1603,6 +1603,7 @@ export default class fidget_daft_i extends fidget{
     {
       if(this.state.steps[step].update_count == 0 )
       {    
+        
         this.bodies_enable( 0 )  
         this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
 
