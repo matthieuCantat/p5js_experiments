@@ -82,11 +82,13 @@ var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:true,
               force_visibility:false,
+
               show_inters:false,
               show_inters_steps:false,
               show_bones:false,
               show_geos:true,
               show_effects:true,
+
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,

@@ -788,3 +788,31 @@ export function anim_values( t, times, values, interp_modes)
   return values[values.length-1]
 
 }
+
+
+
+export function flatten_list( list_input )
+{
+  let array = []
+  if( list_input.constructor === Array)
+  {
+    for( let i = 0; i < list_input.length; i++)
+    {
+      if( list_input[i].constructor === Array)
+      {
+        for( let j = 0; j < list_input[i].length; j++)
+          array.push(list_input[i][j])
+      }
+      else{
+        array.push(list_input[i])
+      }
+      
+    }
+  }
+  else
+  {
+    array.push(list_input)       
+  }
+
+  return array
+}

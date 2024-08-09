@@ -6,7 +6,8 @@ import { utils,
   create_mouse_constraint,
   create_physics_engine_runner,
   create_boundary_wall_collision,
-  userIsInteracting} from './utils.js';
+  userIsInteracting,
+  flatten_list} from './utils.js';
 import * as THREE from 'three';
 import { Mouse_manager,  } from './utils_three.js'
 import { body_build } from './body.js';
@@ -857,21 +858,44 @@ export default class fidget{
         
         if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
         {
-  
-          if( this.bodies[b_type][key].constructor === Array)
-          {
-            for( let i = 0; i < this.bodies[b_type][key].length; i++)
+      
+
+            let bodies = this.bodies[b_type][key]
+            if( bodies.constructor === Array)
             {
-              bodies_list.push(this.bodies[b_type][key][i])
+              let bodies_ordered = bodies
+              if( (bodies[0].constructor !== Array )&&(bodies[0].instances.length != 0))
+                bodies_ordered = put_selected_instance_first(bodies_ordered)
+
+
+              for( let i = 0; i < bodies_ordered.length; i++)
+              {
+                if( bodies_ordered[i].constructor === Array)
+                {
+                  let bodies_ordered_B = bodies_ordered[i]
+                  if( (bodies_ordered[i][0].constructor !== Array )&&( bodies_ordered[i][0].instances.length != 0 ))
+                    bodies_ordered_B = put_selected_instance_first(bodies_ordered_B)
+
+
+                  for( let j = 0; j < bodies_ordered_B.length; j++)
+                    bodies_list.push(bodies_ordered_B[j])
+                }
+                else{
+                  bodies_list.push(bodies_ordered[i])
+                }
+              }
+
+
+
             }
-          }
-          else
-          {
-            bodies_list.push(this.bodies[b_type][key])       
-          }
+            else
+            {
+              bodies_list.push(bodies)       
+            }
+          
+        }
+
   
-  
-        } 
       } 
 
     }
@@ -900,22 +924,9 @@ export default class fidget{
           }
           
           if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-          {
+            for( let elem of flatten_list(this.bodies[b_type][key]) )
+              bodies_list.push(elem) 
     
-            if( this.bodies[b_type][key].constructor === Array)
-            {
-              for( let i = 0; i < this.bodies[b_type][key].length; i++)
-              {
-                bodies_list.push(this.bodies[b_type][key][i])
-              }
-            }
-            else
-            {
-              bodies_list.push(this.bodies[b_type][key])       
-            }
-    
-    
-          }
         } 
       } 
     }
@@ -1080,13 +1091,20 @@ export default class fidget{
     {
       if( this.bodies.inters_step.steps[step] == null )
         continue 
-        
-      if(i < step)
-        this.bodies.inters_step.steps[step].set_resolution_coef(1)
-      else if(step < i)
-        this.bodies.inters_step.steps[step].set_resolution_coef(0)
+
+      let body_step = null
+      if(this.bodies.inters_step.steps[step].constructor === Array )
+        body_step = this.bodies.inters_step.steps[step][0]
       else
-        this.bodies.inters_step.steps[step].set_resolution_coef(null)
+        body_step = this.bodies.inters_step.steps[step]
+              
+
+      if(i < step)
+        body_step.set_resolution_coef(1)
+      else if(step < i)
+        body_step.set_resolution_coef(0)
+      else
+        body_step.set_resolution_coef(null)
     }      
   }
 
@@ -1104,3 +1122,18 @@ export default class fidget{
 }
 
 
+function put_selected_instance_first( bodies )
+{
+  let bodies_ordered = []
+  for( let i = 0; i < bodies.length; i++)
+  {
+    if( bodies[i].is_last_instance_selected )
+      bodies_ordered.push(bodies[i])
+  }
+  for( let i = 0; i < bodies.length; i++)
+  {
+    if( !bodies[i].is_last_instance_selected )
+      bodies_ordered.push(bodies[i])
+  }  
+  return bodies_ordered
+}
