@@ -775,7 +775,7 @@ export class limit{
           m_limit = m_limit_local.getMult(m_parent)            
           this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
           this.obj.set_anglular_velocity(0) 
-
+          
           if((this.transfer_delta_as_parent_force)&&(this.obj.is_touch)&&(this.p_touch_local!=null) )
           {
             p_out = this.p_touch_local.getMult(m_limit)

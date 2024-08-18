@@ -80,26 +80,27 @@ let screen_dims = {x:width,y:height}
 /////////////////////////////////////////// setup game
 var nbr = 10
 var debug = { disable_animation:true,
-              switch_selected_inter_help:true,
-              force_visibility:false,
+              switch_selected_inter_help:false,
+              inter_step_physics : false,
+              mouse_selection_break_length:260,
 
+              show_geos:true,
+              show_effects:true,              
               show_inters:false,
               show_inters_steps:false,
               show_bones:false,
-              show_geos:true,
-              show_effects:true,
+              force_visibility:false,
 
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,
               mouse_info:false,
               show_warning_log:false,
+
               do_bloom_selected: true,
               do_bloom: false, 
               do_shadows: false,         
               do_flare: false,     
-              inter_step_physics : true,
-              mouse_selection_break_length:260,
                 }
 
 
