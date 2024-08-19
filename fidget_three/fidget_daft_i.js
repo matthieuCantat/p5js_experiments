@@ -469,8 +469,9 @@ export default class fidget_daft_i extends fidget{
                                         type : utils.shape.rectangle,
 
                                         constraints:[
-                                          { name:'point' ,type:'dyn_point',
-                                          target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01},
+                                          this.debug_mode.inter_step_physics ? 
+                                          { name:'point' ,type:'dyn_point',target:this.bodies.inters.background, stiffness: 0.999,damping:0.1,length:0.01}:   
+                                          { name:'point' ,type:'kin_point' ,target:this.is_dynamic ?this.bodies.inters.background : this.bodies.bones.traj},                                    
                                           { name:'orient' ,type:'dyn_orient' ,target:this.bodies.inters.background, 
                                           stiffness: 1.0,
                                           stiffness_at_selection:0.0,
@@ -490,7 +491,10 @@ export default class fidget_daft_i extends fidget{
                                       }))
       this.bodies.inters_step.steps[1].get_resolution_coef = function(){ return clamp(deg(this.get_out_rotation('base'))/90.0     ,0,1) }  
       this.bodies.inters_step.steps[1].set_resolution_coef = function(res = null){ if(res!=null)this.set_out_rotation(rad(res*90.5),'world', 'override') }                     
-                                                                             
+                            
+      if(this.debug_mode.inter_step_physics == false)
+        this.bodies.inters_step.steps[1].constraints_args.push({ name:'point_no_dyn' ,type:'kin_point' ,target:this.is_dynamic ?this.bodies.inters.background : this.bodies.bones.traj})
+      
       // other
 
       m_shape = new Matrix()
