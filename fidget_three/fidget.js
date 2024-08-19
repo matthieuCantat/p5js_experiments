@@ -1101,6 +1101,37 @@ export default class fidget{
   }
 
 
+  setup_step()
+  {
+    // compute info
+    for( let step = 0 ; step < this.bodies.inters_step.steps.length+1; step++)
+    {
+
+      if( this.state.current_step == step )
+      {
+        if(this.state.steps[step].update_count == 0 )
+        {      
+          this.bodies_enable( 0 )  
+          this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
+  
+          this.bodies_constraints_enable( true ) 
+          this.constraints_enable(false, this.steps_info[step].constraints_disable )
+  
+          this.set_resolution_coef_from_step(step)   
+          
+          if(this.debug_mode.switch_selected_inter_help)
+          {
+            if((step == 0)||(step == this.bodies.inters_step.steps.length-1))
+              this.Mouse.switch_selection( null )
+            else
+              this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step])   
+          }
+            
+        }
+        this.update_step_count(step)
+      }      
+    }
+  }
 
 
 

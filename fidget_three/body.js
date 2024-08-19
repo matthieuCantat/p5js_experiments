@@ -2158,7 +2158,10 @@ export function anim_effect(opts)
   for( let i=0; i < opts.trails.length; i++)
     opts.trails[i].enable(0)
 
-  if(opts.count == 0)  
+  if(opts.count == 0)
+    return false  
+
+  if(opts.count == 1)  
   {      
     for( let i=0; i < opts.sparcles.length; i++)
     {
@@ -2201,6 +2204,8 @@ export function anim_effect(opts)
       opts.trails[i].enable(1)    
               
   }    
+
+  return true
 }
 
 

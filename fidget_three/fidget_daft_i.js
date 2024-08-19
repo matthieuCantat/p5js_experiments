@@ -1568,239 +1568,8 @@ export default class fidget_daft_i extends fidget{
       if(this.state.steps[i].resoluton_coef == 1)
         this.state.current_step = i +1
     }
-
-    /*
-    if ( this.anim_mode )
-    {
-      let s = [0,1,2,3]   
-      A = clamp(this.resolution_coef_override ,s[0],s[0]+1)
-      B = clamp(this.resolution_coef_override ,s[1],s[1]+1)-s[1]
-      C = clamp(this.resolution_coef_override ,s[2],s[2]+1)-s[2]
-      D = clamp(this.resolution_coef_override ,s[3],s[3]+1)-s[3]
-
-    }
-    */
-
-
   }
   
-
-  set_step_resolution()
-  {
-    //this.bodies_enable(1,['effects'])
-    /*
-    let debug_body = this.get_selected_body()
-    console.log(this.mouse_constraint.constraint.pointA,this.mouse_constraint.constraint.pointB)
-    if( debug_body != null )
-    {
-      console.log(this.fidget_sequence_i,debug_body.name)
-    }
-    else{
-      console.log(this.fidget_sequence_i,null)
-    }
-    */
-
-    let step = 0
-    let res_coef = this.state.steps[step].resoluton_coef
-    let do_it = this.state.current_step == step
-    if( do_it )
-    {
-      if(this.state.steps[step].update_count == 0 )
-      {    
-        
-        this.bodies_enable( 0 )  
-        this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
-
-        this.bodies_constraints_enable( true ) 
-        this.constraints_enable(false, this.steps_info[step].constraints_disable )
-
-        this.set_resolution_coef_from_step(step)    
-      }
-
-      //_________________________________________________________________Update
-      this.state.switch_selection_happened_step = step
-      this.update_step_count(step)
-    }
-
-    
-    ////////////////////////////////////////////////////////////////////////////////////
-    step = 1
-    res_coef = this.state.steps[step].resoluton_coef
-    do_it = this.state.current_step == step
-    if( do_it )
-    {      
-      if(this.state.steps[step].update_count == 0 )
-      {
-        this.bodies_enable( 0 )  
-        this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
-          
-        this.bodies_constraints_enable( true ) 
-        this.constraints_enable(false, this.steps_info[step].constraints_disable )
-
-        this.set_resolution_coef_from_step(step)
-
-        let m = new Matrix(this.bodies.inters.circle.m_shape_init)
-        m.scale(1.85,1.85)
-        this.bodies.inters.circle.update_shape_coords(m)
-        
-        //_________________________________________________________________Mouse
-        if(this.debug_mode.switch_selected_inter_help)
-        {
-          this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[0], this.bodies.inters_step.steps[1])
-        }
-        else
-        {
-          //if( (this.bodies.inters_step.steps[0].is_selected == true) &&(userIsInteracting == false) )
-          //  switch_selection( this.mouse_constraint, null)  
-        }        
-      }       
-   
-      //_________________________________________________________________effects
-      anim_effect({
-        count:this.state.steps[step].update_count,
-        sparcles:this.bodies.effects.colA_sparcles,
-        shapes:this.bodies.effects.colA_shapes,
-        wall:this.bodies.effects.colA_wall,
-        trails:this.bodies.effects.movA_trails,
-      })
-       
-
-
-          
-      //_________________________________________________________________Update
-      this.update_step_count(step)
-    
-    }  
-  
-    ////////////////////////////////////////////////////////////////////////////////////
-    step = 2
-    res_coef = this.state.steps[step].resoluton_coef
-    do_it = this.state.current_step == step
-    if( do_it )
-    {
-      if(this.state.steps[step].update_count == 0 )
-      {
-        this.bodies_enable( 0 ) 
-        this.bodies_list_enable( 1,this.steps_info[step].bodies_enable )
-          
-        this.bodies_constraints_enable( true ) 
-        this.constraints_enable(false, this.steps_info[step].constraints_disable )
-
-        this.set_resolution_coef_from_step(step)
-
-        //_________________________________________________________________Mouse
-        if(this.debug_mode.switch_selected_inter_help)
-        {      
-          this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[1], this.bodies.inters_step.steps[2]) 
-        }      
-        else
-        {
-          //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
-          //  switch_selection( this.mouse_constraint, null)
-        }          
-      }   
-      //_________________________________________________________________Control
-      //_________________________________________________________________effects
-      anim_effect({
-        count:this.state.steps[step].update_count,
-        sparcles:this.bodies.effects.colB_sparcles,
-        shapes:this.bodies.effects.colB_shapes,
-        wall:this.bodies.effects.colB_wall,
-        trails:this.bodies.effects.movB_trails,
-      })
-      
-  
-      
-      //_________________________________________________________________Update
-      //this.state.switch_selection_happened_step = step
-      this.update_step_count(step)   
-      
-      if(this.anim_mode)
-        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2)
-        
-    } 
-
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    step = 3
-    res_coef = this.state.steps[step].resoluton_coef
-    do_it = this.state.current_step == step
-    if( do_it )
-    {
-      if(this.state.steps[step].update_count == 0 )
-      {
-        this.bodies_enable( 0 )
-        this.bodies_list_enable( 1, this.steps_info[step].bodies_enable )
-          
-        this.bodies_constraints_enable( true ) 
-        this.constraints_enable(false, this.steps_info[step].constraints_disable )
-
-        this.set_resolution_coef_from_step(step)
-
-        if(this.debug_mode.switch_selected_inter_help)
-        {      
-          this.Mouse.switch_selection( null)
-        }      
-        else
-        {
-          //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
-          //  switch_selection( this.mouse_constraint, null)
-        }         
-      }      
-
-      //_________________________________________________________________Clean Inter
-      //_________________________________________________________________Clean Other
-      //_________________________________________________________________Control
-      //_________________________________________________________________effects
-
-      anim_effect({
-        count:this.state.steps[step].update_count,
-        sparcles:this.bodies.effects.colC_sparcles,
-        shapes:this.bodies.effects.colC_shapes,
-        wall:this.bodies.effects.colC_wall,
-        trails:this.bodies.effects.movB_trails,
-      })
-     
-      //_________________________________________________________________Mouse
-      
-      //if(this.debug_mode.switch_selected_inter_help)
-      //{
-      //  this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[1], this.bodies.inters_step.steps[2]) 
-      //}
-      //else
-      //{
-      //  //if( (this.bodies.inters_step.steps[1].is_selected == true) &&(userIsInteracting == false) )
-      //  //  switch_selection( this.mouse_constraint, null)  
-      //}
-        
-      //_________________________________________________________________Update
-      //this.state.switch_selection_happened_step = step
-      this.update_step_count(step) 
-
-      //
-      if( this.anim_mode == false )
-      {
-        let wait_time = 20
-        let t = this.state.steps[step].update_count
-        if( t < wait_time )
-        {
-          this.do_pre_explode_animation(t,0,wait_time)
-        }
-        else{
-          this.do_explode(step)
-        }  
-      }
-      else{
-        
-        
-        let y_offset = res_coef * this.screen_dims.y/2.*1.1 
-        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2+y_offset)
-      }
-
-    } 
-    
-
-  }
   
   do_pre_explode_animation(t,start_time,end_time)
   {
@@ -1963,7 +1732,43 @@ export default class fidget_daft_i extends fidget{
     {
       this.state.resolution_coef_last = this.state.resolution_coef
       this.get_resolution_coef_info( this.resolution_coef_override )
-      this.set_step_resolution()
+
+      
+    this.setup_step()
+    anim_effect({
+      count:this.state.steps[1].update_count,
+      sparcles:this.bodies.effects.colA_sparcles,
+      shapes:this.bodies.effects.colA_shapes,
+      wall:this.bodies.effects.colA_wall,
+      trails:this.bodies.effects.movA_trails,
+    })    
+
+    anim_effect({
+      count:this.state.steps[2].update_count,
+      sparcles:this.bodies.effects.colB_sparcles,
+      shapes:this.bodies.effects.colB_shapes,
+      wall:this.bodies.effects.colB_wall,
+      trails:this.bodies.effects.movB_trails,
+    })    
+
+    anim_effect({
+      count:this.state.steps[3].update_count,
+      sparcles:this.bodies.effects.colC_sparcles,
+      shapes:this.bodies.effects.colC_shapes,
+      wall:this.bodies.effects.colC_wall,
+      trails:this.bodies.effects.movB_trails,
+    })    
+
+    // explode
+    let wait_time = 20
+    let t = this.state.steps[3].update_count
+    if( t < wait_time )
+    {
+      this.do_pre_explode_animation(t,0,wait_time)
+    }
+    else{
+      this.do_explode(3)
+    }  
       //this.track_user_drag_error()  
     }
 
