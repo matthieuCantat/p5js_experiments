@@ -852,6 +852,27 @@ export default class fidget{
   }
 
 
+
+  bodies_apply_exlode_force_from_point( explode_point, explode_power, default_dir, adjust_with_mass = false, body_type_filter = [] )
+  {
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+    {
+      let p_center = body.get_out_position('world')
+      let v_dir = p_center.getSub(explode_point)
+      if(v_dir.mag() < 0.001)
+        v_dir = default_dir
+      v_dir.normalize()
+      v_dir.mult(explode_power)
+      if(adjust_with_mass)
+        v_dir.mult(body.get_mass())
+        
+      
+      body.apply_force( p_center, v_dir)
+    }
+  }
+
+
+
   bodies_search_by_name( name, body_type_filter = [] )
   {
     let bodies_found = []
@@ -868,6 +889,51 @@ export default class fidget{
 
   }
 
+
+
+  bodies_explode_effect(opts)
+  {
+    if( opts.count < opts.pre_explode_animation_duration )
+      this.do_pre_explode_animation( opts.count, 0, opts.pre_explode_animation_duration)
+    else
+      this.do_explode()
+  }  
+  
+  do_pre_explode_animation(t,start_time,end_time)
+  {
+    let a = t - start_time
+    a -= end_time/4
+    a /= (end_time/4)
+    a = Math.min(1,Math.max(0,a))
+    
+    let c1 = utils.color.gold    
+    let c2 = utils.color.white
+    let cInterp = [
+      c1[0]*(1-a)+c2[0]*a,
+      c1[1]*(1-a)+c2[1]*a,
+      c1[2]*(1-a)+c2[2]*a]
+ 
+    this.bodies_override_color(cInterp ['geos'])
+    this.bodies_override_color_three(cInterp, ['geos'])   
+  }
+
+  do_explode()
+  {
+    this.bodies_enable(false,['effects'])
+    this.bodies_constraints_enable(false, ['geos'])
+    
+    // custom color
+    this.bodies_override_color(null, ['geos'])
+    this.bodies_override_color_three(null, ['geos'])
+    
+    this.bodies_apply_force_at_center(new Vector(0,0.003),true,['geos'])
+                                 
+    if( this.explode_happened == false )
+    {
+      this.bodies_apply_exlode_force_from_point(new Vector(this.screen_dims.x/2,this.screen_dims.y/2),0.09,new Vector(0,-1),true,['geos'])
+      this.explode_happened = true
+    }
+  }  
 
 
   bodies_get_list_filtered( order = 'eval', body_type_filter = [] )//eval // draw
