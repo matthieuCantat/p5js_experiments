@@ -1586,25 +1586,9 @@ export default class fidget_daft_i extends fidget{
     this.bodies_override_color(null, ['geos'])
     this.bodies_override_color_three(null, ['geos'])
     
-    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_out_position('world'),
-                                        new Vector(0,0.05*1.9))
+    this.bodies_apply_force_at_center(new Vector(0,0.003),true,['geos'])
     
-    this.bodies.geos.rectangle.apply_force( this.bodies.geos.rectangle.get_out_position('world'),
-                                        new Vector(0,0.05*0.4))
-    
-    this.bodies.geos.rectangles[0].apply_force( this.bodies.geos.rectangles[0].get_out_position('world'),
-                                        new Vector(0,0.05*0.01))
-
-    this.bodies.geos.rectangles[1].apply_force( this.bodies.geos.rectangles[1].get_out_position('world'),
-                                        new Vector(0,0.05*0.01))
-
-    this.bodies.geos.rectangles[2].apply_force( this.bodies.geos.rectangles[2].get_out_position('world'),
-                                        new Vector(0,0.05*0.01))
-    
-    this.bodies.geos.rectangles[3].apply_force( this.bodies.geos.rectangles[3].get_out_position('world'),
-                                        new Vector(0,0.05*0.01))
-                                        
-            
+                                          
     if( this.explode_happened == false )
     {
         let p = this.m.get_row(2).get_value()

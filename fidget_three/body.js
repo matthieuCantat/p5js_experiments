@@ -1070,6 +1070,12 @@ export class body_build{
       return out
     }
 
+    get_mass()
+    {
+      if(this.body != null)
+        return this.body.mass
+      return -1
+    }
     update_shape_coords(m)
     {
       this.matter_update_shape_coords(m)

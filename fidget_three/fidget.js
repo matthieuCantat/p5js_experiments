@@ -839,6 +839,19 @@ export default class fidget{
   }
 
 
+  bodies_apply_force_at_center( force, adjust_with_mass = false, body_type_filter = [] )
+  {
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+    {
+      let p_center = body.get_out_position('world')
+      if(adjust_with_mass)
+        body.apply_force( p_center, force.getMult(body.get_mass()) )
+      else
+        body.apply_force( p_center, force)
+    }
+  }
+
+
   bodies_search_by_name( name, body_type_filter = [] )
   {
     let bodies_found = []
