@@ -1196,66 +1196,6 @@ export default class fidget_daft_i extends fidget{
                     ],
 
         constraints_disable:[
-          //this.bodies.inters.background.constraints.point,
-          //this.bodies.inters.background.constraints.orient,
-          //this.bodies.inters.background.constraints.rot_limit,
-          //this.bodies.inters_step.steps[0].constraints.point,
-          //this.bodies.inters_step.steps[0].constraints.orient,
-          //this.bodies.inters_step.steps[0].constraints.axe,
-          //this.bodies.inters.circle.point,
-          //this.bodies.inters.circle.orient,
-          //this.bodies.inters_step.steps[1].constraints.point,
-          //this.bodies.inters_step.steps[1].constraints.orient,
-          //this.bodies.inters_step.steps[1].constraints.rot_limit,
-          //this.bodies.inters.rectangle.constraints.point, 
-          //this.bodies.inters.rectangle.constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.point,
-          //this.bodies.inters_step.steps[2].constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.axe, 
-          //this.bodies.geos.circle.constraints.point,
-          //this.bodies.geos.circle.constraints.orient,
-          //this.bodies.geos.circle.constraints.connect_scale_iA,
-          //'bones','circle',null,'connect_scale_iC',
-          //this.bodies.bones.rectangles_pivots[0].constraints.point,
-          //this.bodies.bones.rectangles_pivots[0].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
-          //'bones','rectangles_pivots',0,'connect_rot_iA',
-          //'bones','rectangles_pivots',0,'connect_tx_iB',
-          //'bones','rectangles_pivots',0,'connect_tx_iC',
-          //this.bodies.geos.rectangles[0].constraints.point,
-          //this.bodies.geos.rectangles[0].constraints.orient,
-          //this.bodies.inters.rectangles[0].constraints.point,
-          //this.bodies.inters.rectangles[0].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[1].constraints.point,
-          //this.bodies.bones.rectangles_pivots[1].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[1].constraints.connect_rot_iA,
-          //'bones','rectangles_pivots',1,'connect_rot_iA',
-          //'bones','rectangles_pivots',1,'connect_tx_iB',
-          //'bones','rectangles_pivots',1,'connect_tx_iC',
-          //this.bodies.geos.rectangles[1].constraints.point,
-          //this.bodies.geos.rectangles[1].constraints.orient,
-          //this.bodies.inters.rectangles[1].constraints.point,
-          //this.bodies.inters.rectangles[1].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[2].constraints.point,
-          //this.bodies.bones.rectangles_pivots[2].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[2].constraints.connect_rot_iA,
-          //'bones','rectangles_pivots',2,'connect_rot_iA',
-          //'bones','rectangles_pivots',2,'connect_tx_iB',
-          //'bones','rectangles_pivots',2,'connect_tx_iC',
-          //this.bodies.geos.rectangles[2].constraints.point,
-          //this.bodies.geos.rectangles[2].constraints.orient,
-          //this.bodies.inters.rectangles[3].constraints.point,
-          //this.bodies.inters.rectangles[3].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[3].constraints.point,
-          //this.bodies.bones.rectangles_pivots[3].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[3].constraints.connect_rot_iA,
-          //'bones','rectangles_pivots',3,'connect_rot_iA',
-          //'bones','rectangles_pivots',3,'connect_tx_iB',
-          //'bones','rectangles_pivots',3,'connect_tx_iC',
-          //this.bodies.geos.rectangles[3].constraints.point,
-          //this.bodies.geos.rectangles[3].constraints.orient,
-          //this.bodies.geos.rectangle.constraints.point,
-          //this.bodies.geos.rectangle.constraints.orient,
           'geos','rectangle',null,'connect_rot_iB',
           'geos','rectangle',null,'connect_ty_iC',
         ],
@@ -1293,72 +1233,7 @@ export default class fidget_daft_i extends fidget{
           this.bodies.bones.rectangles_pivots[2],
           this.bodies.bones.rectangles_pivots[3],           
         ],
-        constraints_disable:[
-          //this.bodies.inters.background.constraints.point,
-          //this.bodies.inters.background.constraints.orient,
-          //this.bodies.inters.background.constraints.rot_limit,
-          //this.bodies.inters_step.steps[0].constraints.point,
-          //this.bodies.inters_step.steps[0].constraints.orient,
-          //this.bodies.inters_step.steps[0].constraints.axe,
-          //this.bodies.inters.circle.point,
-          //this.bodies.inters.circle.orient,
-          //this.bodies.inters_step.steps[1].constraints.point,
-          //this.bodies.inters_step.steps[1].constraints.orient,
-          //this.bodies.inters_step.steps[1].constraints.rot_limit,
-          //this.bodies.inters.rectangle.constraints.point, 
-          //this.bodies.inters.rectangle.constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.point,
-          //this.bodies.inters_step.steps[2].constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.axe, 
-          //this.bodies.geos.circle.constraints.point,
-          //this.bodies.geos.circle.constraints.orient,
-          //this.bodies.geos.circle.constraints.connect_scale_iA,
-          //'bones','circle',null,'connect_scale_iC',
-          //this.bodies.bones.rectangles_pivots[0].constraints.point,
-          //this.bodies.bones.rectangles_pivots[0].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iB,
-          //'bones','rectangles_pivots',0,'connect_rot_iA',
-          //'bones','rectangles_pivots',0,'connect_tx_iB',
-          //'bones','rectangles_pivots',0,'connect_tx_iC',
-          //this.bodies.geos.rectangles[0].constraints.point,
-          //this.bodies.geos.rectangles[0].constraints.orient,
-          //this.bodies.inters.rectangles[0].constraints.point,
-          //this.bodies.inters.rectangles[0].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[1].constraints.point,
-          //this.bodies.bones.rectangles_pivots[1].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[1].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iB,
-          //'bones','rectangles_pivots',1,'connect_rot_iA',
-          //'bones','rectangles_pivots',1,'connect_tx_iB',
-          //'bones','rectangles_pivots',1,'connect_tx_iC',
-          //this.bodies.geos.rectangles[1].constraints.point,
-          //this.bodies.geos.rectangles[1].constraints.orient,
-          //this.bodies.inters.rectangles[1].constraints.point,
-          //this.bodies.inters.rectangles[1].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[2].constraints.point,
-          //this.bodies.bones.rectangles_pivots[2].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[2].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iB,
-          //'bones','rectangles_pivots',2,'connect_rot_iA',
-          //'bones','rectangles_pivots',2,'connect_tx_iB',
-          //'bones','rectangles_pivots',2,'connect_tx_iC',
-          //this.bodies.geos.rectangles[2].constraints.point,
-          //this.bodies.geos.rectangles[2].constraints.orient,
-          //this.bodies.inters.rectangles[3].constraints.point,
-          //this.bodies.inters.rectangles[3].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[3].constraints.point,
-          //this.bodies.bones.rectangles_pivots[3].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[3].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iB,
-          //'bones','rectangles_pivots',3,'connect_rot_iA',
-          //'bones','rectangles_pivots',3,'connect_tx_iB',
-          //'bones','rectangles_pivots',3,'connect_tx_iC',
-          //this.bodies.geos.rectangles[3].constraints.point,
-          //this.bodies.geos.rectangles[3].constraints.orient,
-          //this.bodies.geos.rectangle.constraints.point,
-          //this.bodies.geos.rectangle.constraints.orient,
-          //this.bodies.geos.rectangle.constraints.connect_rot_iB,    
+        constraints_disable:[   
           'geos','rectangle',null,'connect_ty_iC',
         ],
       }, ///////////////////////////////////////////////////////////////////////////////////// 2 
@@ -1393,67 +1268,11 @@ export default class fidget_daft_i extends fidget{
           this.bodies.bones.rectangles_pivots[2],
           this.bodies.bones.rectangles_pivots[3],            
         ],
-        constraints_disable:[
-          //this.bodies.inters.background.constraints.point,
-          //this.bodies.inters.background.constraints.orient,
-          //this.bodies.inters.background.constraints.rot_limit,
-          //this.bodies.inters_step.steps[0].constraints.point,
-          //this.bodies.inters_step.steps[0].constraints.orient,
-          //this.bodies.inters_step.steps[0].constraints.axe,
-          //this.bodies.inters.circle.point,
-          //this.bodies.inters.circle.orient,
-          //this.bodies.inters_step.steps[1].constraints.point,
-          //this.bodies.inters_step.steps[1].constraints.orient,
-          //this.bodies.inters_step.steps[1].constraints.rot_limit,
-          //this.bodies.inters.rectangle.constraints.point, 
-          //this.bodies.inters.rectangle.constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.point,
-          //this.bodies.inters_step.steps[2].constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.axe, 
-          //this.bodies.geos.circle.constraints.point,
-          //this.bodies.geos.circle.constraints.orient,
-          //this.bodies.geos.circle.constraints.connect_scale_iA,
-          //this.bodies.geos.circle.constraints.connect_scale_iC,
-          //'bones','rectangles_pivots',0,'connect_rot_iA',
-          //'bones','rectangles_pivots',0,'connect_tx_iB',
-          //'bones','rectangles_pivots',0,'connect_tx_iC',
-          //this.bodies.geos.rectangles[0].constraints.point,
-          //this.bodies.geos.rectangles[0].constraints.orient,
-          //this.bodies.inters.rectangles[0].constraints.point,
-          //this.bodies.inters.rectangles[0].constraints.orient,
-          //'bones','rectangles_pivots',1,'connect_rot_iA',
-          //'bones','rectangles_pivots',1,'connect_tx_iB',
-          //'bones','rectangles_pivots',1,'connect_tx_iC',
-          //this.bodies.geos.rectangles[1].constraints.point,
-          //this.bodies.geos.rectangles[1].constraints.orient,
-          //this.bodies.inters.rectangles[1].constraints.point,
-          //this.bodies.inters.rectangles[1].constraints.orient,
-          //'bones','rectangles_pivots',2,'connect_rot_iA',
-          //'bones','rectangles_pivots',2,'connect_tx_iB',
-          //'bones','rectangles_pivots',2,'connect_tx_iC',
-          //this.bodies.geos.rectangles[2].constraints.point,
-          //this.bodies.geos.rectangles[2].constraints.orient,
-          //this.bodies.inters.rectangles[3].constraints.point,
-          //this.bodies.inters.rectangles[3].constraints.orient,
-          //'bones','rectangles_pivots',3,'connect_rot_iA',
-          //'bones','rectangles_pivots',3,'connect_tx_iB',
-          //'bones','rectangles_pivots',3,'connect_tx_iC',
-          //this.bodies.geos.rectangles[3].constraints.point,
-          //this.bodies.geos.rectangles[3].constraints.orient,
-          //this.bodies.geos.rectangle.constraints.point,
-          //this.bodies.geos.rectangle.constraints.orient,
-          //this.bodies.geos.rectangle.constraints.connect_rot_iB,
-          //this.bodies.geos.rectangle.constraints.connect_ty_iC,   
+        constraints_disable:[ 
         ],
       }, ///////////////////////////////////////////////////////////////////////////////////// 3
       {
         bodies_enable:[
-          //this.bodies.inters_step.steps[2],
-          //this.bodies.inters.background,
-          //this.bodies.inters.circle,
-          //this.bodies.inters.rectangle,
-          //this.bodies.inters.rectangles[0],
-          //this.bodies.inters.rectangles[2],
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],          
           this.bodies.geos.circle,
@@ -1461,82 +1280,10 @@ export default class fidget_daft_i extends fidget{
           this.bodies.geos.rectangles[0],
           this.bodies.geos.rectangles[1],
           this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          //this.bodies.bones.rectangles[0],
-          //this.bodies.bones.rectangles[1],
-          //this.bodies.bones.rectangles[2],
-          //this.bodies.bones.rectangles[3],
-          //this.bodies.bones.world,
-          //this.bodies.bones.traj, 
-          //this.bodies.bones.root,   
-          //this.bodies.bones.circle,
-          //this.bodies.bones.rectangle,                 
-          //this.bodies.bones.rectangles_center,          
-          //this.bodies.bones.rectangles_pivots[0],
-          //this.bodies.bones.rectangles_pivots[1],
-          //this.bodies.bones.rectangles_pivots[2],
-          //this.bodies.bones.rectangles_pivots[3],            
+          this.bodies.geos.rectangles[3],          
         ],
         constraints_disable:[
-          //this.bodies.inters.background.constraints.point,
-          //this.bodies.inters.background.constraints.orient,
-          //this.bodies.inters.background.constraints.rot_limit,
-          //this.bodies.inters_step.steps[0].constraints.point,
-          //this.bodies.inters_step.steps[0].constraints.orient,
-          //this.bodies.inters_step.steps[0].constraints.axe,
-          //this.bodies.inters.circle.point,
-          //this.bodies.inters.circle.orient,
-          //this.bodies.inters_step.steps[1].constraints.point,
-          //this.bodies.inters_step.steps[1].constraints.orient,
-          //this.bodies.inters_step.steps[1].constraints.rot_limit,
-          //this.bodies.inters.rectangle.constraints.point, 
-          //this.bodies.inters.rectangle.constraints.orient,
-          'inters_step','steps',2,'point',
-          //this.bodies.inters_step.steps[2].constraints.point,
-          //this.bodies.inters_step.steps[2].constraints.orient,
-          //this.bodies.inters_step.steps[2].constraints.axe, 
-          //this.bodies.geos.circle.constraints.point,
-          //this.bodies.geos.circle.constraints.orient,
-          //this.bodies.geos.circle.constraints.connect_scale_iA,
-          //this.bodies.geos.circle.constraints.connect_scale_iC,
-          //this.bodies.bones.rectangles_pivots[0].constraints.point,
-          //this.bodies.bones.rectangles_pivots[0].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[0].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iB,
-          //this.bodies.bones.rectangles_pivots[0].constraints.connect_tx_iC,
-          //this.bodies.geos.rectangles[0].constraints.point,
-          //this.bodies.geos.rectangles[0].constraints.orient,
-          //this.bodies.inters.rectangles[0].constraints.point,
-          //this.bodies.inters.rectangles[0].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[1].constraints.point,
-          //this.bodies.bones.rectangles_pivots[1].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[1].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iB,
-          //this.bodies.bones.rectangles_pivots[1].constraints.connect_tx_iC,
-          //this.bodies.geos.rectangles[1].constraints.point,
-          //this.bodies.geos.rectangles[1].constraints.orient,
-          //this.bodies.inters.rectangles[1].constraints.point,
-          //this.bodies.inters.rectangles[1].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[2].constraints.point,
-          //this.bodies.bones.rectangles_pivots[2].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[2].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iB,
-          //this.bodies.bones.rectangles_pivots[2].constraints.connect_tx_iC,
-          //this.bodies.geos.rectangles[2].constraints.point,
-          //this.bodies.geos.rectangles[2].constraints.orient,
-          //this.bodies.inters.rectangles[3].constraints.point,
-          //this.bodies.inters.rectangles[3].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[3].constraints.point,
-          //this.bodies.bones.rectangles_pivots[3].constraints.orient,
-          //this.bodies.bones.rectangles_pivots[3].constraints.connect_rot_iA,
-          //this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iB,
-          //this.bodies.bones.rectangles_pivots[3].constraints.connect_tx_iC,
-          //this.bodies.geos.rectangles[3].constraints.point,
-          //this.bodies.geos.rectangles[3].constraints.orient,
-          //this.bodies.geos.rectangle.constraints.point,
-          //this.bodies.geos.rectangle.constraints.orient,
-          //this.bodies.geos.rectangle.constraints.connect_rot_iB,
-          //this.bodies.geos.rectangle.constraints.connect_ty_iC,   
+          'inters_step','steps',2,'point', 
         ],
       },   
     ]                                              
@@ -1548,67 +1295,6 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
   //////////////////////////////////////////////////////////////////////////////////// 
 
-
-
-  track_user_drag_error()
-  {
-    //for( let i = 0; i < this.show_step_helpers.length; i++)
-    //  this.show_step_helpers[i] = 0
-
-    
-    if ( this.touch_enable == false )
-      return 
-
-    if( userIsInteracting )
-    {
-      
-      this.mouse_pressed_positions_at_update.push( new Vector( mouseX , mouseY ) )    
-      let size = this.mouse_pressed_positions_at_update.length
-      if( 1 < size )
-      {
-        let p_first = this.mouse_pressed_positions_at_update[0]
-        let p_last = this.mouse_pressed_positions_at_update[size-1]
-        let v_delta = p_last.getSub(p_first)
-        
-        if( 0.01 < v_delta.mag() )
-        {
-
-          let selected_step = this.get_selected_step()
-          if( selected_step == null )
-          {
-            this.bodies_override_color(utils.color.black, ['geos'])
-            this.bodies_override_color_three(utils.color.black, ['geos'])
-            if( this.bodies.geos.backgrounds.length !== 0 )
-            {
-              this.bodies.geos.backgrounds[0].color = utils.color.red
-              this.bodies.geos.backgrounds[1].color = utils.color.red
-              this.bodies.geos.backgrounds[0].update_color_three_shape()
-              this.bodies.geos.backgrounds[1].update_color_three_shape()
-            }
-
-           
-          }
-          else
-          {
-            if(this.state.current_step == selected_step)this.show_step_helpers[selected_step] = 100
-          }
-              
-        }
-      }
-    }
-    else if( 0 < this.mouse_pressed_positions_at_update.length )
-    {
-      this.bodies_override_color(null, ['geos'])
-      this.bodies_override_color_three(null, ['geos'])
-      //this.color_background = utils.color.dark
-      this.mouse_pressed_positions_at_update = []
-    }
-    else
-    {
-      this.mouse_pressed_positions_at_update = []
-    }
-    
-  }
 
 
   update()
@@ -1661,9 +1347,6 @@ export default class fidget_daft_i extends fidget{
         pre_explode_animation_duration:20,
       })
    
-      
-      
-      
     }
     this.bodies_update()
     this.draw_background()
