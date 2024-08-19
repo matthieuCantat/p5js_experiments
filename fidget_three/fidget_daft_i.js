@@ -1548,27 +1548,6 @@ export default class fidget_daft_i extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// UPDATE
   //////////////////////////////////////////////////////////////////////////////////// 
 
-  get_resolution_coef_info( )
-  {   
-    // init
-    this.state.resolution_coef = 0
-    for( let i = 0 ; i < this.state.steps.length; i++)
-      this.state.steps[i].resoluton_coef = 0
-    this.state.current_step = 0
-
-    // compute info
-    for( let i = 0 ; i < this.bodies.inters_step.steps.length; i++)
-    {
-      if(this.bodies.inters_step.steps[i].constructor === Array )
-        this.state.steps[i].resoluton_coef = this.bodies.inters_step.steps[i][0].get_resolution_coef()
-      else
-        this.state.steps[i].resoluton_coef = this.bodies.inters_step.steps[i].get_resolution_coef()
-
-      this.state.resolution_coef += this.state.steps[i].resoluton_coef
-      if(this.state.steps[i].resoluton_coef == 1)
-        this.state.current_step = i +1
-    }
-  }
   
   
   do_pre_explode_animation(t,start_time,end_time)
@@ -1589,14 +1568,19 @@ export default class fidget_daft_i extends fidget{
     this.bodies_override_color_three(cInterp, ['geos'])   
   }
 
-  do_explode(step)
+
+  bodies_explode_effect(opts)
+  {
+    if( opts.count < opts.pre_explode_animation_duration )
+      this.do_pre_explode_animation( opts.count, 0, opts.pre_explode_animation_duration)
+    else
+      this.do_explode()
+  }
+
+  do_explode()
   {
     this.bodies_enable(false,['effects'])
     this.bodies_constraints_enable(false, ['geos'])
-    
-    
-
-
     
     // custom color
     this.bodies_override_color(null, ['geos'])
@@ -1621,9 +1605,7 @@ export default class fidget_daft_i extends fidget{
                                         new Vector(0,0.05*0.01))
                                         
             
-        
-    
-    if( this.state.steps[step].apply_force_happened == false )
+    if( this.explode_happened == false )
     {
         let p = this.m.get_row(2).get_value()
         let p_force = new Vector(p.x+2.1,p.x+50/2.4*this.s)
@@ -1646,8 +1628,7 @@ export default class fidget_daft_i extends fidget{
 
       this.bodies.geos.rectangles[3].apply_force( this.bodies.geos.rectangles[3].get_out_position('world'),
                                           new Vector(0.05*0.35, -0.05*0.35))
-
-      this.state.steps[step].apply_force_happened = true
+      this.explode_happened = true
     }
   }  
 
@@ -1731,55 +1712,49 @@ export default class fidget_daft_i extends fidget{
     if(this.is_dynamic)
     {
       this.state.resolution_coef_last = this.state.resolution_coef
-      this.get_resolution_coef_info( this.resolution_coef_override )
+      this.get_resolution_coef_info( this.resolution_coef_override ) 
+      this.setup_step_from_resolution_coef()
 
+      anim_effect({
+        count:this.state.steps[1].update_count,
+        sparcles:this.bodies.effects.colA_sparcles,
+        shapes:this.bodies.effects.colA_shapes,
+        wall:this.bodies.effects.colA_wall,
+        trails:this.bodies.effects.movA_trails,
+      })    
+
+      anim_effect({
+        count:this.state.steps[2].update_count,
+        sparcles:this.bodies.effects.colB_sparcles,
+        shapes:this.bodies.effects.colB_shapes,
+        wall:this.bodies.effects.colB_wall,
+        trails:this.bodies.effects.movB_trails,
+      })    
+
+      anim_effect({
+        count:this.state.steps[3].update_count,
+        sparcles:this.bodies.effects.colC_sparcles,
+        shapes:this.bodies.effects.colC_shapes,
+        wall:this.bodies.effects.colC_wall,
+        trails:this.bodies.effects.movB_trails,
+      })    
+
+      // explode
+      this.bodies_explode_effect({
+        count:this.state.steps[3].update_count,
+        pre_explode_animation_duration:20,
+      })
+   
       
-    this.setup_step()
-    anim_effect({
-      count:this.state.steps[1].update_count,
-      sparcles:this.bodies.effects.colA_sparcles,
-      shapes:this.bodies.effects.colA_shapes,
-      wall:this.bodies.effects.colA_wall,
-      trails:this.bodies.effects.movA_trails,
-    })    
-
-    anim_effect({
-      count:this.state.steps[2].update_count,
-      sparcles:this.bodies.effects.colB_sparcles,
-      shapes:this.bodies.effects.colB_shapes,
-      wall:this.bodies.effects.colB_wall,
-      trails:this.bodies.effects.movB_trails,
-    })    
-
-    anim_effect({
-      count:this.state.steps[3].update_count,
-      sparcles:this.bodies.effects.colC_sparcles,
-      shapes:this.bodies.effects.colC_shapes,
-      wall:this.bodies.effects.colC_wall,
-      trails:this.bodies.effects.movB_trails,
-    })    
-
-    // explode
-    let wait_time = 20
-    let t = this.state.steps[3].update_count
-    if( t < wait_time )
-    {
-      this.do_pre_explode_animation(t,0,wait_time)
+      
+      
     }
-    else{
-      this.do_explode(3)
-    }  
-      //this.track_user_drag_error()  
-    }
-
     this.bodies_update()
-    
     this.draw_background()
-
-    
 
     return true
   }
+
 
 
   

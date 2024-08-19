@@ -20,7 +20,6 @@ class state_step_tpl{
       this.resoluton_coef = 0
       this.resoluton_coef_last = 0
       this.update_count = 0
-      this.apply_force_happened = false
       this.in_use = false    
       this.used = false 
   } 
@@ -105,7 +104,7 @@ export default class fidget{
 
 
     this.darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
-
+    this.explode_happened = false
   }
 
 
@@ -1101,7 +1100,29 @@ export default class fidget{
   }
 
 
-  setup_step()
+  get_resolution_coef_info( )
+  {   
+    // init
+    this.state.resolution_coef = 0
+    for( let i = 0 ; i < this.state.steps.length; i++)
+      this.state.steps[i].resoluton_coef = 0
+    this.state.current_step = 0
+
+    // compute info
+    for( let i = 0 ; i < this.bodies.inters_step.steps.length; i++)
+    {
+      if(this.bodies.inters_step.steps[i].constructor === Array )
+        this.state.steps[i].resoluton_coef = this.bodies.inters_step.steps[i][0].get_resolution_coef()
+      else
+        this.state.steps[i].resoluton_coef = this.bodies.inters_step.steps[i].get_resolution_coef()
+
+      this.state.resolution_coef += this.state.steps[i].resoluton_coef
+      if(this.state.steps[i].resoluton_coef == 1)
+        this.state.current_step = i +1
+    }
+  }  
+
+  setup_step_from_resolution_coef()
   {
     // compute info
     for( let step = 0 ; step < this.bodies.inters_step.steps.length+1; step++)
