@@ -165,15 +165,31 @@ export default class fidget{
 
   update()
   {
-    // resolution
-    this.state.resolution_coef_last = this.state.resolution_coef
-
-    this.get_resolution_coef_info( this.resolution_coef_override )
-    this.set_step_resolution( this.state.resolution_coef, this.resolution_coef_override != null)
-
-    this.bodies_update()
-
     this.state.update_count += 1
+
+    if(this.play_animation != null)
+      this.animations[this.play_animation]()
+        
+    this.anim_mode =  this.resolution_coef_override != null
+    // resolution
+
+    if(this.is_dynamic)
+    {
+      this.state.resolution_coef_last = this.state.resolution_coef
+      this.get_resolution_coef_info( this.resolution_coef_override ) 
+      this.setup_step_from_resolution_coef()
+
+      // explode
+      this.bodies_explode_effect({
+        count:this.state.steps[3].update_count,
+        pre_explode_animation_duration:20,
+      })
+   
+    }
+    this.bodies_update()
+    this.draw_background()
+
+    return true
   }
 
 

@@ -90,6 +90,11 @@ export default class fidget_daft_i extends fidget{
       }
  
       this.play_animation = null
+      this.animations = {
+        entrance:this.override_with_animation_reverse_build,
+        idle:this.override_with_idle,
+      }
+
       this.is_dynamic = is_dynamic
       this.end_step = 4
 
@@ -1281,37 +1286,6 @@ export default class fidget_daft_i extends fidget{
 
 
 
-  update()
-  {
-    this.state.update_count += 1
-
-    if(this.play_animation == 'entrance')
-      this.override_with_animation_reverse_build(0)
-
-    if(this.play_animation == 'idle')
-      this.override_with_idle()
-        
-    this.anim_mode =  this.resolution_coef_override != null
-    // resolution
-
-    if(this.is_dynamic)
-    {
-      this.state.resolution_coef_last = this.state.resolution_coef
-      this.get_resolution_coef_info( this.resolution_coef_override ) 
-      this.setup_step_from_resolution_coef()
-
-      // explode
-      this.bodies_explode_effect({
-        count:this.state.steps[3].update_count,
-        pre_explode_animation_duration:20,
-      })
-   
-    }
-    this.bodies_update()
-    this.draw_background()
-
-    return true
-  }
 
 
 
@@ -1338,8 +1312,9 @@ export default class fidget_daft_i extends fidget{
     this.bodies.bones.rectangles_pivots[3].set_out_rotation(Math.sin(t*0.04)*rad(10),'base','override')
   }
 
-  override_with_animation_reverse_build( start_time )
+  override_with_animation_reverse_build( )
   {  
+    let start_time = 0
     let t = this.state.update_count
     let anim_duration = 100
 
