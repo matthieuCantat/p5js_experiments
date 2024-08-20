@@ -13,6 +13,7 @@ import { Mouse_manager,  } from './utils_three.js'
 import { body_build } from './body.js';
 import { materials,} from './shader.js';
 import Matrix from './matrix.js';
+import { effect } from './effect.js';
 
 class state_step_tpl{
   constructor()
@@ -413,13 +414,16 @@ export default class fidget{
   bodies_update_matrix( m, body_type_filter = [] )
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
-      body.m = m
+      body.m = m  
   }
 
   bodies_update( body_type_filter = [] )
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.update()
+
+    for( let effect in this.effects)
+      this.effects[effect].update()      
   }
 
   bodies_setup_shapes_three( body_type_filter = [] )
@@ -428,6 +432,9 @@ export default class fidget{
 
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.setup_shapes_three(this.group_three)  
+
+    for( let effect in this.effects)
+      this.effects[effect].setup(this.group_three)  
 
     this.Mouse.setup(this.group_three)
   }  
@@ -438,6 +445,9 @@ export default class fidget{
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.clean_shapes_three(this.group_three) 
+
+    for( let effect in this.effects)
+      this.effects[effect].clean(this.group_three)        
   }
 
   clean_shapes_three(three_scene)
@@ -453,6 +463,10 @@ export default class fidget{
   {
     for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
       body.animate_three()
+    
+    for( let effect in this.effects)
+      this.effects[effect].animate_three()    
+
     this.Mouse.update()
   }  
   /*
@@ -691,11 +705,12 @@ export default class fidget{
 
   bodies_init_physics()
   {   
-    for( let body of this.bodies_get_list_filtered( 'draw' ))
-    {
+    for( let body of this.bodies_get_list_filtered( 'eval' ))
       body.init_physics()   
-    }
-        
+  
+    for( let effect in this.effects)
+      this.effects[effect].init_physics()     
+
   }
 
   bodies_init_constraints()
@@ -706,7 +721,11 @@ export default class fidget{
       body.set_out_matrix(body.get_init_matrix())
       body.init_constraints()
     }
-    
+
+    for( let effect in this.effects)
+      this.effects[effect].init_constraints()     
+  
+
   }
 
   bodies_get_build_order()
@@ -935,6 +954,7 @@ export default class fidget{
     }
   }  
 
+  
 
   bodies_get_list_filtered( order = 'eval', body_type_filter = [] )//eval // draw
   {

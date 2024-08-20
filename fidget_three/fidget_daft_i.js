@@ -10,20 +10,14 @@ import {
   mouseY,
   anim_vectors,
   anim_values } from './utils.js';
-import { body_build,
-  build_effects_trail,
-  build_effects_particles_sparcles,
-  build_effects_particles_shapes,
-  build_effects_wall,
-  anim_effect,
-} from './body.js';
+import { body_build,} from './body.js';
 import Vector from './vector.js';
 import Matrix from './matrix.js';
 import * as ut from './utils_three.js';
 import { and } from './libraries/jsm/nodes/Nodes.js';
 import { three_utils,} from './utils_three.js';
 import { materials,} from './shader.js';
-
+import { effect } from './effect.js';
 
 export default class fidget_daft_i extends fidget{
 
@@ -80,25 +74,33 @@ export default class fidget_daft_i extends fidget{
             traj:null,
             world:null,   
           },     
-          effects : {
-            movA_trails:[],
-            colA_sparcles:[],
-            colA_shapes:[],
-            colA_wall:null,
-            movB_trails:[],
-            colB_sparcles:[],
-            colB_shapes:[],
-            colB_wall:null,
-            colC_sparcles:[],
-            colC_shapes:[],
-            colC_wall:null,
-          },
+          //effects : {
+          //  movA_trails:[],
+          //  colA_sparcles:[],
+          //  colA_shapes:[],
+          //  colA_wall:null,
+          //  movB_trails:[],
+          //  colB_sparcles:[],
+          //  colB_shapes:[],
+          //  colB_wall:null,
+          //  colC_sparcles:[],
+          //  colC_shapes:[],
+          //  colC_wall:null,
+          //},
           helpers : {
             stepA:null,
             stepB:null,
             stepC:null,
           },          
         }
+
+      this.effects = { 
+        trailA : null,
+        trailB : null,
+        sparcles_shock_A : null,
+        sparcles_shock_B : null,
+        sparcles_shock_C : null,
+      }
  
       this.play_animation = null
       this.is_dynamic = is_dynamic
@@ -816,9 +818,16 @@ export default class fidget_daft_i extends fidget{
 
         density:0.001/(s/2.2), 
 
-      }  
-      this.bodies.effects.movA_trails = build_effects_trail(oRect_trail,this.bodies.geos.rectangles[0])                                
+        body: this.bodies.geos.rectangles[0],
+        type:'trail',
+        trigger_body_min:null,
+        trigger_value_min:null,
+        trigger_body_max:this.bodies.inters_step.steps[1],
+        trigger_value_max:0.01,
 
+
+      }  
+      this.effects.trailA = new effect({...oRect_trail} )  
     
     }
 
@@ -949,11 +958,37 @@ export default class fidget_daft_i extends fidget{
       this.bodies.inters_step.steps[1].highlight_selection = [this.bodies.geos.rectangle]  
       this.bodies.inters_step.steps[2].highlight_selection = [this.bodies.geos.rectangle]       
       //this.bodies.inters.rectangle.highlight_selection = [this.bodies.geos.rectangle]   
-      this.bodies.effects.movB_trails = build_effects_trail(oRectangle,this.bodies.geos.rectangle)
+
+      //this.bodies.effects.movB_trails = build_effects_trail(oRectangle,this.bodies.geos.rectangle)
+    
+
+      let oRect_trail = { 
+        ...opts_global,
+        ...opts_collision_no_interaction,
+        ...opts_debug,
+
+        parent:this.bodies.bones.rectangle,
+        m_shape: m_shape,
+        type: utils.shape.rectangle,
+
+        do_shape: true,
+        do_line:false,           
+
+        density:0.001/(s/2.2), 
+
+        body: this.bodies.geos.rectangle,
+        type:'trail',
+        trigger_body_min:this.bodies.inters_step.steps[0][0],
+        trigger_value_min:0.99,
+        trigger_body_max:this.bodies.inters_step.steps[2],
+        trigger_value_max:1.0,        
+      }  
+      this.effects.trailB = new effect({...oRect_trail} )  
+
     
 
 
-
+      /*
       let opts_sparcles = {
         ...opts_global,
         ...opts_debug,
@@ -991,17 +1026,61 @@ export default class fidget_daft_i extends fidget{
       this.bodies.effects.colC_sparcles = build_effects_particles_sparcles(opts_colC_sparcles) 
       this.bodies.effects.colC_shapes = build_effects_particles_shapes(opts_colC_sparcles)       
       this.bodies.effects.colC_wall = build_effects_wall(opts_colC_sparcles)
+      */
 
 
-    //z_depth += z_depth_incr
 
-      if(this.is_dynamic)   
-      {
+
+
+
+      /////////////////////////////////////////////
+      let opts_sparcles_shock = {
+        ...opts_global,
+        ...opts_debug,
+        //z_depth:z_depth,
+        scale_shape:s,
+        parent:this.bodies.inters.background,
+        type:'sparcle_shock',    
+      }  
+
+      this.effects.sparcles_shock_A = new effect({...opts_sparcles_shock,
+                                                    name:'colA',
+                                                    trigger_body_min:this.bodies.inters_step.steps[0][0],
+                                                    trigger_value_min:0.99,    
+                                                    trigger_body_max:null,
+                                                    trigger_value_max:null,
+                                                    p:new Vector(-145*(s/2.2),15*(s/2.2)),
+                                                    r:0,      
+                                                  } )                            
+    
+      this.effects.sparcles_shock_B = new effect({...opts_sparcles_shock,   
+                                                    name:'colB',
+                                                    trigger_body_min:this.bodies.inters_step.steps[1],
+                                                    trigger_value_min:0.99,   
+                                                    trigger_body_max:null,
+                                                    trigger_value_max:null,                                                           
+                                                    p:new Vector(15*(s/2.2),-80*(s/2.2)),
+                                                    r:-90,     
+                                                  })                  
+      
+      this.effects.sparcles_shock_C = new effect({...opts_sparcles_shock,   
+                                                    name:'colC',
+                                                    trigger_body_min:this.bodies.inters_step.steps[2],
+                                                    trigger_value_min:0.99,  
+                                                    trigger_body_max:null,
+                                                    trigger_value_max:null,                                                          
+                                                    p:new Vector(0,200*(s/2.2)),
+                                                    r:0,        
+                                                  })                        
+   
+
+
+      
         this.create_inter_from_geos(
           ['circle',
           'rectangle',
           'rectangles'], this.bodies.inters.background, s ) 
-      }                                         
+                                               
 
       /*
       this.create_bones_from_geos(
@@ -1041,38 +1120,43 @@ export default class fidget_daft_i extends fidget{
                       this.bodies.inters_step.steps[1],
                       this.bodies.inters_step.steps[2],                                                             
                       this.bodies.geos.circle,
-                      this.bodies.effects.movA_trails[0],      
-                      this.bodies.effects.movA_trails[1], 
-                      this.bodies.effects.movA_trails[2], 
-                      this.bodies.effects.movB_trails[0],
-                      this.bodies.effects.movB_trails[1],
-                      this.bodies.effects.movB_trails[2],                         
+                      //this.bodies.effects.movA_trails[0],      
+                      //this.bodies.effects.movA_trails[1], 
+                      //this.bodies.effects.movA_trails[2], 
+                      //this.bodies.effects.movB_trails[0],
+                      //this.bodies.effects.movB_trails[1],
+                      //this.bodies.effects.movB_trails[2], 
+                      this.effects.trailA,
+                      this.effects.trailB,                        
                       this.bodies.geos.rectangle,                      
                       this.bodies.geos.rectangles[0],
                       this.bodies.geos.rectangles[1],
                       this.bodies.geos.rectangles[2],
                       this.bodies.geos.rectangles[3],
-                      this.bodies.effects.colA_sparcles[0], 
-                      this.bodies.effects.colA_sparcles[1],          
-                      this.bodies.effects.colA_sparcles[2],
-                      this.bodies.effects.colA_shapes[0],
-                      this.bodies.effects.colA_shapes[1],
-                      this.bodies.effects.colA_shapes[2],
-                      this.bodies.effects.colA_wall, 
-                      this.bodies.effects.colB_sparcles[0],
-                      this.bodies.effects.colB_sparcles[1],
-                      this.bodies.effects.colB_sparcles[2],
-                      this.bodies.effects.colB_shapes[0],
-                      this.bodies.effects.colB_shapes[1],
-                      this.bodies.effects.colB_shapes[2],
-                      this.bodies.effects.colB_wall,
-                      this.bodies.effects.colC_sparcles[0], 
-                      this.bodies.effects.colC_sparcles[1],
-                      this.bodies.effects.colC_sparcles[2],
-                      this.bodies.effects.colC_shapes[0],
-                      this.bodies.effects.colC_shapes[1],
-                      this.bodies.effects.colC_shapes[2],
-                      this.bodies.effects.colC_wall,                      
+                      //this.bodies.effects.colA_sparcles[0], 
+                      //this.bodies.effects.colA_sparcles[1],          
+                      //this.bodies.effects.colA_sparcles[2],
+                      //this.bodies.effects.colA_shapes[0],
+                      //this.bodies.effects.colA_shapes[1],
+                      //this.bodies.effects.colA_shapes[2],
+                      //this.bodies.effects.colA_wall, 
+                      //this.bodies.effects.colB_sparcles[0],
+                      //this.bodies.effects.colB_sparcles[1],
+                      //this.bodies.effects.colB_sparcles[2],
+                      //this.bodies.effects.colB_shapes[0],
+                      //this.bodies.effects.colB_shapes[1],
+                      //this.bodies.effects.colB_shapes[2],
+                      //this.bodies.effects.colB_wall,
+                      //this.bodies.effects.colC_sparcles[0], 
+                      //this.bodies.effects.colC_sparcles[1],
+                      //this.bodies.effects.colC_sparcles[2],
+                      //this.bodies.effects.colC_shapes[0],
+                      //this.bodies.effects.colC_shapes[1],
+                      //this.bodies.effects.colC_shapes[2],
+                      //this.bodies.effects.colC_wall,     
+                      this.effects.sparcles_shock_A,                 
+                      this.effects.sparcles_shock_B,      
+                      this.effects.sparcles_shock_C,      
                       this.bodies.bones.world,
                       this.bodies.bones.traj, 
                       this.bodies.bones.root,
@@ -1140,19 +1224,7 @@ export default class fidget_daft_i extends fidget{
           'geos','circle',
           'geos','rectangle',                      
           'geos','rectangles',
-
-
-          'effects','colA_sparcles',      
-          'effects','colA_shapes',
-          'effects','colA_wall',    
-          'effects','movA_trails',       
-          'effects','colB_sparcles',
-          'effects','colB_shapes',
-          'effects','colB_wall',
-          'effects','movB_trails', 
-          'effects','colC_sparcles', 
-          'effects','colC_shapes',
-          'effects','colC_wall',                                            
+                                       
             ]    
  
 
@@ -1299,7 +1371,6 @@ export default class fidget_daft_i extends fidget{
 
   update()
   {
-    
     this.state.update_count += 1
 
     if(this.play_animation == 'entrance')
@@ -1317,6 +1388,7 @@ export default class fidget_daft_i extends fidget{
       this.get_resolution_coef_info( this.resolution_coef_override ) 
       this.setup_step_from_resolution_coef()
 
+      /*
       anim_effect({
         count:this.state.steps[1].update_count,
         sparcles:this.bodies.effects.colA_sparcles,
@@ -1339,7 +1411,8 @@ export default class fidget_daft_i extends fidget{
         shapes:this.bodies.effects.colC_shapes,
         wall:this.bodies.effects.colC_wall,
         trails:this.bodies.effects.movB_trails,
-      })    
+      })   
+      */ 
 
       // explode
       this.bodies_explode_effect({
@@ -1363,57 +1436,13 @@ export default class fidget_daft_i extends fidget{
   ////////////////////////////////////////////////////////////////////////////////////
 
 
-  draw_help_three()
-  {
-
-    /////////////////////////////////////////////////
-    if(this.show_step_helpers[0] )
-    {
-      let coef = this.show_step_helpers[0] / 100 
-      this.bodies.helpers.stepA.transparency_line = 1.-coef
-      this.show_step_helpers[0] -= 2
-      this.bodies.helpers.stepA.update_color_three_line()
-    }
-
-    if(this.show_step_helpers[1] )
-    {
-      let coef = this.show_step_helpers[1] / 100 
-      this.bodies.helpers.stepB.transparency_line = 1.-coef
-      this.show_step_helpers[1] -= 2
-      this.bodies.helpers.stepB.update_color_three_line()
-    }
-
-    if(this.show_step_helpers[2] )
-    {
-      let coef = this.show_step_helpers[2] / 100 
-      this.bodies.helpers.stepC.transparency_line = 1.-coef
-      this.show_step_helpers[2] -= 2
-      this.bodies.helpers.stepC.update_color_three_line()
-    }
-    
-
-  }  
-
-  
-  setup_shapes_three()
-  {
-    this.bodies_setup_shapes_three()
-  }
-
-  animate_three()
-  {
-    this.bodies_animate_three()
-    //this.draw_help_three()
-
-  }  
-
-
   override_with_idle()
   {  
     this.bodies_set_dynamic(false)
     this.bodies_constraints_enable(false,['bones'])
-    let t = this.state.update_count
 
+
+    let t = this.state.update_count
     this.bodies.bones.traj.set_out_position(new Vector(Math.sin(t*0.01)*10 ,Math.sin(t*0.05)*10),'base','override')
     this.bodies.bones.traj.set_out_rotation(Math.sin(t*0.03)*0.1,'base','override')
 
@@ -1421,7 +1450,6 @@ export default class fidget_daft_i extends fidget{
     this.bodies.bones.rectangles_pivots[1].set_out_rotation(Math.sin(t*0.04)*rad(10),'base','override')
     this.bodies.bones.rectangles_pivots[2].set_out_rotation(Math.sin(t*0.04)*rad(-10),'base','override')
     this.bodies.bones.rectangles_pivots[3].set_out_rotation(Math.sin(t*0.04)*rad(10),'base','override')
-
   }
 
   override_with_animation_reverse_build( start_time )
@@ -1440,7 +1468,6 @@ export default class fidget_daft_i extends fidget{
     {
       return false
     }
-      
 
     this.bodies_set_dynamic(false)
     this.bodies_constraints_enable(false,['bones'])

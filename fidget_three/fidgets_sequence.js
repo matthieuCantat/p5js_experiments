@@ -143,7 +143,7 @@ export default class fidgets_sequence
     {
       for( let i = 0; i < this.fidgets.length; i++ )
       {   
-        this.fidgets[i].setup_shapes_three()
+        this.fidgets[i].bodies_setup_shapes_three()
         scene_three.add( this.fidgets[i].group_three )
       }
     }
@@ -447,7 +447,7 @@ export default class fidgets_sequence
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
-        this.fidgets[i].animate_three()
+        this.fidgets[i].bodies_animate_three()
       }
 
       this.update_chrono_three()
