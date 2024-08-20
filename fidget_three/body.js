@@ -46,7 +46,7 @@ export class body_build{
         transparency_line:255,
         bloom:false,
         castShadow:false,       
-        receiveShadow:true,   
+        receiveShadow:false,   
         shader:null,
         visibility:true,
         axe_constraint: null,

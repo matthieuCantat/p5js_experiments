@@ -21,6 +21,105 @@ export default class fidget_daft_i extends fidget {
   ) {
     super(m, s, screen_dims, do_background, shaders, debug)
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    let visual_bones_main_size = 150*s
+    let bones_density_value = 0.44/s
+    let inter_step_denstity = 0.022/s //0.01 / (s / 2.2) 
+    let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (s / 2.2)
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    this.is_dynamic = is_dynamic
+    
+    this.colors = [utils.color.green, utils.color.red, utils.color.yellow]
+    this.color_background = [
+      (this.colors[0][0] + 0.2) * 0.3,
+      (this.colors[0][1] + 0.2) * 0.3,
+      (this.colors[0][2] + 0.2) * 0.3
+    ]
+
+    let opts_global = {
+      screen_dims: this.screen_dims,
+      matter_engine: this.matter_engine,
+      mouse_constraint: this.mouse_constraint,
+      fidget: this,
+      dynamic: this.is_dynamic
+    }
+
+    let opts_collision_no_interaction = {
+      collision: false,
+      collision_category: utils.collision_category.none,
+      collision_mask: utils.collision_category.none
+    }
+
+    let opts_collision_activate = {
+      collision: true,
+      collision_category: utils.collision_category.blue,
+      collision_mask: utils.collision_category.default
+    }
+    let opts_collision_mouse_interaction = {
+      collision: true,
+      collision_category: utils.collision_category.inter,
+      collision_mask: utils.collision_category.mouse
+    }
+
+    let opts_debug = {
+      debug_matrix_info: false,
+      debug_matrix_axes: debug.matrix_axes,
+      debug_cns_axes: debug.cns_axes,
+      debug_force_visibility: debug.force_visibility
+    }
+
+    let opts_bones_main = {
+      ...opts_global,
+      ...opts_collision_no_interaction,
+      ...opts_debug,      
+      visibility: true,
+      do_shape: false,
+      do_line: true,
+      color: utils.color.blue,
+      color_line: utils.color.blue,
+      type: utils.shape.circle,
+      debug_matrix_axes: true,
+      m_shape: new Matrix().setScale(visual_bones_main_size),
+      density: bones_density_value,      
+    }
+
+
+    let opts_visual_bones = {
+      ...opts_global,
+      ...opts_collision_no_interaction,
+      ...opts_debug,      
+      visibility: true,
+      do_shape: true,
+      do_line: true,
+      color: utils.color.blue,
+      color_line: utils.color.black,
+      type: utils.shape.circle,
+      debug_matrix_axes: true,
+      dynamic: false,      
+      density: bones_density_value,      
+      m_shape: new Matrix().setScale(4*s), 
+  
+    }
+
+    let opts_inter_step = {
+      ...opts_global,
+      ...opts_collision_mouse_interaction,
+      ...opts_debug,         
+      visibility: true,
+      do_shape: true,
+      do_line: true,
+      color: utils.color.grey,
+      color_line: utils.color.black,
+      material_three: materials.simple.text_checker_three_grey,
+      density: inter_step_denstity,
+      selection_break_length: inter_step_selection_break_length      
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+
+
     this.title = 'dafti'
 
     this.bodies = {
@@ -71,180 +170,54 @@ export default class fidget_daft_i extends fidget {
       idle: this.override_with_idle
     }
 
-    this.is_dynamic = is_dynamic
-    
-
-
-    this.colors = [utils.color.green, utils.color.red, utils.color.yellow]
-    this.color_background = [
-      (this.colors[0][0] + 0.2) * 0.3,
-      (this.colors[0][1] + 0.2) * 0.3,
-      (this.colors[0][2] + 0.2) * 0.3
-    ]
-
-
-    let opts_global = {
-      screen_dims: this.screen_dims,
-      matter_engine: this.matter_engine,
-      mouse_constraint: this.mouse_constraint,
-      fidget: this,
-      dynamic: this.is_dynamic
-    }
-
-    let opts_collision_no_interaction = {
-      collision_category: utils.collision_category.none,
-      collision_mask: utils.collision_category.none
-    }
-
-    let opts_collision_activate = {
-      collision_category: utils.collision_category.blue,
-      collision_mask: utils.collision_category.default
-    }
-    let opts_collision_mouse_interaction = {
-      collision_category: utils.collision_category.inter,
-      collision_mask: utils.collision_category.mouse
-    }
-
-    let opts_visual_inter = {
-      visibility: true,
-      do_shape: true,
-      do_line: true,
-      color: utils.color.grey,
-      color_line: utils.color.black,
-      material_three: materials.simple.text_checker_three_grey
-    }
-
-    let opts_visual_bones = {
-      visibility: true,
-      do_shape: true,
-      do_line: true,
-      color: utils.color.blue,
-      color_line: utils.color.black,
-      type: utils.shape.circle,
-      debug_matrix_axes: true
-    }
-    let opts_visual_bones_main = {
-      visibility: true,
-      do_shape: false,
-      do_line: true,
-      color: utils.color.blue,
-      color_line: utils.color.blue,
-      type: utils.shape.circle,
-      debug_matrix_axes: true
-    }
-
-    let opts_debug = {
-      debug_matrix_info: false,
-      debug_matrix_axes: debug.matrix_axes,
-      debug_cns_axes: debug.cns_axes,
-      debug_force_visibility: debug.force_visibility
-    }
-
-    /////////////////////////////////////////////////////
-
-    let m_shape_bones_main = new Matrix()
-    m_shape_bones_main.setScale(s * 150)
-
-    let m_shape_bones = new Matrix()
-    m_shape_bones.setScale(s * 4)
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
     this.bodies.bones.world = new body_build({
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
-      ...opts_visual_bones_main,
-
+      ...opts_bones_main,
       name: 'bones_world',
-      m_shape: m_shape_bones_main,
-      density: 0.2 / (s / 2.2)
     })
 
-    let m_shape = new Matrix()
-    m_shape.set_row(0, m_shape.get_row(0).getMult(this.screen_dims.x / 2))
-    m_shape.set_row(1, m_shape.get_row(1).getMult(this.screen_dims.y))
-
-    let oBackground = {
+    this.bodies.geos.backgrounds.push( new body_build({
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,
       dynamic: false,
-
+      name: 'geos_background_L_',
       m: this.m,
       parent: this.bodies.bones.world,
-      m_offset: new Matrix(),
-
-      m_shape: m_shape,
+      m_offset: new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2),
+      m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
       type: utils.shape.rectangle,
-
-      do_shape: true,
-      do_line: false,
-      bevel: 0,
       material_three: materials.old_custom_exemple, //materials.background.space_grid ,
-      color_line: utils.color.black,
-
-      density: 0.01 / (s / 2.2),
-      collision: false,
       visibility: this.do_background,
-      castShadow: false,
-      receiveShadow: true
-    }
-
-    let background_L = new body_build({
-      ...oBackground,
-      name: 'geos_background_L_',
-      m_offset: new Matrix().setTranslation(
-        this.screen_dims.x / 4,
-        this.screen_dims.y / 2
-      )
-    })
-    this.bodies.geos.backgrounds.push(background_L)
-    this.bodies.geos.backgrounds.push(background_L.get_mirror(false, true))
-
+    }) )
+    this.bodies.geos.backgrounds.push(this.bodies.geos.backgrounds[0].get_mirror(false, true))
 
 
     this.bodies.bones.traj = new body_build({
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
-      ...opts_visual_bones_main,
-
+      ...opts_bones_main,
       name: 'bones_traj',
-
       m: this.m,
       parent: this.bodies.bones.world,
       m_offset: this.m,
-      m_shape: m_shape_bones_main,
-
       constraints: [
         { name: 'point', type: 'kin_point', target: this.bodies.bones.world },
         { name: 'orient', type: 'kin_orient', target: this.bodies.bones.world }
       ],
-
-      density: 0.2 / (s / 2.2)
     })
 
-
-    m_shape = new Matrix()
-    m_shape.set_row(0, m_shape.get_row(0).getMult((350 / 2.4) * s))
-    m_shape.set_row(1, m_shape.get_row(1).getMult((220 / 2.4) * s))
-
-    if (this.is_dynamic) {
+    if (this.is_dynamic)
       this.bodies.inters.background = new body_build({
-        ...opts_global,
+        ...opts_inter_step,
         ...opts_collision_no_interaction,
-        ...opts_visual_inter,
-        ...opts_debug,
-
         name: 'inters_background',
         highlight_selection: [],
-
         m: this.m,
         parent: this.bodies.bones.traj,
         m_offset: new Matrix(),
-        m_shape: m_shape,
-        //z:z_depth,
+        m_shape: new Matrix().setScale(145*s,92*s),
         type: utils.shape.rectangle,
-
+        frictionAir: 0.3,
         constraints: [
           {
             name: 'point',
@@ -275,29 +248,16 @@ export default class fidget_daft_i extends fidget {
             limit_lock: false
           }
         ],
-
-        density: 0.01 / (s / 2.2),
-        frictionAir: 0.3,
-        selection_break_length:
-          this.debug_mode.mouse_selection_break_length * (s / 2.2)
       })
-    }
-
+    
     this.bodies.bones.root = new body_build({
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
-      ...opts_visual_bones_main,
+      ...opts_bones_main,
       dynamic: false,
-
       name: 'bones_root',
-
       m: this.m,
       parent: this.is_dynamic
         ? this.bodies.inters.background
         : this.bodies.bones.traj,
-      m_shape: m_shape_bones_main,
-
       constraints: [
         {
           name: 'point',
@@ -314,32 +274,18 @@ export default class fidget_daft_i extends fidget {
             : this.bodies.bones.traj
         }
       ],
-
-      density: 0.2 / (s / 2.2)
     })
-
-    var om_iA = new Matrix()
-    om_iA.setTranslation(-130 * (s / 2.2), -50 * (s / 2.2))
-
-    m_shape = new Matrix()
-    m_shape.set_row(0, m_shape.get_row(0).getMult((100 / 2.4) * s))
-    m_shape.set_row(1, m_shape.get_row(1).getMult((100 / 2.4) * s))
 
     if (this.is_dynamic) {
       this.bodies.inters_step.steps.push([
-        new body_build({
-          ...opts_global,
-          ...opts_collision_mouse_interaction,
-          ...opts_visual_inter,
-          ...opts_debug,
-
+        new body_build({       
+          ...opts_inter_step,
           name: 'inters_A_T__L_',
           m: this.m,
           parent: this.bodies.inters.background,
-          m_offset: om_iA,
-          m_shape: m_shape,
+          m_offset: new Matrix().setTranslation(-59*s,-22.7*s),
+          m_shape: new Matrix().setScale(41.5*s),
           type: utils.shape.circle,
-
           constraints: [
             {
               name: 'point',
@@ -366,39 +312,20 @@ export default class fidget_daft_i extends fidget {
             }
           ],
 
-          density: 0.01 / (s / 2.2),
-          selection_break_length:
-            this.debug_mode.mouse_selection_break_length * (s / 2.2)
         })
       ])
-      this.bodies.inters_step.steps[0][0].get_resolution_coef = function () {
-        return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)
-      }
-      this.bodies.inters_step.steps[0][0].set_resolution_coef = function (
-        res = null
-      ) {
-        this.constraints.axe.current_pos = res
-      }
-
-      m_shape = new Matrix()
-      m_shape.set_row(0, m_shape.get_row(0).getMult((200 / 2.4) * s))
-      m_shape.set_row(1, m_shape.get_row(1).getMult((50 / 2.4) * s))
+      this.bodies.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
+      this.bodies.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
 
       this.bodies.inters_step.steps.push(
         new body_build({
-          ...opts_global,
-          ...opts_collision_mouse_interaction,
-          ...opts_visual_inter,
-          ...opts_debug,
-
+          ...opts_inter_step,
           name: 'inters_B',
-
           m: this.m,
           parent: this.bodies.inters.background,
           m_offset: new Matrix(),
-          m_shape: m_shape,
+          m_shape: new Matrix().setScale(83*s,21*s),
           type: utils.shape.rectangle,
-
           constraints: [
             this.debug_mode.inter_step_physics
               ? {
@@ -437,20 +364,10 @@ export default class fidget_daft_i extends fidget {
             }
           ],
 
-          density: 0.01 / (s / 2.2),
-          selection_break_length:
-            this.debug_mode.mouse_selection_break_length * (s / 2.2)
         })
       )
-      this.bodies.inters_step.steps[1].get_resolution_coef = function () {
-        return clamp(deg(this.get_out_rotation('base')) / 90.0, 0, 1)
-      }
-      this.bodies.inters_step.steps[1].set_resolution_coef = function (
-        res = null
-      ) {
-        if (res != null)
-          this.set_out_rotation(rad(res * 90.5), 'world', 'override')
-      }
+      this.bodies.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.get_out_rotation('base')) / 90.0, 0, 1)}
+      this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.set_out_rotation(rad(res * 90.5), 'world', 'override')}
 
       if (this.debug_mode.inter_step_physics == false)
         this.bodies.inters_step.steps[1].constraints_args.push({
@@ -463,22 +380,15 @@ export default class fidget_daft_i extends fidget {
 
       // other
 
-      m_shape = new Matrix()
-      m_shape.set_row(0, m_shape.get_row(0).getMult((50 / 2.4) * s))
-      m_shape.set_row(1, m_shape.get_row(1).getMult((200 / 2.4) * s))
-
       this.bodies.inters_step.steps.push(
         new body_build({
-          ...opts_global,
-          ...opts_collision_mouse_interaction,
-          ...opts_visual_inter,
-          ...opts_debug,
+          ...opts_inter_step,
 
           name: 'inters_C',
 
           m: this.m,
           m_offset: new Matrix(),
-          m_shape: m_shape,
+          m_shape: new Matrix().setScale(21*s,83*s),
           parent: this.bodies.inters.background,
 
           type: utils.shape.rectangle,
@@ -509,9 +419,6 @@ export default class fidget_daft_i extends fidget {
             }
           ],
 
-          density: 0.01 / (s / 2.2),
-          selection_break_length:
-            this.debug_mode.mouse_selection_break_length * (s / 2.2)
         })
       )
       this.bodies.inters_step.steps[2].get_resolution_coef = function () {
@@ -525,26 +432,18 @@ export default class fidget_daft_i extends fidget {
 
     }
 
+
+  
+
     let bone_circle_opts = {
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
       ...opts_visual_bones,
-      dynamic: false,
-
       name: 'bones_circle',
-
       m: this.m,
       parent: this.bodies.bones.root,
-      //m_offset:om_rA_bones,
-      m_shape: m_shape_bones,
-      //z:z_depth,
-
       constraints: [
         { name: 'point', type: 'kin_point', target: this.bodies.bones.root },
         { name: 'orient', type: 'kin_orient', target: this.bodies.bones.root }
       ],
-      density: 0.2 / (s / 2.2)
     }
 
     if (this.is_dynamic) {
@@ -567,10 +466,6 @@ export default class fidget_daft_i extends fidget {
 
     this.bodies.bones.circle = new body_build(bone_circle_opts)
 
-    m_shape = new Matrix()
-    m_shape.set_row(0, m_shape.get_row(0).getMult(50 * s))
-    m_shape.set_row(1, m_shape.get_row(1).getMult(50 * s))
-
     this.bodies.geos.circle = new body_build({
       ...opts_global,
       ...opts_collision_activate,
@@ -581,7 +476,7 @@ export default class fidget_daft_i extends fidget {
       m: this.m,
       parent: this.bodies.bones.circle,
       m_offset: new Matrix(),
-      m_shape: m_shape,
+      m_shape: new Matrix().setScale(50*s),
       //z:z_depth,
       type: utils.shape.circle,
 
@@ -613,16 +508,12 @@ export default class fidget_daft_i extends fidget {
     })
 
 
-    m_shape = new Matrix()
-    m_shape.set_row(0, m_shape.get_row(0).getMult(16.21 * s))
-    m_shape.set_row(1, m_shape.get_row(1).getMult(3.51 * s))
-
     let oRect = {
       ...opts_global,
       ...opts_collision_activate,
       ...opts_debug,
 
-      m_shape: m_shape,
+      m_shape: new Matrix().setScale(16*s,3.5*s),
       type: utils.shape.rectangle,
 
       do_shape: true,
@@ -634,19 +525,10 @@ export default class fidget_daft_i extends fidget {
     }
 
     this.bodies.bones.rectangles_center = new body_build({
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
       ...opts_visual_bones,
-      dynamic: false,
-
       name: 'bones_rectangle_center',
-
       m: this.m,
       parent: this.bodies.bones.root,
-      //m_offset:om_rA_bones,
-      m_shape: m_shape_bones,
-      //z:z_depth,
       constraints: [
         {
           name: 'point',
@@ -665,7 +547,6 @@ export default class fidget_daft_i extends fidget {
           length: 0.01
         }
       ],
-      density: 0.2 / (s / 2.2)
     })
 
     let ray_tmp = 80 * (s / 2.2)
@@ -675,9 +556,6 @@ export default class fidget_daft_i extends fidget {
 
     rot_tmp = 180 + 35
 
-    m_shape_bones = new Matrix()
-    m_shape_bones.setScale(s * 4)
-
     var om_rD_bones = new Matrix()
     om_rD_bones.setTranslation(-65 * (s / 2.2), 0)
 
@@ -685,20 +563,12 @@ export default class fidget_daft_i extends fidget {
     om_rD_bones_transform.setRotation(rad(rot_tmp + 180))
 
     let rectangle_pivot_opts = {
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
       ...opts_visual_bones,
-      dynamic: false,
-
       name: 'bones_rectangle_pivot_T__L_',
-
       m: this.m,
       parent: this.bodies.bones.rectangles_center,
       m_offset: om_rD_bones,
       m_transform: om_rD_bones_transform,
-      m_shape: m_shape_bones,
-
       constraints: [
         {
           name: 'point',
@@ -717,7 +587,6 @@ export default class fidget_daft_i extends fidget {
           length: 0.01
         }
       ],
-      density: 0.2 / (s / 2.2)
     }
 
     if (this.is_dynamic) {
@@ -757,20 +626,11 @@ export default class fidget_daft_i extends fidget {
 
     this.bodies.bones.rectangles.push(
       new body_build({
-        ...opts_global,
-        ...opts_collision_no_interaction,
-        ...opts_debug,
         ...opts_visual_bones,
-        dynamic: false,
-
         name: 'bones_rectangle_T__L_',
-
         m: this.m,
         parent: this.bodies.bones.rectangles_pivots[0],
         m_offset: om_rD,
-        m_shape: m_shape_bones,
-        //z:z_depth,
-
         constraints: [
           {
             name: 'point',
@@ -789,8 +649,6 @@ export default class fidget_daft_i extends fidget {
             length: 0.01
           }
         ],
-
-        density: 0.2 / (s / 2.2)
       })
     )
 
@@ -800,7 +658,7 @@ export default class fidget_daft_i extends fidget {
 
       parent: this.bodies.bones.rectangles[0],
       //m_offset:om_rD,
-      m_shape: m_shape,
+      m_shape: new Matrix().setScale(16*s,3.5*s),
       bevel: 0,
       castShadow: true,
       receiveShadow: false,
@@ -834,7 +692,7 @@ export default class fidget_daft_i extends fidget {
         ...opts_debug,
 
         parent: this.bodies.bones.rectangles[0],
-        m_shape: m_shape,
+        m_shape: new Matrix().setScale(16*s,3.5*s),
         type: utils.shape.rectangle,
 
         do_shape: true,
@@ -916,31 +774,16 @@ export default class fidget_daft_i extends fidget {
     }
 
     this.bodies.bones.rectangle = new body_build({
-      ...opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,
       ...opts_visual_bones,
-      dynamic: false,
-
       name: 'bones_rectangle',
-
       m: this.m,
       parent: this.bodies.bones.root,
-      //m_offset:om_rA_bones,
-      m_shape: m_shape_bones,
-      //z:z_depth,
-
       constraints: [
         { name: 'point', type: 'kin_point', target: this.bodies.bones.root },
         { name: 'orient', type: 'kin_orient', target: this.bodies.bones.root }
       ],
-
-      density: 0.2 / (s / 2.2)
     })
 
-    m_shape = new Matrix()
-    m_shape.set_row(0, m_shape.get_row(0).getMult(74 * s))
-    m_shape.set_row(1, m_shape.get_row(1).getMult(18 * s))
 
     let oRectangle = {
       ...opts_global,
@@ -952,7 +795,7 @@ export default class fidget_daft_i extends fidget {
       m: this.m,
       parent: this.bodies.bones.rectangle,
       m_offset: new Matrix(),
-      m_shape: m_shape,
+      m_shape: new Matrix().setScale(74*s,18*s),
       type: utils.shape.rectangle,
 
       do_shape: true,
@@ -1018,7 +861,7 @@ export default class fidget_daft_i extends fidget {
         ...opts_debug,
 
         parent: this.bodies.bones.rectangle,
-        m_shape: m_shape,
+        m_shape: new Matrix().setScale(74*s,18*s),
         type: utils.shape.rectangle,
 
         do_shape: true,
