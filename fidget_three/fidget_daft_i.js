@@ -82,6 +82,14 @@ export default class fidget_daft_i extends fidget {
       do_line: false,
       material_three: null,
     }
+    let opts_sparcles_shock = {
+      ...opts_global,
+      ...opts_debug,
+      scale_shape: s,
+      parent: this.bodies.inters.background,
+      type: 'sparcle_shock'
+    }
+
 
     let opts_bones_main = {
       ...opts_global,
@@ -597,22 +605,14 @@ export default class fidget_daft_i extends fidget {
       })
 
       /////////////////////////////////////////////
-      let opts_sparcles_shock = {
-        ...opts_global,
-        ...opts_debug,
-        scale_shape: s,
-        parent: this.bodies.inters.background,
-        type: 'sparcle_shock'
-      }
+     
 
       this.effects.sparcles_shock_A = new effect({
         ...opts_sparcles_shock,
         name: 'colA',
         trigger_body_min: this.bodies.inters_step.steps[0][0],
         trigger_value_min: 0.99,
-        trigger_body_max: null,
-        trigger_value_max: null,
-        p: new Vector(-145 * (s / 2.2), 15 * (s / 2.2)),
+        p: new Vector(-66*s, 6.8*s),
         r: 0
       })
 
@@ -621,9 +621,7 @@ export default class fidget_daft_i extends fidget {
         name: 'colB',
         trigger_body_min: this.bodies.inters_step.steps[1],
         trigger_value_min: 0.99,
-        trigger_body_max: null,
-        trigger_value_max: null,
-        p: new Vector(15 * (s / 2.2), -80 * (s / 2.2)),
+        p: new Vector(6.8*s, -36*s),
         r: -90
       })
 
@@ -632,9 +630,7 @@ export default class fidget_daft_i extends fidget {
         name: 'colC',
         trigger_body_min: this.bodies.inters_step.steps[2],
         trigger_value_min: 0.99,
-        trigger_body_max: null,
-        trigger_value_max: null,
-        p: new Vector(0, 200 * (s / 2.2)),
+        p: new Vector(0, 91*s),
         r: 0
       })
 
@@ -706,12 +702,12 @@ export default class fidget_daft_i extends fidget {
     ]
     let z_depth = z_depth_start
     let z_depth_incr = 0.5 //0.1
-    for (let i = 0; i < this.bodies_draw_order.length; i++) {
-      if (this.bodies_draw_order[i] == null) {
+    for (let i = 0; i < this.bodies_draw_order.length; i++)
+    {
+      if (this.bodies_draw_order[i] == null)
+      {
         if (this.debug_mode.show_warning_log)
-          console.log(
-            ' z_order - this.bodies_draw_order[' + i + '] doesnt exists'
-          )
+          console.log(  ' z_order - this.bodies_draw_order[' + i + '] doesnt exists')
         continue
       }
       this.bodies_draw_order[i].z = z_depth
