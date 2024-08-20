@@ -80,6 +80,7 @@ export default class fidget_daft_i extends fidget {
       ...opts_collision_no_interaction,
       type: 'trail',
       do_line: false,
+      material_three: null,
     }
 
     let opts_bones_main = {
@@ -585,29 +586,15 @@ export default class fidget_daft_i extends fidget {
       this.bodies.inters_step.steps[1].highlight_selection = [  this.bodies.geos.rectangle]
       this.bodies.inters_step.steps[2].highlight_selection = [  this.bodies.geos.rectangle]
 
-
-      let oRect_trail = {
-        ...opts_global,
-        ...opts_collision_no_interaction,
-        ...opts_debug,
-
-        parent: this.bodies.bones.rectangle,
-        m_shape: new Matrix().setScale(74*s,18*s),
-        type: utils.shape.rectangle,
-
-        do_shape: true,
-        do_line: false,
-
-        density: opts_geo.density,
-
+    this.effects.trailB = new effect({
+        ...oRectangle,
+        ...opts_effect_trail,
         body: this.bodies.geos.rectangle,
-        type: 'trail',
         trigger_body_min: this.bodies.inters_step.steps[0][0],
         trigger_value_min: 0.99,
         trigger_body_max: this.bodies.inters_step.steps[2],
         trigger_value_max: 1.0
-      }
-      this.effects.trailB = new effect({ ...oRect_trail })
+      })
 
       /////////////////////////////////////////////
       let opts_sparcles_shock = {
