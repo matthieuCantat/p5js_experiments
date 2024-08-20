@@ -76,6 +76,11 @@ export default class fidget_daft_i extends fidget {
               length: 0.01
             }
 
+    let opts_effect_trail = {
+      ...opts_collision_no_interaction,
+      type: 'trail',
+      do_line: false,
+    }
 
     let opts_bones_main = {
       ...opts_global,
@@ -420,12 +425,6 @@ export default class fidget_daft_i extends fidget {
     })
 
 
-    let oRect = {
-      ...opts_geo,
-      m_shape: new Matrix().setScale(16*s,3.5*s),
-      type: utils.shape.rectangle,
-      material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
-    }
 
     this.bodies.bones.rectangles_center = new body_build({
       ...opts_visual_bones,
@@ -434,25 +433,15 @@ export default class fidget_daft_i extends fidget {
       constraint_to_parent: true,
     })
 
-    let ray_tmp = 80 * (s / 2.2)
-    let rot_tmp = 0
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// RECTANGLES
-
-    rot_tmp = 180 + 35
-
-    var om_rD_bones = new Matrix()
-    om_rD_bones.setTranslation(-65 * (s / 2.2), 0)
-
-    var om_rD_bones_transform = new Matrix()
-    om_rD_bones_transform.setRotation(rad(rot_tmp + 180))
 
     let rectangle_pivot_opts = {
       ...opts_visual_bones,
       name: 'bones_rectangle_pivot_T__L_',
       parent: this.bodies.bones.rectangles_center,
-      m_offset: om_rD_bones,
-      m_transform: om_rD_bones_transform,
+      m_offset: new Matrix().setTranslation(-29.5*s, 0),
+      m_transform: new Matrix().setRotation(rad(35)),
       constraint_to_parent: true,
       constraints: [],
     }
@@ -484,125 +473,69 @@ export default class fidget_daft_i extends fidget {
         ]
       })
     }
-
-    this.bodies.bones.rectangles_pivots.push(
-      new body_build(rectangle_pivot_opts)
-    )
-
-    var om_rD = new Matrix()
-    om_rD.setTranslation(ray_tmp * -1, 0)
+    this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
 
     this.bodies.bones.rectangles.push(
       new body_build({
         ...opts_visual_bones,
         name: 'bones_rectangle_T__L_',
         parent: this.bodies.bones.rectangles_pivots[0],
-        m_offset: om_rD,
         constraint_to_parent: true,
+        m_offset: new Matrix().setTranslation(-36.4*s, 0),
       })
     )
 
-    let oRect_TL = {
-      ...oRect,
+    let opts_rectangles = {
+      ...opts_geo,
       name: 'geos_rectangle_T__L_',
-
+      type: utils.shape.rectangle,
       parent: this.bodies.bones.rectangles[0],
-      //m_offset:om_rD,
-      m_shape: new Matrix().setScale(16*s,3.5*s),
-      bevel: 0,
-      castShadow: true,
-      receiveShadow: false,
       constraint_to_parent: true,
+      m_shape: new Matrix().setScale(16*s,3.5*s),
+      material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
     }
-
-    this.bodies.geos.rectangles.push(new body_build(oRect_TL))
+    this.bodies.geos.rectangles.push(new body_build(opts_rectangles))
+    
 
     if (this.is_dynamic) {
-      let oRect_trail = {
-        ...opts_global,
-        ...opts_collision_no_interaction,
-        ...opts_debug,
-
-        parent: this.bodies.bones.rectangles[0],
-        m_shape: new Matrix().setScale(16*s,3.5*s),
-        type: utils.shape.rectangle,
-
-        do_shape: true,
-        do_line: false,
-
-        density: opts_geo.density,
-
+      this.effects.trailA = new effect({
+        ...opts_rectangles,
+        ...opts_effect_trail,
         body: this.bodies.geos.rectangles[0],
-        type: 'trail',
-        trigger_body_min: null,
-        trigger_value_min: null,
         trigger_body_max: this.bodies.inters_step.steps[1],
         trigger_value_max: 0.01
-      }
-      this.effects.trailA = new effect({ ...oRect_trail })
+      })
     }
 
     // TOP RIGHT
     let axe_x = false
     let axe_y = true
-    this.bodies.inters_step.steps[0].push(
-      this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.bones.rectangles_pivots.push(
-      this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.bones.rectangles.push(
-      this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.geos.rectangles.push(
-      this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y)
-    )
+    this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
+    this.bodies.bones.rectangles_pivots.push(  this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y))
+    this.bodies.bones.rectangles.push(  this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y))
+    this.bodies.geos.rectangles.push(  this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y))
 
     // BOTTOM LEFT
     axe_x = true
     axe_y = false
-    this.bodies.inters_step.steps[0].push(
-      this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.bones.rectangles_pivots.push(
-      this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.bones.rectangles.push(
-      this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.geos.rectangles.push(
-      this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y)
-    )
+    this.bodies.inters_step.steps[0].push(  this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
+    this.bodies.bones.rectangles_pivots.push(  this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y))
+    this.bodies.bones.rectangles.push(  this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y))
+    this.bodies.geos.rectangles.push(  this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y))
 
     // BOTTOM RIGHT
     axe_x = true
     axe_y = true
-    this.bodies.inters_step.steps[0].push(
-      this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.bones.rectangles_pivots.push(
-      this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.bones.rectangles.push(
-      this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y)
-    )
-    this.bodies.geos.rectangles.push(
-      this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y)
-    )
+    this.bodies.inters_step.steps[0].push(  this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
+    this.bodies.bones.rectangles_pivots.push(  this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y))
+    this.bodies.bones.rectangles.push(  this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y))
+    this.bodies.geos.rectangles.push(  this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y))
 
     if (this.is_dynamic) {
-      this.bodies.inters_step.steps[0][0].highlight_selection = [
-        this.bodies.geos.rectangles[0]
-      ]
-      this.bodies.inters_step.steps[0][1].highlight_selection = [
-        this.bodies.geos.rectangles[1]
-      ]
-      this.bodies.inters_step.steps[0][2].highlight_selection = [
-        this.bodies.geos.rectangles[2]
-      ]
-      this.bodies.inters_step.steps[0][3].highlight_selection = [
-        this.bodies.geos.rectangles[3]
-      ]
+      this.bodies.inters_step.steps[0][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
+      this.bodies.inters_step.steps[0][1].highlight_selection = [  this.bodies.geos.rectangles[1]]
+      this.bodies.inters_step.steps[0][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
+      this.bodies.inters_step.steps[0][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
     }
 
     this.bodies.bones.rectangle = new body_build({
@@ -649,12 +582,8 @@ export default class fidget_daft_i extends fidget {
     this.bodies.geos.rectangle = new body_build(oRectangle)
 
     if (this.is_dynamic) {
-      this.bodies.inters_step.steps[1].highlight_selection = [
-        this.bodies.geos.rectangle
-      ]
-      this.bodies.inters_step.steps[2].highlight_selection = [
-        this.bodies.geos.rectangle
-      ]
+      this.bodies.inters_step.steps[1].highlight_selection = [  this.bodies.geos.rectangle]
+      this.bodies.inters_step.steps[2].highlight_selection = [  this.bodies.geos.rectangle]
 
 
       let oRect_trail = {
