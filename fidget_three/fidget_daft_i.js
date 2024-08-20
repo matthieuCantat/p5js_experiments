@@ -69,6 +69,14 @@ export default class fidget_daft_i extends fidget {
       debug_force_visibility: debug.force_visibility
     }
 
+    let opts_cns_disable_at_select = {
+              stiffness: 1.0,
+              stiffness_at_selection: 0.0,
+              damping: 0.1,
+              length: 0.01
+            }
+
+
     let opts_bones_main = {
       ...opts_global,
       ...opts_collision_no_interaction,
@@ -271,15 +279,7 @@ export default class fidget_daft_i extends fidget {
           m_shape: new Matrix().setScale(41.5*s),
           type: utils.shape.circle,
           constraints: [
-            {
-              name: 'point',
-              type: 'dyn_point',
-              target: this.bodies.inters.background,
-              stiffness: 1.0,
-              stiffness_at_selection: 0.0,
-              damping: 0.1,
-              length: 0.01
-            },
+            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
             { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background},
             {
               name: 'axe',
@@ -316,16 +316,7 @@ export default class fidget_daft_i extends fidget {
                   length: 0.01
                 }
               : {name: 'point',type: 'kin_point',target: this.is_dynamic  ? this.bodies.inters.background  : this.bodies.bones.traj},
-            {
-              name: 'orient',
-              type: 'dyn_orient',
-              target: this.bodies.inters.background,
-              stiffness: 1.0,
-              stiffness_at_selection: 0.0,
-              //stiffness_after_selection:0.0,
-              damping: 0.01,
-              length: 0.01
-            },
+            { name: 'orient', type: 'dyn_orient', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
             {
               name: 'rot_limit',
               type: 'kin_limit',
@@ -359,20 +350,8 @@ export default class fidget_daft_i extends fidget {
           type: utils.shape.rectangle,
 
           constraints: [
-            {
-              name: 'point',
-              type: 'dyn_point',
-              target: this.bodies.inters.background,
-              stiffness: 1.0,
-              stiffness_at_selection: 0.0,
-              damping: 0.1,
-              length: 0.01
-            },
-            {
-              name: 'orient',
-              type: 'kin_orient',
-              target: this.bodies.inters.background
-            },
+            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background,...opts_cns_disable_at_select},
+            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background },
             {
               name: 'axe',
               type: 'kin_axe',
@@ -431,8 +410,6 @@ export default class fidget_daft_i extends fidget {
       material_three: materials.raw_shader_exemple, //three_utils.material.simple.cyan_grid ,
       constraint_to_parent: true,
       constraints: [
-        //{ name: 'point', type: 'kin_point', target: this.bodies.bones.circle },
-        //{ name: 'orient',type: 'kin_orient',target: this.bodies.bones.circle},
         { name: 'connect_scale_bone',
           type: 'connect',
           target: this.bodies.bones.circle,
@@ -447,7 +424,6 @@ export default class fidget_daft_i extends fidget {
       ...opts_geo,
       m_shape: new Matrix().setScale(16*s,3.5*s),
       type: utils.shape.rectangle,
-
       material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
     }
 
