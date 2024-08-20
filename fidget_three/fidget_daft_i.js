@@ -116,6 +116,17 @@ export default class fidget_daft_i extends fidget {
       selection_break_length: inter_step_selection_break_length      
     }
 
+    let opts_geo = {
+    ...opts_global,
+    ...opts_collision_activate,
+    ...opts_debug,
+    m_offset: new Matrix(),
+    do_shape: true,
+    do_line: true,
+    color_line: utils.color.black,
+    density: 0.0022/s,
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
 
@@ -193,7 +204,6 @@ export default class fidget_daft_i extends fidget {
     }) )
     this.bodies.geos.backgrounds.push(this.bodies.geos.backgrounds[0].get_mirror(false, true))
 
-
     this.bodies.bones.traj = new body_build({
       ...opts_bones_main,
       name: 'bones_traj',
@@ -211,7 +221,6 @@ export default class fidget_daft_i extends fidget {
         ...opts_inter_step,
         ...opts_collision_no_interaction,
         name: 'inters_background',
-        highlight_selection: [],
         m: this.m,
         parent: this.bodies.bones.traj,
         m_offset: new Matrix(),
@@ -421,14 +430,8 @@ export default class fidget_daft_i extends fidget {
 
         })
       )
-      this.bodies.inters_step.steps[2].get_resolution_coef = function () {
-        return clamp(this.constraints.axe.current_pos, 0, 1)
-      }
-      this.bodies.inters_step.steps[2].set_resolution_coef = function (
-        res = null
-      ) {
-        this.constraints.axe.current_pos = res
-      }
+      this.bodies.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
+      this.bodies.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
 
     }
 
@@ -463,31 +466,17 @@ export default class fidget_daft_i extends fidget {
         ]
       })
     }
-
     this.bodies.bones.circle = new body_build(bone_circle_opts)
 
     this.bodies.geos.circle = new body_build({
-      ...opts_global,
-      ...opts_collision_activate,
-      ...opts_debug,
-
+      ...opts_geo,
       name: 'geos_circle',
-
       m: this.m,
       parent: this.bodies.bones.circle,
-      m_offset: new Matrix(),
       m_shape: new Matrix().setScale(50*s),
-      //z:z_depth,
       type: utils.shape.circle,
 
-      do_shape: true,
-      do_line: true,
-      bevel: 0,
-      color_line: utils.color.black,
       material_three: materials.raw_shader_exemple, //three_utils.material.simple.cyan_grid ,
-      castShadow: true,
-      receiveShadow: true,
-      bloom: this.debug_mode.do_bloom ? true : false,
 
       constraints: [
         { name: 'point', type: 'kin_point', target: this.bodies.bones.circle },
@@ -504,24 +493,15 @@ export default class fidget_daft_i extends fidget {
           target_attr: 's'
         }
       ],
-      density: 0.001 / (s / 2.2)
     })
 
 
     let oRect = {
-      ...opts_global,
-      ...opts_collision_activate,
-      ...opts_debug,
-
+      ...opts_geo,
       m_shape: new Matrix().setScale(16*s,3.5*s),
       type: utils.shape.rectangle,
 
-      do_shape: true,
-      do_line: true,
-      color_line: utils.color.black,
       material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
-
-      density: 0.001 / (s / 2.2)
     }
 
     this.bodies.bones.rectangles_center = new body_build({
@@ -698,7 +678,7 @@ export default class fidget_daft_i extends fidget {
         do_shape: true,
         do_line: false,
 
-        density: 0.001 / (s / 2.2),
+        density: opts_geo.density,
 
         body: this.bodies.geos.rectangles[0],
         type: 'trail',
@@ -786,26 +766,13 @@ export default class fidget_daft_i extends fidget {
 
 
     let oRectangle = {
-      ...opts_global,
-      ...opts_collision_activate,
-      ...opts_debug,
-
+      ...opts_geo,
       name: 'geos_rectangle',
-
       m: this.m,
       parent: this.bodies.bones.rectangle,
-      m_offset: new Matrix(),
       m_shape: new Matrix().setScale(74*s,18*s),
       type: utils.shape.rectangle,
-
-      do_shape: true,
-      do_line: true,
-      bevel: 0,
-      color_line: utils.color.black,
       material_three: materials.background_test, //materials.simple.gradient_gold_red_A ,
-      castShadow: true,
-      receiveShadow: false,
-
       constraints: [
         {
           name: 'point',
@@ -818,8 +785,6 @@ export default class fidget_daft_i extends fidget {
           target: this.bodies.bones.rectangle
         }
       ],
-
-      density: 0.001 / (s / 2.2)
     }
 
     if (this.is_dynamic) {
@@ -867,7 +832,7 @@ export default class fidget_daft_i extends fidget {
         do_shape: true,
         do_line: false,
 
-        density: 0.001 / (s / 2.2),
+        density: opts_geo.density,
 
         body: this.bodies.geos.rectangle,
         type: 'trail',
