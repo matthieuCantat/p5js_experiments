@@ -194,7 +194,6 @@ export default class fidget_daft_i extends fidget {
       ...opts_debug,
       dynamic: false,
       name: 'geos_background_L_',
-      m: this.m,
       parent: this.bodies.bones.world,
       m_offset: new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2),
       m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
@@ -207,13 +206,9 @@ export default class fidget_daft_i extends fidget {
     this.bodies.bones.traj = new body_build({
       ...opts_bones_main,
       name: 'bones_traj',
-      m: this.m,
       parent: this.bodies.bones.world,
+      constraint_to_parent: true,
       m_offset: this.m,
-      constraints: [
-        { name: 'point', type: 'kin_point', target: this.bodies.bones.world },
-        { name: 'orient', type: 'kin_orient', target: this.bodies.bones.world }
-      ],
     })
 
     if (this.is_dynamic)
@@ -221,7 +216,6 @@ export default class fidget_daft_i extends fidget {
         ...opts_inter_step,
         ...opts_collision_no_interaction,
         name: 'inters_background',
-        m: this.m,
         parent: this.bodies.bones.traj,
         m_offset: new Matrix(),
         m_shape: new Matrix().setScale(145*s,92*s),
@@ -263,26 +257,8 @@ export default class fidget_daft_i extends fidget {
       ...opts_bones_main,
       dynamic: false,
       name: 'bones_root',
-      m: this.m,
-      parent: this.is_dynamic
-        ? this.bodies.inters.background
-        : this.bodies.bones.traj,
-      constraints: [
-        {
-          name: 'point',
-          type: 'kin_point',
-          target: this.is_dynamic
-            ? this.bodies.inters.background
-            : this.bodies.bones.traj
-        },
-        {
-          name: 'orient',
-          type: 'kin_orient',
-          target: this.is_dynamic
-            ? this.bodies.inters.background
-            : this.bodies.bones.traj
-        }
-      ],
+      parent: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj,
+      constraint_to_parent: true,
     })
 
     if (this.is_dynamic) {
@@ -290,7 +266,6 @@ export default class fidget_daft_i extends fidget {
         new body_build({       
           ...opts_inter_step,
           name: 'inters_A_T__L_',
-          m: this.m,
           parent: this.bodies.inters.background,
           m_offset: new Matrix().setTranslation(-59*s,-22.7*s),
           m_shape: new Matrix().setScale(41.5*s),
@@ -305,11 +280,7 @@ export default class fidget_daft_i extends fidget {
               damping: 0.1,
               length: 0.01
             },
-            {
-              name: 'orient',
-              type: 'kin_orient',
-              target: this.bodies.inters.background
-            },
+            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background},
             {
               name: 'axe',
               type: 'kin_axe',
@@ -330,7 +301,6 @@ export default class fidget_daft_i extends fidget {
         new body_build({
           ...opts_inter_step,
           name: 'inters_B',
-          m: this.m,
           parent: this.bodies.inters.background,
           m_offset: new Matrix(),
           m_shape: new Matrix().setScale(83*s,21*s),
@@ -345,13 +315,7 @@ export default class fidget_daft_i extends fidget {
                   damping: 0.1,
                   length: 0.01
                 }
-              : {
-                  name: 'point',
-                  type: 'kin_point',
-                  target: this.is_dynamic
-                    ? this.bodies.inters.background
-                    : this.bodies.bones.traj
-                },
+              : {name: 'point',type: 'kin_point',target: this.is_dynamic  ? this.bodies.inters.background  : this.bodies.bones.traj},
             {
               name: 'orient',
               type: 'dyn_orient',
@@ -379,13 +343,7 @@ export default class fidget_daft_i extends fidget {
       this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.set_out_rotation(rad(res * 90.5), 'world', 'override')}
 
       if (this.debug_mode.inter_step_physics == false)
-        this.bodies.inters_step.steps[1].constraints_args.push({
-          name: 'point_no_dyn',
-          type: 'kin_point',
-          target: this.is_dynamic
-            ? this.bodies.inters.background
-            : this.bodies.bones.traj
-        })
+        this.bodies.inters_step.steps[1].constraints_args.push({name: 'point_no_dyn', type: 'kin_point', target: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj})
 
       // other
 
@@ -394,8 +352,6 @@ export default class fidget_daft_i extends fidget {
           ...opts_inter_step,
 
           name: 'inters_C',
-
-          m: this.m,
           m_offset: new Matrix(),
           m_shape: new Matrix().setScale(21*s,83*s),
           parent: this.bodies.inters.background,
@@ -441,12 +397,9 @@ export default class fidget_daft_i extends fidget {
     let bone_circle_opts = {
       ...opts_visual_bones,
       name: 'bones_circle',
-      m: this.m,
       parent: this.bodies.bones.root,
-      constraints: [
-        { name: 'point', type: 'kin_point', target: this.bodies.bones.root },
-        { name: 'orient', type: 'kin_orient', target: this.bodies.bones.root }
-      ],
+      constraint_to_parent: true,
+      constraints:[],
     }
 
     if (this.is_dynamic) {
@@ -471,22 +424,16 @@ export default class fidget_daft_i extends fidget {
     this.bodies.geos.circle = new body_build({
       ...opts_geo,
       name: 'geos_circle',
-      m: this.m,
       parent: this.bodies.bones.circle,
       m_shape: new Matrix().setScale(50*s),
       type: utils.shape.circle,
 
       material_three: materials.raw_shader_exemple, //three_utils.material.simple.cyan_grid ,
-
+      constraint_to_parent: true,
       constraints: [
-        { name: 'point', type: 'kin_point', target: this.bodies.bones.circle },
-        {
-          name: 'orient',
-          type: 'kin_orient',
-          target: this.bodies.bones.circle
-        },
-        {
-          name: 'connect_scale_bone',
+        //{ name: 'point', type: 'kin_point', target: this.bodies.bones.circle },
+        //{ name: 'orient',type: 'kin_orient',target: this.bodies.bones.circle},
+        { name: 'connect_scale_bone',
           type: 'connect',
           target: this.bodies.bones.circle,
           attr: 's',
@@ -507,26 +454,8 @@ export default class fidget_daft_i extends fidget {
     this.bodies.bones.rectangles_center = new body_build({
       ...opts_visual_bones,
       name: 'bones_rectangle_center',
-      m: this.m,
       parent: this.bodies.bones.root,
-      constraints: [
-        {
-          name: 'point',
-          type: 'kin_point',
-          target: this.bodies.bones.root,
-          stiffness: 1.0,
-          damping: 0.1,
-          length: 0.01
-        },
-        {
-          name: 'orient',
-          type: 'kin_orient',
-          target: this.bodies.bones.root,
-          stiffness: 1.0,
-          damping: 0.1,
-          length: 0.01
-        }
-      ],
+      constraint_to_parent: true,
     })
 
     let ray_tmp = 80 * (s / 2.2)
@@ -545,28 +474,11 @@ export default class fidget_daft_i extends fidget {
     let rectangle_pivot_opts = {
       ...opts_visual_bones,
       name: 'bones_rectangle_pivot_T__L_',
-      m: this.m,
       parent: this.bodies.bones.rectangles_center,
       m_offset: om_rD_bones,
       m_transform: om_rD_bones_transform,
-      constraints: [
-        {
-          name: 'point',
-          type: 'kin_point',
-          target: this.bodies.bones.rectangles_center,
-          stiffness: 1.0,
-          damping: 0.1,
-          length: 0.01
-        },
-        {
-          name: 'orient',
-          type: 'kin_orient',
-          target: this.bodies.bones.rectangles_center,
-          stiffness: 1.0,
-          damping: 0.1,
-          length: 0.01
-        }
-      ],
+      constraint_to_parent: true,
+      constraints: [],
     }
 
     if (this.is_dynamic) {
@@ -608,27 +520,9 @@ export default class fidget_daft_i extends fidget {
       new body_build({
         ...opts_visual_bones,
         name: 'bones_rectangle_T__L_',
-        m: this.m,
         parent: this.bodies.bones.rectangles_pivots[0],
         m_offset: om_rD,
-        constraints: [
-          {
-            name: 'point',
-            type: 'kin_point',
-            target: this.bodies.bones.rectangles_pivots[0],
-            stiffness: 1.0,
-            damping: 0.1,
-            length: 0.01
-          },
-          {
-            name: 'orient',
-            type: 'kin_orient',
-            target: this.bodies.bones.rectangles_pivots[0],
-            stiffness: 1.0,
-            damping: 0.1,
-            length: 0.01
-          }
-        ],
+        constraint_to_parent: true,
       })
     )
 
@@ -642,25 +536,7 @@ export default class fidget_daft_i extends fidget {
       bevel: 0,
       castShadow: true,
       receiveShadow: false,
-
-      constraints: [
-        {
-          name: 'point',
-          type: 'kin_point',
-          target: this.bodies.bones.rectangles[0],
-          stiffness: 1.0,
-          damping: 0.1,
-          length: 0.01
-        },
-        {
-          name: 'orient',
-          type: 'kin_orient',
-          target: this.bodies.bones.rectangles[0],
-          stiffness: 1.0,
-          damping: 0.1,
-          length: 0.01
-        }
-      ]
+      constraint_to_parent: true,
     }
 
     this.bodies.geos.rectangles.push(new body_build(oRect_TL))
@@ -756,35 +632,20 @@ export default class fidget_daft_i extends fidget {
     this.bodies.bones.rectangle = new body_build({
       ...opts_visual_bones,
       name: 'bones_rectangle',
-      m: this.m,
       parent: this.bodies.bones.root,
-      constraints: [
-        { name: 'point', type: 'kin_point', target: this.bodies.bones.root },
-        { name: 'orient', type: 'kin_orient', target: this.bodies.bones.root }
-      ],
+      constraint_to_parent: true,
     })
 
 
     let oRectangle = {
       ...opts_geo,
       name: 'geos_rectangle',
-      m: this.m,
       parent: this.bodies.bones.rectangle,
       m_shape: new Matrix().setScale(74*s,18*s),
       type: utils.shape.rectangle,
       material_three: materials.background_test, //materials.simple.gradient_gold_red_A ,
-      constraints: [
-        {
-          name: 'point',
-          type: 'kin_point',
-          target: this.bodies.bones.rectangle
-        },
-        {
-          name: 'orient',
-          type: 'kin_orient',
-          target: this.bodies.bones.rectangle
-        }
-      ],
+      constraint_to_parent: true,
+      constraints: [],
     }
 
     if (this.is_dynamic) {

@@ -26,6 +26,7 @@ export class body_build{
         m_transform: new Matrix(),
         m_shape: new Matrix(),
         parent:null,
+        constraint_to_parent:false,
         z: 0,
         w: 1,
         h: 1,
@@ -75,6 +76,7 @@ export class body_build{
       this.highlight_selection = args.highlight_selection    
       this.m = args.m
       this.parent = args.parent
+      this.constraint_to_parent = args.constraint_to_parent
       this.m_offset = args.m_offset
       this.m_transform = args.m_transform
       this.z = args.z
@@ -87,7 +89,6 @@ export class body_build{
       this.extra_rotation = 0
       this.rot_override = null
       this.scale = 1.0
-      this.constraints_args = args.constraints
       this.do_shape= args.do_shape
       this.do_line= args.do_line   
       this.bevel = args.bevel   
@@ -135,6 +136,14 @@ export class body_build{
       this.three_material = null
       this.build_order = build_order
       build_order += 1
+
+
+      this.constraints_args = []
+      if(this.constraint_to_parent)
+        this.constraints_args = [ { name: 'point' , type: 'kin_point' , target: this.parent },
+                                  { name: 'orient', type: 'kin_orient', target: this.parent }]
+      for( let cns_args of args.constraints )
+        this.constraints_args.push(cns_args)
       
 
       this.draw_text_debug = null
