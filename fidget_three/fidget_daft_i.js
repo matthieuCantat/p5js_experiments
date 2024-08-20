@@ -82,6 +82,7 @@ export default class fidget_daft_i extends fidget {
       do_line: false,
       material_three: null,
     }
+
     let opts_sparcles_shock = {
       ...opts_global,
       ...opts_debug,
@@ -89,7 +90,6 @@ export default class fidget_daft_i extends fidget {
       parent: this.bodies.inters.background,
       type: 'sparcle_shock'
     }
-
 
     let opts_bones_main = {
       ...opts_global,
@@ -106,7 +106,6 @@ export default class fidget_daft_i extends fidget {
       density: bones_density_value,      
     }
 
-
     let opts_visual_bones = {
       ...opts_global,
       ...opts_collision_no_interaction,
@@ -121,7 +120,6 @@ export default class fidget_daft_i extends fidget {
       dynamic: false,      
       density: bones_density_value,      
       m_shape: new Matrix().setScale(4*s), 
-  
     }
 
     let opts_inter_step = {
@@ -350,7 +348,6 @@ export default class fidget_daft_i extends fidget {
       if (this.debug_mode.inter_step_physics == false)
         this.bodies.inters_step.steps[1].constraints_args.push({name: 'point_no_dyn', type: 'kin_point', target: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj})
 
-      // other
 
       this.bodies.inters_step.steps.push(
         new body_build({
@@ -381,7 +378,6 @@ export default class fidget_daft_i extends fidget {
       )
       this.bodies.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
       this.bodies.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
-
     }
 
 
