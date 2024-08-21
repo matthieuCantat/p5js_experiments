@@ -75,16 +75,27 @@ export default class fidgets_sequence
 
       // build  
       this.chrono = new Chrono(this.screen_dims)  
+
+
         
       let z_depth = 0
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
-          let do_background = true
-          let is_dynamic = true
-          //var fidget = new fidget_windmill(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
-          var fidget = new fidget_daft_i(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
+          let opts = 
+          {
+            m:new Matrix(this.m), 
+            s:this.s, 
+            screen_dims:this.screen_dims, 
+            z_depth_start:z_depth,
+            do_background: true, 
+            is_dynamic:true,
+            debug : this.debug_mode,  
+            play_animation:null,    
+          }
+          //var fidget = new fidget_windmill(opts)
+          var fidget = new fidget_daft_i(opts)
           z_depth = fidget.z_depth_end
-          //var fidget = this.get_random_fidget(new Matrix(this.m),this.s,this.screen_dims,z_depth,do_background,is_dynamic,this.shaders,this.debug_mode)
+          //var fidget = this.get_random_fidget(opts)
           fidget.force_way = this.force_way
           fidget.fidget_sequence_i = i + 1
           this.fidgets.push(fidget)

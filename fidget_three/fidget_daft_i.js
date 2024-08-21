@@ -8,28 +8,46 @@ import { effect } from './effect.js'
 
 export default class fidget_daft_i extends fidget {
 
-  constructor (
-    m,
-    s,
-    screen_dims,
-    z_depth_start,
-    do_background,
-    is_dynamic = true,
-    shaders = [],
-    debug = false,
-    random_color = true
-  ) {
-    super(m, s, screen_dims, do_background, shaders, debug)
+  constructor (in_options) {
+    super(in_options)
+
+    let defaultOptions = 
+    {
+      m:null, 
+      s:1, 
+      screen_dims:null, 
+      z_depth_start:0,
+      do_background: true, 
+      is_dynamic:true,
+      debug : false,  
+      play_animation:null,    
+    }
+    const args = { ...defaultOptions, ...in_options };
 
     ///////////////////////////////////////////////////////////////////////////////////////////
-    let visual_bones_main_size = 150*s
-    let bones_density_value = 0.44/s
-    let inter_step_denstity = 0.022/s //0.01 / (s / 2.2) 
-    let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (s / 2.2)
-
+    let visual_bones_main_size = 150*this.s
+    let bones_density_value = 0.44/this.s
+    let inter_step_denstity = 0.022/this.s 
+    let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
+    this.end_step = 4
     ///////////////////////////////////////////////////////////////////////////////////////////
-    this.is_dynamic = is_dynamic
+    this.is_dynamic = args.is_dynamic
     
+    this.play_animation = args.play_animation//'animation_idle'
+
+    if(this.play_animation != null)
+    {
+      this.anim_mode = true
+      this.is_dynamic = false
+    }
+    else
+    {
+      this.anim_mode = false
+      this.is_dynamic = true
+    }
+
+
+
     this.colors = [utils.color.green, utils.color.red, utils.color.yellow]
     this.color_background = [
       (this.colors[0][0] + 0.2) * 0.3,
@@ -64,9 +82,9 @@ export default class fidget_daft_i extends fidget {
 
     let opts_debug = {
       debug_matrix_info: false,
-      debug_matrix_axes: debug.matrix_axes,
-      debug_cns_axes: debug.cns_axes,
-      debug_force_visibility: debug.force_visibility
+      debug_matrix_axes: this.debug_mode.matrix_axes,
+      debug_cns_axes: this.debug_mode.cns_axes,
+      debug_force_visibility: this.debug_mode.force_visibility
     }
 
     let opts_cns_disable_at_select = {
@@ -86,7 +104,7 @@ export default class fidget_daft_i extends fidget {
     let opts_sparcles_shock = {
       ...opts_global,
       ...opts_debug,
-      scale_shape: s,
+      scale_shape: this.s,
       type: 'sparcle_shock'
     }
 
@@ -118,7 +136,7 @@ export default class fidget_daft_i extends fidget {
       debug_matrix_axes: true,
       dynamic: false,      
       density: bones_density_value,      
-      m_shape: new Matrix().setScale(4*s), 
+      m_shape: new Matrix().setScale(4*this.s), 
     }
 
     let opts_inter_step = {
@@ -143,7 +161,7 @@ export default class fidget_daft_i extends fidget {
     do_shape: true,
     do_line: true,
     color_line: utils.color.black,
-    density: 0.0022/s,
+    density: 0.0022/this.s,
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -194,11 +212,6 @@ export default class fidget_daft_i extends fidget {
       sparcles_shock_C: null
     }
 
-    this.play_animation = null
-    this.animations = {
-      entrance: this.override_with_animation_reverse_build,
-      idle: this.override_with_idle
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -229,7 +242,7 @@ export default class fidget_daft_i extends fidget {
       constraint_to_parent: true,
       m_offset: this.m,
     })
-
+    
     if (this.is_dynamic)
       this.bodies.inters.background = new body_build({
         ...opts_inter_step,
@@ -237,7 +250,7 @@ export default class fidget_daft_i extends fidget {
         name: 'inters_background',
         parent: this.bodies.bones.traj,
         m_offset: new Matrix(),
-        m_shape: new Matrix().setScale(145*s,92*s),
+        m_shape: new Matrix().setScale(145*this.s,92*this.s),
         type: utils.shape.rectangle,
         frictionAir: 0.3,
         constraints: [
@@ -279,15 +292,19 @@ export default class fidget_daft_i extends fidget {
       parent: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj,
       constraint_to_parent: true,
     })
+    
+    
 
-    if (this.is_dynamic) {
+    if( this.is_dynamic )
+    {
+
       this.bodies.inters_step.steps.push([
         new body_build({       
           ...opts_inter_step,
           name: 'inters_A_T__L_',
           parent: this.bodies.inters.background,
-          m_offset: new Matrix().setTranslation(-59*s,-22.7*s),
-          m_shape: new Matrix().setScale(41.5*s),
+          m_offset: new Matrix().setTranslation(-59*this.s,-22.7*this.s),
+          m_shape: new Matrix().setScale(41.5*this.s),
           type: utils.shape.circle,
           constraints: [
             { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
@@ -296,7 +313,7 @@ export default class fidget_daft_i extends fidget {
               name: 'axe',
               type: 'kin_axe',
               axe: 1,
-              distPos: 25 * s,
+              distPos: 25 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
               transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
@@ -314,7 +331,7 @@ export default class fidget_daft_i extends fidget {
           name: 'inters_B',
           parent: this.bodies.inters.background,
           m_offset: new Matrix(),
-          m_shape: new Matrix().setScale(83*s,21*s),
+          m_shape: new Matrix().setScale(83*this.s,21*this.s),
           type: utils.shape.rectangle,
           constraints: [
             this.debug_mode.inter_step_physics
@@ -341,6 +358,8 @@ export default class fidget_daft_i extends fidget {
 
         })
       )
+      
+
       this.bodies.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.get_out_rotation('base')) / 90.0, 0, 1)}
       this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.set_out_rotation(rad(res * 90.5), 'world', 'override')}
 
@@ -354,7 +373,7 @@ export default class fidget_daft_i extends fidget {
 
           name: 'inters_C',
           m_offset: new Matrix(),
-          m_shape: new Matrix().setScale(21*s,83*s),
+          m_shape: new Matrix().setScale(21*this.s,83*this.s),
           parent: this.bodies.inters.background,
 
           type: utils.shape.rectangle,
@@ -366,7 +385,7 @@ export default class fidget_daft_i extends fidget {
               name: 'axe',
               type: 'kin_axe',
               axe: 1,
-              distPos: 50 * s,
+              distPos: 50 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
               transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
@@ -379,7 +398,7 @@ export default class fidget_daft_i extends fidget {
       this.bodies.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
     }
 
-
+    
   
 
     let bone_circle_opts = {
@@ -389,7 +408,7 @@ export default class fidget_daft_i extends fidget {
       constraint_to_parent: true,
       constraints:[],
     }
-
+    
     if (this.is_dynamic) {
       bone_circle_opts.constraints.push({
         name: 'connect_scale_iA',
@@ -402,8 +421,8 @@ export default class fidget_daft_i extends fidget {
         targets_attr: ['ty', 'ty'],
         targets_space: ['base', 'base'],
         targets_remap: [
-          [0, 55 * (s / 2.2), 1, 1.82],
-          [0, 110 * (s / 2.2), 0, 0.45 - 1.82]
+          [0, 55 * (this.s / 2.2), 1, 1.82],
+          [0, 110 * (this.s / 2.2), 0, 0.45 - 1.82]
         ]
       })
     }
@@ -413,7 +432,7 @@ export default class fidget_daft_i extends fidget {
       ...opts_geo,
       name: 'geos_circle',
       parent: this.bodies.bones.circle,
-      m_shape: new Matrix().setScale(50*s),
+      m_shape: new Matrix().setScale(50*this.s),
       type: utils.shape.circle,
 
       material_three: materials.raw_shader_exemple, //three_utils.material.simple.cyan_grid ,
@@ -436,7 +455,7 @@ export default class fidget_daft_i extends fidget {
       parent: this.bodies.bones.root,
       constraint_to_parent: true,
     })
-
+    
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// RECTANGLES
 
@@ -444,13 +463,14 @@ export default class fidget_daft_i extends fidget {
       ...opts_visual_bones,
       name: 'bones_rectangle_pivot_T__L_',
       parent: this.bodies.bones.rectangles_center,
-      m_offset: new Matrix().setTranslation(-29.5*s, 0),
+      m_offset: new Matrix().setTranslation(-29.5*this.s, 0),
       m_transform: new Matrix().setRotation(rad(35)),
       constraint_to_parent: true,
       constraints: [],
     }
-
+    
     if (this.is_dynamic) {
+
       rectangle_pivot_opts.constraints.push({
         name: 'connect_rot_iA',
         type: 'connect',
@@ -458,7 +478,7 @@ export default class fidget_daft_i extends fidget {
         attr: 'r',
         target_attr: 'ty',
         target_space: 'base',
-        target_remap: [0, 55 * (s / 2.2), 35, 0]
+        target_remap: [0, 55, 15.9*this.s, 0]
       })
 
       rectangle_pivot_opts.constraints.push({
@@ -472,11 +492,13 @@ export default class fidget_daft_i extends fidget {
         targets_attr: ['r', 'ty'],
         targets_space: ['base', 'base'],
         targets_remap: [
-          [0, 90, 0, 85 * (s / 2.2)],
-          [0, 110 * (s / 2.2), 0, 140 * (s / 2.2) - 85 * (s / 2.2)]
+          [0, 90, 0, 85 * (this.s / 2.2)],
+          [0, 110 * (this.s / 2.2), 0, 140 * (this.s / 2.2) - 85 * (this.s / 2.2)]
         ]
       })
+
     }
+
     this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
 
     this.bodies.bones.rectangles.push(
@@ -485,7 +507,7 @@ export default class fidget_daft_i extends fidget {
         name: 'bones_rectangle_T__L_',
         parent: this.bodies.bones.rectangles_pivots[0],
         constraint_to_parent: true,
-        m_offset: new Matrix().setTranslation(-36.4*s, 0),
+        m_offset: new Matrix().setTranslation(-36.4*this.s, 0),
       })
     )
 
@@ -495,13 +517,14 @@ export default class fidget_daft_i extends fidget {
       type: utils.shape.rectangle,
       parent: this.bodies.bones.rectangles[0],
       constraint_to_parent: true,
-      m_shape: new Matrix().setScale(16*s,3.5*s),
+      m_shape: new Matrix().setScale(16*this.s,3.5*this.s),
       material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
     }
     this.bodies.geos.rectangles.push(new body_build(opts_rectangles))
     
-
+    
     if (this.is_dynamic) {
+
       this.effects.trailA = new effect({
         ...opts_rectangles,
         ...opts_effect_trail,
@@ -509,12 +532,14 @@ export default class fidget_daft_i extends fidget {
         trigger_body_max: this.bodies.inters_step.steps[1],
         trigger_value_max: 0.01
       })
+
     }
 
     // TOP RIGHT
     let axe_x = false
     let axe_y = true
-    this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
+    if(this.is_dynamic)
+      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
     this.bodies.bones.rectangles_pivots.push(  this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y))
     this.bodies.bones.rectangles.push(  this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y))
     this.bodies.geos.rectangles.push(  this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y))
@@ -522,15 +547,17 @@ export default class fidget_daft_i extends fidget {
     // BOTTOM LEFT
     axe_x = true
     axe_y = false
-    this.bodies.inters_step.steps[0].push(  this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
+    if(this.is_dynamic)
+      this.bodies.inters_step.steps[0].push(  this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
     this.bodies.bones.rectangles_pivots.push(  this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y))
     this.bodies.bones.rectangles.push(  this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y))
     this.bodies.geos.rectangles.push(  this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y))
-
+    
     // BOTTOM RIGHT
     axe_x = true
     axe_y = true
-    this.bodies.inters_step.steps[0].push(  this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
+    if(this.is_dynamic)
+      this.bodies.inters_step.steps[0].push(  this.bodies.inters_step.steps[0][0].get_mirror(axe_x, axe_y))
     this.bodies.bones.rectangles_pivots.push(  this.bodies.bones.rectangles_pivots[0].get_mirror(axe_x, axe_y))
     this.bodies.bones.rectangles.push(  this.bodies.bones.rectangles[0].get_mirror(axe_x, axe_y))
     this.bodies.geos.rectangles.push(  this.bodies.geos.rectangles[0].get_mirror(axe_x, axe_y))
@@ -541,7 +568,7 @@ export default class fidget_daft_i extends fidget {
       this.bodies.inters_step.steps[0][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
       this.bodies.inters_step.steps[0][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
     }
-
+    
     this.bodies.bones.rectangle = new body_build({
       ...opts_visual_bones,
       name: 'bones_rectangle',
@@ -554,7 +581,7 @@ export default class fidget_daft_i extends fidget {
       ...opts_geo,
       name: 'geos_rectangle',
       parent: this.bodies.bones.rectangle,
-      m_shape: new Matrix().setScale(74*s,18*s),
+      m_shape: new Matrix().setScale(74*this.s,18*this.s),
       type: utils.shape.rectangle,
       material_three: materials.background_test, //materials.simple.gradient_gold_red_A ,
       constraint_to_parent: true,
@@ -585,7 +612,9 @@ export default class fidget_daft_i extends fidget {
 
     this.bodies.geos.rectangle = new body_build(oRectangle)
 
-    if (this.is_dynamic) {
+    if (this.is_dynamic)
+    {
+
       this.bodies.inters_step.steps[1].highlight_selection = [  this.bodies.geos.rectangle]
       this.bodies.inters_step.steps[2].highlight_selection = [  this.bodies.geos.rectangle]
 
@@ -608,7 +637,7 @@ export default class fidget_daft_i extends fidget {
         trigger_body_min: this.bodies.inters_step.steps[0][0],
         trigger_value_min: 0.99,
         parent: this.bodies.inters.background,
-        p: new Vector(-66*s, 6.8*s),
+        p: new Vector(-66*this.s, 6.8*this.s),
         r: 0
       })
 
@@ -618,7 +647,7 @@ export default class fidget_daft_i extends fidget {
         trigger_body_min: this.bodies.inters_step.steps[1],
         trigger_value_min: 0.99,
         parent: this.bodies.inters.background,
-        p: new Vector(6.8*s, -36*s),
+        p: new Vector(6.8*this.s, -36*this.s),
         r: -90
       })
 
@@ -628,14 +657,14 @@ export default class fidget_daft_i extends fidget {
         trigger_body_min: this.bodies.inters_step.steps[2],
         trigger_value_min: 0.99,
         parent: this.bodies.inters.background,
-        p: new Vector(0, 91*s),
+        p: new Vector(0, 91*this.s),
         r: 0
       })
 
       this.create_inter_from_geos(
         ['circle', 'rectangle', 'rectangles'],
         this.bodies.inters.background,
-        s
+        this.s
       )
 
       /*
@@ -645,17 +674,19 @@ export default class fidget_daft_i extends fidget {
         'rectangles'], s )        
         */
     }
+    
+    if(this.is_dynamic)
+      this.instance_each_others(
+        [
+          this.bodies.inters_step.steps[0][0],
+          this.bodies.inters_step.steps[0][1],
+          this.bodies.inters_step.steps[0][2],
+          this.bodies.inters_step.steps[0][3]
+        ],
+        [false, false, true, false, false, true, true, true]
+      )
 
-    this.instance_each_others(
-      [
-        this.bodies.inters_step.steps[0][0],
-        this.bodies.inters_step.steps[0][1],
-        this.bodies.inters_step.steps[0][2],
-        this.bodies.inters_step.steps[0][3]
-      ],
-      [false, false, true, false, false, true, true, true]
-    )
-
+    
     this.bodies_draw_order = [
       this.bodies.geos.backgrounds[0],
       this.bodies.geos.backgrounds[1],
@@ -666,12 +697,12 @@ export default class fidget_daft_i extends fidget {
       this.bodies.inters.rectangles[1],
       this.bodies.inters.rectangles[2],
       this.bodies.inters.rectangles[3],
-      this.bodies.inters_step.steps[0][0],
-      this.bodies.inters_step.steps[0][1],
-      this.bodies.inters_step.steps[0][2],
-      this.bodies.inters_step.steps[0][3],
-      this.bodies.inters_step.steps[1],
-      this.bodies.inters_step.steps[2],
+      this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[1]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[2]:null,
       this.bodies.geos.circle,
       this.effects.trailA,
       this.effects.trailB,
@@ -698,7 +729,7 @@ export default class fidget_daft_i extends fidget {
       this.bodies.bones.rectangles[2],
       this.bodies.bones.rectangles[3]
     ]
-    let z_depth = z_depth_start
+    let z_depth = args.z_depth_start
     let z_depth_incr = 0.5 //0.1
     for (let i = 0; i < this.bodies_draw_order.length; i++)
     {
@@ -758,15 +789,15 @@ export default class fidget_daft_i extends fidget {
       'geos',
       'rectangles'
     ]
-
+    
     this.steps_info = [
       ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable: [
-          this.bodies.inters_step.steps[0][0],
-          this.bodies.inters_step.steps[0][1],
-          this.bodies.inters_step.steps[0][2],
-          this.bodies.inters_step.steps[0][3],
+          this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
+          this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
+          this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
+          this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
           this.bodies.inters.background,
           this.bodies.inters.circle,
           this.bodies.inters.rectangle,
@@ -844,7 +875,7 @@ export default class fidget_daft_i extends fidget {
       }, ///////////////////////////////////////////////////////////////////////////////////// 2
       {
         bodies_enable: [
-          this.bodies.inters_step.steps[2],
+          this.is_dynamic ? this.bodies.inters_step.steps[2] : null,
           this.bodies.inters.background,
           this.bodies.inters.circle,
           //this.bodies.inters.rectangle,
@@ -893,10 +924,11 @@ export default class fidget_daft_i extends fidget {
     this.bodies_init_physics()
     this.bodies_init_constraints()
 
-    this.end_step = this.bodies.inters_step.steps.length +1
+    
   }
 
-  override_with_idle () {
+  animation_idle() {
+    
     this.bodies_set_dynamic(false)
     this.bodies_constraints_enable(false, ['bones'])
 
@@ -934,7 +966,7 @@ export default class fidget_daft_i extends fidget {
     )
   }
 
-  override_with_animation_reverse_build () {
+  animation_entrance() {
     let start_time = 0
     let t = this.state.update_count
     let anim_duration = 100

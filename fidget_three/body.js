@@ -1345,6 +1345,7 @@ export class body_build{
         m:this.m,
         parent:this.parent,
         m_offset:this.m_offset,
+        m_transform:this.m_transform,
         z:this.z,
         m_shape:this.m_shape,
      
@@ -1415,6 +1416,7 @@ export class body_build{
       let parent = args.parent
       let parent_name = parent.name
       let m_offset = args.m_offset
+      let m_transform = args.m_transform
       let m_shape = args.m_shape
 
       let slop = args.slop
@@ -1708,7 +1710,17 @@ export class body_build{
       }
       
       if( parent_is_sided == false)
+      {
+        let m_transform_offset_mirrored = m_transform.getMult(m_offset).get_mirror(axe_x,axe_y)
+
         m_offset = m_offset.get_mirror(axe_x,axe_y)
+
+        let angleA = m_transform.getRotation()
+        m_transform = m_transform_offset_mirrored.getMult(m_offset.getInverse())
+        let angleB = m_transform.getRotation()
+
+      }
+        
 
       // m_shape mirrored
       // constraint 
@@ -1724,6 +1736,7 @@ export class body_build{
       args.name = name
       args.parent = parent
       args.m_offset = m_offset
+      args.m_transform = m_transform
       args.m_shape = m_shape
 
       args.slop = slop

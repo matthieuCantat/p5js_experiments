@@ -33,25 +33,30 @@ export default class fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( 
-    m, 
-    s, 
-    screen_dims, 
-    do_background, 
-    shaders = [],
-    debug=false)
+  constructor( in_options)
   {
+    let defaultOptions = 
+    {
+      m:null, 
+      s:1, 
+      screen_dims:null, 
+      do_background: true, 
+      debug : false,      
+    }
+    const args = { ...defaultOptions, ...in_options };
+
+
     let matter_engine        = create_physics_engine()
     let matter_engine_runner = create_physics_engine_runner(matter_engine)
     let mouse_constraint = create_mouse_constraint(matter_engine)
-    create_boundary_wall_collision(matter_engine, screen_dims.x,screen_dims.y,false)
+    create_boundary_wall_collision(matter_engine, args.screen_dims.x,args.screen_dims.y,false)
     
 
 
 
-    this.m = m
-    this.s = s
-    this.screen_dims = screen_dims
+    this.m = args.m
+    this.s = args.s
+    this.screen_dims = args.screen_dims
     this.state = {
       update_count : 0,
       resolution_coef : 0, 
@@ -69,7 +74,7 @@ export default class fidget{
 
     this.force_way = null
     this.resolution_coef_override = null
-    this.debug_mode = debug
+    this.debug_mode = args.debug
     this.fidget_sequence_i = 0
     this.mouse_pressed_positions_at_update = []
     this.touch_enable = true
@@ -77,8 +82,8 @@ export default class fidget{
     this.matter_engine = matter_engine
     this.matter_engine_runner = matter_engine_runner 
     this.mouse_constraint = mouse_constraint
-    this.Mouse = new Mouse_manager( mouse_constraint, screen_dims, this, this.debug_mode.mouse_info)
-    this.do_background = do_background
+    this.Mouse = new Mouse_manager( mouse_constraint, this.screen_dims, this, this.debug_mode.mouse_info)
+    this.do_background = args.do_background
     this.do_bloom_selected = this.debug_mode.do_bloom_selected
     this.do_bloom = this.debug_mode.do_bloom
     /////////////////////////////////////////////////////////////////// build
@@ -96,10 +101,6 @@ export default class fidget{
     //this.color_background = utils.color.dark
     this.show_step_helpers = [ 0, 0, 0 ]  
     
-
-    this.shaders = shaders
-
-     
       
     this.group_three = null
 
@@ -168,9 +169,16 @@ export default class fidget{
     this.state.update_count += 1
 
     if(this.play_animation != null)
-      this.animations[this.play_animation]()
+    {
+      this[this.play_animation]()
+      //this.anim_mode = true
+    }
+    else
+    {
+      //this.anim_mode = false
+    }
         
-    this.anim_mode =  this.resolution_coef_override != null
+    //this.anim_mode =  this.resolution_coef_override != null
     // resolution
 
     if(this.is_dynamic)
@@ -439,7 +447,7 @@ export default class fidget{
       body.update()
 
     for( let effect in this.effects)
-      this.effects[effect].update()      
+      if(this.effects[effect] != null)this.effects[effect].update()      
   }
 
   bodies_setup_shapes_three( body_type_filter = [] )
@@ -450,7 +458,7 @@ export default class fidget{
       body.setup_shapes_three(this.group_three)  
 
     for( let effect in this.effects)
-      this.effects[effect].setup(this.group_three)  
+      if(this.effects[effect] != null)this.effects[effect].setup(this.group_three)  
 
     this.Mouse.setup(this.group_three)
   }  
@@ -463,7 +471,7 @@ export default class fidget{
       body.clean_shapes_three(this.group_three) 
 
     for( let effect in this.effects)
-      this.effects[effect].clean(this.group_three)        
+      if(this.effects[effect] != null)this.effects[effect].clean(this.group_three)        
   }
 
   clean_shapes_three(three_scene)
@@ -481,7 +489,7 @@ export default class fidget{
       body.animate_three()
     
     for( let effect in this.effects)
-      this.effects[effect].animate_three()    
+      if(this.effects[effect] != null)this.effects[effect].animate_three()    
 
     this.Mouse.update()
   }  
@@ -725,7 +733,7 @@ export default class fidget{
       body.init_physics()   
   
     for( let effect in this.effects)
-      this.effects[effect].init_physics()     
+      if(this.effects[effect] != null)this.effects[effect].init_physics()     
 
   }
 
@@ -739,7 +747,7 @@ export default class fidget{
     }
 
     for( let effect in this.effects)
-      this.effects[effect].init_constraints()     
+      if(this.effects[effect] != null)this.effects[effect].init_constraints()     
   
 
   }
@@ -1064,7 +1072,12 @@ export default class fidget{
       } 
     }
 
-
+    // //remove none
+    // let bodies_list_clean = []
+    // for( let elem of bodies_list)
+    //   if(elem != null)
+    //     bodies_list_clean.push(elem)
+  
     return bodies_list
 
   }

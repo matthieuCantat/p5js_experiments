@@ -578,7 +578,6 @@ Matrix.prototype = {
 		
 		let vX = this.get_row(0)
 		let vY = this.get_row(1)
-
 		let vX_mirrored = null
 		let vY_mirrored = null		
 		if( (axe_x == false)&&(axe_y == true))
@@ -602,7 +601,6 @@ Matrix.prototype = {
 
 			//vX_mirrored.mult(-1)
 		}
-
 		m_mirrored.set_row(0,vX_mirrored)
 		m_mirrored.set_row(1,vY_mirrored)
 		
