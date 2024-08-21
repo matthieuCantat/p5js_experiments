@@ -14,9 +14,19 @@ export default class fidget_windmill extends fidget{
   //////////////////////////////////////////////////////////////////////////////////// SETUP
   ////////////////////////////////////////////////////////////////////////////////////
 
-  constructor( m, s, screen_dims, matter_engine,mouse_constraint, shaders = [],debug=false,random_color=true)
+  constructor(
+    m,
+    s,
+    screen_dims,
+    z_depth_start,
+    do_background,
+    is_dynamic = true,
+    shaders = [],
+    debug = false,
+    random_color = true    
+  )
   {
-    super(m, s, screen_dims, matter_engine,mouse_constraint,shaders, debug)
+    super(m, s, screen_dims, do_background, shaders, debug)
 
     this.title = 'windmill'
 
@@ -498,9 +508,47 @@ export default class fidget_windmill extends fidget{
   }
 
 
-  ////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////// UPDATE
-  //////////////////////////////////////////////////////////////////////////////////// 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
   get_resolution_coef_info()
   {
@@ -981,6 +1029,6 @@ export default class fidget_windmill extends fidget{
 
 
 
+*/
 }
-
 

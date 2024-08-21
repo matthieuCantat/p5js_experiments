@@ -254,7 +254,7 @@ function build_effects_particles_sparcles(opts)
     debug_force_visibility: opts.debug_force_visibility,             
   }  
   ////////////////////////////////////////////////////////////////////////////////
-
+  
   let bodies = []
 
   let m_shape = new Matrix()

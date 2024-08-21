@@ -87,7 +87,6 @@ export default class fidget_daft_i extends fidget {
       ...opts_global,
       ...opts_debug,
       scale_shape: s,
-      parent: this.bodies.inters.background,
       type: 'sparcle_shock'
     }
 
@@ -608,6 +607,7 @@ export default class fidget_daft_i extends fidget {
         name: 'colA',
         trigger_body_min: this.bodies.inters_step.steps[0][0],
         trigger_value_min: 0.99,
+        parent: this.bodies.inters.background,
         p: new Vector(-66*s, 6.8*s),
         r: 0
       })
@@ -617,6 +617,7 @@ export default class fidget_daft_i extends fidget {
         name: 'colB',
         trigger_body_min: this.bodies.inters_step.steps[1],
         trigger_value_min: 0.99,
+        parent: this.bodies.inters.background,
         p: new Vector(6.8*s, -36*s),
         r: -90
       })
@@ -626,6 +627,7 @@ export default class fidget_daft_i extends fidget {
         name: 'colC',
         trigger_body_min: this.bodies.inters_step.steps[2],
         trigger_value_min: 0.99,
+        parent: this.bodies.inters.background,
         p: new Vector(0, 91*s),
         r: 0
       })
