@@ -291,7 +291,7 @@ export default class fidget_windmill extends fidget{
       })
       
     //////////////////////////////////////////////////////////////////////////////// steps
-
+    let inter_size = 22
     if( this.is_dynamic )
     {
 
@@ -301,7 +301,7 @@ export default class fidget_windmill extends fidget{
           name: 'inters_A_S_',
           parent: this.bodies.inters.background,
           m_offset: new Matrix().setTranslation(0,30*this.s),
-          m_shape: new Matrix().setScale(7*this.s,30*this.s),
+          m_shape: new Matrix().setScale(7*this.s+inter_size,30*this.s+inter_size),
           type: utils.shape.rectangle,
           constraints: [
             { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
@@ -332,8 +332,8 @@ export default class fidget_windmill extends fidget{
           ...opts_collision_no_interaction,
           name: 'inters_B_S_help',
           parent: this.bodies.inters.background,
-          m_offset: new Matrix(),
-          m_shape: new Matrix().setScale(40*this.s),
+          m_offset: new Matrix().setRotation(rad(1)),
+          m_shape: new Matrix().setScale(100*this.s),
           type: utils.shape.circle,
           constraints: [
             {
@@ -368,7 +368,7 @@ export default class fidget_windmill extends fidget{
           name: 'inters_B_S_',
           parent: this.bodies.inters.background,
           m_offset: new Matrix().setTranslation(0,55*this.s),
-          m_shape: new Matrix().setScale(7*this.s,30*this.s),
+          m_shape: new Matrix().setScale(7*this.s+inter_size,30*this.s+inter_size),
           type: utils.shape.rectangle,
           constraints: [
             {
@@ -399,7 +399,8 @@ export default class fidget_windmill extends fidget{
         if( middle_value < angle )
           angle = 0
         
-        return clamp(angle / 269.9, 0, 1)
+        
+        return clamp(angle / 268.9, 0, 1)
       }
       this.bodies.inters_step.steps[1][0].set_resolution_coef = function (res = null) {/*if (res != null)this.body_coef_ref.set_out_rotation(rad(res * -91), 'world', 'override')*/}
 
@@ -410,7 +411,7 @@ export default class fidget_windmill extends fidget{
 
           name: 'inters_C',
           m_offset: new Matrix().setRotation(rad(180)).setTranslation(55*this.s,0),
-          m_shape: new Matrix().setScale(30*this.s,7*this.s),
+          m_shape: new Matrix().setScale(30*this.s+inter_size,7*this.s+inter_size),
           parent: this.bodies.inters.background,
 
           type: utils.shape.rectangle,
@@ -422,7 +423,7 @@ export default class fidget_windmill extends fidget{
               name: 'axe',
               type: 'kin_axe',
               axe: 0,
-              distPos: 50 * this.s,
+              distPos: 25 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
               transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
@@ -547,7 +548,7 @@ export default class fidget_windmill extends fidget{
       ...opts_geo,
       name: 'geos_circle',
       parent: this.bodies.bones.circle,
-      m_shape: new Matrix().setScale(20*this.s),
+      m_shape: new Matrix().setScale(17*this.s),
       type: utils.shape.circle,
 
       material_three: materials.raw_shader_exemple, //three_utils.material.simple.cyan_grid ,
@@ -565,6 +566,18 @@ export default class fidget_windmill extends fidget{
       name: 'bones_trapezoids_center',
       parent: this.bodies.bones.root,
       constraint_to_parent: true,
+      constraints: [
+        {
+          name: 'connect_ty_iA',
+          type: 'connect',
+          target: this.bodies.inters_step.steps_help[0],
+          attr: 'r',
+          target_attr: 'r',
+          target_space: 'base',
+          target_remap: [0, 270, 0, 270], 
+          clockwize_mode: true,
+        },
+      ]      
     })
     
     this.bodies.bones.trapezoids.push(
@@ -574,13 +587,35 @@ export default class fidget_windmill extends fidget{
         parent: this.bodies.bones.trapezoids_center,
         constraint_to_parent: true,
         m_offset: new Matrix().setTranslation(30*this.s*0.7, 30*this.s*0.7).setRotation(rad(-45)),
+        constraints: [
+          {
+            name: 'connect_ty_iA',
+            type: 'connect',
+            target: this.bodies.inters_step.steps_help[0],
+            attr: 'ty',
+            target_attr: 'r',
+            target_space: 'base',
+            target_remap: [0, 270, 0, -28], 
+            clockwize_mode: true,
+          },
+          {
+            name: 'connect_r_iA',
+            type: 'connect',
+            target: this.bodies.inters_step.steps[2],
+            attr: 'r',
+            target_attr: 'tx',
+            target_space: 'base',
+            target_remap: [0, 50, 0, -45], 
+            clockwize_mode: true,
+          },          
+        ]        
       })
     )
     
     let opts_trapezoids = {
       ...opts_geo,
       name: 'geos_trapezoid_T__S_',
-      type: utils.shape.rectangle,
+      type: utils.shape.trapezoid,
       parent: this.bodies.bones.trapezoids[0],
       constraint_to_parent: true,
       m_shape: new Matrix().setScale(40*this.s,7*this.s),
@@ -616,8 +651,8 @@ export default class fidget_windmill extends fidget{
     name_replace = '_N_'
     if(this.is_dynamic)
     {
-      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_search))
-      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_search))
+      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
       this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
       this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
       this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
@@ -629,14 +664,23 @@ export default class fidget_windmill extends fidget{
     name_replace = '_E_'
     if(this.is_dynamic)
     {
-      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_search))
-      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_search))
+      this.bodies.inters_step.steps[0].push(   this.bodies.inters_step.steps[0][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
+      this.bodies.inters_step.steps[1].push(   this.bodies.inters_step.steps[1][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
       this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.trapezoids.push(this.bodies.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.trapezoids.push(this.bodies.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))            
+      this.bodies.bones.rectangles.push(       this.bodies.bones.rectangles[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.rectangles.push(        this.bodies.geos.rectangles[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.trapezoids.push(       this.bodies.bones.trapezoids[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.trapezoids.push(        this.bodies.geos.trapezoids[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))            
     }
+
+    /*
+    this.create_inter_from_geos(
+      ['circle', 'trapezoids'],
+      this.bodies.inters.background,
+      this.s
+    )
+    */
+
 
     if(this.is_dynamic)
      this.instance_each_others(

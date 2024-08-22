@@ -990,6 +990,7 @@ export class body_build{
       if( !this.do_update )
         return false
 
+      
       for( let i = 0; i < this.constraints_order.length; i++)
       {
         this.constraints[this.constraints_order[i]].apply()

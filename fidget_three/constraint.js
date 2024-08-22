@@ -240,7 +240,7 @@ export class dyn_constraint_build{
       {
         if((this.obj.is_selected)||(this.obj.instance_is_selected))
         {
-          //console.log(this.obj.name, 'is selected')
+          
           this.cns.stiffness = this.stiffness_at_selection
           if(this.stiffness_at_selection == 0 )
           {
@@ -253,7 +253,7 @@ export class dyn_constraint_build{
         }
         else
         {
-          //console.log(this.obj.name, 'is not selected')
+          
           this.cns.stiffness = this.stiffness
           if(this.stiffness_at_selection == 0 )
           {
@@ -959,8 +959,6 @@ export class constraint_build{
         if(this.is_enable == false)
             return false
 
-        //if(this.target.name == 'geo_rectangle_TL')
-        //  console.log('constraint_build',this.name,this.target.name,this.obj.name)
 
         
         let m_target = this.target.get_out_matrix()
@@ -1048,6 +1046,7 @@ export class connect{
       activate_when_target_is_selected:false, 
       instance_mode:false, 
       out_multiplier:1,
+      clockwize_mode:false,
     };
     const args = { ...defaultOptions, ...in_options };
     
@@ -1061,6 +1060,7 @@ export class connect{
     this.out_multiplier = args.out_multiplier
     this.activate_when_target_is_selected = args.activate_when_target_is_selected
     this.instance_mode = args.instance_mode
+    this.clockwize_mode = args.clockwize_mode
 
     this.value_old = null
  
@@ -1097,7 +1097,7 @@ export class connect{
       let value = null
       if( this.target_attr == 'tx'          )value = m.get_row(2).x()      
       if( this.target_attr == 'ty'          )value = m.get_row(2).y()
-      if( this.target_attr == 'r'           )value = deg(m.getRotation())
+      if( this.target_attr == 'r'           )value = deg(m.getRotation(this.clockwize_mode))
       if( this.target_attr == 's'           )value = this.target.scale
       if( this.target_attr == 'is_selected' )value = this.target.is_selected
 
@@ -1139,7 +1139,7 @@ export class connect{
       //SET VALUE
       if( (this.activate_when_target_is_selected)&&(this.target.is_selected == false))
         return false
-
+      
       if((this.instance_mode)&&(this.target.is_last_instance_selected == false))
         return false
 
@@ -1154,7 +1154,7 @@ export class connect{
         this.obj.set_out_position_Y(value ,this.space, 'override')  
       if( this.attr == 'is_selected' )
         this.obj.instance_is_selected = value
-      
+
       return true
 
   }

@@ -87,7 +87,7 @@ var debug = { disable_animation:true,
               show_geos:true,
               show_effects:true,              
               show_inters:false,
-              show_inters_steps:false,
+              show_inters_steps:true,
               show_bones:false,
               force_visibility:false,
 
