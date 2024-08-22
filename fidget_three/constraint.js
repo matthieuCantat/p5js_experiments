@@ -832,7 +832,7 @@ export class limit{
           }
           else if( this.rot_min < middle_value )
           {
-            if( (a == 2*Math.PI)||(a==0))
+            if( (Math.round(a*100)/100 == Math.round(2*Math.PI*100)/100)||(Math.round(a*100)/100==0))
               a = this.rot_min
 
             if( ( middle_value <= a )&&( a < 2*Math.PI ))
@@ -849,7 +849,7 @@ export class limit{
           }
           else if( middle_value < this.rot_max )
           {
-            if( (a == 2*Math.PI)||(a==0))
+            if( (Math.round(a*100)/100 == Math.round(2*Math.PI*100)/100)||(Math.round(a*100)/100==0))
               a = this.rot_max            
 
             if( ( this.rot_max <= a )&&( a < 2*Math.PI ))

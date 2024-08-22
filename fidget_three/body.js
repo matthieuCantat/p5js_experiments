@@ -833,10 +833,10 @@ export class body_build{
       let m = this.get_out_matrix(space)
       return m.get_row(2)
     }
-    get_out_rotation(space = 'world')
+    get_out_rotation(space = 'world',clockwise=false)
     {
       let m = this.get_out_matrix(space)
-      return m.getRotation()
+      return m.getRotation(clockwise)
     }   
     get_out_scale(space = 'world')
     {

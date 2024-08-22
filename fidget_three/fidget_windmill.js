@@ -327,6 +327,7 @@ export default class fidget_windmill extends fidget{
       this.bodies.inters_step.steps_help.push(
         new body_build({
           ...opts_inter_step,
+          ...opts_collision_no_interaction,
           name: 'inters_B_S_help',
           parent: this.bodies.inters.background,
           m_offset: new Matrix(),
@@ -385,17 +386,29 @@ export default class fidget_windmill extends fidget{
         })
       )
 
-      this.bodies.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.get_out_rotation('base')) / 180.0, 0, 1)}
-      this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.set_out_rotation(rad(res * 90.5), 'world', 'override')}
+      this.bodies.inters_step.steps[1].body_coef_ref = this.bodies.inters_step.steps_help[0]
+      this.bodies.inters_step.steps[1].get_resolution_coef = function ()
+      {
+        let max_value = 270.0
+        let min_value = 0
+        let middle_value = 315.0
 
-      /*
+        let angle = deg(this.body_coef_ref.get_out_rotation('base',true))
+        if( middle_value < angle )
+          angle = 0
+        
+        return clamp(angle / 269.9, 0, 1)
+      }
+      this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {/*if (res != null)this.body_coef_ref.set_out_rotation(rad(res * -91), 'world', 'override')*/}
+
+      
       this.bodies.inters_step.steps.push(
         new body_build({
           ...opts_inter_step,
 
           name: 'inters_C',
-          m_offset: new Matrix(),
-          m_shape: new Matrix().setScale(7*this.s,30*this.s),
+          m_offset: new Matrix().setRotation(rad(180)).setTranslation(55*this.s,0),
+          m_shape: new Matrix().setScale(30*this.s,7*this.s),
           parent: this.bodies.inters.background,
 
           type: utils.shape.rectangle,
@@ -418,7 +431,7 @@ export default class fidget_windmill extends fidget{
       )
       this.bodies.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
       this.bodies.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
-      */
+      
     }
 
     /*
