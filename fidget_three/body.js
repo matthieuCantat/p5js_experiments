@@ -1406,6 +1406,318 @@ export class body_build{
       }
     }
 
+    get_resolution_coef(){return 0}
+    set_resolution_coef(){}
+
+    get_duplicate( m_transform_start, m_transform_end, name_search, name_replace )
+    {
+      let args = this.get_args()
+
+      let name = args.name
+      let parent = args.parent
+      let parent_name = parent.name
+      let m_offset = args.m_offset
+      let m_transform = args.m_transform
+      let m_shape = args.m_shape
+
+      let slop = args.slop
+      let extra_rotation = args.extra_rotation
+      let rot_override = args.rot_override
+
+      let highlight_selection = args.highlight_selection  
+      let highlight_selection_names = []
+      for( let i = 0 ; i < highlight_selection.length; i++)
+        highlight_selection_names.push( highlight_selection[i].name )         
+
+      let constraints_args = args.constraints_args
+      let target_names = []
+      for( let i = 0 ; i < constraints_args.length; i++)
+      {
+        if( constraints_args[i]['target'] != null )
+          target_names.push( constraints_args[i]['target'].name )   
+        else
+          target_names.push( null )   
+      }
+         
+ 
+      let arc_limites = args.arc_limites
+    
+      let suffix_axeY = [name_search, name_replace]
+
+      let parent_is_sided = false
+      if(true)
+      {
+        // name
+        if( name.includes(suffix_axeY[0]) )
+          name = name.replace(suffix_axeY[0],suffix_axeY[1])
+        else
+          console.error('no '+suffix_axeY[0]+' in name, cannot mirror')
+
+        // parent
+        if( parent_name.includes(suffix_axeY[0]) )
+        {
+          parent_name = parent_name.replace(suffix_axeY[0],suffix_axeY[1])
+
+          let bodies_found = this.fidget.bodies_search_by_name( parent_name )
+          if( 0 < bodies_found.length )
+          {
+            let mirrored_body = bodies_found[0]
+            parent = mirrored_body
+            parent_is_sided = true
+          }
+        }
+
+        //highlight_selection
+        let highlight_selection_mirrored = []
+        for( let i = 0 ; i < highlight_selection.length; i++)
+        {
+          if( highlight_selection_names[i].includes(suffix_axeY[0]) )
+          {
+            highlight_selection_names[i] = highlight_selection_names[i].replace(suffix_axeY[0],suffix_axeY[1])
+            let bodies_found = this.fidget.bodies_search_by_name( highlight_selection_names[i] )
+            if( 0 < bodies_found.length )
+            {
+              let mirrored_body = bodies_found[0]
+              highlight_selection_mirrored.push(mirrored_body)
+            }  
+            else
+              highlight_selection_mirrored.push(highlight_selection[i])
+          }  
+          else
+            highlight_selection_mirrored.push(highlight_selection[i])                
+        }
+        highlight_selection = highlight_selection_mirrored
+
+        // constraint 
+        const constraints_args_mirrored = []
+        for( let i = 0 ; i < constraints_args.length; i++)
+        {
+          let constraints_arg_mirrored = {}
+          for( let attr in constraints_args[i] )
+            constraints_arg_mirrored[attr] = constraints_args[i][attr]
+
+          if( (target_names[i] != null)&&( target_names[i].includes(suffix_axeY[0]) ) )
+          {
+            target_names[i] = target_names[i].replace(suffix_axeY[0],suffix_axeY[1])
+            let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
+            if( 0 < bodies_found.length )
+            {
+              let mirrored_body = bodies_found[0]
+              constraints_arg_mirrored['target'] = mirrored_body 
+            } 
+          }     
+          
+          if(constraints_arg_mirrored.type == 'kin_axe')
+          {       
+            /*
+            let distPos = constraints_arg_mirrored.distPos
+            let distNeg = constraints_arg_mirrored.distNeg
+            constraints_arg_mirrored.distPos = distNeg
+            constraints_arg_mirrored.distNeg = distPos
+
+            constraints_arg_mirrored.limit_lock *= -1
+            */
+          }
+          
+
+
+           /*
+          if(constraints_arg_mirrored.type == 'connect')
+          {
+            if( constraints_arg_mirrored.attr == 'tx' )
+              constraints_arg_mirrored['out_multiplier'] = 1     
+            else if( constraints_arg_mirrored.attr == 'ty' )
+              constraints_arg_mirrored['out_multiplier'] = -1
+            else if( constraints_arg_mirrored.attr == 'r' )
+              constraints_arg_mirrored['out_multiplier'] = -1
+            else if( constraints_arg_mirrored.attr == 's' )
+              constraints_arg_mirrored['out_multiplier'] = -1  
+              
+            
+            
+            if(constraints_arg_mirrored['target_remap'] != null )
+            {
+              let r = constraints_arg_mirrored['target_remap']
+              
+              if( constraints_arg_mirrored.attr == 'tx' )
+                r = [ r[0], r[1], r[2], r[3] ]   
+              else if( constraints_arg_mirrored.attr == 'ty' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]   
+              else if( constraints_arg_mirrored.attr == 'r' )
+                r = [ r[0], r[1], r[3], r[2]  ]    
+              else if( constraints_arg_mirrored.attr == 's' )
+                r = [ r[0], r[1], r[2]*-1, r[3]*-1 ]    
+              
+              if( constraints_arg_mirrored.target_attr == 'tx' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]                 
+              else if( constraints_arg_mirrored.target_attr == 'ty' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]               
+              else if( constraints_arg_mirrored.target_attr == 'r' )
+                r = [ r[0], r[1], r[2], r[3] ]                  
+              else if( constraints_arg_mirrored.target_attr == 's' )
+                r = [ r[0]*-1, r[1]*-1, r[2], r[3] ]     
+                
+                constraints_arg_mirrored['target_remap'] = r
+            }              
+            
+          }
+          else if(constraints_arg_mirrored.type == 'kin_orient')
+            constraints_arg_mirrored['out_multiplier'] = -1
+          else if(constraints_arg_mirrored.type == 'dyn_orient')
+            constraints_arg_mirrored['out_multiplier'] = -1
+          */
+
+          constraints_args_mirrored.push(constraints_arg_mirrored)          
+   
+        }
+        constraints_args = constraints_args_mirrored
+        
+
+
+      }
+      
+      
+      if( parent_is_sided == false)
+      {
+        let m_parent = parent.get_init_matrix()
+        let m_offset_world = m_offset.getMult(m_parent)
+        let m_transform_offset_world = m_transform.getMult(m_offset_world)
+
+        let m_offset_world_transformed = m_offset_world.getMult(m_transform_start.getInverse()).getMult(m_transform_end)
+        let m_transform_offset_world_transformed = m_transform_offset_world.getMult(m_transform_start.getInverse()).getMult(m_transform_end)
+
+        m_offset = m_offset_world_transformed.getMult(m_parent.getInverse())
+
+        m_transform = m_transform_offset_world_transformed.getMult(m_offset_world_transformed.getInverse())
+
+
+      }
+        
+
+      // m_shape mirrored
+      // constraint 
+
+
+      
+
+
+
+
+
+      // update args
+      args.name = name
+      args.parent = parent
+      args.m_offset = m_offset
+      args.m_transform = m_transform
+      args.m_shape = m_shape
+
+      args.slop = slop
+      args.extra_rotation = extra_rotation
+      args.rot_override = rot_override
+
+      args.highlight_selection = highlight_selection
+      args.constraints = constraints_args
+ 
+      args.arc_limites = arc_limites
+
+      let body_duplicated = new body_build(args)
+      
+
+      
+      /*
+      if(instance)
+      {
+        let connect_to_dupli_tx ={
+          name:'instance_A_to_B_tx', 
+          type:'connect', 
+          target:this, 
+          attr:'tx',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_orig_tx ={
+          name:'instance_B_to_A_tx', 
+          type:'connect', 
+          target:body_duplicated, 
+          attr:'tx',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_dupli_ty ={
+          name:'instance_A_to_B_ty', 
+          type:'connect', 
+          target:this, 
+          attr:'ty',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_orig_ty ={
+          name:'instance_B_to_A_ty', 
+          type:'connect', 
+          target:body_duplicated, 
+          attr:'ty',
+          target_attr:'ty', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_dupli_r ={
+          name:'instance_A_to_B_r', 
+          type:'connect', 
+          target:this, 
+          attr:'r',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        let connect_to_orig_r ={
+          name:'instance_B_to_A_r', 
+          type:'connect', 
+          target:body_duplicated, 
+          attr:'r',
+          target_attr:'tx', 
+          target_space:'local',
+          target_remap:[-1000,1000,-1000,1000],
+          activate_when_target_is_selected: true }
+
+        if((!axe_x)&&axe_y)
+        {
+          //connect_to_dupli_tx.target_remap = [-1000,1000,-1000,1000]
+          //connect_to_orig_tx.target_remap = [-1000,1000,-1000,1000]
+          connect_to_dupli_ty.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          connect_to_orig_ty.target_remap = [-1000*-1,1000*-1,-1000,1000]          
+          //connect_to_dupli_r.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          //connect_to_orig_r.target_remap = [-1000,1000,-1000*-1,1000*-1]  
+        }        
+        if(axe_x&&(!axe_y))
+        {
+          //connect_to_dupli_tx.target_remap = [-1000,1000,-1000,1000]
+          //connect_to_orig_tx.target_remap = [-1000,1000,-1000,1000]
+          connect_to_dupli_ty.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          connect_to_orig_ty.target_remap = [-1000*-1,1000*-1,-1000,1000]          
+          //connect_to_dupli_r.target_remap = [-1000,1000,-1000*-1,1000*-1]
+          //connect_to_orig_r.target_remap = [-1000,1000,-1000*-1,1000*-1]  
+        }
+
+        //this.constraints_args.push(connect_to_orig_tx)
+        this.constraints_args.push(connect_to_orig_ty)
+        //this.constraints_args.push(connect_to_orig_r)
+
+        //body_duplicated.constraints_args.push(connect_to_dupli_tx)
+        body_duplicated.constraints_args.push(connect_to_dupli_ty)
+        //body_duplicated.constraints_args.push(connect_to_dupli_r)        
+      }
+      */
+
+      return body_duplicated      
+    }
 
 
     get_mirror(  axe_x = false, axe_y = true)

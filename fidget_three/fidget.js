@@ -274,7 +274,7 @@ export default class fidget{
           let reciever_axe_y = iB[1]
           let emetor_axe_x = iA[0]
           let emetor_axe_y = iA[1]
-
+          
           let r = connect_to_dupli_ty.target_remap
           if(reciever_axe_y == emetor_axe_y)
           {
@@ -284,39 +284,15 @@ export default class fidget{
           {
             r = [r[0], r[1], r[2]*-1, r[3]*-1]
           }
-
-          /*
-          
-          if((!reciever_axe_x)&&reciever_axe_y)
-          {
-            
-            connect_to_dupli_ty.target_remap = [r[0], r[1], r[2]*-1, r[3]*-1]
-          }        
-          if(reciever_axe_x&&(!reciever_axe_y))
-          {
-            let r = connect_to_dupli_ty.target_remap
-            connect_to_dupli_ty.target_remap = [r[0], r[1], r[2]*-1, r[3]*-1]        
-          }
-
-          // emmetor
-
-          if((!emetor_axe_x)&&emetor_axe_y)
-          {
-            let r = connect_to_dupli_ty.target_remap
-            connect_to_dupli_ty.target_remap = [r[0]*-1, r[1]*-1, r[2], r[3]]
-          }        
-          if(emetor_axe_x&&(!emetor_axe_y))
-          {
-            let r = connect_to_dupli_ty.target_remap
-            connect_to_dupli_ty.target_remap = [r[0]*-1, r[1]*-1, r[2], r[3]]        
-          }
-          */
-         
           
         connect_to_dupli_ty.target_remap = r
         bodies[j].constraints_args.push(connect_to_dupli_ty)
-        //console.log(bodies[i].name,bodies[j].name)
 
+        ///////////////////////////////////////////////////////////////////////
+
+
+
+        ///////////////////////////////////////////////////////////////////////
         let connect_to_dupli_is_selected ={
           name:'instance_is_selected_'+bodies[i].name+'_to_'+bodies[j].name, 
           type:'connect', 

@@ -290,7 +290,7 @@ export default class fidget_windmill extends fidget{
         constraint_to_parent: true,
       })
       
-    //////////////////////////////////////////////////////////////////////////////// CUSTOM
+    //////////////////////////////////////////////////////////////////////////////// steps
 
     if( this.is_dynamic )
     {
@@ -306,6 +306,7 @@ export default class fidget_windmill extends fidget{
           constraints: [
             { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
             { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background},
+            
             {
               name: 'axe',
               type: 'kin_axe',
@@ -315,6 +316,7 @@ export default class fidget_windmill extends fidget{
               limit_lock: 1,
               transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
             }
+            
           ],
 
         })
@@ -360,7 +362,7 @@ export default class fidget_windmill extends fidget{
       
 
 
-      this.bodies.inters_step.steps.push(
+      this.bodies.inters_step.steps.push([
         new body_build({
           ...opts_inter_step,
           name: 'inters_B_S_',
@@ -383,11 +385,11 @@ export default class fidget_windmill extends fidget{
             },
           ],
 
-        })
+        })]
       )
 
-      this.bodies.inters_step.steps[1].body_coef_ref = this.bodies.inters_step.steps_help[0]
-      this.bodies.inters_step.steps[1].get_resolution_coef = function ()
+      this.bodies.inters_step.steps[1][0].body_coef_ref = this.bodies.inters_step.steps_help[0]
+      this.bodies.inters_step.steps[1][0].get_resolution_coef = function ()
       {
         let max_value = 270.0
         let min_value = 0
@@ -399,7 +401,7 @@ export default class fidget_windmill extends fidget{
         
         return clamp(angle / 269.9, 0, 1)
       }
-      this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {/*if (res != null)this.body_coef_ref.set_out_rotation(rad(res * -91), 'world', 'override')*/}
+      this.bodies.inters_step.steps[1][0].set_resolution_coef = function (res = null) {/*if (res != null)this.body_coef_ref.set_out_rotation(rad(res * -91), 'world', 'override')*/}
 
       
       this.bodies.inters_step.steps.push(
@@ -434,8 +436,223 @@ export default class fidget_windmill extends fidget{
       
     }
 
-    /*
 
+
+    ////////////////////////////////////// rectangles
+
+
+
+
+    this.bodies.bones.rectangles_center = new body_build({
+      ...opts_visual_bones,
+      name: 'bones_rectangle_center',
+      parent: this.bodies.bones.root,
+      constraint_to_parent: true,
+      constraints:[
+      {
+        name: 'connect_ty_iA',
+        type: 'connect',
+        target: this.bodies.inters_step.steps[2],
+        attr: 'tx',
+        target_attr: 'tx',
+        target_space: 'base',
+        target_remap: [0, 100, 0, -100]
+      },
+      ]
+    })
+    
+
+    let rectangle_pivot_opts = {
+      ...opts_visual_bones,
+      name: 'bones_rectangle_pivot_T__S_',
+      parent: this.bodies.bones.rectangles_center,
+      constraint_to_parent: true,
+      constraints: [
+      ],
+    }
+    
+    if (this.is_dynamic) {
+
+      rectangle_pivot_opts.constraints.push({
+        name: 'connect_rot_iA',
+        type: 'connect',
+        target: this.bodies.inters_step.steps_help[0],
+        attr: 'r',
+        target_attr: 'r',
+        target_space: 'base',
+        target_remap: [-1000, 1000, -1000, 1000]
+      })
+
+      rectangle_pivot_opts.constraints.push({
+        name: 'rot_limit',
+        type: 'kin_limit',
+        obj: this,
+        rot_min: rad(0),
+        rot_max: rad(270),
+        clockwize_mode:true,
+        limit_lock:true,
+      })
+
+    }
+    
+
+    this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
+
+    this.bodies.bones.rectangles.push(
+      new body_build({
+        ...opts_visual_bones,
+        name: 'bones_rectangle_T__S_',
+        parent: this.bodies.bones.rectangles_pivots[0],
+        constraint_to_parent: true,
+        m_offset: new Matrix().setTranslation(0,30*this.s),
+        constraints: [
+          {
+            name: 'connect_ty_iA',
+            type: 'connect',
+            target: this.bodies.inters_step.steps[0][0],
+            attr: 'ty',
+            target_attr: 'ty',
+            target_space: 'base',
+            target_remap: [0, 100, 0, 100]
+          },
+        ]
+      })
+    )
+
+    let opts_rectangles = {
+      ...opts_geo,
+      name: 'geos_rectangle_T__S_',
+      type: utils.shape.rectangle,
+      parent: this.bodies.bones.rectangles[0],
+      constraint_to_parent: true,
+      m_shape: new Matrix().setScale(7*this.s,30*this.s),
+      material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
+    }
+    this.bodies.geos.rectangles.push(new body_build(opts_rectangles))
+
+    /////////////////////////////////// circle
+
+
+    let bone_circle_opts = {
+      ...opts_visual_bones,
+      name: 'bones_circle',
+      parent: this.bodies.bones.root,
+      constraint_to_parent: true,
+      constraints:[],
+    }
+    
+    this.bodies.bones.circle = new body_build(bone_circle_opts)
+
+    this.bodies.geos.circle = new body_build({
+      ...opts_geo,
+      name: 'geos_circle',
+      parent: this.bodies.bones.circle,
+      m_shape: new Matrix().setScale(20*this.s),
+      type: utils.shape.circle,
+
+      material_three: materials.raw_shader_exemple, //three_utils.material.simple.cyan_grid ,
+      constraint_to_parent: true,
+      constraints: [],
+    })
+
+
+    /////////////////////////////////// trapezoids
+
+    
+
+    this.bodies.bones.trapezoids_center = new body_build({
+      ...opts_visual_bones,
+      name: 'bones_trapezoids_center',
+      parent: this.bodies.bones.root,
+      constraint_to_parent: true,
+    })
+    
+    this.bodies.bones.trapezoids.push(
+      new body_build({
+        ...opts_visual_bones,
+        name: 'bones_trapezoid_T__S_',
+        parent: this.bodies.bones.trapezoids_center,
+        constraint_to_parent: true,
+        m_offset: new Matrix().setTranslation(30*this.s*0.7, 30*this.s*0.7).setRotation(rad(-45)),
+      })
+    )
+    
+    let opts_trapezoids = {
+      ...opts_geo,
+      name: 'geos_trapezoid_T__S_',
+      type: utils.shape.rectangle,
+      parent: this.bodies.bones.trapezoids[0],
+      constraint_to_parent: true,
+      m_shape: new Matrix().setScale(40*this.s,7*this.s),
+      slop:45,
+      material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
+    }
+    this.bodies.geos.trapezoids.push(new body_build(opts_trapezoids))
+        
+
+
+
+
+    /////////////////////////////////
+
+
+    // TOP RIGHT
+    let m_ref = new Matrix(this.m)
+    let m_transform = new Matrix(this.m).setRotation(rad(90))
+    let name_search = '_S_'
+    let name_replace = '_O_'
+    if(this.is_dynamic)
+    {
+      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.trapezoids.push(this.bodies.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.trapezoids.push(this.bodies.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+    }
+    // BOTTOM LEFT
+    m_transform = new Matrix(this.m).setRotation(rad(180))
+    name_replace = '_N_'
+    if(this.is_dynamic)
+    {
+      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_search))
+      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_search))
+      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
+      this.bodies.bones.trapezoids.push(this.bodies.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.trapezoids.push(this.bodies.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
+    }
+    // BOTTOM RIGHT
+    m_transform = new Matrix(this.m).setRotation(rad(270))
+    name_replace = '_E_'
+    if(this.is_dynamic)
+    {
+      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_search))
+      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_search))
+      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.bones.trapezoids.push(this.bodies.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.geos.trapezoids.push(this.bodies.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))            
+    }
+
+    if(this.is_dynamic)
+     this.instance_each_others(
+       [
+         this.bodies.inters_step.steps[0][0],
+         this.bodies.inters_step.steps[0][1],
+         this.bodies.inters_step.steps[0][2],
+         this.bodies.inters_step.steps[0][3]
+       ],
+       [false, false, 
+        false, false, 
+         false, false, 
+         false, false]
+     )
+
+    /*
     this.bodies.inters.B = new body_build({  
                                     m:this.m,
                                     m_offset:new Matrix(),
@@ -808,8 +1025,8 @@ export default class fidget_windmill extends fidget{
     } 
 
   let mo_tA = new Matrix()
-  mo_tA.setTranslation(oRect.h*oTrap.posCoef,
-                       oRect.h*oTrap.posCoef)             
+  mo_tA.setTranslation(oRect.h*0.7,
+                       oRect.h*0.7)             
   this.bodies.geos.trapezoids.push(new body_build({ ...oTrap,
                                           m_offset:mo_tA, 
                                           x:oRect.h*oTrap.posCoef,
@@ -865,36 +1082,46 @@ export default class fidget_windmill extends fidget{
       // this.bodies.inters.rectangles[3],
       this.bodies.inters_step.steps_help[0],
       this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
-      // this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
-      // this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
-      // this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[1]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[1][0]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[1][1]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[1][2]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[1][3]:null,
       this.is_dynamic ? this.bodies.inters_step.steps[2]:null,
-      // this.bodies.geos.circle,
+      this.bodies.geos.circle,
       // this.effects.trailA,
       // this.effects.trailB,
-      // this.bodies.geos.rectangle,
-      // this.bodies.geos.rectangles[0],
-      // this.bodies.geos.rectangles[1],
-      // this.bodies.geos.rectangles[2],
-      // this.bodies.geos.rectangles[3],
+      this.bodies.geos.trapezoids[0],
+      this.bodies.geos.trapezoids[1],
+      this.bodies.geos.trapezoids[2],
+      this.bodies.geos.trapezoids[3],
+      this.bodies.geos.rectangles[0],
+      this.bodies.geos.rectangles[1],
+      this.bodies.geos.rectangles[2],
+      this.bodies.geos.rectangles[3],
       // this.effects.sparcles_shock_A,
       // this.effects.sparcles_shock_B,
       // this.effects.sparcles_shock_C,
       this.bodies.bones.world,
       this.bodies.bones.traj,
       this.bodies.bones.root,
-      // this.bodies.bones.circle,
-      // this.bodies.bones.rectangle,
-      // this.bodies.bones.rectangles_center,
-      // this.bodies.bones.rectangles_pivots[0],
-      // this.bodies.bones.rectangles_pivots[1],
-      // this.bodies.bones.rectangles_pivots[2],
-      // this.bodies.bones.rectangles_pivots[3],
-      // this.bodies.bones.rectangles[0],
-      // this.bodies.bones.rectangles[1],
-      // this.bodies.bones.rectangles[2],
-      // this.bodies.bones.rectangles[3]
+      this.bodies.bones.circle,
+      this.bodies.bones.trapezoids_center,
+      this.bodies.bones.trapezoids[0],
+      this.bodies.bones.trapezoids[1],
+      this.bodies.bones.trapezoids[2],
+      this.bodies.bones.trapezoids[3],
+      this.bodies.bones.rectangles_center,
+      this.bodies.bones.rectangles_pivots[0],
+      this.bodies.bones.rectangles_pivots[1],
+      this.bodies.bones.rectangles_pivots[2],
+      this.bodies.bones.rectangles_pivots[3],
+      this.bodies.bones.rectangles[0],
+      this.bodies.bones.rectangles[1],
+      this.bodies.bones.rectangles[2],
+      this.bodies.bones.rectangles[3]
     ]
     let z_depth = args.z_depth_start
     let z_depth_incr = 0.5 //0.1
@@ -930,15 +1157,16 @@ export default class fidget_windmill extends fidget{
 
       'bones','root',
 
-      // 'bones','circle',
-      // 'bones','rectangle',
-      // 'bones','rectangles_center',
-      // 'bones','rectangles_pivots',
-      // 'bones','rectangles',
+      'bones','circle',
+      'bones','trapezoids_center',
+      'bones','trapezoids',
+      'bones','rectangles_center',
+      'bones','rectangles_pivots',
+      'bones','rectangles',
 
-      // 'geos','circle',
-      // 'geos','rectangle',
-      // 'geos','rectangles'
+      'geos','circle',
+      'geos','trapezoids',
+      'geos','rectangles'
     ]
     
     this.steps_info = [
@@ -947,9 +1175,9 @@ export default class fidget_windmill extends fidget{
         bodies_enable: [
           this.bodies.inters_step.steps_help[0],
           this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
-          // this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
-          // this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
-          // this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
+          this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
+          this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
+          this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
           this.bodies.inters.background,
           // this.bodies.inters.circle,
           // this.bodies.inters.rectangle,
@@ -959,26 +1187,33 @@ export default class fidget_windmill extends fidget{
           // this.bodies.inters.rectangles[3],
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
-          // this.bodies.geos.circle,
-          // this.bodies.geos.rectangle,
-          // this.bodies.geos.rectangles[0],
-          // this.bodies.geos.rectangles[1],
-          // this.bodies.geos.rectangles[2],
-          // this.bodies.geos.rectangles[3],
-          // this.bodies.bones.rectangles[0],
-          // this.bodies.bones.rectangles[1],
-          // this.bodies.bones.rectangles[2],
-          // this.bodies.bones.rectangles[3],
+          this.bodies.geos.circle,
+          this.bodies.geos.trapezoids[0],
+          this.bodies.geos.trapezoids[1],
+          this.bodies.geos.trapezoids[2],
+          this.bodies.geos.trapezoids[3],
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
+          this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],
           this.bodies.bones.world,
           this.bodies.bones.traj,
           this.bodies.bones.root,
-          // this.bodies.bones.circle,
-          // this.bodies.bones.rectangle,
-          // this.bodies.bones.rectangles_center,
-          // this.bodies.bones.rectangles_pivots[0],
-          // this.bodies.bones.rectangles_pivots[1],
-          // this.bodies.bones.rectangles_pivots[2],
-          // this.bodies.bones.rectangles_pivots[3]
+          this.bodies.bones.circle,
+          this.bodies.bones.trapezoids_center,
+          this.bodies.bones.trapezoids[0],
+          this.bodies.bones.trapezoids[1],
+          this.bodies.bones.trapezoids[2],
+          this.bodies.bones.trapezoids[3],
+          this.bodies.bones.rectangles_center,
+          this.bodies.bones.rectangles_pivots[0],
+          this.bodies.bones.rectangles_pivots[1],
+          this.bodies.bones.rectangles_pivots[2],
+          this.bodies.bones.rectangles_pivots[3]
         ],
 
         constraints_disable: [
@@ -989,31 +1224,41 @@ export default class fidget_windmill extends fidget{
       {
         bodies_enable: [
           this.bodies.inters_step.steps_help[0],
-          this.bodies.inters_step.steps[1],
+          this.bodies.inters_step.steps[1][0],
+          this.bodies.inters_step.steps[1][1],
+          this.bodies.inters_step.steps[1][2],
+          this.bodies.inters_step.steps[1][3],
           this.bodies.inters.background,
           // this.bodies.inters.circle,
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
-          // this.bodies.geos.circle,
-          // this.bodies.geos.rectangle,
-          // this.bodies.geos.rectangles[0],
-          // this.bodies.geos.rectangles[1],
-          // this.bodies.geos.rectangles[2],
-          // this.bodies.geos.rectangles[3],
-          // this.bodies.bones.rectangles[0],
-          // this.bodies.bones.rectangles[1],
-          // this.bodies.bones.rectangles[2],
-          // this.bodies.bones.rectangles[3],
+          this.bodies.geos.circle,
+          this.bodies.geos.trapezoids[0],
+          this.bodies.geos.trapezoids[1],
+          this.bodies.geos.trapezoids[2],
+          this.bodies.geos.trapezoids[3],
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
+          this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],
           this.bodies.bones.world,
           this.bodies.bones.traj,
           this.bodies.bones.root,
-          // this.bodies.bones.circle,
-          // this.bodies.bones.rectangle,
-          // this.bodies.bones.rectangles_center,
-          // this.bodies.bones.rectangles_pivots[0],
-          // this.bodies.bones.rectangles_pivots[1],
-          // this.bodies.bones.rectangles_pivots[2],
-          // this.bodies.bones.rectangles_pivots[3]
+          this.bodies.bones.circle,
+          this.bodies.bones.trapezoids_center,
+          this.bodies.bones.trapezoids[0],
+          this.bodies.bones.trapezoids[1],
+          this.bodies.bones.trapezoids[2],
+          this.bodies.bones.trapezoids[3],
+          this.bodies.bones.rectangles_center,
+          this.bodies.bones.rectangles_pivots[0],
+          this.bodies.bones.rectangles_pivots[1],
+          this.bodies.bones.rectangles_pivots[2],
+          this.bodies.bones.rectangles_pivots[3]
         ],
         constraints_disable: [
           //'geos', 'rectangle', null, 'connect_ty_iC'
@@ -1027,26 +1272,33 @@ export default class fidget_windmill extends fidget{
           // this.bodies.inters.circle,
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
-          // this.bodies.geos.circle,
-          // this.bodies.geos.rectangle,
-          // this.bodies.geos.rectangles[0],
-          // this.bodies.geos.rectangles[1],
-          // this.bodies.geos.rectangles[2],
-          // this.bodies.geos.rectangles[3],
-          // this.bodies.bones.rectangles[0],
-          // this.bodies.bones.rectangles[1],
-          // this.bodies.bones.rectangles[2],
-          // this.bodies.bones.rectangles[3],
+          this.bodies.geos.circle,
+          this.bodies.geos.trapezoids[0],
+          this.bodies.geos.trapezoids[1],
+          this.bodies.geos.trapezoids[2],
+          this.bodies.geos.trapezoids[3],
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
+          this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3],
+          this.bodies.bones.rectangles[0],
+          this.bodies.bones.rectangles[1],
+          this.bodies.bones.rectangles[2],
+          this.bodies.bones.rectangles[3],
           this.bodies.bones.world,
           this.bodies.bones.traj,
           this.bodies.bones.root,
-          // this.bodies.bones.circle,
-          // this.bodies.bones.rectangle,
-          // this.bodies.bones.rectangles_center,
-          // this.bodies.bones.rectangles_pivots[0],
-          // this.bodies.bones.rectangles_pivots[1],
-          // this.bodies.bones.rectangles_pivots[2],
-          // this.bodies.bones.rectangles_pivots[3]
+          this.bodies.bones.circle,
+          this.bodies.bones.trapezoids_center,
+          this.bodies.bones.trapezoids[0],
+          this.bodies.bones.trapezoids[1],
+          this.bodies.bones.trapezoids[2],
+          this.bodies.bones.trapezoids[3],
+          this.bodies.bones.rectangles_center,
+          this.bodies.bones.rectangles_pivots[0],
+          this.bodies.bones.rectangles_pivots[1],
+          this.bodies.bones.rectangles_pivots[2],
+          this.bodies.bones.rectangles_pivots[3]
         ],
         constraints_disable: []
       }, ///////////////////////////////////////////////////////////////////////////////////// 3
@@ -1054,12 +1306,15 @@ export default class fidget_windmill extends fidget{
         bodies_enable: [
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
-          // this.bodies.geos.circle,
-          // this.bodies.geos.rectangle,
-          // this.bodies.geos.rectangles[0],
-          // this.bodies.geos.rectangles[1],
-          // this.bodies.geos.rectangles[2],
-          // this.bodies.geos.rectangles[3]
+          this.bodies.geos.circle,
+          this.bodies.geos.trapezoids[0],
+          this.bodies.geos.trapezoids[1],
+          this.bodies.geos.trapezoids[2],
+          this.bodies.geos.trapezoids[3],
+          this.bodies.geos.rectangles[0],
+          this.bodies.geos.rectangles[1],
+          this.bodies.geos.rectangles[2],
+          this.bodies.geos.rectangles[3]
         ],
         constraints_disable: [
           //'inters_step', 'steps', 2, 'point'

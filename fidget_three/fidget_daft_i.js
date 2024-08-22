@@ -676,7 +676,10 @@ export default class fidget_daft_i extends fidget {
           this.bodies.inters_step.steps[0][2],
           this.bodies.inters_step.steps[0][3]
         ],
-        [false, false, true, false, false, true, true, true]
+        [false, false, 
+          true, false, 
+          false, true, 
+          true, true]
       )
 
     
