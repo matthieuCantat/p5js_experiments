@@ -200,9 +200,9 @@ Matrix.prototype = {
 		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
 		return this;
 	},
-	getRotation: function() {
+	getRotation: function( clockwise = false) {
 		let vX = new Vector(1,0)
-		return vX.getRotation(this.get_row(0));
+		return vX.getRotation( this.get_row(0), clockwise );
 	},	
 	setRotationDeg: function(angle) {
 		this.setRotation(angle/180*PI)
@@ -621,7 +621,7 @@ Matrix.prototype = {
 			Math.round(this.d*100,2)/100,
 			Math.round(this.e*100,2)/100,
 			Math.round(this.f*100,2)/100,
-			'rotation deg : '+ Math.round(deg(this.getRotation())*100,2)/100)
+			'rotation deg : '+ Math.round(deg(this.getRotation(true))*100,2)/100)
 		}
 		else
 		{
@@ -631,7 +631,7 @@ Matrix.prototype = {
 			Math.round(this.d*100,2)/100,
 			Math.round(this.e*100,2)/100,
 			Math.round(this.f*100,2)/100,
-			'rotation deg: '+ Math.round(deg(this.getRotation())*100,2)/100)
+			'rotation deg: '+ Math.round(deg(this.getRotation(true))*100,2)/100)
 		
 		}
 

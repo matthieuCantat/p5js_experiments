@@ -711,6 +711,7 @@ export class limit{
         rot_max: null,
         transfer_delta_as_parent_force: true,
         limit_lock: false,
+        clockwize_mode: false,
       };
       const args = { ...defaultOptions, ...in_options };
       
@@ -721,6 +722,7 @@ export class limit{
       this.y_max   = args.y_max      
       this.rot_min = args.rot_min
       this.rot_max = args.rot_max
+      this.clockwize_mode = args.clockwize_mode
 
 
       this.limit_lock = args.limit_lock
@@ -742,7 +744,8 @@ export class limit{
         let m_local = m.getMult(m_parent.getInverse())        
         let p = m_local.get_row(2)
         let v = this.obj.get_velocity()
-        let a = m_local.getRotation()
+        let a = m_local.getRotation(this.clockwize_mode)
+        
 
         
         if( userIsInteracting == false )
@@ -817,30 +820,77 @@ export class limit{
             this.obj.set_velocity(v) 
         } 
         */
- 
 
-        if((this.rot_min!=null)&&( a < this.rot_min ))
+        if((this.rot_min!=null)&&(this.rot_max!=null)&&(this.clockwize_mode))
         {
-            a = this.rot_min
-            let m_limit_local = new Matrix()
-            m_limit_local.setRotation(a)
-            m_limit = m_limit_local.getMult(m_parent)
-            this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
-            this.obj.set_anglular_velocity(0)
-            this.is_at_limit = -1
+          let middle_value = ( (this.rot_min + this.rot_max)/2 + Math.PI %(2*Math.PI) )
 
-        }  
+          if( middle_value < this.rot_min )
+          {
+            if( ( middle_value <= a )&&( a <= this.rot_min ))
+              a = this.rot_min // found
+          }
+          else if( this.rot_min < middle_value )
+          {
+            if( (a == 2*Math.PI)||(a==0))
+              a = this.rot_min
+
+            if( ( middle_value <= a )&&( a < 2*Math.PI ))
+              a = this.rot_min // found
+
+            if( ( 0 < a )&&( a <= this.rot_min ))
+              a = this.rot_min // found              
+          }
+
+          if( this.rot_max < middle_value  )
+          {
+            if( ( this.rot_max <= a )&&( a < middle_value ))
+              a = this.rot_max // found
+          }
+          else if( middle_value < this.rot_max )
+          {
+            if( (a == 2*Math.PI)||(a==0))
+              a = this.rot_max            
+
+            if( ( this.rot_max <= a )&&( a < 2*Math.PI ))
+              a = this.rot_max // found
+
+            if( ( 0 < a )&&( a < middle_value ))
+              a = this.rot_max // found              
+          }
+
+        }
+        else
+        {
+          if(this.rot_min!=null)
+            if( a < this.rot_min )
+              a = this.rot_min
           
-        if((this.rot_max!=null)&&( this.rot_max < a ))
+          if(this.rot_max!=null)
+            if( this.rot_max < a )
+              a = this.rot_max
+          
+        }
+
+        
+        if(a === this.rot_min)
         {
-            a = this.rot_max
-            let m_limit_local = new Matrix()
-            m_limit_local.setRotation(a)
-            m_limit = m_limit_local.getMult(m_parent)            
-            this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
-            this.obj.set_anglular_velocity(0)  
-            this.is_at_limit = 1   
-        }   
+          let m_limit_local = new Matrix()
+          m_limit_local.setRotation(a)
+          m_limit = m_limit_local.getMult(m_parent)            
+          this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
+          this.obj.set_anglular_velocity(0)  
+          this.is_at_limit = -1   
+        }
+        else if(a === this.rot_max)
+        {
+          let m_limit_local = new Matrix()
+          m_limit_local.setRotation(a)
+          m_limit = m_limit_local.getMult(m_parent)            
+          this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
+          this.obj.set_anglular_velocity(0)  
+          this.is_at_limit = 1   
+        }
 
 
         if((this.transfer_delta_as_parent_force)&&(this.obj.is_touch)&&(this.p_touch_local!=null))

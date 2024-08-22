@@ -122,14 +122,26 @@ export default class Vector
         return new_v
 	}
 
+    getOrtho()
+    {
+        return new Vector(this.v.y,this.v.x*-1)
+    }
+
 	///////////////////////////////////////////////////////////////////////////////////////////new
-	getRotation(vOther)
+	getRotation(vOther, clockwise = false)
     {
         //https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
         let dot = this.v.x*vOther.v.x + this.v.y*vOther.v.y      // Dot product between [x1, y1] and [x2, y2]
         let det = this.v.x*vOther.v.y - this.v.y*vOther.v.x      // Determinant
         let angle = Math.atan2(det, dot)  // atan2(y, x) or atan2(sin, cos) 
         //let angle = this.v.angleBetween(v.v)
+        if(clockwise)
+        {
+            let v_ortho = this.getOrtho()
+            if(0 < v_ortho.dot(vOther) )
+                angle = 2*Math.PI+angle
+        }
+
         return angle
     }
     
@@ -145,7 +157,7 @@ export default class Vector
 		return this;
 	}
 	setRotationDeg(angle) {
-		this.setRotation(angle/180*PI)
+		this.setRotation(angle/180*Math.PI)
 		return this;
 	}	
 	setScale(s) {
