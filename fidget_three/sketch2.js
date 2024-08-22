@@ -78,7 +78,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 1
+var nbr = 10
 var debug = { disable_animation:true,
               switch_selected_inter_help:false,
               inter_step_physics : false,
@@ -87,7 +87,7 @@ var debug = { disable_animation:true,
               show_geos:true,
               show_effects:true,              
               show_inters:false,
-              show_inters_steps:true,
+              show_inters_steps:false,
               show_bones:false,
               force_visibility:false,
 
