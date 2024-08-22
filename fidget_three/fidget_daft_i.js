@@ -46,8 +46,6 @@ export default class fidget_daft_i extends fidget {
       this.is_dynamic = true
     }
 
-
-
     this.colors = [utils.color.green, utils.color.red, utils.color.yellow]
     this.color_background = [
       (this.colors[0][0] + 0.2) * 0.3,
@@ -196,11 +194,6 @@ export default class fidget_daft_i extends fidget {
         root: null,
         traj: null,
         world: null
-      },
-      helpers: {
-        stepA: null,
-        stepB: null,
-        stepC: null
       }
     }
 
@@ -213,7 +206,7 @@ export default class fidget_daft_i extends fidget {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////// BASE
 
     this.bodies.bones.world = new body_build({
       ...opts_bones_main,
@@ -293,6 +286,8 @@ export default class fidget_daft_i extends fidget {
       constraint_to_parent: true,
     })
     
+
+    //////////////////////////////////////////////////////////////////////////////////////////// CUSTOM
     
 
     if( this.is_dynamic )
@@ -456,8 +451,6 @@ export default class fidget_daft_i extends fidget {
       constraint_to_parent: true,
     })
     
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// RECTANGLES
 
     let rectangle_pivot_opts = {
       ...opts_visual_bones,
@@ -748,46 +741,30 @@ export default class fidget_daft_i extends fidget {
 
     this.bodies_build_order = this.bodies_get_build_order()
 
+
     this.bodies_eval_order = [
-      'bones',
-      'world',
-      'geos',
-      'backgrounds',
+      'bones','world',
+      'geos','backgrounds',
 
-      'bones',
-      'traj',
+      'bones','traj',
 
-      'inters',
-      'background',
-      'inters',
-      'circle',
-      'inters',
-      'rectangle',
-      'inters',
-      'rectangles',
-      'inters_step',
-      'steps',
+      'inters','background',
+      'inters','circle',
+      'inters','rectangle',
+      'inters','rectangles',
+      'inters_step','steps',
 
-      'bones',
-      'root',
+      'bones','root',
 
-      'bones',
-      'circle',
-      'bones',
-      'rectangle',
-      'bones',
-      'rectangles_center',
-      'bones',
-      'rectangles_pivots',
-      'bones',
-      'rectangles',
+      'bones','circle',
+      'bones','rectangle',
+      'bones','rectangles_center',
+      'bones','rectangles_pivots',
+      'bones','rectangles',
 
-      'geos',
-      'circle',
-      'geos',
-      'rectangle',
-      'geos',
-      'rectangles'
+      'geos','circle',
+      'geos','rectangle',
+      'geos','rectangles'
     ]
     
     this.steps_info = [

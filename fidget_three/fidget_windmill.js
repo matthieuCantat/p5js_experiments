@@ -1,98 +1,428 @@
 
-import fidget from './fidget.js';
-import { utils,clamp,rad,deg,userIsInteracting,mouseX, mouseY } from './utils.js';
-import { body_build }from './body.js';
-import Vector from './vector.js';
-import Matrix from './matrix.js';
-import * as ut from './utils_three.js';
+import fidget from './fidget.js'
+import { utils, clamp, rad, deg, anim_vectors, anim_values } from './utils.js'
+import { body_build } from './body.js'
+import Vector from './vector.js'
+import Matrix from './matrix.js'
+import { materials } from './shader.js'
+import { effect } from './effect.js'
 
 
 export default class fidget_windmill extends fidget{
 
-
-  ////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////// SETUP
-  ////////////////////////////////////////////////////////////////////////////////////
-
-  constructor(
-    m,
-    s,
-    screen_dims,
-    z_depth_start,
-    do_background,
-    is_dynamic = true,
-    shaders = [],
-    debug = false,
-    random_color = true    
-  )
-  {
-    super(m, s, screen_dims, do_background, shaders, debug)
-
-    this.title = 'windmill'
-
-    this.bodies = {
-      inters : {
-        A:null,
-        A_bg:null,
-        B:null,
-        B_mask:null,
-        C:null,
-        C_bg:null,
-      },
-      geos : {
-        circle:null,
-        rectangles:[],
-        trapezoids:[],
-        backgrounds:[],
-      },
-      helpers:{
-        stepA:null,
-        stepB:null,
-        stepC:null,
+    constructor (in_options) {
+      super(in_options)
+  
+      let defaultOptions = 
+      {
+        m:null, 
+        s:1, 
+        screen_dims:null, 
+        z_depth_start:0,
+        do_background: true, 
+        is_dynamic:true,
+        debug : false,  
+        play_animation:null,    
       }
-    }
+      const args = { ...defaultOptions, ...in_options };
+  
+      ///////////////////////////////////////////////////////////////////////////////////////////
+      let visual_bones_main_size = 150*this.s
+      let bones_density_value = 0.44/this.s
+      let inter_step_denstity = 0.022/this.s 
+      let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
+      this.end_step = 4
+      ///////////////////////////////////////////////////////////////////////////////////////////
+      this.is_dynamic = args.is_dynamic
+      
+      this.play_animation = args.play_animation//'animation_idle'
+  
+      if(this.play_animation != null)
+      {
+        this.anim_mode = true
+        this.is_dynamic = false
+      }
+      else
+      {
+        this.anim_mode = false
+        this.is_dynamic = true
+      }
+  
+      this.colors = [utils.color.green, utils.color.red, utils.color.yellow]
+      this.color_background = [
+        (this.colors[0][0] + 0.2) * 0.3,
+        (this.colors[0][1] + 0.2) * 0.3,
+        (this.colors[0][2] + 0.2) * 0.3
+      ]
+  
+      let opts_global = {
+        screen_dims: this.screen_dims,
+        matter_engine: this.matter_engine,
+        mouse_constraint: this.mouse_constraint,
+        fidget: this,
+        dynamic: this.is_dynamic
+      }
+  
+      let opts_collision_no_interaction = {
+        collision: false,
+        collision_category: utils.collision_category.none,
+        collision_mask: utils.collision_category.none
+      }
+  
+      let opts_collision_activate = {
+        collision: true,
+        collision_category: utils.collision_category.blue,
+        collision_mask: utils.collision_category.default
+      }
+      let opts_collision_mouse_interaction = {
+        collision: true,
+        collision_category: utils.collision_category.inter,
+        collision_mask: utils.collision_category.mouse
+      }
+  
+      let opts_debug = {
+        debug_matrix_info: false,
+        debug_matrix_axes: this.debug_mode.matrix_axes,
+        debug_cns_axes: this.debug_mode.cns_axes,
+        debug_force_visibility: this.debug_mode.force_visibility
+      }
+  
+      let opts_cns_disable_at_select = {
+                stiffness: 1.0,
+                stiffness_at_selection: 0.0,
+                damping: 0.1,
+                length: 0.01
+              }
+  
+      let opts_effect_trail = {
+        ...opts_collision_no_interaction,
+        type: 'trail',
+        do_line: false,
+        material_three: null,
+      }
+  
+      let opts_sparcles_shock = {
+        ...opts_global,
+        ...opts_debug,
+        scale_shape: this.s,
+        type: 'sparcle_shock'
+      }
+  
+      let opts_bones_main = {
+        ...opts_global,
+        ...opts_collision_no_interaction,
+        ...opts_debug,      
+        visibility: true,
+        do_shape: false,
+        do_line: true,
+        color: utils.color.blue,
+        color_line: utils.color.blue,
+        type: utils.shape.circle,
+        debug_matrix_axes: true,
+        m_shape: new Matrix().setScale(visual_bones_main_size),
+        density: bones_density_value,      
+      }
+  
+      let opts_visual_bones = {
+        ...opts_global,
+        ...opts_collision_no_interaction,
+        ...opts_debug,      
+        visibility: true,
+        do_shape: true,
+        do_line: true,
+        color: utils.color.blue,
+        color_line: utils.color.black,
+        type: utils.shape.circle,
+        debug_matrix_axes: true,
+        dynamic: false,      
+        density: bones_density_value,      
+        m_shape: new Matrix().setScale(4*this.s), 
+      }
+  
+      let opts_inter_step = {
+        ...opts_global,
+        ...opts_collision_mouse_interaction,
+        ...opts_debug,         
+        visibility: true,
+        do_shape: true,
+        do_line: true,
+        color: utils.color.grey,
+        color_line: utils.color.black,
+        material_three: materials.simple.text_checker_three_grey,
+        density: inter_step_denstity,
+        selection_break_length: inter_step_selection_break_length      
+      }
+  
+      let opts_geo = {
+      ...opts_global,
+      ...opts_collision_activate,
+      ...opts_debug,
+      m_offset: new Matrix(),
+      do_shape: true,
+      do_line: true,
+      color_line: utils.color.black,
+      density: 0.0022/this.s,
+      }
+  
+      //////////////////////////////////////////////////////////////////////////
+  
+  
+  
+      this.title = 'windmill'
+  
+      this.bodies = {
+        inters: {
+          background: null,
+          circle: null,
+          rectangles: [],
+          trapezoids: [],
+        },
+        inters_step: {
+          steps: [],
+          steps_help: [],
+          steps_instances: []
+        },
+        geos: {
+          backgrounds: [],
+          circle: null,
+          rectangles: [],
+          trapezoids: [],
+        },
+        bones: {
+          rectangles: [],
+          rectangles_pivots: [],
+          rectangles_center: null,
+          trapezoids: [],
+          trapezoids_center: null,
+          circle: null,
+          root: null,
+          traj: null,
+          world: null
+        }
+      }
+  
+      this.effects = {
+        trailA: null,
+        trailB: null,
+        sparcles_shock_A: null,
+        sparcles_shock_B: null,
+        sparcles_shock_C: null
+      }
+  
+  
+      //////////////////////////////////////////////////////////////////////////////////////////// BASE
+  
+      this.bodies.bones.world = new body_build({
+        ...opts_bones_main,
+        name: 'bones_world',
+      })
+  
+      this.bodies.geos.backgrounds.push( new body_build({
+        ...opts_global,
+        ...opts_collision_no_interaction,
+        ...opts_debug,
+        dynamic: false,
+        name: 'geos_background_L_',
+        parent: this.bodies.bones.world,
+        m_offset: new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2),
+        m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
+        type: utils.shape.rectangle,
+        material_three: materials.old_custom_exemple, //materials.background.space_grid ,
+        visibility: this.do_background,
+      }) )
+      this.bodies.geos.backgrounds.push(this.bodies.geos.backgrounds[0].get_mirror(false, true))
+  
+      this.bodies.bones.traj = new body_build({
+        ...opts_bones_main,
+        name: 'bones_traj',
+        parent: this.bodies.bones.world,
+        constraint_to_parent: true,
+        m_offset: this.m,
+      })
+      
+      if (this.is_dynamic)
+        this.bodies.inters.background = new body_build({
+          ...opts_inter_step,
+          ...opts_collision_no_interaction,
+          name: 'inters_background',
+          parent: this.bodies.bones.traj,
+          m_offset: new Matrix(),
+          m_shape: new Matrix().setScale(145*this.s,92*this.s),
+          type: utils.shape.rectangle,
+          frictionAir: 0.3,
+          constraints: [
+            {
+              name: 'point',
+              type: 'dyn_point',
+              target: this.bodies.bones.traj,
+              stiffness: 0.05,
+              damping: 0.01,
+              length: 0.01
+            },
+            {
+              name: 'orient',
+              type: 'dyn_orient',
+              target: this.bodies.bones.traj,
+              stiffness: 0.2,
+              damping: 0.01,
+              length: 0.01
+            },
+            //{
+            //  name: 'rot_limit',
+            //  type: 'kin_limit',
+            //  target: this.bodies.bones.traj,
+            //  x_min: -50,
+            //  x_max: 50,
+            //  y_min: -50,
+            //  y_max: 50,
+            //  rot_min: rad(-20),
+            //  rot_max: rad(20),
+            //  limit_lock: false
+            //}
+          ],
+        })
+      
+      this.bodies.bones.root = new body_build({
+        ...opts_bones_main,
+        dynamic: false,
+        name: 'bones_root',
+        parent: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj,
+        constraint_to_parent: true,
+      })
+      
+    //////////////////////////////////////////////////////////////////////////////// CUSTOM
 
-    this.bodies_draw_order = [
-        'geos','backgrounds',
-        'inters','B',
-        'inters','B_mask',
-        'inters','A_bg',
-        'inters','A',
-        'inters','C_bg',
-        'inters','C',
-        'geos','circle',
-        'geos','rectangles',      
-        'geos','trapezoids',
-        'helpers','stepA',
-        'helpers','stepB',
-        'helpers','stepC',
-        ]         
-    
-
-
-    this.end_step = 4
-
-    this.possible_colors = [[utils.color.green,utils.color.red,utils.color.yellow],
-    [utils.color.cyan,utils.color.magenta,utils.color.orangeRed],
-    [utils.color.olive,utils.color.teal,utils.color.green],
-    [utils.color.purple,utils.color.aquamarine,utils.color.turquoise],
-    [utils.color.paleGreen,utils.color.skyBlue,utils.color.orangeRed],
-    [utils.color.orangeRed,utils.color.tomato,utils.color.khaki],
-    [utils.color.chocolate,utils.color.lavender,utils.color.red],
-    [utils.color.rosyBrown,utils.color.redLight,utils.color.gold]]
-
-    this.colors = [utils.color.green,utils.color.red,utils.color.yellow]
-    if(random_color)
+    if( this.is_dynamic )
     {
-      let i_random = Math.floor(clamp( Math.random()*(this.possible_colors.length+1), 0,this.possible_colors.length-1))
-      this.colors = this.possible_colors[i_random]
-    }
-    this.color_background = [ (this.colors[0][0]+0.2)*0.3,(this.colors[0][1]+0.2)*0.3,(this.colors[0][2]+0.2)*0.3]
-    this.show_step_helpers = [ 0, 0, 0 ]
-    var text_checker_three = ut.get_texture_grid_checker()
-    var text_checker_three_grey = ut.get_texture_grid_checker_grey()
 
-    
+      this.bodies.inters_step.steps.push([
+        new body_build({       
+          ...opts_inter_step,
+          name: 'inters_A_S_',
+          parent: this.bodies.inters.background,
+          m_offset: new Matrix().setTranslation(0,30*this.s),
+          m_shape: new Matrix().setScale(7*this.s,30*this.s),
+          type: utils.shape.rectangle,
+          constraints: [
+            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
+            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background},
+            {
+              name: 'axe',
+              type: 'kin_axe',
+              axe: 1,
+              distPos: 25 * this.s,
+              distNeg: 0.001,
+              limit_lock: 1,
+              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+            }
+          ],
+
+        })
+      ])
+      this.bodies.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
+      this.bodies.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
+      
+
+
+      this.bodies.inters_step.steps_help.push(
+        new body_build({
+          ...opts_inter_step,
+          name: 'inters_B_S_help',
+          parent: this.bodies.inters.background,
+          m_offset: new Matrix(),
+          m_shape: new Matrix().setScale(40*this.s),
+          type: utils.shape.circle,
+          constraints: [
+            {
+                  name: 'point',
+                  type: 'dyn_point',
+                  target: this.bodies.inters.background,
+                  stiffness: 0.999,
+                  damping: 0.1,
+                  length: 0.01
+            },
+            //{ name: 'orient', type: 'dyn_orient', target: this.bodies.inters.background, stiffness: 0.1,},
+            {
+              name: 'rot_limit',
+              type: 'kin_limit',
+              obj: this,
+              rot_min: rad(0),
+              rot_max: rad(270),
+              clockwize_mode:true,
+              limit_lock: true,
+              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+            }
+          ],
+
+        })
+      )
+      
+
+
+      this.bodies.inters_step.steps.push(
+        new body_build({
+          ...opts_inter_step,
+          name: 'inters_B_S_',
+          parent: this.bodies.inters.background,
+          m_offset: new Matrix().setTranslation(0,55*this.s),
+          m_shape: new Matrix().setScale(7*this.s,30*this.s),
+          type: utils.shape.rectangle,
+          constraints: [
+            {
+              name: 'point',
+              type: 'dyn_point',
+              target: this.bodies.inters_step.steps_help[0],
+              stiffness: 0.999,
+              damping: 0.1,
+              length: 0.01
+            },
+            { name: 'orient', 
+              type: 'kin_orient', 
+              target: this.bodies.inters_step.steps_help[0],
+            },
+          ],
+
+        })
+      )
+
+      this.bodies.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.get_out_rotation('base')) / 180.0, 0, 1)}
+      this.bodies.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.set_out_rotation(rad(res * 90.5), 'world', 'override')}
+
+      /*
+      this.bodies.inters_step.steps.push(
+        new body_build({
+          ...opts_inter_step,
+
+          name: 'inters_C',
+          m_offset: new Matrix(),
+          m_shape: new Matrix().setScale(7*this.s,30*this.s),
+          parent: this.bodies.inters.background,
+
+          type: utils.shape.rectangle,
+
+          constraints: [
+            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background,...opts_cns_disable_at_select},
+            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background },
+            {
+              name: 'axe',
+              type: 'kin_axe',
+              axe: 0,
+              distPos: 50 * this.s,
+              distNeg: 0.001,
+              limit_lock: 1,
+              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+            }
+          ],
+
+        })
+      )
+      this.bodies.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
+      this.bodies.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
+      */
+    }
+
+    /*
+
     this.bodies.inters.B = new body_build({  
                                     m:this.m,
                                     m_offset:new Matrix(),
@@ -502,8 +832,233 @@ export default class fidget_windmill extends fidget{
                                           y:-oRect.h*oTrap.posCoef,
                                           rot:45+180,     
                                         })) 
-  
+  */
    
+
+
+
+
+
+
+    this.bodies_draw_order = [
+      this.bodies.geos.backgrounds[0],
+      this.bodies.geos.backgrounds[1],
+      this.bodies.inters.background,
+      // this.bodies.inters.circle,
+      // this.bodies.inters.rectangle,
+      // this.bodies.inters.rectangles[0],
+      // this.bodies.inters.rectangles[1],
+      // this.bodies.inters.rectangles[2],
+      // this.bodies.inters.rectangles[3],
+      this.bodies.inters_step.steps_help[0],
+      this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
+      // this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
+      // this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
+      // this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[1]:null,
+      this.is_dynamic ? this.bodies.inters_step.steps[2]:null,
+      // this.bodies.geos.circle,
+      // this.effects.trailA,
+      // this.effects.trailB,
+      // this.bodies.geos.rectangle,
+      // this.bodies.geos.rectangles[0],
+      // this.bodies.geos.rectangles[1],
+      // this.bodies.geos.rectangles[2],
+      // this.bodies.geos.rectangles[3],
+      // this.effects.sparcles_shock_A,
+      // this.effects.sparcles_shock_B,
+      // this.effects.sparcles_shock_C,
+      this.bodies.bones.world,
+      this.bodies.bones.traj,
+      this.bodies.bones.root,
+      // this.bodies.bones.circle,
+      // this.bodies.bones.rectangle,
+      // this.bodies.bones.rectangles_center,
+      // this.bodies.bones.rectangles_pivots[0],
+      // this.bodies.bones.rectangles_pivots[1],
+      // this.bodies.bones.rectangles_pivots[2],
+      // this.bodies.bones.rectangles_pivots[3],
+      // this.bodies.bones.rectangles[0],
+      // this.bodies.bones.rectangles[1],
+      // this.bodies.bones.rectangles[2],
+      // this.bodies.bones.rectangles[3]
+    ]
+    let z_depth = args.z_depth_start
+    let z_depth_incr = 0.5 //0.1
+    for (let i = 0; i < this.bodies_draw_order.length; i++)
+    {
+      if (this.bodies_draw_order[i] == null)
+      {
+        if (this.debug_mode.show_warning_log)
+          console.log(  ' z_order - this.bodies_draw_order[' + i + '] doesnt exists')
+        continue
+      }
+      this.bodies_draw_order[i].z = z_depth
+      z_depth += z_depth_incr
+    }
+    this.z_depth_end = z_depth
+
+    this.Mouse.z = this.z_depth_end
+
+    this.bodies_build_order = this.bodies_get_build_order()
+
+    this.bodies_eval_order = [
+      'bones','world',
+      'geos','backgrounds',
+
+      'bones','traj',
+
+      'inters','background',
+      //'inters','circle',
+      //'inters','rectangle',
+      //'inters','rectangles',
+      'inters_step','steps',
+      'inters_step','steps_help',
+
+      'bones','root',
+
+      // 'bones','circle',
+      // 'bones','rectangle',
+      // 'bones','rectangles_center',
+      // 'bones','rectangles_pivots',
+      // 'bones','rectangles',
+
+      // 'geos','circle',
+      // 'geos','rectangle',
+      // 'geos','rectangles'
+    ]
+    
+    this.steps_info = [
+      ///////////////////////////////////////////////////////////////////////////////////// 0
+      {
+        bodies_enable: [
+          this.bodies.inters_step.steps_help[0],
+          this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
+          // this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
+          // this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
+          // this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
+          this.bodies.inters.background,
+          // this.bodies.inters.circle,
+          // this.bodies.inters.rectangle,
+          // this.bodies.inters.rectangles[0],
+          // this.bodies.inters.rectangles[1],
+          // this.bodies.inters.rectangles[2],
+          // this.bodies.inters.rectangles[3],
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],
+          // this.bodies.geos.circle,
+          // this.bodies.geos.rectangle,
+          // this.bodies.geos.rectangles[0],
+          // this.bodies.geos.rectangles[1],
+          // this.bodies.geos.rectangles[2],
+          // this.bodies.geos.rectangles[3],
+          // this.bodies.bones.rectangles[0],
+          // this.bodies.bones.rectangles[1],
+          // this.bodies.bones.rectangles[2],
+          // this.bodies.bones.rectangles[3],
+          this.bodies.bones.world,
+          this.bodies.bones.traj,
+          this.bodies.bones.root,
+          // this.bodies.bones.circle,
+          // this.bodies.bones.rectangle,
+          // this.bodies.bones.rectangles_center,
+          // this.bodies.bones.rectangles_pivots[0],
+          // this.bodies.bones.rectangles_pivots[1],
+          // this.bodies.bones.rectangles_pivots[2],
+          // this.bodies.bones.rectangles_pivots[3]
+        ],
+
+        constraints_disable: [
+          // 'geos','rectangle',null,'connect_rot_iB',
+          // 'geos','rectangle',null,'connect_ty_iC',
+        ]
+      }, ///////////////////////////////////////////////////////////////////////////////////// 1
+      {
+        bodies_enable: [
+          this.bodies.inters_step.steps_help[0],
+          this.bodies.inters_step.steps[1],
+          this.bodies.inters.background,
+          // this.bodies.inters.circle,
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],
+          // this.bodies.geos.circle,
+          // this.bodies.geos.rectangle,
+          // this.bodies.geos.rectangles[0],
+          // this.bodies.geos.rectangles[1],
+          // this.bodies.geos.rectangles[2],
+          // this.bodies.geos.rectangles[3],
+          // this.bodies.bones.rectangles[0],
+          // this.bodies.bones.rectangles[1],
+          // this.bodies.bones.rectangles[2],
+          // this.bodies.bones.rectangles[3],
+          this.bodies.bones.world,
+          this.bodies.bones.traj,
+          this.bodies.bones.root,
+          // this.bodies.bones.circle,
+          // this.bodies.bones.rectangle,
+          // this.bodies.bones.rectangles_center,
+          // this.bodies.bones.rectangles_pivots[0],
+          // this.bodies.bones.rectangles_pivots[1],
+          // this.bodies.bones.rectangles_pivots[2],
+          // this.bodies.bones.rectangles_pivots[3]
+        ],
+        constraints_disable: [
+          //'geos', 'rectangle', null, 'connect_ty_iC'
+        ]
+      }, ///////////////////////////////////////////////////////////////////////////////////// 2
+      {
+        bodies_enable: [
+          this.bodies.inters_step.steps_help[0],
+          this.is_dynamic ? this.bodies.inters_step.steps[2] : null,
+          this.bodies.inters.background,
+          // this.bodies.inters.circle,
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],
+          // this.bodies.geos.circle,
+          // this.bodies.geos.rectangle,
+          // this.bodies.geos.rectangles[0],
+          // this.bodies.geos.rectangles[1],
+          // this.bodies.geos.rectangles[2],
+          // this.bodies.geos.rectangles[3],
+          // this.bodies.bones.rectangles[0],
+          // this.bodies.bones.rectangles[1],
+          // this.bodies.bones.rectangles[2],
+          // this.bodies.bones.rectangles[3],
+          this.bodies.bones.world,
+          this.bodies.bones.traj,
+          this.bodies.bones.root,
+          // this.bodies.bones.circle,
+          // this.bodies.bones.rectangle,
+          // this.bodies.bones.rectangles_center,
+          // this.bodies.bones.rectangles_pivots[0],
+          // this.bodies.bones.rectangles_pivots[1],
+          // this.bodies.bones.rectangles_pivots[2],
+          // this.bodies.bones.rectangles_pivots[3]
+        ],
+        constraints_disable: []
+      }, ///////////////////////////////////////////////////////////////////////////////////// 3
+      {
+        bodies_enable: [
+          this.bodies.geos.backgrounds[0],
+          this.bodies.geos.backgrounds[1],
+          // this.bodies.geos.circle,
+          // this.bodies.geos.rectangle,
+          // this.bodies.geos.rectangles[0],
+          // this.bodies.geos.rectangles[1],
+          // this.bodies.geos.rectangles[2],
+          // this.bodies.geos.rectangles[3]
+        ],
+        constraints_disable: [
+          //'inters_step', 'steps', 2, 'point'
+        ]
+      }
+    ]
+
+    this.bodies_init_physics()
+    this.bodies_init_constraints()
+
+    
+
                                 
   }
 
