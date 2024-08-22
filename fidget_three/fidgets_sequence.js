@@ -92,10 +92,11 @@ export default class fidgets_sequence
             debug : this.debug_mode,  
             play_animation:null,    
           }
-          var fidget = new fidget_windmill(opts)
+         // var fidget = new fidget_windmill(opts)
           //var fidget = new fidget_daft_i(opts)
+          var fidget = this.get_random_fidget(opts)
           z_depth = fidget.z_depth_end
-          //var fidget = this.get_random_fidget(opts)
+          
           fidget.force_way = this.force_way
           fidget.fidget_sequence_i = i + 1
           this.fidgets.push(fidget)
@@ -138,14 +139,14 @@ export default class fidgets_sequence
 
     }
 
-    get_random_fidget(p,s,sceen_dims,shaders,debug)
+    get_random_fidget(in_options)
     {
       
       let r = Math.random()
       if(  0.5 < r)
-        return new fidget_windmill(p,s,sceen_dims,shaders,debug)
+        return new fidget_windmill(in_options)
       else
-        return new fidget_daft_i(p,s,sceen_dims,shaders,debug)   
+        return new fidget_daft_i(in_options)   
     }
 
 

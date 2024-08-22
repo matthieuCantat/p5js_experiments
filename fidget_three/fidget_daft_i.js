@@ -576,7 +576,7 @@ export default class fidget_daft_i extends fidget {
       parent: this.bodies.bones.rectangle,
       m_shape: new Matrix().setScale(74*this.s,18*this.s),
       type: utils.shape.rectangle,
-      material_three: materials.background_test, //materials.simple.gradient_gold_red_A ,
+      material_three: materials.raw_shader_exemple, //materials.background_test, //materials.simple.gradient_gold_red_A ,
       constraint_to_parent: true,
       constraints: [],
     }
