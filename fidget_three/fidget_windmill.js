@@ -673,13 +673,33 @@ export default class fidget_windmill extends fidget{
       this.bodies.geos.trapezoids.push(        this.bodies.geos.trapezoids[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))            
     }
 
-    /*
+    
+    if (this.is_dynamic) {
+      this.bodies.inters_step.steps[0][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
+      this.bodies.inters_step.steps[0][1].highlight_selection = [  this.bodies.geos.rectangles[1]]
+      this.bodies.inters_step.steps[0][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
+      this.bodies.inters_step.steps[0][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
+
+      this.bodies.inters_step.steps[1][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
+      this.bodies.inters_step.steps[1][1].highlight_selection = [  this.bodies.geos.rectangles[1]]
+      this.bodies.inters_step.steps[1][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
+      this.bodies.inters_step.steps[1][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
+
+      this.bodies.inters_step.steps[2].highlight_selection = [  
+                                                              this.bodies.geos.rectangles[0],
+                                                              this.bodies.geos.rectangles[1],
+                                                              this.bodies.geos.rectangles[2],
+                                                              this.bodies.geos.rectangles[3]]
+                                                                    
+    }
+
+    
     this.create_inter_from_geos(
       ['circle', 'trapezoids'],
       this.bodies.inters.background,
       this.s
     )
-    */
+    
 
 
     if(this.is_dynamic)
@@ -1118,12 +1138,11 @@ export default class fidget_windmill extends fidget{
       this.bodies.geos.backgrounds[0],
       this.bodies.geos.backgrounds[1],
       this.bodies.inters.background,
-      // this.bodies.inters.circle,
-      // this.bodies.inters.rectangle,
-      // this.bodies.inters.rectangles[0],
-      // this.bodies.inters.rectangles[1],
-      // this.bodies.inters.rectangles[2],
-      // this.bodies.inters.rectangles[3],
+      this.bodies.inters.circle,
+      this.bodies.inters.trapezoids[0],
+      this.bodies.inters.trapezoids[1],
+      this.bodies.inters.trapezoids[2],
+      this.bodies.inters.trapezoids[3],
       this.bodies.inters_step.steps_help[0],
       this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
       this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
@@ -1193,9 +1212,8 @@ export default class fidget_windmill extends fidget{
       'bones','traj',
 
       'inters','background',
-      //'inters','circle',
-      //'inters','rectangle',
-      //'inters','rectangles',
+      'inters','circle',
+      'inters','trapezoids',
       'inters_step','steps',
       'inters_step','steps_help',
 
@@ -1223,12 +1241,11 @@ export default class fidget_windmill extends fidget{
           this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
           this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
           this.bodies.inters.background,
-          // this.bodies.inters.circle,
-          // this.bodies.inters.rectangle,
-          // this.bodies.inters.rectangles[0],
-          // this.bodies.inters.rectangles[1],
-          // this.bodies.inters.rectangles[2],
-          // this.bodies.inters.rectangles[3],
+          this.bodies.inters.circle,
+          this.bodies.inters.trapezoids[0],
+          this.bodies.inters.trapezoids[1],
+          this.bodies.inters.trapezoids[2],
+          this.bodies.inters.trapezoids[3],
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
           this.bodies.geos.circle,
@@ -1273,7 +1290,7 @@ export default class fidget_windmill extends fidget{
           this.bodies.inters_step.steps[1][2],
           this.bodies.inters_step.steps[1][3],
           this.bodies.inters.background,
-          // this.bodies.inters.circle,
+          this.bodies.inters.circle,
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
           this.bodies.geos.circle,
@@ -1313,7 +1330,7 @@ export default class fidget_windmill extends fidget{
           this.bodies.inters_step.steps_help[0],
           this.is_dynamic ? this.bodies.inters_step.steps[2] : null,
           this.bodies.inters.background,
-          // this.bodies.inters.circle,
+          this.bodies.inters.circle,
           this.bodies.geos.backgrounds[0],
           this.bodies.geos.backgrounds[1],
           this.bodies.geos.circle,
