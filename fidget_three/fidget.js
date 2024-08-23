@@ -1269,7 +1269,7 @@ export default class fidget{
                     if( i < this.bodies.inters_step.steps.length )
                       this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step][i])   
                     else
-                      this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step][0])   
+                      this.Mouse.switch_selection(null)
 
 
                   }

@@ -665,7 +665,7 @@ export default class fidget_windmill extends fidget{
     if(this.is_dynamic)
     {
       this.bodies.inters_step.steps[0].push(   this.bodies.inters_step.steps[0][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
-      this.bodies.inters_step.steps[1].push(   this.bodies.inters_step.steps[1][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
+      //this.bodies.inters_step.steps[1].push(   this.bodies.inters_step.steps[1][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
       this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
       this.bodies.bones.rectangles.push(       this.bodies.bones.rectangles[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
       this.bodies.geos.rectangles.push(        this.bodies.geos.rectangles[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))
@@ -683,7 +683,7 @@ export default class fidget_windmill extends fidget{
       this.bodies.inters_step.steps[1][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
       this.bodies.inters_step.steps[1][1].highlight_selection = [  this.bodies.geos.rectangles[1]]
       this.bodies.inters_step.steps[1][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
-      this.bodies.inters_step.steps[1][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
+      //this.bodies.inters_step.steps[1][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
 
       this.bodies.inters_step.steps[2].highlight_selection = [  
                                                               this.bodies.geos.rectangles[0],
@@ -1151,7 +1151,7 @@ export default class fidget_windmill extends fidget{
       this.is_dynamic ? this.bodies.inters_step.steps[1][0]:null,
       this.is_dynamic ? this.bodies.inters_step.steps[1][1]:null,
       this.is_dynamic ? this.bodies.inters_step.steps[1][2]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[1][3]:null,
+      //this.is_dynamic ? this.bodies.inters_step.steps[1][3]:null,
       this.is_dynamic ? this.bodies.inters_step.steps[2]:null,
       this.bodies.geos.circle,
       // this.effects.trailA,
@@ -1289,7 +1289,7 @@ export default class fidget_windmill extends fidget{
           this.bodies.inters_step.steps[1][0],
           this.bodies.inters_step.steps[1][1],
           this.bodies.inters_step.steps[1][2],
-          this.bodies.inters_step.steps[1][3],
+          //this.bodies.inters_step.steps[1][3],
           this.bodies.inters.background,
           this.bodies.inters.circle,
           this.bodies.geos.backgrounds[0],
