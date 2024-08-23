@@ -1220,8 +1220,9 @@ export default class fidget{
       else
         this.state.steps[i].resoluton_coef = this.bodies.inters_step.steps[i].get_resolution_coef()
 
+
       this.state.resolution_coef += this.state.steps[i].resoluton_coef
-      if(this.state.steps[i].resoluton_coef == 1)
+      if(Math.round(this.state.steps[i].resoluton_coef*100)/100 == 1)
         this.state.current_step = i +1
     }
   }  
@@ -1234,6 +1235,7 @@ export default class fidget{
 
       if( this.state.current_step == step )
       {
+        
         if(this.state.steps[step].update_count == 0 )
         {      
           this.bodies_enable( 0 )  
@@ -1244,12 +1246,48 @@ export default class fidget{
   
           this.set_resolution_coef_from_step(step)   
           
-          if(this.debug_mode.switch_selected_inter_help)
+          
+          if((this.debug_mode.switch_selected_inter_help)||(this.steps_info[step].switch_selection_transition))
           {
-            if((step == 0)||(step == this.bodies.inters_step.steps.length-1))
+            if((step == 0)||(step == this.bodies.inters_step.steps.length))
+            {
               this.Mouse.switch_selection( null )
+              
+            }
             else
-              this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step])   
+            {
+              
+              if(step < this.bodies.inters_step.steps.length)
+              {
+                if( this.bodies.inters_step.steps[step].constructor === Array )
+                {
+                  if( this.bodies.inters_step.steps[step-1].constructor === Array )
+                  {
+                    let selected_body = this.get_selected_body()
+                    let i = this.bodies.inters_step.steps[step-1].indexOf(selected_body)
+                    
+                    if( i < this.bodies.inters_step.steps.length )
+                      this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step][i])   
+                    else
+                      this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step][0])   
+
+
+                  }
+                  else
+                  {
+                    this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step][0])   
+                  }
+                  
+                }
+                else
+                {
+                  this.switch_selection_transition( step, this.get_selected_body(), this.bodies.inters_step.steps[step-1], this.bodies.inters_step.steps[step])   
+                }
+                
+              }
+               
+            }
+              
           }
             
         }

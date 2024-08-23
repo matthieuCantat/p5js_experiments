@@ -92,7 +92,7 @@ export default class fidgets_sequence
             debug : this.debug_mode,  
             play_animation:null,    
           }
-         // var fidget = new fidget_windmill(opts)
+          //var fidget = new fidget_windmill(opts)
           //var fidget = new fidget_daft_i(opts)
           var fidget = this.get_random_fidget(opts)
           z_depth = fidget.z_depth_end

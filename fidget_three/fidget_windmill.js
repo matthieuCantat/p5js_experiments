@@ -1280,7 +1280,8 @@ export default class fidget_windmill extends fidget{
         constraints_disable: [
           // 'geos','rectangle',null,'connect_rot_iB',
           // 'geos','rectangle',null,'connect_ty_iC',
-        ]
+        ],
+        switch_selection_transition:null,
       }, ///////////////////////////////////////////////////////////////////////////////////// 1
       {
         bodies_enable: [
@@ -1323,7 +1324,8 @@ export default class fidget_windmill extends fidget{
         ],
         constraints_disable: [
           //'geos', 'rectangle', null, 'connect_ty_iC'
-        ]
+        ],
+        switch_selection_transition:true,
       }, ///////////////////////////////////////////////////////////////////////////////////// 2
       {
         bodies_enable: [
@@ -1361,7 +1363,8 @@ export default class fidget_windmill extends fidget{
           this.bodies.bones.rectangles_pivots[2],
           this.bodies.bones.rectangles_pivots[3]
         ],
-        constraints_disable: []
+        constraints_disable: [],
+        switch_selection_transition:true,
       }, ///////////////////////////////////////////////////////////////////////////////////// 3
       {
         bodies_enable: [
