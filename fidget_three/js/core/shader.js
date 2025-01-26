@@ -4,7 +4,7 @@ import {
   get_texture,
   get_background,
   convert_to_three_color,
-} from './utils_three.js';
+} from '../utils/utils_three.js';
 
 import {
   utils,
@@ -12,7 +12,7 @@ import {
   mouseY,
   mix_value_function,
   map_range,
-} from './utils.js';
+} from '../utils/utils.js';
 
 var materials = {
     black: new THREE.MeshBasicMaterial( { color: 'black' } ),

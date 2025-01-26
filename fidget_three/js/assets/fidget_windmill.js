@@ -1,11 +1,11 @@
 
-import fidget from './fidget.js'
-import { utils, clamp, rad, deg, anim_vectors, anim_values } from './utils.js'
-import { body_build } from './body.js'
-import Vector from './vector.js'
-import Matrix from './matrix.js'
-import { materials } from './shader.js'
-import { effect } from './effect.js'
+import fidget from '../core/fidget.js'
+import { utils, clamp, rad, deg, anim_vectors, anim_values } from '../utils/utils.js'
+import { body_build } from '../core/body.js'
+import Vector from '../utils/vector.js'
+import Matrix from '../utils/matrix.js'
+import { materials } from '../core/shader.js'
+import { effect } from '../core/effect.js'
 
 
 export default class fidget_windmill extends fidget{

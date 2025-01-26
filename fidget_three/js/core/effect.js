@@ -1,9 +1,9 @@
 
 
-import Vector from './vector.js';
-import { utils, rad} from './utils.js';
+import Vector from '../utils/vector.js';
+import { utils, rad} from '../utils/utils.js';
 import { body_build } from './body.js';
-import Matrix from './matrix.js';
+import Matrix from '../utils/matrix.js';
 
 
 

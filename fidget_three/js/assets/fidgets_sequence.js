@@ -1,14 +1,22 @@
 
-import Vector from './vector.js';
-import Matrix from './matrix.js';
-import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY , userIsInteracting,userInteractionChange} from './utils.js';
-import fidget_daft_i from './fidget_daft_i.js';
-import fidget_windmill from './fidget_windmill.js';
+import Vector from '../utils/vector.js';
+import Matrix from '../utils/matrix.js';
+import { Chrono, 
+  Draw_text_debug, 
+  clamp, 
+  isMousePressed, 
+  isScreenTouched, 
+  mouseX, mouseY , 
+  userIsInteracting,
+  userInteractionChange} from '../utils/utils.js';
+import fidget_daft_i from '../assets/fidget_daft_i.js';
+import fidget_windmill from '../assets/fidget_windmill.js';
+import fidget_simple_slide from '../assets/fidget_simple_slide.js';
 
 
 export default class fidgets_sequence
 {
-    constructor( nbr, m, s, screen_dims, shaders = [], debug=false)
+    constructor( nbr, m, s, screen_dims, shaders = [], debug=false, fidget_choice = null)
     {
         // hard coded
         this.chrono_appears_start = 250
@@ -44,6 +52,8 @@ export default class fidgets_sequence
         this.fidgets = []
         this.draw_text_debug = null
         this.scene = null
+
+        this.fidget_choice = fidget_choice
     }
 
 
@@ -53,6 +63,9 @@ export default class fidgets_sequence
         this.scene = scene
       
       console.log('setup : fidgets_sequence')
+
+      const e_test_title = document.getElementById('test_title')
+      e_test_title.textContent = 'fidgets_sequence'
 
       //clean
       this.anim_mode = false
@@ -92,9 +105,16 @@ export default class fidgets_sequence
             debug : this.debug_mode,  
             play_animation:null,    
           }
-          //var fidget = new fidget_windmill(opts)
-          //var fidget = new fidget_daft_i(opts)
-          var fidget = this.get_random_fidget(opts)
+          var fidget = null
+          if( this.fidget_choice == "windmill" )
+            fidget = new fidget_windmill(opts)
+          else if( this.fidget_choice == "daft_i" )
+            fidget = new fidget_daft_i(opts)
+          else if( this.fidget_choice == "simple_slide" )
+            fidget = new fidget_simple_slide(opts);
+          else
+            fidget = this.get_random_fidget(opts)
+          
           z_depth = fidget.z_depth_end
           
           fidget.force_way = this.force_way
@@ -133,10 +153,11 @@ export default class fidgets_sequence
     clean_scene(scene)
     {
       for( let fidget of this.fidgets)
+      {
+        fidget.clean_physics()
         fidget.clean_shapes_three(scene)
+      }
       this.chrono.clean_scene(scene)
-      //
-
     }
 
     get_random_fidget(in_options)
@@ -275,7 +296,10 @@ export default class fidgets_sequence
 
     update()
     {
+      console.log('update')
+      
       this.get_resolution_coef_info()
+
       for( let i = 0; i < this.fidgets.length; i++ )
         this.fidgets_do_computation[i] = this.do_fidget_computation(i)
         
@@ -361,14 +385,13 @@ export default class fidgets_sequence
         {
           this.reset()
         }
-          
-
 
       }
       
       this.draw_fidgets_updates_only()
       this.update_count += 1
     }
+
 
     do_fidget_computation(i)
     {

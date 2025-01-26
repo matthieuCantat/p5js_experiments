@@ -180,8 +180,11 @@ export function change_selected_obj(mouse_cns,obj)
 
 export class Draw_text_debug
 {
+  
   constructor(screen_dims)
   {
+    this.USE_3D = false
+    
     this.firstPos = null
     this.history =  []
     this.hitHistory = []
@@ -192,6 +195,7 @@ export class Draw_text_debug
     this.screen_dims = screen_dims
     this.font = null
     let Chrono = this
+
     const loader = new FontLoader();
     loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {Chrono.font = font})    
   
@@ -232,6 +236,9 @@ export class Draw_text_debug
 
   setup_three(scene_three)
   {
+    if( this.USE_3D == false )
+      return false
+
     let Debug_inst = this
     const loader = new FontLoader();
     loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {    
@@ -254,6 +261,7 @@ export class Draw_text_debug
 
     })
     
+    return true
   }
 
   update_three(texts_to_draw)
@@ -261,8 +269,21 @@ export class Draw_text_debug
     if( (this.font == null)||(this.three_meshs == null) )
       return false
 
-    for( let i = 0; i < texts_to_draw.length; i++)
-      this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( texts_to_draw[i], this.sText ) );
+    if( this.USE_3D )
+    {
+      for( let i = 0; i < texts_to_draw.length; i++)
+        this.three_meshs[i].geometry = new THREE.ShapeGeometry( this.font.generateShapes( texts_to_draw[i], this.sText ) );  
+    }
+    else
+    {    
+      let debug_txt  = ''
+      for( let i = 0; i < texts_to_draw.length; i++)
+        debug_txt += texts_to_draw[i] + '<br>'
+      
+      const e_debug = document.getElementById('debug_info')
+      e_debug.innerHTML  = debug_txt
+  
+    }
 
     return true
   }
@@ -659,27 +680,35 @@ document.addEventListener('touchend', function(event) {
 
 export function create_mouse_constraint(matter_engine)
 {
-
+  console.log( "mouse_created" ,matter_engine )
   var mouse = Matter.Mouse.create(document.body)
 
-    var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
-        mouse: mouse,
-        collisionFilter: { category: utils.collision_category.mouse, 
-                           mask: utils.collision_category.inter}, // <---
-        constraint: {
-            // allow bodies on mouse to rotate
-            //stiffness:0.01,
-            damping:0.01,
-            angularStiffness: 0,
-            render: {
-                visible: false
-            }
-        }
-      });
-      
-      Matter.Composite.add(matter_engine.world, mouse_constraint);
+  var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
+      mouse: mouse,
+      collisionFilter: { category: utils.collision_category.mouse, 
+                          mask: utils.collision_category.inter}, // <---
+      constraint: {
+          // allow bodies on mouse to rotate
+          //stiffness:0.01,
+          damping:0.01,
+          angularStiffness: 0,
+          render: {
+              visible: false
+          }
+      }
+    });
+    
+    console.log('add_to_world',matter_engine.world, mouse_constraint)
+    Matter.Composite.add(matter_engine.world, mouse_constraint);
 
     return mouse_constraint   
+}
+
+
+export function delete_mouse_constraint(matter_engine, mouse_constraint)
+{
+  console.log( "mouse_deleteded" ,matter_engine,mouse_constraint )
+  Matter.Composite.remove(matter_engine.world, mouse_constraint);
 }
 
 export function create_physics_engine()

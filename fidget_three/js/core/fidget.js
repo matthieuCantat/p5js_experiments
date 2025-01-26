@@ -1,19 +1,20 @@
 
 
-import Vector from './vector.js';
+import Vector from '../utils/vector.js';
 import { utils, 
   create_physics_engine,
   create_mouse_constraint,
+  delete_mouse_constraint,
   create_physics_engine_runner,
   create_boundary_wall_collision,
   userIsInteracting,
-  flatten_list} from './utils.js';
+  flatten_list} from '../utils/utils.js';
 import * as THREE from 'three';
-import { Mouse_manager,  } from './utils_three.js'
-import { body_build } from './body.js';
-import { materials,} from './shader.js';
-import Matrix from './matrix.js';
-import { effect } from './effect.js';
+import { Mouse_manager,  } from '../utils/utils_three.js'
+import { body_build } from '../core/body.js';
+import { materials,} from '../core/shader.js';
+import Matrix from '../utils/matrix.js';
+import { effect } from '../core/effect.js';
 
 class state_step_tpl{
   constructor()
@@ -196,6 +197,8 @@ export default class fidget{
     }
     this.bodies_update()
     this.draw_background()
+
+    countElements(this.matter_engine.world);
 
     return true
   }
@@ -439,7 +442,13 @@ export default class fidget{
     this.Mouse.setup(this.group_three)
   }  
 
-
+  bodies_clean_physics(body_type_filter = [])
+  {
+    for( let body of this.bodies_get_list_filtered( 'eval', body_type_filter ))
+      body.clean_physics() 
+    
+    Matter.Composite.clear(this.matter_engine.world, true);
+  }
 
   bodies_clean_shapes_three(body_type_filter = [])
   {
@@ -448,6 +457,19 @@ export default class fidget{
 
     for( let effect in this.effects)
       if(this.effects[effect] != null)this.effects[effect].clean(this.group_three)        
+  }
+
+  clean_physics()
+  {
+    this.bodies_clean_physics()
+
+    delete_mouse_constraint(this.matter_engine, this.mouse_constraint)
+
+    Matter.Events.off(this.matter_engine);  // Remove all events attached to the engine
+    Matter.Runner.stop(this.matter_engine_runner);
+    this.matter_engine = null
+    this.matter_engine_runner = null
+
   }
 
   clean_shapes_three(three_scene)
@@ -1350,3 +1372,17 @@ function put_selected_instance_first( bodies )
   }  
   return bodies_ordered
 }
+
+
+
+
+function countElements(world) {
+  const bodiesCount = world.bodies.length;
+  const constraintsCount = world.constraints.length;
+  const compositesCount = world.composites.length;
+  
+  console.log(`Bodies: ${bodiesCount}`);
+  console.log(`Constraints: ${constraintsCount}`);
+  console.log(`Composites: ${compositesCount}`);
+  console.log(`Total elements: ${bodiesCount + constraintsCount + compositesCount}`);
+  }

@@ -1,6 +1,6 @@
-import Vector from './vector.js';
-import Matrix from './matrix.js';
-import { utils , rad, deg, Draw_text_debug,convert_coords_matter_to_three} from './utils.js';
+import Vector from '../utils/vector.js';
+import Matrix from '../utils/matrix.js';
+import { utils , rad, deg, Draw_text_debug,convert_coords_matter_to_three} from '../utils/utils.js';
 import { 
   dyn_constraint_build, 
   constraint_build, 
@@ -8,8 +8,8 @@ import {
   dyn_constraint_build_custom_orient,
   connect,
   connect_multi} from './constraint.js';
-import * as ut from './utils_three.js';
-import { VerticalTiltShiftShader } from './libraries/jsm/Addons.js';
+import * as ut from '../utils/utils_three.js';
+import { VerticalTiltShiftShader } from '../libraries/jsm/Addons.js';
 import * as THREE from 'three';
 
 var build_order = 0
@@ -306,7 +306,7 @@ export class body_build{
         return body
     }
 
-
+    
     init_physics()
     {
       if(!this.dynamic)
@@ -1107,6 +1107,11 @@ export class body_build{
       }     
     }
     
+    clean_physics()
+    {
+      if( this.body != null )
+        Matter.Composite.remove( this.matter_engine.world, this.body) 
+    }
 
     clean_shapes_three(group_fidget)
     {

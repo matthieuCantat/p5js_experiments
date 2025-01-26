@@ -6,3 +6,43 @@ html, body {
 canvas {
   display: block;
 }
+
+
+#test_title {
+	position: absolute;
+	top: 100px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display:block;
+}
+
+
+
+#debug_info {
+	position: absolute;
+	top: 200px;
+	width: 100%;
+	text-align: left;
+	z-index: 100;
+	display:block;
+}
+
+
+#menu {
+    position: absolute;
+    top: 50px;
+    left: 4px;
+    z-index: 10; /* Ensures it appears in front of the canvas */
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  select {
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }

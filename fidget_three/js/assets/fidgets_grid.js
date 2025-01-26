@@ -1,9 +1,16 @@
 
-import Vector from './vector.js';
-import Matrix from './matrix.js';
-import { Chrono, Draw_text_debug, clamp,isMousePressed, isScreenTouched, mouseX, mouseY , userIsInteracting,userInteractionChange} from './utils.js';
-import fidget_daft_i from './fidget_daft_i.js';
-import fidget_windmill from './fidget_windmill.js';
+import Vector from '../utils/vector.js';
+import Matrix from '../utils/matrix.js';
+import { Chrono, 
+  Draw_text_debug, 
+  clamp, 
+  isMousePressed, 
+  isScreenTouched, 
+  mouseX, mouseY , 
+  userIsInteracting, 
+  userInteractionChange} from '../utils/utils.js';
+import fidget_daft_i from '../assets/fidget_daft_i.js';
+import fidget_windmill from '../assets/fidget_windmill.js';
 
 
 export default class fidgets_grid

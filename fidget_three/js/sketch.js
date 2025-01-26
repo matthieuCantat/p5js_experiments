@@ -5,20 +5,22 @@
 
 
 import './libraries/matter.js';
-import Vector from './vector.js'
-import Matrix from './matrix.js'
+import Vector from './utils/vector.js'
+import Matrix from './utils/matrix.js'
 import { utils, 
          create_boundary_wall_collision,
          rad,
          create_physics_engine,
          create_mouse_constraint,
-         create_physics_engine_runner} from './utils.js';
+         create_physics_engine_runner} from './utils/utils.js';
 
-import { three_utils,} from './utils_three.js';
+import { three_utils,} from './utils/utils_three.js';
 
          
-import fidgets_sequence from './fidgets_sequence.js'
-import fidgets_grid from './fidgets_grid.js'
+import fidgets_sequence from './assets/fidgets_sequence.js'
+import fidgets_grid from './assets/fidgets_grid.js'
+import fidget_daft_i from './assets/fidget_daft_i.js'
+import fidget_windmill from './assets/fidget_windmill.js'
 
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
 import { RenderPass } from './libraries/jsm/postprocessing/RenderPass.js';
@@ -78,7 +80,7 @@ height = window.innerHeight;
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
-var nbr = 10
+var nbr = 1
 var debug = { disable_animation:true,
               switch_selected_inter_help:false,
               inter_step_physics : false,
@@ -86,15 +88,15 @@ var debug = { disable_animation:true,
 
               show_geos:true,
               show_effects:true,              
-              show_inters:false,
-              show_inters_steps:false,
-              show_bones:false,
+              show_inters:true,
+              show_inters_steps:true,
+              show_bones:true,
               force_visibility:false,
 
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,
-              mouse_info:false,
+              mouse_info:true,
               show_warning_log:false,
 
               do_bloom_selected: true,
@@ -107,7 +109,7 @@ var debug = { disable_animation:true,
 
 
 /////////////////////////////////////////// variables
-var F_sequence = null
+var current_asset = null
 
 var shdrs = [] 
 
@@ -117,8 +119,10 @@ let m = new Matrix()
 m.setTranslation(width/2, height/2 )
 
 let s = 2.2
-F_sequence = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
-//F_sequence = new fidgets_grid(nbr, 5, screen_dims, shdrs, debug)
+
+current_asset = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
+//current_asset = new fidgets_grid(nbr, 5, screen_dims, shdrs, debug)
+//current_asset = new fidget_daft_i();
 
 
 
@@ -131,16 +135,19 @@ let uniforms,light1;
 let finalComposer,bloomComposer;
 let light_lens_flare;
 
-init();
 
 
-function init() {
+container = document.createElement( 'div' );
+document.body.appendChild( container );
+init_three_scene();
+init_others()
+init_three_render()
 
 
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
+function init_three_scene() {
 
-    //////////////// scene setup
+
+    // scene setup
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000 );
 
@@ -203,35 +210,19 @@ function init() {
    
 
     ///////////////// fidgets
+    if( current_asset != null )
+        current_asset.setup(scene)
 
-    F_sequence.setup(scene)
+}
 
-    
-    /*
-    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material = three_utils.material.background_test
-    let colors = []
-    let positions = []
-    for ( let i = 0; i < 4; i ++ ) {
+function clear_three_render()
+{
+    renderer.dispose();
+    renderer.domElement.parentNode.removeChild(renderer.domElement);
+}
 
-        // adding x,y,z
-        positions.push( Math.random()* 255 );
-        positions.push( Math.random()* 255 );
-        positions.push( Math.random()* 255 );
-
-        // adding r,g,b,a
-        colors.push( Math.random() * 255 );
-        colors.push( Math.random() * 255 );
-        colors.push( Math.random() * 255 );
-        colors.push( Math.random() * 255 );
-
-    }
-    const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
-    const colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
-    colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
-    //F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'position', positionAttribute ); // arleady in
-    F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.geometry.setAttribute( 'color', colorAttribute );
-    */
-    
+function init_three_render()
+{    
     ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -281,8 +272,19 @@ function init() {
         finalComposer.addPass( mixPass );
         finalComposer.addPass( outputPass );
     }
+    
+    /*
+    const controls = new OrbitControls( camera, renderer.domElement );
+    controls.maxPolarAngle = Math.PI * 0.5;
+    controls.minDistance = 1;
+    controls.maxDistance = 500;
+    */
+    
+}
 
-
+function init_others()
+{
+    
     // stats
     stats = new Stats();
     container.appendChild( stats.dom );
@@ -293,20 +295,10 @@ function init() {
     window.addEventListener( 'resize', onWindowResize );
 
 
-    
-    /*
-    const controls = new OrbitControls( camera, renderer.domElement );
-    controls.maxPolarAngle = Math.PI * 0.5;
-    controls.minDistance = 1;
-    controls.maxDistance = 500;
-    */
-    
-    
-    
-    
-    
-
 }
+
+
+
 
 function onWindowResize() {
 
@@ -339,20 +331,33 @@ function animate() {
     }        
 
     
-    // other
-    F_sequence.update()
-    F_sequence.animate_three()
+    if( current_asset != null )
+    {
+        current_asset.update()
+        current_asset.animate_three()
+
+        console.log('__________________' + animate_count)
+        console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
+        console.log('Elements in the scene:', scene.children);
+        for( let F of current_asset.fidgets)
+        {
+            //console.log( F.title , 'Mouse canvas element' , F.mouse_constraint.mouse.element);
+            //console.log(F.mouse_constraint.world === F.matter_engine.world); // Should log true
+        }
+            
+    }
+
     //uniforms[ 'time' ].value = performance.now() / 1000;
-    //F_sequence.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
+    //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
 
     if(debug.do_bloom)
     {
         let save_states = []
-        for( let i = 0 ; i < F_sequence.fidgets.length; i++)
-            save_states.push( F_sequence.fidgets[i].setup_bloom_pass() )
+        for( let i = 0 ; i < current_asset.fidgets.length; i++)
+            save_states.push( current_asset.fidgets[i].setup_bloom_pass() )
         bloomComposer.render()
-        for( let i = 0 ; i < F_sequence.fidgets.length; i++)
-            F_sequence.fidgets[i].clean_bloom_pass(save_states[i])
+        for( let i = 0 ; i < current_asset.fidgets.length; i++)
+            current_asset.fidgets[i].clean_bloom_pass(save_states[i])
 
         finalComposer.render();
     }
@@ -368,8 +373,116 @@ function animate() {
 
     
     animate_count += 1
+
+
     
 }
 
 
+function displayAssetsList()
+{
+    let new_categories_info = ['fidgets_grid','fidgets_sequence','fidget_daft_i','fidget_windmill',"simple_slide"];
 
+    //console.log(categories_sorted, new_categories_info);
+    const newCategoryElement = document.getElementById("menu-select");
+    new_categories_info.forEach(option => {
+        const newOption = document.createElement("option");
+        newOption.value = option; // Set the value attribute
+        newOption.textContent = option; // Set the text inside the option
+        newCategoryElement.appendChild(newOption); // Add to the <select> element
+    }); 
+}
+
+
+displayAssetsList()
+
+
+const menuSelect = document.getElementById('menu-select');
+
+
+
+menuSelect.addEventListener('change', (event) => {
+  const value = event.target.value;
+
+  // Remove existing objects
+
+  if( current_asset != null )
+  {
+    current_asset.clean_scene(current_asset.scene)
+    current_asset = null
+    clear_three_render()
+  }
+
+
+  // Add 
+  if (value === 'fidgets_grid')
+  {
+    current_asset = new fidgets_grid(nbr, 5, screen_dims, shdrs, debug)
+    current_asset.setup(scene)
+    init_three_render()    
+  }
+  else if (value === 'fidgets_sequence')
+  {
+    current_asset = new fidgets_sequence(
+        nbr,
+        m,
+        s,
+        screen_dims, 
+        shdrs,
+        debug)
+    current_asset.setup(scene)
+    init_three_render()
+  }
+  else if (value === 'fidget_daft_i')
+  {
+    current_asset = new fidgets_sequence(
+        nbr,
+        m,
+        s,
+        screen_dims, 
+        shdrs,
+        debug,
+        "daft_i")
+    current_asset.setup(scene)
+    init_three_render()
+  }
+  else if (value === 'fidget_windmill')
+  {
+    current_asset = new fidgets_sequence(
+        nbr,
+        m,
+        s,
+        screen_dims, 
+        shdrs,
+        debug,
+        "windmill")
+    current_asset.setup(scene)
+    init_three_render()
+  }
+  else if (value === 'simple_slide')
+    {
+      current_asset = new fidgets_sequence(
+          nbr,
+          m,
+          s,
+          screen_dims, 
+          shdrs,
+          debug,
+          "simple_slide")
+      current_asset.setup(scene)
+      init_three_render()
+    }  
+
+
+});
+
+
+function countObjects(obj) {
+    let count = 1; // Count the current object
+    obj.children.forEach((child) => {
+      count += countObjects(child); // Recursively count children
+    });
+    return count;
+  }
+  
+  
