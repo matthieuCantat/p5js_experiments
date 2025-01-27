@@ -48,6 +48,6 @@ canvas {
   }
 
 #three_canvas{
-  touch-action: none;
+  /*touch-action: none;*/
   z-index: 0; 
 }
