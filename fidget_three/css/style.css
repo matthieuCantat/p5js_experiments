@@ -46,3 +46,8 @@ canvas {
     border-radius: 5px;
     border: 1px solid #ccc;
   }
+
+#three_canvas{
+  touch-action: none;
+  z-index: 0; 
+}

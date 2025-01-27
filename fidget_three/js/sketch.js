@@ -129,7 +129,7 @@ current_asset = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
 
 
 
-let container, stats;
+let three_canvas_container, stats;
 let camera, scene, renderer;
 let uniforms,light1;
 let finalComposer,bloomComposer;
@@ -137,8 +137,7 @@ let light_lens_flare;
 
 
 
-container = document.createElement( 'div' );
-document.body.appendChild( container );
+three_canvas_container = document.getElementById("three_canvas");
 init_three_scene();
 init_others()
 init_three_render()
@@ -234,7 +233,7 @@ function init_three_render()
         renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     }
     //renderer.toneMapping = THREE.ReinhardToneMapping;
-    container.appendChild( renderer.domElement );
+    three_canvas_container.appendChild( renderer.domElement );
 
     if(debug.do_bloom)
     {
@@ -287,10 +286,10 @@ function init_others()
     
     // stats
     stats = new Stats();
-    container.appendChild( stats.dom );
+    three_canvas_container.appendChild( stats.dom );
 
     ///////////////// action
-    container.style.touchAction = 'none';
+    //three_canvas_container.style.touchAction = 'none';
 
     window.addEventListener( 'resize', onWindowResize );
 
