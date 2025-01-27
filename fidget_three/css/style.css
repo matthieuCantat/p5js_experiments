@@ -13,7 +13,7 @@ canvas {
 	top: 100px;
 	width: 100%;
 	text-align: center;
-	z-index: 100;
+	z-index: 2;
 	display:block;
 }
 
@@ -24,7 +24,7 @@ canvas {
 	top: 200px;
 	width: 100%;
 	text-align: left;
-	z-index: 100;
+	z-index: 2;
 	display:block;
 }
 
@@ -45,6 +45,7 @@ canvas {
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    z-index: 10; 
   }
 
 #three_canvas{
