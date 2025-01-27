@@ -103,7 +103,7 @@ var debug = { disable_animation:true,
               matrix_axes:false,
               cns_axes:false,
               fidget_steps_info:false,
-              mouse_info:true,
+              mouse_info:false,
               show_warning_log:false,
 
               do_bloom_selected: true,
