@@ -76,12 +76,12 @@ function addLight( h, s, l, x, y, z ) {
 let FULL_SCREEN_MODE = false
 let width       = 400
 let height      = 400//700
-let yOffset = 400
+let lowerLeftCornerPos = new Vector(0,height+500);
 if(FULL_SCREEN_MODE)
 {
     width = window.innerWidth;
     height = window.innerHeight;
-    yOffset = 0;
+    lowerLeftCornerPos = new Vector(0,height);
 }
 
 let screen_dims = {x:width,y:height}
@@ -232,7 +232,13 @@ function init_three_render()
     ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setTranslation(0,yOffset)
+    /*
+    renderer.setViewport ( 
+        lowerLeftCornerPos.x, 
+        lowerLeftCornerPos.y, 
+        lowerLeftCornerPos.x+width, 
+        lowerLeftCornerPos.y+height);
+    */
     renderer.setSize( width, height );
     renderer.setAnimationLoop( animate );
     if(debug.do_shadows)
