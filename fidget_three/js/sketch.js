@@ -73,10 +73,17 @@ function addLight( h, s, l, x, y, z ) {
 }
 
 /////////////////////////////////////////// setup screen
+let FULL_SCREEN_MODE = false
 let width       = 400
 let height      = 400//700
-width = window.innerWidth;
-height = window.innerHeight;
+let yOffset = 400
+if(FULL_SCREEN_MODE)
+{
+    width = window.innerWidth;
+    height = window.innerHeight;
+    yOffset = 0;
+}
+
 let screen_dims = {x:width,y:height}
 
 /////////////////////////////////////////// setup game
@@ -225,6 +232,7 @@ function init_three_render()
     ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setTranslation(0,yOffset)
     renderer.setSize( width, height );
     renderer.setAnimationLoop( animate );
     if(debug.do_shadows)
