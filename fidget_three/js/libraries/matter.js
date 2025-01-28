@@ -5748,7 +5748,7 @@ var Common = __webpack_require__(0);
 
             if (touches) {
                 mouse.button = 0;
-                event.preventDefault();
+                //event.preventDefault(); 29/01/2025 it makes impossible to use <select> menu in touch mode
             } else {
                 mouse.button = event.button;
             }
@@ -5767,7 +5767,7 @@ var Common = __webpack_require__(0);
                 touches = event.changedTouches;
 
             if (touches) {
-                event.preventDefault();
+                //event.preventDefault(); 29/01/2025 it makes impossible to use <select> menu in touch mode
             }
             
             mouse.button = -1;
@@ -5799,16 +5799,16 @@ var Common = __webpack_require__(0);
     Mouse.setElement = function(mouse, element) {
         mouse.element = element;
 
-        element.addEventListener('mousemove', mouse.mousemove);
-        element.addEventListener('mousedown', mouse.mousedown);
-        element.addEventListener('mouseup', mouse.mouseup);
+        element.addEventListener('mousemove', mouse.mousemove, { passive: false });
+        element.addEventListener('mousedown', mouse.mousedown, { passive: false });
+        element.addEventListener('mouseup', mouse.mouseup, { passive: false });
         
-        element.addEventListener('mousewheel', mouse.mousewheel);
-        element.addEventListener('DOMMouseScroll', mouse.mousewheel);
+        element.addEventListener('mousewheel', mouse.mousewheel, { passive: false });
+        element.addEventListener('DOMMouseScroll', mouse.mousewheel, { passive: false });
 
-        element.addEventListener('touchmove', mouse.mousemove);
-        element.addEventListener('touchstart', mouse.mousedown);
-        element.addEventListener('touchend', mouse.mouseup);
+        element.addEventListener('touchmove', mouse.mousemove, { passive: false });
+        element.addEventListener('touchstart', mouse.mousedown, { passive: false });
+        element.addEventListener('touchend', mouse.mouseup, { passive: false });
     };
 
     /**
