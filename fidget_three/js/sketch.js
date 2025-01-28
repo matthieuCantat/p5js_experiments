@@ -36,19 +36,21 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 
 
-
+/*
 // prevents the mobile browser from processing some default
 // touch events, like swiping left for "back" or scrolling
 // the page.
 document.ontouchmove = function(event) {
   event.preventDefault();
 };
+*/
 
 
 // Disable pull-to-refresh using JavaScript
 document.body.addEventListener('touchmove', function(event) {
 event.preventDefault();
-}, { passive: false });
+}, { passive: false } );
+
 
 const loader = new THREE.TextureLoader();
 const textureFlare0 = loader.load( './textures/lensflare/lensflare0.png' );
@@ -95,9 +97,9 @@ var debug = { disable_animation:true,
 
               show_geos:true,
               show_effects:true,              
-              show_inters:true,
-              show_inters_steps:true,
-              show_bones:true,
+              show_inters:false,
+              show_inters_steps:false,
+              show_bones:false,
               force_visibility:false,
 
               matrix_axes:false,
@@ -106,7 +108,7 @@ var debug = { disable_animation:true,
               mouse_info:false,
               show_warning_log:false,
 
-              do_bloom_selected: true,
+              do_bloom_selected: false,
               do_bloom: false, 
               do_shadows: false,         
               do_flare: false,     
@@ -145,6 +147,7 @@ let light_lens_flare;
 
 
 three_canvas_container = document.getElementById("three_canvas");
+
 init_three_scene();
 init_others()
 init_three_render()
@@ -168,15 +171,7 @@ function init_three_scene() {
 
     //let light_group = new THREE.Group();
     //const light = new THREE.PointLight( 0xffffff, 2.5, 0, 0 );
-    /*
-    light1 = new THREE.PointLight( 0xffffff, 3.5, 0, 0 );
-    const sphere = new THREE.SphereGeometry( 2.5, 16, 8 );
-    light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
-    light1.position.x = Math.sin(rad(45))*200
-    light1.position.y = Math.cos(rad(45))*200
-    light1.position.z = 100
-    light1.castShadow = true
-    */
+
 
     light1 = new THREE.DirectionalLight( 0xffffff, 3.5 );
     //const sphere = new THREE.SphereGeometry( 2.5, 16, 8 );
@@ -349,9 +344,9 @@ function animate() {
         current_asset.update()
         current_asset.animate_three()
 
-        console.log('__________________' + animate_count)
-        console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
-        console.log('Elements in the scene:', scene.children);
+        //console.log('__________________' + animate_count)
+        //console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
+        //console.log('Elements in the scene:', scene.children);
         for( let F of current_asset.fidgets)
         {
             //console.log( F.title , 'Mouse canvas element' , F.mouse_constraint.mouse.element);
@@ -497,5 +492,4 @@ function countObjects(obj) {
     });
     return count;
   }
-  
-  
+

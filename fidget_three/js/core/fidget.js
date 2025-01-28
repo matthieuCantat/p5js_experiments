@@ -108,6 +108,7 @@ export default class fidget{
 
     this.darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
     this.explode_happened = false
+    
   }
 
 
@@ -198,7 +199,7 @@ export default class fidget{
     this.bodies_update()
     this.draw_background()
 
-    countElements(this.matter_engine.world);
+    //countElements(this.matter_engine.world);
 
     return true
   }
