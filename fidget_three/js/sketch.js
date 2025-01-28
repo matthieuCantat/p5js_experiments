@@ -75,7 +75,7 @@ function addLight( h, s, l, x, y, z ) {
 }
 
 /////////////////////////////////////////// setup screen
-let FULL_SCREEN_MODE = false
+let FULL_SCREEN_MODE = true
 let width       = 400
 let height      = 400//700
 let lowerLeftCornerPos = new Vector(0,height+500);
