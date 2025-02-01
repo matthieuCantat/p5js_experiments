@@ -9,6 +9,7 @@ import { Chrono,
   mouseX, mouseY , 
   userIsInteracting,
   userInteractionChange} from '../utils/utils.js';
+  
 import fidget_daft_i from '../assets/fidget_daft_i.js';
 import fidget_windmill from '../assets/fidget_windmill.js';
 import fidget_simple_slide from '../assets/fidget_simple_slide.js';
@@ -16,22 +17,29 @@ import fidget_simple_slide from '../assets/fidget_simple_slide.js';
 
 export default class fidgets_sequence
 {
-    constructor( nbr, m, s, screen_dims, shaders = [], debug=false, fidget_choice = null)
+    constructor( args_in )
     {
+        const args_default = {
+          shaders : [],
+          debug : false,
+          fidget_choice : null };
+
+        const args = {...args_default, ...args_in}
+        console.log(args)
         // hard coded
         this.chrono_appears_start = 250
         this.chrono_appears_end   = 290  
         this.chrono_appears_range = this.chrono_appears_end-this.chrono_appears_start
         
         // init memory
-        this.fidgets_nbr = nbr
-        this.m = m
-        this.s = s
-        this.debug_mode = debug
+        this.fidgets_nbr = args.nbr
+        this.m = args.m
+        this.s = args.s
+        this.debug_mode = args.debug
         this.force_way = 1
 
-        this.shaders = shaders
-        this.screen_dims = screen_dims
+        this.shaders = args.shaders
+        this.screen_dims = args.screen_dims
      
         // instance memory
         this.anim_mode = false
@@ -53,7 +61,7 @@ export default class fidgets_sequence
         this.draw_text_debug = null
         this.scene = null
 
-        this.fidget_choice = fidget_choice
+        this.fidget_choice = args.fidget_choice
     }
 
 
@@ -106,11 +114,11 @@ export default class fidgets_sequence
             play_animation:null,    
           }
           var fidget = null
-          if( this.fidget_choice == "windmill" )
+          if( this.fidget_choice == "fidget_windmill" )
             fidget = new fidget_windmill(opts)
-          else if( this.fidget_choice == "daft_i" )
+          else if( this.fidget_choice == "fidget_daft_i" )
             fidget = new fidget_daft_i(opts)
-          else if( this.fidget_choice == "simple_slide" )
+          else if( this.fidget_choice == "fidget_simple_slide" )
             fidget = new fidget_simple_slide(opts);
           else
             fidget = this.get_random_fidget(opts)
@@ -122,25 +130,20 @@ export default class fidgets_sequence
           this.fidgets.push(fidget)
       }
   
-      if(this.debug_mode.fidget_steps_info)
-      {
-          this.draw_text_debug = new Draw_text_debug(this.screen_dims)
-          this.draw_text_debug.mouse_cns = this.mouse_constraint
-      }   
+
          
       // setup
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
-        this.fidgets[i].setup();
+        this.fidgets[i].setup(this.scene);
         this.fidgets_do_computation.push(null)
         this.fidgets_do_computation_last.push(null)
       }
 
       // add to scene
-      this.setup_shapes_fidgets_three(this.scene)
       this.setup_chrono_three(this.scene)
-      this.setup_debug_three(this.scene)
-
+      
+      this.set_debug(this.debug_mode)
     }
 
     reset()
@@ -153,10 +156,8 @@ export default class fidgets_sequence
     clean_scene(scene)
     {
       for( let fidget of this.fidgets)
-      {
-        fidget.clean_physics()
-        fidget.clean_shapes_three(scene)
-      }
+        fidget.clean_scene(scene)
+
       this.chrono.clean_scene(scene)
     }
 
@@ -170,23 +171,28 @@ export default class fidgets_sequence
         return new fidget_daft_i(in_options)   
     }
 
-
-
-    setup_shapes_fidgets_three(scene_three)
-    {
-      for( let i = 0; i < this.fidgets.length; i++ )
-      {   
-        this.fidgets[i].bodies_setup_shapes_three()
-        scene_three.add( this.fidgets[i].group_three )
-      }
-    }
-
-
     setup_chrono_three(scene_three)
     {
       this.chrono.setup_three(scene_three)
     }
     
+    set_debug( debug )
+    {
+      this.debug_mode = debug
+
+      for( let F of this.fidgets )
+      {
+        F.set_debug(this.debug_mode)
+      }
+
+      if(this.debug_mode.fidget_steps_info)
+      {
+          this.draw_text_debug = new Draw_text_debug(this.screen_dims)
+          this.draw_text_debug.mouse_cns = this.mouse_constraint
+      }   
+      this.setup_debug_three(this.scene)      
+    }
+
     setup_debug_three(scene_three)
     {
       if(this.debug_mode.fidget_steps_info)
@@ -482,7 +488,7 @@ export default class fidgets_sequence
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
-        this.fidgets[i].bodies_animate_three()
+        this.fidgets[i].animate_three()
       }
 
       this.update_chrono_three()

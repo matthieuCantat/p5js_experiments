@@ -318,17 +318,23 @@ export class Mouse_manager
         this.mouse_lock_selection = false
 
         this.draw_text_debug = null
+        this.set_debug(debug)
+ 
+        this.update_count = 0 
+        this.selected_body_last_eval_name = ''   
+        this.z = 0
+        this.circle_touch_radius = 20
+        this.cross_apply_radius = 10
+    }
+
+    set_debug( debug )
+    {
         this.debug = debug
         if(this.debug != false)
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             this.draw_text_debug.mouse_cns = this.mouse_constraint
         }     
-        this.update_count = 0 
-        this.selected_body_last_eval_name = ''   
-        this.z = 0
-        this.circle_touch_radius = 20
-        this.cross_apply_radius = 10
     }
 
     setup(scene)

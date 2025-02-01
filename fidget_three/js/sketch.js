@@ -18,9 +18,6 @@ import { three_utils,} from './utils/utils_three.js';
 
          
 import fidgets_sequence from './assets/fidgets_sequence.js'
-import fidgets_grid from './assets/fidgets_grid.js'
-import fidget_daft_i from './assets/fidget_daft_i.js'
-import fidget_windmill from './assets/fidget_windmill.js'
 
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
 import { RenderPass } from './libraries/jsm/postprocessing/RenderPass.js';
@@ -115,6 +112,14 @@ var debug = { disable_animation:true,
                 }
 
 
+var assets_name = [
+    'fidgets_sequence',
+    'fidget_daft_i',
+    'fidget_simple_slide',
+    'fidget_windmill',
+    'fidgets_grid',
+]
+
 
 
 /////////////////////////////////////////// variables
@@ -129,11 +134,15 @@ m.setTranslation(width/2, height/2 )
 
 let s = 2.2
 
-current_asset = new fidgets_sequence(nbr, m, s, screen_dims, shdrs, debug)
-//current_asset = new fidgets_grid(nbr, 5, screen_dims, shdrs, debug)
-//current_asset = new fidget_daft_i();
-
-
+const args = {
+    nbr : nbr,
+    m : m,
+    s : s,
+    screen_dims : screen_dims,
+    shdrs : shdrs,
+    debug : debug
+}
+current_asset = new fidgets_sequence(args)
 
 
 
@@ -227,22 +236,22 @@ function init_three_render()
     ///////////////// render
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
-    /*
-    renderer.setViewport ( 
-        lowerLeftCornerPos.x, 
-        lowerLeftCornerPos.y, 
-        lowerLeftCornerPos.x+width, 
-        lowerLeftCornerPos.y+height);
-    */
+    const width = window.innerWidth; //ADD
+    const height = window.innerHeight; //ADD
     renderer.setSize( width, height );
     renderer.setAnimationLoop( animate );
-    if(debug.do_shadows)
-    {
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
-    }
-    //renderer.toneMapping = THREE.ReinhardToneMapping;
+
+    const three_canvas_container = document.getElementById('three_canvas');
+    if (!three_canvas_container) {
+        throw new Error("Container element not found!");
+    }    
     three_canvas_container.appendChild( renderer.domElement );
+
+    if(debug.do_shadows)
+        {
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+        }
 
     if(debug.do_bloom)
     {
@@ -347,11 +356,11 @@ function animate() {
         //console.log('__________________' + animate_count)
         //console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
         //console.log('Elements in the scene:', scene.children);
-        for( let F of current_asset.fidgets)
-        {
-            //console.log( F.title , 'Mouse canvas element' , F.mouse_constraint.mouse.element);
-            //console.log(F.mouse_constraint.world === F.matter_engine.world); // Should log true
-        }
+        //for( let F of current_asset.fidgets)
+        //{
+        //    //console.log( F.title , 'Mouse canvas element' , F.mouse_constraint.mouse.element);
+        //    //console.log(F.mouse_constraint.world === F.matter_engine.world); // Should log true
+        //}
             
     }
 
@@ -389,11 +398,9 @@ function animate() {
 
 function displayAssetsList()
 {
-    let new_categories_info = ['fidgets_grid','fidgets_sequence','fidget_daft_i','fidget_windmill',"simple_slide"];
-
-    //console.log(categories_sorted, new_categories_info);
+    //console.log(categories_sorted, fileLinks);
     const newCategoryElement = document.getElementById("menu-select");
-    new_categories_info.forEach(option => {
+    assets_name.forEach(option => {
         const newOption = document.createElement("option");
         newOption.value = option; // Set the value attribute
         newOption.textContent = option; // Set the text inside the option
@@ -408,9 +415,65 @@ displayAssetsList()
 const menuSelect = document.getElementById('menu-select');
 
 
+async function loadAndExecuteClass( fileName, args) {
+    try {
+        // Dynamically import the module
+        const module_str = `./assets/${fileName}.js`;
+        const module = await import(module_str);
 
-menuSelect.addEventListener('change', (event) => {
-  const value = event.target.value;
+        // Check if the class exists and matches the file name
+        if ( module.default ){//(module[fileName]) {
+            const ClassToExecute = module.default;//module[fileName];
+
+            // Instantiate the class
+            const instance = new ClassToExecute(args);
+    
+            // Call a method or execute functionality of the class
+            if (typeof instance.setup === 'function') {
+                instance.setup(scene); // Assuming the class has an 'execute' method
+                init_three_render()
+            } else {
+                console.log(`${fileName} loaded, but no 'execute' method found.`);
+            }
+
+            return instance;
+        } else {
+            console.error(`Class ${fileName} not found in the module.`);
+        }
+    } catch (error) {
+        console.error(`Failed to load or execute ${fileName}:`, error);
+    }
+}
+/*
+const loadAndExecuteClass = async (className, ...args) => {
+    try {
+      // Dynamically import the module
+      //const module = await import('./assets/'+className+'.js');
+      const module_path = './assets/'+className+'.js'
+      const module = await import('./assets/'+className+'.js');
+      
+      // Get the class by name from the module
+      const ClassToLoad = module[className];
+
+      console.log(module_path, module, ClassToLoad )
+      
+      if (!ClassToLoad) {
+        throw new Error(`Class "${className}" not found in module.`);
+      }
+      
+      // Instantiate the class with arguments
+      const instance = new ClassToLoad(...args);
+  
+      // Return the instance or use it directly
+      return instance;
+    } catch (error) {
+      console.error('Error loading or executing the class:', error);
+    }
+  };
+*/
+
+menuSelect.addEventListener('change', (event) =>{
+  const class_name = event.target.value;
 
   // Remove existing objects
 
@@ -421,66 +484,27 @@ menuSelect.addEventListener('change', (event) => {
     clear_three_render()
   }
 
+  const args = {
+    nbr : 5,
+    m : m,
+    s : s,
+    screen_dims : screen_dims, 
+    shdrs : shdrs,
+    debug : debug,
+  }
+  
+  //loadAndExecuteClass( class_name, args )
+  
 
   // Add 
-  if (value === 'fidgets_grid')
-  {
-    current_asset = new fidgets_grid(nbr, 5, screen_dims, shdrs, debug)
-    current_asset.setup(scene)
-    init_three_render()    
-  }
-  else if (value === 'fidgets_sequence')
-  {
-    current_asset = new fidgets_sequence(
-        nbr,
-        m,
-        s,
-        screen_dims, 
-        shdrs,
-        debug)
-    current_asset.setup(scene)
-    init_three_render()
-  }
-  else if (value === 'fidget_daft_i')
-  {
-    current_asset = new fidgets_sequence(
-        nbr,
-        m,
-        s,
-        screen_dims, 
-        shdrs,
-        debug,
-        "daft_i")
-    current_asset.setup(scene)
-    init_three_render()
-  }
-  else if (value === 'fidget_windmill')
-  {
-    current_asset = new fidgets_sequence(
-        nbr,
-        m,
-        s,
-        screen_dims, 
-        shdrs,
-        debug,
-        "windmill")
-    current_asset.setup(scene)
-    init_three_render()
-  }
-  else if (value === 'simple_slide')
-    {
-      current_asset = new fidgets_sequence(
-          nbr,
-          m,
-          s,
-          screen_dims, 
-          shdrs,
-          debug,
-          "simple_slide")
-      current_asset.setup(scene)
-      init_three_render()
-    }  
+  if      (class_name === 'fidgets_grid'    )current_asset = new fidgets_grid(args) 
+  else if (class_name === 'fidgets_sequence')current_asset = new fidgets_sequence(args)
+  else if (class_name === 'fidget_daft_i'   )current_asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
+  else if (class_name === 'fidget_windmill' )current_asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
+  else if (class_name === 'fidget_simple_slide'    )current_asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
 
+  current_asset.setup(scene)
+  init_three_render()
 
 });
 
@@ -493,3 +517,95 @@ function countObjects(obj) {
     return count;
   }
 
+function getAssetsInfo()
+{
+    fetch('/js/assets/')
+    .then(response => response.text())
+    .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Assuming the directory listing page contains <a> tags for files
+    assets_name = Array.from(doc.querySelectorAll('a'))
+        .map(link => link.href) // Extract href attributes
+        .filter(href => href.endsWith('.js')); // Exclude subfolders or parent links if present
+    
+    })
+    .catch(error => console.error('Error fetching assets directory:', error));
+}
+
+//getAssetsInfo()
+
+
+
+// JavaScript object to populate the list
+
+
+    // Reference to the button and fieldset
+    const toggleButton = document.getElementById("debug_menu_show");
+    const fieldset = document.getElementById("debug_menu");
+
+    // Event listener for the button
+    toggleButton.addEventListener("click", function () {
+    if (fieldset.style.display === "block") {
+        // If the list is visible, hide it
+        fieldset.style.display = "none";
+        toggleButton.textContent = "Debug";
+    } else {
+        // If the list is hidden, show it
+        if (fieldset.children.length === 1) {
+        // Create checkboxes dynamically (only once)
+        for (const [key, value] of Object.entries(debug)) {
+            const label = document.createElement("label");
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = 'debug';
+            checkbox.value = key;
+
+            const labelText = document.createTextNode(key);
+
+            // Append checkbox and text to label
+            label.appendChild(checkbox);
+            label.appendChild(labelText);
+
+            // Append label to the fieldset
+            fieldset.appendChild(label);
+
+            // Add event listener to log selected items
+            checkbox.addEventListener("change", handleCheckboxChange);
+        }
+        }
+        fieldset.style.display = "block"; // Show the list
+        toggleButton.textContent = ""; // Update button text
+    }
+    });
+
+    var debug_modified = { ...debug }
+    // Function to handle checkbox selection
+    function handleCheckboxChange() {
+        
+    const debug_elements_to_activate = Array.from(document.querySelectorAll("input[name='debug']:checked"))
+        .map(checkbox => checkbox.value);
+
+    console.log("Selected Debug:", debug_elements_to_activate);
+
+    
+    for( let elem in debug)
+    {
+        if( elem.includes( debug_elements_to_activate) )
+            debug_modified[elem] = !debug[elem]
+        else
+            debug_modified[elem] = debug[elem]
+    }
+    /*
+    for( let elem of debug_elements_to_activate )
+        debug[elem] = true
+    else
+        debug[elem] = false
+    */
+
+    //debug.selected = checkbox.value
+    current_asset.set_debug( debug_modified )
+    
+    }

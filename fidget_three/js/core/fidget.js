@@ -72,10 +72,9 @@ export default class fidget{
         new state_step_tpl,
         new state_step_tpl]
     }
-
+    this.set_debug_init(args.debug)
     this.force_way = null
     this.resolution_coef_override = null
-    this.debug_mode = args.debug
     this.fidget_sequence_i = 0
     this.mouse_pressed_positions_at_update = []
     this.touch_enable = true
@@ -85,8 +84,7 @@ export default class fidget{
     this.mouse_constraint = mouse_constraint
     this.Mouse = new Mouse_manager( mouse_constraint, this.screen_dims, this, this.debug_mode.mouse_info)
     this.do_background = args.do_background
-    this.do_bloom_selected = this.debug_mode.do_bloom_selected
-    this.do_bloom = this.debug_mode.do_bloom
+
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
@@ -112,18 +110,40 @@ export default class fidget{
   }
 
 
-  setup()
+  setup(scene)
   {     
-    console.log('setup : fidget')                      
+    console.log('setup : fidget')  
+    this.set_debug_setup()                      
+    this.bodies_init_out_matrix()
+
+    this.bodies_setup_shapes_three()
+    scene.add( this.group_three )    
+  }
+
+  set_debug_init(debug)
+  {
+    this.debug_mode = debug
+    this.do_bloom_selected = debug.do_bloom_selected
+    this.do_bloom = debug.do_bloom   
+  }
+    
+  set_debug_setup()
+  {
+    this.Mouse.set_debug(this.debug_mode.mouse_info)
+
     this.bodies_set_debug( this.debug_mode )
     this.bodies_set_visibility_secondary(this.debug_mode.show_inters, ['inters'])  
     this.bodies_set_visibility_secondary(this.debug_mode.show_inters_steps, ['inters_step']) 
     this.bodies_set_visibility_secondary(this.debug_mode.show_geos, ['geos']) 
     this.bodies_set_visibility_secondary(this.debug_mode.show_effects, ['effects']) 
-    this.bodies_set_visibility_secondary(this.debug_mode.show_bones, ['bones'])  
-    this.bodies_init_out_matrix()
+    this.bodies_set_visibility_secondary(this.debug_mode.show_bones, ['bones']) 
   }
 
+  set_debug(debug)
+  {
+    this.set_debug_init(debug)
+    this.set_debug_setup()
+  }
   
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -480,7 +500,17 @@ export default class fidget{
     this.group_three = null
   }
 
+  clean_scene(scene)
+  {
+    this.clean_physics()
+    this.clean_shapes_three(scene)
+  }
+  
 
+  animate_three()
+  {
+    this.bodies_animate_three()
+  }
 
   bodies_animate_three( body_type_filter = [] )
   {
