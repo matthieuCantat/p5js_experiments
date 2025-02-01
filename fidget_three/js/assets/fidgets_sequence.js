@@ -189,7 +189,16 @@ export default class fidgets_sequence
       {
           this.draw_text_debug = new Draw_text_debug(this.screen_dims)
           this.draw_text_debug.mouse_cns = this.mouse_constraint
-      }   
+      }  
+      else
+      {
+        if( this.draw_text_debug != null )
+        {
+          this.draw_text_debug.clean()
+          this.draw_text_debug = null
+        }
+          
+      } 
       this.setup_debug_three(this.scene)      
     }
 
@@ -494,6 +503,7 @@ export default class fidgets_sequence
       this.update_chrono_three()
       if(this.debug_mode.fidget_steps_info)
       {
+        let F = this.fidgets[0].state;
         let texts_to_draw = [
           /*
           'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
@@ -501,21 +511,21 @@ export default class fidgets_sequence
           'user is interacting : '+ userIsInteracting,
           */
           
-          'count : ' + this.fidgets[0].state.update_count,
-          'res : ' + Math.round( this.fidgets[0].state.resolution_coef*100, 2 )/100 + ' / 4',
-          'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,
-          '0 - count: ' + this.fidgets[0].state.steps[0].update_count,
-          '0 - res: ' + Math.round( this.fidgets[0].state.steps[0].resoluton_coef*100, 2)/100 + ' / 1',
-          '1 - count: ' + this.fidgets[0].state.steps[1].update_count,
-          '1 - res Coef: ' + Math.round( this.fidgets[0].state.steps[1].resoluton_coef*100, 2)/100 + ' / 1',
-          '2 - count: ' + this.fidgets[0].state.steps[2].update_count ,
-          '2 - res Coef: ' + Math.round( this.fidgets[0].state.steps[2].resoluton_coef*100, 2)/100 + ' / 1',
-          '3 - count: ' + this.fidgets[0].state.steps[3].update_count ,
-          '3 - res Coef: ' + Math.round( this.fidgets[0].state.steps[3].resoluton_coef*100, 2)/100 + ' / 1' ,
-          '4 - count: ' + this.fidgets[0].state.steps[4].update_count,
-          '4 - res Coef: ' + Math.round( this.fidgets[0].state.steps[4].resoluton_coef*100, 2)/100 + ' / 1',
-          '5 - count: ' + this.fidgets[0].state.steps[5].update_count,
-          '5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef*100, 2)/100 + ' / 1',
+          'count : ' + F.update_count,
+          'res : ' + Math.round( F.resolution_coef*100, 2 )/100 + ' / 4',
+          'last selection switch step : ' + F.switch_selection_happened_step,
+          '0 - count: ' + F.steps[0].update_count,
+          '0 - res: ' + Math.round( F.steps[0].resoluton_coef*100, 2)/100 + ' / 1',
+          '1 - count: ' + F.steps[1].update_count,
+          '1 - res Coef: ' + Math.round( F.steps[1].resoluton_coef*100, 2)/100 + ' / 1',
+          '2 - count: ' + F.steps[2].update_count ,
+          '2 - res Coef: ' + Math.round( F.steps[2].resoluton_coef*100, 2)/100 + ' / 1',
+          '3 - count: ' + F.steps[3].update_count ,
+          '3 - res Coef: ' + Math.round( F.steps[3].resoluton_coef*100, 2)/100 + ' / 1' ,
+          '4 - count: ' + F.steps[4].update_count,
+          '4 - res Coef: ' + Math.round( F.steps[4].resoluton_coef*100, 2)/100 + ' / 1',
+          '5 - count: ' + F.steps[5].update_count,
+          '5 - res Coef: ' + Math.round( F.steps[5].resoluton_coef*100, 2)/100 + ' / 1',
           
           
         ]

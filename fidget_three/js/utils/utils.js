@@ -287,6 +287,12 @@ export class Draw_text_debug
 
     return true
   }
+
+  clean()
+  {
+    const e_debug = document.getElementById('debug_info')
+    e_debug.innerHTML  = '' 
+  }
 }
 
 
@@ -680,7 +686,7 @@ document.addEventListener('touchend', function(event) {
 
 export function create_mouse_constraint(matter_engine)
 {
-  console.log( "mouse_created" ,matter_engine )
+  //console.log( "mouse_created" )
   var mouse = Matter.Mouse.create(document.body)
 
   var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
@@ -698,7 +704,7 @@ export function create_mouse_constraint(matter_engine)
       }
     });
     
-    console.log('add_to_world',matter_engine.world, mouse_constraint)
+    //console.log('add_to_world')
     Matter.Composite.add(matter_engine.world, mouse_constraint);
 
     return mouse_constraint   
@@ -707,7 +713,7 @@ export function create_mouse_constraint(matter_engine)
 
 export function delete_mouse_constraint(matter_engine, mouse_constraint)
 {
-  console.log( "mouse_deleteded" ,matter_engine,mouse_constraint )
+  //console.log( "mouse_deleteded" ,matter_engine,mouse_constraint )
   Matter.Composite.remove(matter_engine.world, mouse_constraint);
 }
 

@@ -211,7 +211,7 @@ export default class fidget{
 
       // explode
       this.bodies_explode_effect({
-        count:this.state.steps[3].update_count,
+        count:this.state.steps[this.end_step-1].update_count,
         pre_explode_animation_duration:20,
       })
    
@@ -232,19 +232,19 @@ export default class fidget{
   
   draw_background()
   {
-    let a = this.state.steps[3].update_count
+    let a = this.state.steps[this.end_step-1].update_count
     a -=30
     a = Math.max(0,a)
     a *=15
     if(this.anim_mode)
-      a = this.state.steps[3].resoluton_coef*this.screen_dims.x/2    
+      a = this.state.steps[this.end_step-1].resoluton_coef*this.screen_dims.x/2    
 
     // a 0-->200
     let pA = new Vector(this.screen_dims.x/4,this.screen_dims.y/2)
     pA.v.x -= a
     this.bodies.geos.backgrounds[0].set_out_position(pA, 'world', 'override')
     /*
-    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+    if(( 0 < this.state.steps[this.end_step-1].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[0].color = [50,140,50]
       this.bodies.geos.backgrounds[0].update_color_three_shape()
@@ -257,7 +257,7 @@ export default class fidget{
     pB.v.x += a
     this.bodies.geos.backgrounds[1].set_out_position(pB,'world', 'override')  
     /*
-    if(( 0 < this.state.steps[3].update_count-15)&&(this.anim_mode==false))
+    if(( 0 < this.state.steps[this.end_step-1].update_count-15)&&(this.anim_mode==false))
     {
       this.bodies.geos.backgrounds[1].color = [50,140,50] 
       this.bodies.geos.backgrounds[1].update_color_three_shape()      

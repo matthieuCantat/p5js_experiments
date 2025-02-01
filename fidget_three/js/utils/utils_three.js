@@ -334,7 +334,16 @@ export class Mouse_manager
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             this.draw_text_debug.mouse_cns = this.mouse_constraint
-        }     
+        }   
+        else
+        {
+            if( this.draw_text_debug != null )
+            {
+                this.draw_text_debug.clean()
+                this.draw_text_debug = null
+            }
+            
+        }  
     }
 
     setup(scene)
