@@ -588,13 +588,15 @@ function getAssetsInfo()
     const debug_elements_to_activate = Array.from(document.querySelectorAll("input[name='debug']:checked"))
         .map(checkbox => checkbox.value);
 
-    console.log("Selected Debug:", debug_elements_to_activate);
 
     
     for( let elem in debug)
     {
-        if( elem.includes( debug_elements_to_activate) )
+        if( ( 0 < debug_elements_to_activate.length )&&( elem.includes( debug_elements_to_activate) ))
+        {
             debug_modified[elem] = !debug[elem]
+            //console.log("Selected Debug:", elem);
+        }
         else
             debug_modified[elem] = debug[elem]
     }
