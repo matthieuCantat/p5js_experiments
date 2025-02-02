@@ -684,10 +684,10 @@ document.addEventListener('touchend', function(event) {
 
 
 
-export function create_mouse_constraint(matter_engine)
+export function create_mouse_constraint(matter_engine, dom_canvas)
 {
   //console.log( "mouse_created" )
-  var mouse = Matter.Mouse.create(document.body)
+  var mouse = Matter.Mouse.create(dom_canvas)
 
   var mouse_constraint = Matter.MouseConstraint.create(matter_engine, {
       mouse: mouse,

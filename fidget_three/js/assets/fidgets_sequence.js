@@ -62,6 +62,7 @@ export default class fidgets_sequence
         this.scene = null
 
         this.fidget_choice = args.fidget_choice
+        this.dom_canvas = args.dom_canvas
     }
 
 
@@ -111,7 +112,8 @@ export default class fidgets_sequence
             do_background: true, 
             is_dynamic:true,
             debug : this.debug_mode,  
-            play_animation:null,    
+            play_animation:null,   
+            dom_canvas : this.dom_canvas 
           }
           var fidget = null
           if( this.fidget_choice == "fidget_windmill" )

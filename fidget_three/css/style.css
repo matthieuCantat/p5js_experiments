@@ -99,10 +99,13 @@ canvas {
 
 
 fieldset {
+  
   border: none;
   padding: 0;
   display: none; /* Initially hidden */
 }
+
+
 
 
 legend {
@@ -112,10 +115,30 @@ legend {
   color: #555;
 }
 
+label {
+  display: block;  /* Ensures each checkbox is on a new line */
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
 
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
   accent-color: #4caf50;
+}
+
+.scrollable-list {
+  max-height: 500px;  /* Set the maximum height */
+  overflow-y: auto;   /* Enable vertical scrolling */
+  border: 1px solid #ddd; /* Optional: Add a border */
+  padding: 10px; /* Add padding for better spacing */
+  border-radius: 8px;
+  background: #fff;
+
+  
+  /* Enable smooth scrolling for touch screens */
+  -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+  touch-action: auto; /* Ensures touch scrolling works */
 }

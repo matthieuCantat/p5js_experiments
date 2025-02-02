@@ -42,14 +42,15 @@ export default class fidget{
       s:1, 
       screen_dims:null, 
       do_background: true, 
-      debug : false,      
+      debug : false,   
+      dom_canvas : null   
     }
     const args = { ...defaultOptions, ...in_options };
 
 
     let matter_engine        = create_physics_engine()
     let matter_engine_runner = create_physics_engine_runner(matter_engine)
-    let mouse_constraint = create_mouse_constraint(matter_engine)
+    let mouse_constraint = create_mouse_constraint(matter_engine, args.dom_canvas)
     create_boundary_wall_collision(matter_engine, args.screen_dims.x,args.screen_dims.y,false)
     
 

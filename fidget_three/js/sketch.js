@@ -14,7 +14,7 @@ import { utils,
          create_mouse_constraint,
          create_physics_engine_runner} from './utils/utils.js';
 
-import { three_utils,} from './utils/utils_three.js';
+import Game_engine from './core/game_engine.js';
 
          
 import fidgets_sequence from './assets/fidgets_sequence.js'
@@ -30,46 +30,11 @@ import { ShaderPass } from './libraries/jsm/postprocessing/ShaderPass.js';
 import { Lensflare, LensflareElement } from './libraries/jsm/objects/Lensflare.js';
 
 import * as THREE from 'three';
-import Stats from 'three/addons/libs/stats.module.js';
 
 
-/*
-// prevents the mobile browser from processing some default
-// touch events, like swiping left for "back" or scrolling
-// the page.
-document.ontouchmove = function(event) {
-  event.preventDefault();
-};
-*/
 
 
-// Disable pull-to-refresh using JavaScript
-document.body.addEventListener('touchmove', function(event) {
-event.preventDefault();
-}, { passive: false } );
 
-
-const loader = new THREE.TextureLoader();
-const textureFlare0 = loader.load( './textures/lensflare/lensflare0.png' );
-const textureFlare3 = loader.load( './textures/lensflare/lensflare3.png' );
-
-function addLight( h, s, l, x, y, z ) {
-
-    const light = new THREE.PointLight( 0xffffff, 1.5, 2000, 0 );
-    light.color.setHSL( h, s, l );
-    light.position.set( x, y, z );
-
-    const lensflare = new Lensflare();
-    lensflare.addElement( new LensflareElement( textureFlare0, 700*0.5, 0, light.color ) );
-    lensflare.addElement( new LensflareElement( textureFlare3, 60 *0.5, 0.6 ) );
-    lensflare.addElement( new LensflareElement( textureFlare3, 70 *0.5, 0.7 ) );
-    lensflare.addElement( new LensflareElement( textureFlare3, 120*0.5, 0.9 ) );
-    lensflare.addElement( new LensflareElement( textureFlare3, 70 *0.5, 1 ) );
-    light.add( lensflare );
-
-    return light
-
-}
 
 /////////////////////////////////////////// setup screen
 let FULL_SCREEN_MODE = true
@@ -83,7 +48,10 @@ if(FULL_SCREEN_MODE)
     lowerLeftCornerPos = new Vector(0,height);
 }
 
-let screen_dims = {x:width,y:height}
+let screen_dims = {
+    x : width,
+    y : height,
+    pixelRatio : window.devicePixelRatio}
 
 /////////////////////////////////////////// setup game
 var nbr = 1
@@ -123,278 +91,61 @@ var assets_name = [
 
 
 /////////////////////////////////////////// variables
-var current_asset = null
+
 
 var shdrs = [] 
 
+// BUILD GAME ENGIN
+const Game_engine_args = {
+    dom_canvas : document.getElementById("three_canvas"),
+    screen_dims : screen_dims,
+    debug : debug,
+}
+var game_engine = new Game_engine( Game_engine_args )
 
-
+// BUILD ASSET
 let m = new Matrix()
 m.setTranslation(width/2, height/2 )
 
 let s = 2.2
 
-const args = {
+const asset_args = {
     nbr : nbr,
     m : m,
     s : s,
     screen_dims : screen_dims,
     shdrs : shdrs,
-    debug : debug
+    debug : debug,
+    dom_canvas : document.getElementById("three_canvas"),
 }
-current_asset = new fidgets_sequence(args)
+var asset = new fidgets_sequence(asset_args)
+
+game_engine.setup_asset(asset)
 
 
 
+////////////////////////////////////////////////////////////CALLBACKS
 
-let three_canvas_container, stats;
-let camera, scene, renderer;
-let uniforms,light1;
-let finalComposer,bloomComposer;
-let light_lens_flare;
+/*
+// prevents the mobile browser from processing some default
+// touch events, like swiping left for "back" or scrolling
+// the page.
+document.ontouchmove = function(event) {
+    event.preventDefault();
+  };
+*/
 
+// Disable pull-to-refresh using JavaScript
+document.body.addEventListener('touchmove', function(event) {
+event.preventDefault();
+}, { passive: false } );
 
-
-three_canvas_container = document.getElementById("three_canvas");
-
-init_three_scene();
-init_others()
-init_three_render()
-
-
-function init_three_scene() {
-
-
-    // scene setup
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x000 );
-
-    camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-    camera.position.set( 0, 0, 500 );  
-    //let camera_far_dist = 1000 
-    //camera = new THREE.PerspectiveCamera( 76, width / height, 1, camera_far_dist );
-    //camera.position.set( 0, 0, 500 );
-    //camera.rotation.set( 0, 0, 0 );
-    
-    scene.add( camera );
-
-    //let light_group = new THREE.Group();
-    //const light = new THREE.PointLight( 0xffffff, 2.5, 0, 0 );
-
-
-    light1 = new THREE.DirectionalLight( 0xffffff, 3.5 );
-    //const sphere = new THREE.SphereGeometry( 2.5, 16, 8 );
-    //light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
-
-    light1.position.x = 200*2
-    light1.position.y = 200*2
-    light1.position.z = 100*2
-
-    scene.add( light1 );
-    //light_group.add(light)
-    //light.position.set( Math.sin(0*0.01)*100, Math.cos(0*0.01)*100, -200)
-    //camera.add( light1 );
-    if(debug.do_shadows)
-    {
-        light1.castShadow = true
-        //light1.shadow.radius = 5;  
-        //light1.shadow.blurSamples = 250
-        light1.shadow.camera.near = 0.5; // default
-        light1.shadow.camera.far = 600*1.5; // default
-        light1.shadow.camera.top = 200;
-        light1.shadow.camera.bottom = -200;
-        light1.shadow.camera.left = -200*0.5;
-        light1.shadow.camera.right = 200*0.5;
-        light1.shadow.mapSize.set( 200, 200 );
-
-        //let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
-        //scene.add( light2 );
-    }
-
-    if( debug.do_flare )
-    {
-        light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
-        scene.add( light_lens_flare )
-    }
-
-   
-
-    ///////////////// fidgets
-    if( current_asset != null )
-        current_asset.setup(scene)
-
-}
-
-function clear_three_render()
-{
-    renderer.dispose();
-    renderer.domElement.parentNode.removeChild(renderer.domElement);
-}
-
-function init_three_render()
-{    
-    ///////////////// render
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    const width = window.innerWidth; //ADD
-    const height = window.innerHeight; //ADD
-    renderer.setSize( width, height );
-    renderer.setAnimationLoop( animate );
-
-    const three_canvas_container = document.getElementById('three_canvas');
-    if (!three_canvas_container) {
-        throw new Error("Container element not found!");
-    }    
-    three_canvas_container.appendChild( renderer.domElement );
-
-    if(debug.do_shadows)
-        {
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
-        }
-
-    if(debug.do_bloom)
-    {
-        //render pass
-        const renderScene = new RenderPass( scene, camera );
-        const outputPass = new OutputPass();
-
-        const bloomPass = new UnrealBloomPass( new THREE.Vector2( width, height ), 1.5, 0.4, 0.85 );
-        bloomPass.threshold = 0;
-        bloomPass.strength = 1;
-        bloomPass.radius = 0.1;
-        
-        bloomComposer = new EffectComposer( renderer );
-        bloomComposer.renderToScreen = false;
-        bloomComposer.addPass( renderScene );
-        bloomComposer.addPass( bloomPass );
-        
-        const mixPass = new ShaderPass(
-            new THREE.ShaderMaterial( {
-                uniforms: {
-                    baseTexture: { value: null },
-                    bloomTexture: { value: bloomComposer.renderTarget2.texture }
-                },
-                vertexShader: document.getElementById( 'bloom_mix_vertexShader' ).textContent,
-                fragmentShader: document.getElementById( 'bloom_mix_fragmentShader' ).textContent,
-                defines: {}
-            } ), 'baseTexture'
-        );
-        mixPass.needsSwap = true;
-
-
-        finalComposer = new EffectComposer( renderer );
-        finalComposer.addPass( renderScene );
-        //finalComposer.addPass( bloomPass );
-        finalComposer.addPass( mixPass );
-        finalComposer.addPass( outputPass );
-    }
-    
-    /*
-    const controls = new OrbitControls( camera, renderer.domElement );
-    controls.maxPolarAngle = Math.PI * 0.5;
-    controls.minDistance = 1;
-    controls.maxDistance = 500;
-    */
-    
-}
-
-function init_others()
-{
-    
-    // stats
-    stats = new Stats();
-    three_canvas_container.appendChild( stats.dom );
-
-    ///////////////// action
-    //three_canvas_container.style.touchAction = 'none';
-
-    window.addEventListener( 'resize', onWindowResize );
-
-
-}
+  
+window.addEventListener( 'resize', () => { game_engine.resize_render( width, height )} );
 
 
 
-
-function onWindowResize() {
-
-
-
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize( width, height);
-
-    if(debug.do_bloom)
-    {
-        bloomComposer.setSize( width, height );
-        finalComposer.setSize( width, height );
-    }
-
-}
-
-
-//
-
-var animate_count =0
-function animate() {
-
-    if( debug.do_flare )
-    {
-        // light - change position
-        light_lens_flare.position.x = Math.sin(rad(45)+animate_count*0.01)*120
-        light_lens_flare.position.y = Math.cos(rad(45)+animate_count*0.01)*120
-    }        
-
-    
-    if( current_asset != null )
-    {
-        current_asset.update()
-        current_asset.animate_three()
-
-        //console.log('__________________' + animate_count)
-        //console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
-        //console.log('Elements in the scene:', scene.children);
-        //for( let F of current_asset.fidgets)
-        //{
-        //    //console.log( F.title , 'Mouse canvas element' , F.mouse_constraint.mouse.element);
-        //    //console.log(F.mouse_constraint.world === F.matter_engine.world); // Should log true
-        //}
-            
-    }
-
-    //uniforms[ 'time' ].value = performance.now() / 1000;
-    //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
-
-    if(debug.do_bloom)
-    {
-        let save_states = []
-        for( let i = 0 ; i < current_asset.fidgets.length; i++)
-            save_states.push( current_asset.fidgets[i].setup_bloom_pass() )
-        bloomComposer.render()
-        for( let i = 0 ; i < current_asset.fidgets.length; i++)
-            current_asset.fidgets[i].clean_bloom_pass(save_states[i])
-
-        finalComposer.render();
-    }
-    else
-    {
-        renderer.render( scene, camera );
-    }
-
-    stats.update();
-
-    
-
-
-    
-    animate_count += 1
-
-
-    
-}
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function displayAssetsList()
 {
@@ -414,7 +165,7 @@ displayAssetsList()
 
 const menuSelect = document.getElementById('menu-select');
 
-
+/*
 async function loadAndExecuteClass( fileName, args) {
     try {
         // Dynamically import the module
@@ -430,8 +181,8 @@ async function loadAndExecuteClass( fileName, args) {
     
             // Call a method or execute functionality of the class
             if (typeof instance.setup === 'function') {
-                instance.setup(scene); // Assuming the class has an 'execute' method
-                init_three_render()
+                instance.setup(three_global_obj.scene); // Assuming the class has an 'execute' method
+                init_three_render(three_global_obj,screen_dims,debug,animate_loop)
             } else {
                 console.log(`${fileName} loaded, but no 'execute' method found.`);
             }
@@ -444,45 +195,14 @@ async function loadAndExecuteClass( fileName, args) {
         console.error(`Failed to load or execute ${fileName}:`, error);
     }
 }
-/*
-const loadAndExecuteClass = async (className, ...args) => {
-    try {
-      // Dynamically import the module
-      //const module = await import('./assets/'+className+'.js');
-      const module_path = './assets/'+className+'.js'
-      const module = await import('./assets/'+className+'.js');
-      
-      // Get the class by name from the module
-      const ClassToLoad = module[className];
+    */
 
-      console.log(module_path, module, ClassToLoad )
-      
-      if (!ClassToLoad) {
-        throw new Error(`Class "${className}" not found in module.`);
-      }
-      
-      // Instantiate the class with arguments
-      const instance = new ClassToLoad(...args);
-  
-      // Return the instance or use it directly
-      return instance;
-    } catch (error) {
-      console.error('Error loading or executing the class:', error);
-    }
-  };
-*/
 
 menuSelect.addEventListener('change', (event) =>{
   const class_name = event.target.value;
 
   // Remove existing objects
-
-  if( current_asset != null )
-  {
-    current_asset.clean_scene(current_asset.scene)
-    current_asset = null
-    clear_three_render()
-  }
+  game_engine.remove_asset()
 
   const args = {
     nbr : 5,
@@ -497,14 +217,13 @@ menuSelect.addEventListener('change', (event) =>{
   
 
   // Add 
-  if      (class_name === 'fidgets_grid'    )current_asset = new fidgets_grid(args) 
-  else if (class_name === 'fidgets_sequence')current_asset = new fidgets_sequence(args)
-  else if (class_name === 'fidget_daft_i'   )current_asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
-  else if (class_name === 'fidget_windmill' )current_asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
-  else if (class_name === 'fidget_simple_slide'    )current_asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
-
-  current_asset.setup(scene)
-  init_three_render()
+  let asset = null;
+  if      (class_name === 'fidgets_grid'    )asset = new fidgets_grid(args) 
+  else if (class_name === 'fidgets_sequence')asset = new fidgets_sequence(args)
+  else if (class_name === 'fidget_daft_i'   )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
+  else if (class_name === 'fidget_windmill' )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
+  else if (class_name === 'fidget_simple_slide'    )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
+  game_engine.setup_asset(asset)
 
 });
 
@@ -541,57 +260,76 @@ function getAssetsInfo()
 // JavaScript object to populate the list
 
 
-    // Reference to the button and fieldset
-    const toggleButton = document.getElementById("debug_menu_show");
-    const fieldset = document.getElementById("debug_menu");
+// Reference to the button and fieldset
+const toggleButton = document.getElementById("debug_menu_show");
 
-    // Event listener for the button
-    toggleButton.addEventListener("click", function () {
-    if (fieldset.style.display === "block") {
-        // If the list is visible, hide it
-        fieldset.style.display = "none";
+function debug_choice_window_fill()
+{
+    const menu = document.getElementById("debug_menu");
+    // Create checkboxes dynamically (only once)
+    for (const [key, value] of Object.entries(debug))
+    {
+        const checkbox_and_text = document.createElement("label");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = 'debug';
+        checkbox.value = key;
+        checkbox.checked = value;
+
+        const text = document.createTextNode(key);
+
+        // Append checkbox and text to checkbox_and_text
+        checkbox_and_text.appendChild(checkbox);
+        checkbox_and_text.appendChild(text);
+
+        // Append checkbox_and_text to the menu
+        menu.appendChild(checkbox_and_text);
+
+        // Add event listener to log selected items
+        checkbox.addEventListener("change", handleCheckboxChange);
+    } 
+}
+
+function toggle_debug_choice_window()
+{
+    const menu = document.getElementById("debug_menu");
+
+    const debug_list_is_visible = menu.style.display === "block";
+    if (debug_list_is_visible)
+    {
+        // hide it
+        menu.style.display = "none";
         toggleButton.textContent = "Debug";
     } else {
         // If the list is hidden, show it
-        if (fieldset.children.length === 1) {
-        // Create checkboxes dynamically (only once)
-        for (const [key, value] of Object.entries(debug)) {
-            const label = document.createElement("label");
-
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.name = 'debug';
-            checkbox.value = key;
-
-            const labelText = document.createTextNode(key);
-
-            // Append checkbox and text to label
-            label.appendChild(checkbox);
-            label.appendChild(labelText);
-
-            // Append label to the fieldset
-            fieldset.appendChild(label);
-
-            // Add event listener to log selected items
-            checkbox.addEventListener("change", handleCheckboxChange);
-        }
-        }
-        fieldset.style.display = "block"; // Show the list
+        const debug_list_is_empty = menu.children.length === 1;
+        if (debug_list_is_empty)
+            debug_choice_window_fill()
+             
+        // Show it
+        menu.style.display = "block"; // Show the list
         toggleButton.textContent = ""; // Update button text
     }
-    });
+}    
+
+    // Event listener for the button
+    toggleButton.addEventListener("click", toggle_debug_choice_window );
 
     var debug_modified = { ...debug }
     // Function to handle checkbox selection
     function handleCheckboxChange() {
         
-    const debug_elements_to_activate = Array.from(document.querySelectorAll("input[name='debug']:checked"))
-        .map(checkbox => checkbox.value);
-
+    const debug_elements = Array.from(document.querySelectorAll("input[name='debug']"))
 
     
-    for( let elem in debug)
+    for( let elem of debug_elements)
     {
+        if( elem.value == "mouse_selection_break_length")
+            continue
+        console.log(elem.value, elem.checked)
+        debug_modified[elem.value] = elem.checked
+        /*
         if( ( 0 < debug_elements_to_activate.length )&&( elem.includes( debug_elements_to_activate) ))
         {
             debug_modified[elem] = !debug[elem]
@@ -599,6 +337,7 @@ function getAssetsInfo()
         }
         else
             debug_modified[elem] = debug[elem]
+        */
     }
     /*
     for( let elem of debug_elements_to_activate )
@@ -608,6 +347,6 @@ function getAssetsInfo()
     */
 
     //debug.selected = checkbox.value
-    current_asset.set_debug( debug_modified )
+    game_engine.asset.set_debug( debug_modified )
     
     }

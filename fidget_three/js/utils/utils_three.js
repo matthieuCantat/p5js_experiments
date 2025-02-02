@@ -414,6 +414,10 @@ export class Mouse_manager
         //    return
 
         let p_mouse_grap = new Vector( mouseX, mouseY) 
+
+        if( this.mouse_constraint == null )
+            return ;
+
         let selected_body = this.mouse_constraint.constraint.bodyB
         
 
@@ -701,4 +705,28 @@ export var three_utils = {
 }
 
 
- 
+
+export function addLight( h, s, l, x, y, z )
+{
+
+    const loader = new THREE.TextureLoader();
+    const textureFlare0 = loader.load( './textures/lensflare/lensflare0.png' );
+    const textureFlare3 = loader.load( './textures/lensflare/lensflare3.png' );
+    
+    const light = new THREE.PointLight( 0xffffff, 1.5, 2000, 0 );
+    light.color.setHSL( h, s, l );
+    light.position.set( x, y, z );
+
+    const lensflare = new Lensflare();
+    lensflare.addElement( new LensflareElement( textureFlare0, 700*0.5, 0, light.color ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 60 *0.5, 0.6 ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 70 *0.5, 0.7 ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 120*0.5, 0.9 ) );
+    lensflare.addElement( new LensflareElement( textureFlare3, 70 *0.5, 1 ) );
+    light.add( lensflare );
+
+    return light
+}
+
+
+
