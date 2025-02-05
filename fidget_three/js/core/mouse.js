@@ -28,7 +28,7 @@ export class Mouse_manager
         this.matter_mouse = null
         this.matter_constraint = null
         //_____________ CREATE MOUSE IN MATTER
-        /*
+        
         this.matter_mouse = Matter.Mouse.create(dom_canvas)
         
         const collision_info = 
@@ -53,7 +53,7 @@ export class Mouse_manager
         );
             
         Matter.Composite.add(this.matter_engine.world, this.matter_constraint);
-        */
+        
 
         //
         this.screen_dims = screen_dims
