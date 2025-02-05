@@ -48,7 +48,7 @@ export class Mouse_manager
         );
             
         Matter.Composite.add(this.matter_engine.world, this.matter_constraint);
-        //this.clean()
+        this.clean()
 
         //
         this.screen_dims = screen_dims
