@@ -126,12 +126,24 @@ document.ontouchmove = function(event) {
   };
 */
 
-/*
+
+
 // Disable pull-to-refresh using JavaScript
-document.body.addEventListener('touchmove', function(event) {
-event.preventDefault();
-}, { passive: false } );
-*/
+
+function disable_pull_to_refresh(event)
+{
+    const menu = document.getElementById("debug_menu");
+    const debug_menu_is_open = menu.style.display === "block";
+    if( debug_menu_is_open)
+        return false
+
+    // Disable pull-to-refresh
+    event.preventDefault();
+
+    return true
+}
+document.body.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
+
   
 window.addEventListener( 'resize', () => { game_engine.resize_render( width, height )} );
 
