@@ -69,9 +69,14 @@ export default class Game_engine
 
     setup_asset(asset)
     {
+        if(asset == null)
+            return false
+
         this.asset = asset
         this.asset.setup(this.scene)
         this.setup_render()
+
+        return true
     }
 
     remove_asset()
