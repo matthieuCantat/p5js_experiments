@@ -16,6 +16,7 @@ canvas {
 	text-align: center;
 	z-index: 2;
 	display:block;
+  pointer-events: none; /* This makes it non-blocking */
 }
 
 
@@ -27,6 +28,7 @@ canvas {
 	text-align: left;
 	z-index: 2;
 	display:block;
+  pointer-events: none; /* This makes it non-blocking */
 }
 
 
