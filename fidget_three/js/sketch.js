@@ -126,6 +126,7 @@ document.ontouchmove = function(event) {
   };
 */
 
+/*
 // Disable pull-to-refresh using JavaScript
 document.body.addEventListener('touchmove', function(event) {
 event.preventDefault();
@@ -133,7 +134,7 @@ event.preventDefault();
 
   
 window.addEventListener( 'resize', () => { game_engine.resize_render( width, height )} );
-
+*/
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
