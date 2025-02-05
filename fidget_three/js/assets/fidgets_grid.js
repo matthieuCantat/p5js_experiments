@@ -3,12 +3,11 @@ import Vector from '../utils/vector.js';
 import Matrix from '../utils/matrix.js';
 import { Chrono, 
   Draw_text_debug, 
-  clamp, 
-  isMousePressed, 
-  isScreenTouched, 
-  mouseX, mouseY , 
-  userIsInteracting, 
-  userInteractionChange} from '../utils/utils.js';
+  clamp,
+} from '../utils/utils.js';
+import { 
+  userInteractionChange
+} from '../core/mouse.js';
 import fidget_daft_i from '../assets/fidget_daft_i.js';
 import fidget_windmill from '../assets/fidget_windmill.js';
 
@@ -83,7 +82,7 @@ export default class fidgets_grid
         if(this.debug_mode.fidget_steps_info)
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
-            this.draw_text_debug.mouse_cns = this.mouse_constraint
+            //this.draw_text_debug.mouse_cns = this.mouse_constraint
         }   
         
         
@@ -142,7 +141,7 @@ export default class fidgets_grid
         this.fidgets[i].setup_shapes_three()
         
         scene_three.add( this.fidgets[i].group_three )
-        //this.fidgets[i].mouse_select_highlight(this.mouse_constraint)
+        this.fidgets[i].mouse_select_highlight()
       }
     }
 
@@ -374,7 +373,7 @@ export default class fidgets_grid
           continue  
         this.fidgets[i].update()
         if(userInteractionChange)
-          this.fidgets[i].mouse_select_highlight(this.fidgets[i].mouse_constraint)
+          this.fidgets[i].mouse_select_highlight()
       }
 
 

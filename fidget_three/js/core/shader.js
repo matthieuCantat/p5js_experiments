@@ -8,11 +8,13 @@ import {
 
 import {
   utils,
-  mouseX,
-  mouseY,
-  mix_value_function,
   map_range,
 } from '../utils/utils.js';
+
+import {
+mouseX,
+mouseY,
+} from '../core/mouse.js';
 
 var materials = {
     black: new THREE.MeshBasicMaterial( { color: 'black' } ),

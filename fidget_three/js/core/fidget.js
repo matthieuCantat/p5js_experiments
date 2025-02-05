@@ -3,14 +3,14 @@
 import Vector from '../utils/vector.js';
 import { utils, 
   create_physics_engine,
-  create_mouse_constraint,
-  delete_mouse_constraint,
   create_physics_engine_runner,
   create_boundary_wall_collision,
-  userIsInteracting,
   flatten_list} from '../utils/utils.js';
 import * as THREE from 'three';
-import { Mouse_manager,  } from '../utils/utils_three.js'
+import { 
+  Mouse_manager, 
+  userIsInteracting
+} from '../core/mouse.js'
 import { body_build } from '../core/body.js';
 import { materials,} from '../core/shader.js';
 import Matrix from '../utils/matrix.js';
@@ -50,7 +50,7 @@ export default class fidget{
 
     let matter_engine        = create_physics_engine()
     let matter_engine_runner = create_physics_engine_runner(matter_engine)
-    let mouse_constraint = create_mouse_constraint(matter_engine, args.dom_canvas)
+    
     create_boundary_wall_collision(matter_engine, args.screen_dims.x,args.screen_dims.y,false)
     
 
@@ -80,12 +80,16 @@ export default class fidget{
     this.mouse_pressed_positions_at_update = []
     this.touch_enable = true
     this.anim_mode = false
-    this.matter_engine = matter_engine
-    this.matter_engine_runner = matter_engine_runner 
-    this.mouse_constraint = mouse_constraint
-    this.Mouse = new Mouse_manager( mouse_constraint, this.screen_dims, this, this.debug_mode.mouse_info)
     this.do_background = args.do_background
 
+    this.matter_engine = matter_engine
+    this.matter_engine_runner = matter_engine_runner     
+    this.Mouse = new Mouse_manager( 
+      this.matter_engine, 
+      args.dom_canvas, 
+      this.screen_dims, 
+      this, 
+      this.debug_mode.mouse_info)    
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = {
@@ -161,7 +165,7 @@ export default class fidget{
   {
     /*
     // utils
-    var selected_body = this.mouse_constraint.constraint.bodyB
+    var selected_body = this.Mouse.mouse_constraint.constraint.bodyB
 
     // clean
     this.bodies_axe_clean_override()
@@ -484,8 +488,7 @@ export default class fidget{
   clean_physics()
   {
     this.bodies_clean_physics()
-
-    delete_mouse_constraint(this.matter_engine, this.mouse_constraint)
+    this.Mouse.clean()
 
     Matter.Events.off(this.matter_engine);  // Remove all events attached to the engine
     Matter.Runner.stop(this.matter_engine_runner);
@@ -1162,7 +1165,7 @@ export default class fidget{
   }
 
 
-  mouse_select_highlight(mouse_cns,body_type_filter = [], bloom = true)
+  mouse_select_highlight(body_type_filter = [], bloom = true)
   {
     
 
@@ -1177,7 +1180,7 @@ export default class fidget{
     {
       body.is_touch = false
 
-      if( body.body == mouse_cns.constraint.bodyB )
+      if( body.body == this.Mouse.matter_constraint.constraint.bodyB )
       {
         body.color = utils.color.redLight
         body.is_selected = true

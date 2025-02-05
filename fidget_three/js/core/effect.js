@@ -240,7 +240,7 @@ function build_effects_particles_sparcles(opts)
   let opts_global = {
     screen_dims: opts.screen_dims,
     matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
+    Mouse: opts.Mouse,
   }
 
   let opts_collision_no_interaction = {
@@ -317,7 +317,7 @@ function build_effects_particles_shapes(opts)
   let opts_global = {
     screen_dims: opts.screen_dims,
     matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
+    Mouse: opts.Mouse,
   }
 
   let opts_collision_no_interaction = {
@@ -394,7 +394,7 @@ function build_effects_wall(opts)
   let opts_global = {
     screen_dims: opts.screen_dims,
     matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
+    Mouse: opts.Mouse,
   }
 
   let opts_collision_no_interaction = {
@@ -522,7 +522,7 @@ function build_effects_trail(opts, body_target)
   let opts_global = {
     screen_dims: opts.screen_dims,
     matter_engine: opts.matter_engine, 
-    mouse_constraint: opts.mouse_constraint,
+    Mouse: opts.Mouse,
   }
   let opts_collision_no_interaction = {
     collision_category: utils.collision_category.none,

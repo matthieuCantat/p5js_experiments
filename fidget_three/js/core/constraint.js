@@ -1,7 +1,18 @@
 
 import Vector from '../utils/vector.js';
 import Matrix from '../utils/matrix.js';
-import { rad, deg, clamp, snap_point_on_line, proj_vector_on_line, userIsInteracting,mouseX,mouseY} from '../utils/utils.js';
+import { 
+  rad, 
+  deg, 
+  clamp, 
+  snap_point_on_line, 
+  proj_vector_on_line, 
+} from '../utils/utils.js';
+import { 
+  mouseX,
+  mouseY,
+  userIsInteracting,
+} from '../core/mouse.js';
 //import { join } from 'path';
 
 

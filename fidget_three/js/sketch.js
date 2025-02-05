@@ -7,16 +7,7 @@
 import './libraries/matter.js';
 import Vector from './utils/vector.js'
 import Matrix from './utils/matrix.js'
-import { utils, 
-         create_boundary_wall_collision,
-         rad,
-         create_physics_engine,
-         create_mouse_constraint,
-         create_physics_engine_runner} from './utils/utils.js';
-
-import Game_engine from './core/game_engine.js';
-
-         
+import Game_engine from './core/game_engine.js';     
 import fidgets_sequence from './assets/fidgets_sequence.js'
 
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';

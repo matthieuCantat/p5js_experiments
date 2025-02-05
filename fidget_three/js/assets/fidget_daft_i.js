@@ -1,5 +1,11 @@
 import fidget from '../core/fidget.js'
-import { utils, clamp, rad, deg, anim_vectors, anim_values } from '../utils/utils.js'
+import { 
+  utils, 
+  clamp, 
+  rad, 
+  deg, 
+  anim_vectors, 
+  anim_values } from '../utils/utils.js'
 import { body_build } from '../core/body.js'
 import Vector from '../utils/vector.js'
 import Matrix from '../utils/matrix.js'
@@ -56,7 +62,7 @@ export default class fidget_daft_i extends fidget {
     let opts_global = {
       screen_dims: this.screen_dims,
       matter_engine: this.matter_engine,
-      mouse_constraint: this.mouse_constraint,
+      Mouse: this.Mouse,
       fidget: this,
       dynamic: this.is_dynamic
     }

@@ -1,6 +1,11 @@
 import Vector from '../utils/vector.js';
 import Matrix from '../utils/matrix.js';
-import { utils , rad, deg, Draw_text_debug,convert_coords_matter_to_three} from '../utils/utils.js';
+import { 
+  utils , 
+  rad, 
+  deg, 
+  Draw_text_debug,
+  convert_coords_matter_to_three} from '../utils/utils.js';
 import { 
   dyn_constraint_build, 
   constraint_build, 
@@ -56,7 +61,7 @@ export class body_build{
         mass:null,
         screen_dims:null,
         matter_engine:null,
-        mouse_constraint:null,
+        Mouse:null,
         fidget:null, 
         material_three:null,
         arc_limites:[0,3.14*2],
@@ -119,7 +124,7 @@ export class body_build{
       this.mass = args.mass
       this.screen_dims = args.screen_dims
       this.matter_engine = args.matter_engine
-      this.mouse_constraint = args.mouse_constraint
+      this.Mouse = args.Mouse
       this.fidget = args.fidget
       this.material_three = args.material_three
       this.arc_limites = args.arc_limites
@@ -1385,7 +1390,7 @@ export class body_build{
         mass:this.mass,
         screen_dims:this.screen_dims,
         matter_engine:this.matter_engine,
-        mouse_constraint:this.mouse_constraint,
+        Mouse:this.Mouse,
         fidget:this.fidget,
         material_three:this.material_three,
         arc_limites:this.arc_limites,
