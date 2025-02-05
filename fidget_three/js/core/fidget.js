@@ -1180,7 +1180,7 @@ export default class fidget{
     {
       body.is_touch = false
 
-      if( body.body == this.Mouse.matter_constraint.constraint.bodyB )
+      if(( this.Mouse.matter_constraint != null )&&( body.body == this.Mouse.matter_constraint.constraint.bodyB ))
       {
         body.color = utils.color.redLight
         body.is_selected = true

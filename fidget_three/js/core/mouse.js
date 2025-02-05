@@ -21,9 +21,14 @@ export class Mouse_manager
         debug)
     {
         
-        //_____________ CREATE MOUSE IN MATTER
+        
         this.matter_engine = matter_engine
         
+
+        this.matter_mouse = null
+        this.matter_constraint = null
+        //_____________ CREATE MOUSE IN MATTER
+        /*
         this.matter_mouse = Matter.Mouse.create(dom_canvas)
         
         const collision_info = 
@@ -48,7 +53,7 @@ export class Mouse_manager
         );
             
         Matter.Composite.add(this.matter_engine.world, this.matter_constraint);
-        this.clean()
+        */
 
         //
         this.screen_dims = screen_dims
@@ -140,6 +145,9 @@ export class Mouse_manager
 
     update()
     {
+        if( this.matter_mouse == null )
+            return false
+
         this.group.visible = false
 
         if(this.mouse_lock_selection)
@@ -156,8 +164,6 @@ export class Mouse_manager
 
         let p_mouse_grap = new Vector( mouseX, mouseY) 
 
-        if( this.matter_constraint == null )
-            return ;
 
         let selected_body = this.matter_constraint.constraint.bodyB
         
@@ -291,11 +297,17 @@ export class Mouse_manager
         
         // next eval
         this.update_count += 1
+
+
+        return false
     }
 
 
     switch_selection( next_elem = null , hack = false)
     {
+        if( this.matter_mouse == null )
+            return false
+
       if ( next_elem == null)
       {
         this.matter_constraint.body = null
@@ -308,22 +320,30 @@ export class Mouse_manager
       let p = new Vector( 
         this.matter_constraint.constraint.pointA.x - next_elem.body.position.x,
         this.matter_constraint.constraint.pointA.y - next_elem.body.position.y)
-    
-    this.matter_constraint.body = next_elem.body
-    this.matter_constraint.constraint.bodyB = next_elem.body
-    this.matter_constraint.constraint.pointB = {x: p.x() , y: p.y()}
+
+      this.matter_constraint.body = next_elem.body
+      this.matter_constraint.constraint.bodyB = next_elem.body
+      this.matter_constraint.constraint.pointB = {x: p.x() , y: p.y()}
+
       if(hack)
         this.matter_constraint.constraint.pointB = {x: - p.y(), y: p.x()}
       this.matter_constraint.constraint.angleB = 0
       
       this.fidget.mouse_select_highlight(this.matter_constraint)
+
+      return true
     
     }    
     
     clean()
     {
+        if( this.matter_mouse == null )
+            return false
+
         Matter.Mouse.clearSourceEvents(this.matter_mouse)
         Matter.Composite.remove(this.matter_engine.world, this.matter_constraint);
+
+        return true
     }
 
 
