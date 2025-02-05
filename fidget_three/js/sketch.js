@@ -109,7 +109,7 @@ const asset_args = {
     debug : debug,
     dom_canvas : document.getElementById("three_canvas"),
 }
-var asset = null;//new fidgets_sequence(asset_args)
+var asset = new fidgets_sequence(asset_args)
 
 game_engine.setup_asset(asset)
 
@@ -131,10 +131,10 @@ document.ontouchmove = function(event) {
 document.body.addEventListener('touchmove', function(event) {
 event.preventDefault();
 }, { passive: false } );
-
+*/
   
 window.addEventListener( 'resize', () => { game_engine.resize_render( width, height )} );
-*/
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
