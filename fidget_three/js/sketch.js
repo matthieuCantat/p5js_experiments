@@ -109,7 +109,7 @@ const asset_args = {
     debug : debug,
     dom_canvas : document.getElementById("three_canvas"),
 }
-var asset = new fidgets_sequence(asset_args)
+var asset = null;//new fidgets_sequence(asset_args)
 
 game_engine.setup_asset(asset)
 
