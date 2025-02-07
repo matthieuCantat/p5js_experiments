@@ -45,7 +45,7 @@ let screen_dims = {
     pixelRatio : window.devicePixelRatio}
 
 /////////////////////////////////////////// setup game
-var nbr = 1
+var nbr = 5
 var debug = { disable_animation:true,
               switch_selected_inter_help:false,
               inter_step_physics : false,
@@ -230,15 +230,6 @@ menuSelect.addEventListener('change', (event) =>{
   game_engine.setup_asset(asset)
 
 });
-
-
-function countObjects(obj) {
-    let count = 1; // Count the current object
-    obj.children.forEach((child) => {
-      count += countObjects(child); // Recursively count children
-    });
-    return count;
-  }
 
 function getAssetsInfo()
 {

@@ -12,8 +12,7 @@ import {
 } from '../utils/utils.js';
 
 import {
-mouseX,
-mouseY,
+  user_interaction_info,
 } from '../core/mouse.js';
 
 var materials = {
@@ -327,7 +326,7 @@ class material_old_custom_exemple extends three_material
   {
     //mesh.material.uniforms.iFrame.value = count*1.22;
     mesh.material.uniforms.iTime.value = count*0.01;
-    mesh.material.uniforms.iMouse.value = { x: mouseX*2, y: map_range(mouseY, 0, this.iResolution.x, this.iResolution.y, 0)*2};
+    mesh.material.uniforms.iMouse.value = { x: user_interaction_info.mouseX*2, y: map_range(user_interaction_info.mouseY, 0, this.iResolution.x, this.iResolution.y, 0)*2};
     
     /*
     //mesh.material.uniforms.uvOffset.value = [this.uvOffset.x,this.uvOffset.y]

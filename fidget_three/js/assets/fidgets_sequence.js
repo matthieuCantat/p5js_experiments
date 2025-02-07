@@ -6,7 +6,7 @@ import { Chrono,
   clamp, 
 } from '../utils/utils.js';
 import {
-  userInteractionChange
+  user_interaction_info
 } from '../core/mouse.js'
   
 import fidget_daft_i from '../assets/fidget_daft_i.js';
@@ -83,6 +83,7 @@ export default class fidgets_sequence
       this.chrono_end_time_show_start = 0
       this.chrono_end_time_show_end = 0       
 
+      this.fidget_focus_id = 0
       this.fidgets_do_computation = []
       this.fidgets_do_computation_last = []
       this.resolution_coef = 0
@@ -181,16 +182,11 @@ export default class fidgets_sequence
     {
       this.debug_mode = debug
 
-      for( let F of this.fidgets )
-      {
-        F.set_debug(this.debug_mode)
-      }
+      
+      this.fidgets[this.fidget_focus_id].set_debug(this.debug_mode)
 
       if(this.debug_mode.fidget_steps_info)
-      {
           this.draw_text_debug = new Draw_text_debug(this.screen_dims)
-          //this.draw_text_debug.mouse_cns = this.mouse_constraint
-      }  
       else
       {
         if( this.draw_text_debug != null )
@@ -318,8 +314,14 @@ export default class fidgets_sequence
 
       for( let i = 0; i < this.fidgets.length; i++ )
         this.fidgets_do_computation[i] = this.do_fidget_computation(i)
-        
       
+      for( let i = 0; i < this.fidgets.length; i++ )
+        if( this.fidgets_do_computation[i] )
+        {
+          this.fidget_focus_id = i
+          break
+        }
+          
 
       var user_interaction_start = 290
       if(this.debug_mode.disable_animation)
@@ -478,7 +480,7 @@ export default class fidgets_sequence
         this.fidgets[i].update()
         
 
-        if(userInteractionChange)
+        if(user_interaction_info.userInteractionChange)
         {
           this.fidgets[i].mouse_select_highlight()
         }
@@ -502,15 +504,11 @@ export default class fidgets_sequence
       }
 
       this.update_chrono_three()
+
       if(this.debug_mode.fidget_steps_info)
       {
-        let F = this.fidgets[0].state;
+        let F = this.fidgets[this.fidget_focus_id].state;
         let texts_to_draw = [
-          /*
-          'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
-          'mouse position : ' + mouseX + ' : '+mouseY ,
-          'user is interacting : '+ userIsInteracting,
-          */
           
           'count : ' + F.update_count,
           'res : ' + Math.round( F.resolution_coef*100, 2 )/100 + ' / 4',

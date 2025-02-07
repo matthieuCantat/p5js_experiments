@@ -9,7 +9,7 @@ import { utils,
 import * as THREE from 'three';
 import { 
   Mouse_manager, 
-  userIsInteracting
+  user_interaction_info
 } from '../core/mouse.js'
 import { body_build } from '../core/body.js';
 import { materials,} from '../core/shader.js';
@@ -1184,7 +1184,7 @@ export default class fidget{
       {
         body.color = utils.color.redLight
         body.is_selected = true
-        if(userIsInteracting)
+        if(user_interaction_info.userIsInteracting)
         {
           body.is_touch = true
         }

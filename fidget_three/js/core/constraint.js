@@ -9,9 +9,7 @@ import {
   proj_vector_on_line, 
 } from '../utils/utils.js';
 import { 
-  mouseX,
-  mouseY,
-  userIsInteracting,
+  user_interaction_info,
 } from '../core/mouse.js';
 //import { join } from 'path';
 
@@ -759,7 +757,7 @@ export class limit{
         
 
         
-        if( userIsInteracting == false )
+        if( user_interaction_info.userIsInteracting == false )
           this.p_touch_local = null
 
         let p_out = null
@@ -768,7 +766,9 @@ export class limit{
         {
           if(this.p_touch_local==null)
           {
-            let p_touch = new Vector(mouseX,mouseY)
+            let p_touch = new Vector(
+              user_interaction_info.mouseX,
+              user_interaction_info.mouseY)
             this.p_touch_local = p_touch.getMult(m.getInverse())
             p_out = p_touch
             p_out_before = p_touch            

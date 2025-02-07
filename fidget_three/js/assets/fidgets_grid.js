@@ -6,7 +6,7 @@ import { Chrono,
   clamp,
 } from '../utils/utils.js';
 import { 
-  userInteractionChange
+  user_interaction_info
 } from '../core/mouse.js';
 import fidget_daft_i from '../assets/fidget_daft_i.js';
 import fidget_windmill from '../assets/fidget_windmill.js';
@@ -372,7 +372,7 @@ export default class fidgets_grid
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
         this.fidgets[i].update()
-        if(userInteractionChange)
+        if( user_interaction_info.userInteractionChange)
           this.fidgets[i].mouse_select_highlight()
       }
 
@@ -394,11 +394,6 @@ export default class fidgets_grid
       if(this.debug_mode.fidget_steps_info)
       {
         let texts_to_draw = [
-          /*
-          'mouse is pressed : ' + isMousePressed + ' screen is touch : '+isScreenTouched + ' !',
-          'mouse position : ' + mouseX + ' : '+mouseY ,
-          'user is interacting : '+ userIsInteracting,
-          */
           
           'count : ' + this.fidgets[0].state.update_count,
           'res : ' + Math.round( this.fidgets[0].state.resolution_coef*100, 2 )/100 + ' / 4',
