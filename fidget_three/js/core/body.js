@@ -1469,7 +1469,7 @@ export class body_build{
         {
           parent_name = parent_name.replace(suffix_axeY[0],suffix_axeY[1])
 
-          let bodies_found = this.fidget.bodies_search_by_name( parent_name )
+          let bodies_found = this.fidget.bodies.search_by_name( parent_name )
           if( 0 < bodies_found.length )
           {
             let mirrored_body = bodies_found[0]
@@ -1485,7 +1485,7 @@ export class body_build{
           if( highlight_selection_names[i].includes(suffix_axeY[0]) )
           {
             highlight_selection_names[i] = highlight_selection_names[i].replace(suffix_axeY[0],suffix_axeY[1])
-            let bodies_found = this.fidget.bodies_search_by_name( highlight_selection_names[i] )
+            let bodies_found = this.fidget.bodies.search_by_name( highlight_selection_names[i] )
             if( 0 < bodies_found.length )
             {
               let mirrored_body = bodies_found[0]
@@ -1510,7 +1510,7 @@ export class body_build{
           if( (target_names[i] != null)&&( target_names[i].includes(suffix_axeY[0]) ) )
           {
             target_names[i] = target_names[i].replace(suffix_axeY[0],suffix_axeY[1])
-            let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
+            let bodies_found = this.fidget.bodies.search_by_name( target_names[i] )
             if( 0 < bodies_found.length )
             {
               let mirrored_body = bodies_found[0]
@@ -1783,7 +1783,7 @@ export class body_build{
         {
           parent_name = parent_name.replace(suffix_axeY[0],suffix_axeY[1])
 
-          let bodies_found = this.fidget.bodies_search_by_name( parent_name )
+          let bodies_found = this.fidget.bodies.search_by_name( parent_name )
           if( 0 < bodies_found.length )
           {
             let mirrored_body = bodies_found[0]
@@ -1799,7 +1799,7 @@ export class body_build{
           if( highlight_selection_names[i].includes(suffix_axeY[0]) )
           {
             highlight_selection_names[i] = highlight_selection_names[i].replace(suffix_axeY[0],suffix_axeY[1])
-            let bodies_found = this.fidget.bodies_search_by_name( highlight_selection_names[i] )
+            let bodies_found = this.fidget.bodies.search_by_name( highlight_selection_names[i] )
             if( 0 < bodies_found.length )
             {
               let mirrored_body = bodies_found[0]
@@ -1824,7 +1824,7 @@ export class body_build{
           if( (target_names[i] != null)&&( target_names[i].includes(suffix_axeY[0]) ) )
           {
             target_names[i] = target_names[i].replace(suffix_axeY[0],suffix_axeY[1])
-            let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
+            let bodies_found = this.fidget.bodies.search_by_name( target_names[i] )
             if( 0 < bodies_found.length )
             {
               let mirrored_body = bodies_found[0]
@@ -1911,7 +1911,7 @@ export class body_build{
         {
           parent_name = parent_name.replace(suffix_axeX[0],suffix_axeX[1])
 
-          let bodies_found = this.fidget.bodies_search_by_name( parent_name )
+          let bodies_found = this.fidget.bodies.search_by_name( parent_name )
           if( 0 < bodies_found.length )
           {
             let mirrored_body = bodies_found[0]
@@ -1926,7 +1926,7 @@ export class body_build{
           if( highlight_selection_names[i].includes(suffix_axeX[0]) )
           {
             highlight_selection_names[i] = highlight_selection_names[i].replace(suffix_axeX[0],suffix_axeX[1])
-            let bodies_found = this.fidget.bodies_search_by_name( highlight_selection_names[i] )
+            let bodies_found = this.fidget.bodies.search_by_name( highlight_selection_names[i] )
             if( 0 < bodies_found.length )
             {
               let mirrored_body = bodies_found[0]
@@ -1952,7 +1952,7 @@ export class body_build{
           if( (target_names[i] != null)&&( target_names[i].includes(suffix_axeX[0]) ) )
           {
             target_names[i] = target_names[i].replace(suffix_axeX[0],suffix_axeX[1])
-            let bodies_found = this.fidget.bodies_search_by_name( target_names[i] )
+            let bodies_found = this.fidget.bodies.search_by_name( target_names[i] )
             if( 0 < bodies_found.length )
             {
               let mirrored_body = bodies_found[0]

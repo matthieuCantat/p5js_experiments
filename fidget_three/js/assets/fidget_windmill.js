@@ -176,7 +176,7 @@ export default class fidget_windmill extends fidget{
   
       this.title = 'windmill'
   
-      this.bodies = {
+      this.bodies.store = {
         inters: {
           background: null,
           circle: null,
@@ -218,40 +218,40 @@ export default class fidget_windmill extends fidget{
   
       //////////////////////////////////////////////////////////////////////////////////////////// BASE
   
-      this.bodies.bones.world = new body_build({
+      this.bodies.store.bones.world = new body_build({
         ...opts_bones_main,
         name: 'bones_world',
       })
   
-      this.bodies.geos.backgrounds.push( new body_build({
+      this.bodies.store.geos.backgrounds.push( new body_build({
         ...opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,
         dynamic: false,
         name: 'geos_background_L_',
-        parent: this.bodies.bones.world,
+        parent: this.bodies.store.bones.world,
         m_offset: new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2),
         m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
         type: utils.shape.rectangle,
         material_three: materials.old_custom_exemple, //materials.background.space_grid ,
         visibility: this.do_background,
       }) )
-      this.bodies.geos.backgrounds.push(this.bodies.geos.backgrounds[0].get_mirror(false, true))
+      this.bodies.store.geos.backgrounds.push(this.bodies.store.geos.backgrounds[0].get_mirror(false, true))
   
-      this.bodies.bones.traj = new body_build({
+      this.bodies.store.bones.traj = new body_build({
         ...opts_bones_main,
         name: 'bones_traj',
-        parent: this.bodies.bones.world,
+        parent: this.bodies.store.bones.world,
         constraint_to_parent: true,
         m_offset: this.m,
       })
       
       if (this.is_dynamic)
-        this.bodies.inters.background = new body_build({
+        this.bodies.store.inters.background = new body_build({
           ...opts_inter_step,
           ...opts_collision_no_interaction,
           name: 'inters_background',
-          parent: this.bodies.bones.traj,
+          parent: this.bodies.store.bones.traj,
           m_offset: new Matrix(),
           m_shape: new Matrix().setScale(145*this.s,92*this.s),
           type: utils.shape.rectangle,
@@ -260,7 +260,7 @@ export default class fidget_windmill extends fidget{
             {
               name: 'point',
               type: 'dyn_point',
-              target: this.bodies.bones.traj,
+              target: this.bodies.store.bones.traj,
               stiffness: 0.05,
               damping: 0.01,
               length: 0.01
@@ -268,7 +268,7 @@ export default class fidget_windmill extends fidget{
             {
               name: 'orient',
               type: 'dyn_orient',
-              target: this.bodies.bones.traj,
+              target: this.bodies.store.bones.traj,
               stiffness: 0.2,
               damping: 0.01,
               length: 0.01
@@ -276,7 +276,7 @@ export default class fidget_windmill extends fidget{
             //{
             //  name: 'rot_limit',
             //  type: 'kin_limit',
-            //  target: this.bodies.bones.traj,
+            //  target: this.bodies.store.bones.traj,
             //  x_min: -50,
             //  x_max: 50,
             //  y_min: -50,
@@ -288,11 +288,11 @@ export default class fidget_windmill extends fidget{
           ],
         })
       
-      this.bodies.bones.root = new body_build({
+      this.bodies.store.bones.root = new body_build({
         ...opts_bones_main,
         dynamic: false,
         name: 'bones_root',
-        parent: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj,
+        parent: this.is_dynamic ? this.bodies.store.inters.background : this.bodies.store.bones.traj,
         constraint_to_parent: true,
       })
       
@@ -301,17 +301,17 @@ export default class fidget_windmill extends fidget{
     if( this.is_dynamic )
     {
 
-      this.bodies.inters_step.steps.push([
+      this.bodies.store.inters_step.steps.push([
         new body_build({       
           ...opts_inter_step,
           name: 'inters_A_S_',
-          parent: this.bodies.inters.background,
+          parent: this.bodies.store.inters.background,
           m_offset: new Matrix().setTranslation(0,30*this.s),
           m_shape: new Matrix().setScale(7*this.s+inter_size,30*this.s+inter_size),
           type: utils.shape.rectangle,
           constraints: [
-            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
-            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background},
+            { name: 'point', type: 'dyn_point', target: this.bodies.store.inters.background, ...opts_cns_disable_at_select},
+            { name: 'orient', type: 'kin_orient', target: this.bodies.store.inters.background},
             
             {
               name: 'axe',
@@ -327,17 +327,17 @@ export default class fidget_windmill extends fidget{
 
         })
       ])
-      this.bodies.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
-      this.bodies.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
+      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
       
 
 
-      this.bodies.inters_step.steps_help.push(
+      this.bodies.store.inters_step.steps_help.push(
         new body_build({
           ...opts_inter_step,
           ...opts_collision_no_interaction,
           name: 'inters_B_S_help',
-          parent: this.bodies.inters.background,
+          parent: this.bodies.store.inters.background,
           m_offset: new Matrix().setRotation(rad(1)),
           m_shape: new Matrix().setScale(100*this.s),
           type: utils.shape.circle,
@@ -345,12 +345,12 @@ export default class fidget_windmill extends fidget{
             {
                   name: 'point',
                   type: 'dyn_point',
-                  target: this.bodies.inters.background,
+                  target: this.bodies.store.inters.background,
                   stiffness: 0.999,
                   damping: 0.1,
                   length: 0.01
             },
-            //{ name: 'orient', type: 'dyn_orient', target: this.bodies.inters.background, stiffness: 0.1,},
+            //{ name: 'orient', type: 'dyn_orient', target: this.bodies.store.inters.background, stiffness: 0.1,},
             {
               name: 'rot_limit',
               type: 'kin_limit',
@@ -368,11 +368,11 @@ export default class fidget_windmill extends fidget{
       
 
 
-      this.bodies.inters_step.steps.push([
+      this.bodies.store.inters_step.steps.push([
         new body_build({
           ...opts_inter_step,
           name: 'inters_B_S_',
-          parent: this.bodies.inters.background,
+          parent: this.bodies.store.inters.background,
           m_offset: new Matrix().setTranslation(0,55*this.s),
           m_shape: new Matrix().setScale(7*this.s+inter_size,30*this.s+inter_size),
           type: utils.shape.rectangle,
@@ -380,22 +380,22 @@ export default class fidget_windmill extends fidget{
             {
               name: 'point',
               type: 'dyn_point',
-              target: this.bodies.inters_step.steps_help[0],
+              target: this.bodies.store.inters_step.steps_help[0],
               stiffness: 0.999,
               damping: 0.1,
               length: 0.01
             },
             { name: 'orient', 
               type: 'kin_orient', 
-              target: this.bodies.inters_step.steps_help[0],
+              target: this.bodies.store.inters_step.steps_help[0],
             },
           ],
 
         })]
       )
 
-      this.bodies.inters_step.steps[1][0].body_coef_ref = this.bodies.inters_step.steps_help[0]
-      this.bodies.inters_step.steps[1][0].get_resolution_coef = function ()
+      this.bodies.store.inters_step.steps[1][0].body_coef_ref = this.bodies.store.inters_step.steps_help[0]
+      this.bodies.store.inters_step.steps[1][0].get_resolution_coef = function ()
       {
         let max_value = 270.0
         let min_value = 0
@@ -408,23 +408,23 @@ export default class fidget_windmill extends fidget{
         
         return clamp(angle / 268.9, 0, 1)
       }
-      this.bodies.inters_step.steps[1][0].set_resolution_coef = function (res = null) {/*if (res != null)this.body_coef_ref.set_out_rotation(rad(res * -91), 'world', 'override')*/}
+      this.bodies.store.inters_step.steps[1][0].set_resolution_coef = function (res = null) {/*if (res != null)this.body_coef_ref.set_out_rotation(rad(res * -91), 'world', 'override')*/}
 
       
-      this.bodies.inters_step.steps.push(
+      this.bodies.store.inters_step.steps.push(
         new body_build({
           ...opts_inter_step,
 
           name: 'inters_C',
           m_offset: new Matrix().setRotation(rad(180)).setTranslation(55*this.s,0),
           m_shape: new Matrix().setScale(30*this.s+inter_size,7*this.s+inter_size),
-          parent: this.bodies.inters.background,
+          parent: this.bodies.store.inters.background,
 
           type: utils.shape.rectangle,
 
           constraints: [
-            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background,...opts_cns_disable_at_select},
-            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background },
+            { name: 'point', type: 'dyn_point', target: this.bodies.store.inters.background,...opts_cns_disable_at_select},
+            { name: 'orient', type: 'kin_orient', target: this.bodies.store.inters.background },
             {
               name: 'axe',
               type: 'kin_axe',
@@ -438,8 +438,8 @@ export default class fidget_windmill extends fidget{
 
         })
       )
-      this.bodies.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
-      this.bodies.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
+      this.bodies.store.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
       
     }
 
@@ -450,16 +450,16 @@ export default class fidget_windmill extends fidget{
 
 
 
-    this.bodies.bones.rectangles_center = new body_build({
+    this.bodies.store.bones.rectangles_center = new body_build({
       ...opts_visual_bones,
       name: 'bones_rectangle_center',
-      parent: this.bodies.bones.root,
+      parent: this.bodies.store.bones.root,
       constraint_to_parent: true,
       constraints:[
       {
         name: 'connect_ty_iA',
         type: 'connect',
-        target: this.bodies.inters_step.steps[2],
+        target: this.bodies.store.inters_step.steps[2],
         attr: 'tx',
         target_attr: 'tx',
         target_space: 'base',
@@ -472,7 +472,7 @@ export default class fidget_windmill extends fidget{
     let rectangle_pivot_opts = {
       ...opts_visual_bones,
       name: 'bones_rectangle_pivot_T__S_',
-      parent: this.bodies.bones.rectangles_center,
+      parent: this.bodies.store.bones.rectangles_center,
       constraint_to_parent: true,
       constraints: [
       ],
@@ -483,7 +483,7 @@ export default class fidget_windmill extends fidget{
       rectangle_pivot_opts.constraints.push({
         name: 'connect_rot_iA',
         type: 'connect',
-        target: this.bodies.inters_step.steps_help[0],
+        target: this.bodies.store.inters_step.steps_help[0],
         attr: 'r',
         target_attr: 'r',
         target_space: 'base',
@@ -503,20 +503,20 @@ export default class fidget_windmill extends fidget{
     }
     
 
-    this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
+    this.bodies.store.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
 
-    this.bodies.bones.rectangles.push(
+    this.bodies.store.bones.rectangles.push(
       new body_build({
         ...opts_visual_bones,
         name: 'bones_rectangle_T__S_',
-        parent: this.bodies.bones.rectangles_pivots[0],
+        parent: this.bodies.store.bones.rectangles_pivots[0],
         constraint_to_parent: true,
         m_offset: new Matrix().setTranslation(0,30*this.s),
         constraints: [
           {
             name: 'connect_ty_iA',
             type: 'connect',
-            target: this.bodies.inters_step.steps[0][0],
+            target: this.bodies.store.inters_step.steps[0][0],
             attr: 'ty',
             target_attr: 'ty',
             target_space: 'base',
@@ -530,12 +530,12 @@ export default class fidget_windmill extends fidget{
       ...opts_geo,
       name: 'geos_rectangle_T__S_',
       type: utils.shape.rectangle,
-      parent: this.bodies.bones.rectangles[0],
+      parent: this.bodies.store.bones.rectangles[0],
       constraint_to_parent: true,
       m_shape: new Matrix().setScale(7*this.s,30*this.s),
       material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
     }
-    this.bodies.geos.rectangles.push(new body_build(opts_rectangles))
+    this.bodies.store.geos.rectangles.push(new body_build(opts_rectangles))
 
     /////////////////////////////////// circle
 
@@ -543,17 +543,17 @@ export default class fidget_windmill extends fidget{
     let bone_circle_opts = {
       ...opts_visual_bones,
       name: 'bones_circle',
-      parent: this.bodies.bones.root,
+      parent: this.bodies.store.bones.root,
       constraint_to_parent: true,
       constraints:[],
     }
     
-    this.bodies.bones.circle = new body_build(bone_circle_opts)
+    this.bodies.store.bones.circle = new body_build(bone_circle_opts)
 
-    this.bodies.geos.circle = new body_build({
+    this.bodies.store.geos.circle = new body_build({
       ...opts_geo,
       name: 'geos_circle',
-      parent: this.bodies.bones.circle,
+      parent: this.bodies.store.bones.circle,
       m_shape: new Matrix().setScale(17*this.s),
       type: utils.shape.circle,
 
@@ -567,16 +567,16 @@ export default class fidget_windmill extends fidget{
 
     
 
-    this.bodies.bones.trapezoids_center = new body_build({
+    this.bodies.store.bones.trapezoids_center = new body_build({
       ...opts_visual_bones,
       name: 'bones_trapezoids_center',
-      parent: this.bodies.bones.root,
+      parent: this.bodies.store.bones.root,
       constraint_to_parent: true,
       constraints: [
         {
           name: 'connect_ty_iA',
           type: 'connect',
-          target: this.bodies.inters_step.steps_help[0],
+          target: this.bodies.store.inters_step.steps_help[0],
           attr: 'r',
           target_attr: 'r',
           target_space: 'base',
@@ -586,18 +586,18 @@ export default class fidget_windmill extends fidget{
       ]      
     })
     
-    this.bodies.bones.trapezoids.push(
+    this.bodies.store.bones.trapezoids.push(
       new body_build({
         ...opts_visual_bones,
         name: 'bones_trapezoid_T__S_',
-        parent: this.bodies.bones.trapezoids_center,
+        parent: this.bodies.store.bones.trapezoids_center,
         constraint_to_parent: true,
         m_offset: new Matrix().setTranslation(30*this.s*0.7, 30*this.s*0.7).setRotation(rad(-45)),
         constraints: [
           {
             name: 'connect_ty_iA',
             type: 'connect',
-            target: this.bodies.inters_step.steps_help[0],
+            target: this.bodies.store.inters_step.steps_help[0],
             attr: 'ty',
             target_attr: 'r',
             target_space: 'base',
@@ -607,7 +607,7 @@ export default class fidget_windmill extends fidget{
           {
             name: 'connect_r_iA',
             type: 'connect',
-            target: this.bodies.inters_step.steps[2],
+            target: this.bodies.store.inters_step.steps[2],
             attr: 'r',
             target_attr: 'tx',
             target_space: 'base',
@@ -622,13 +622,13 @@ export default class fidget_windmill extends fidget{
       ...opts_geo,
       name: 'geos_trapezoid_T__S_',
       type: utils.shape.trapezoid,
-      parent: this.bodies.bones.trapezoids[0],
+      parent: this.bodies.store.bones.trapezoids[0],
       constraint_to_parent: true,
       m_shape: new Matrix().setScale(40*this.s,7*this.s),
       slop:45,
       material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
     }
-    this.bodies.geos.trapezoids.push(new body_build(opts_trapezoids))
+    this.bodies.store.geos.trapezoids.push(new body_build(opts_trapezoids))
         
 
 
@@ -644,65 +644,65 @@ export default class fidget_windmill extends fidget{
     let name_replace = '_O_'
     if(this.is_dynamic)
     {
-      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.trapezoids.push(this.bodies.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.trapezoids.push(this.bodies.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.inters_step.steps[0].push(this.bodies.store.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.inters_step.steps[1].push(this.bodies.store.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.rectangles_pivots.push(this.bodies.store.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.rectangles.push(this.bodies.store.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.geos.rectangles.push(this.bodies.store.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.trapezoids.push(this.bodies.store.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.geos.trapezoids.push(this.bodies.store.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
     }
     // BOTTOM LEFT
     m_transform = new Matrix(this.m).setRotation(rad(180))
     name_replace = '_N_'
     if(this.is_dynamic)
     {
-      this.bodies.inters_step.steps[0].push(this.bodies.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.inters_step.steps[1].push(this.bodies.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles.push(this.bodies.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.rectangles.push(this.bodies.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
-      this.bodies.bones.trapezoids.push(this.bodies.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.trapezoids.push(this.bodies.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
+      this.bodies.store.inters_step.steps[0].push(this.bodies.store.inters_step.steps[0][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.inters_step.steps[1].push(this.bodies.store.inters_step.steps[1][0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.rectangles_pivots.push(this.bodies.store.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.rectangles.push(this.bodies.store.bones.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.geos.rectangles.push(this.bodies.store.geos.rectangles[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
+      this.bodies.store.bones.trapezoids.push(this.bodies.store.bones.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.geos.trapezoids.push(this.bodies.store.geos.trapezoids[0].get_duplicate(m_ref, m_transform, name_search,name_replace))      
     }
     // BOTTOM RIGHT
     m_transform = new Matrix(this.m).setRotation(rad(270))
     name_replace = '_E_'
     if(this.is_dynamic)
     {
-      this.bodies.inters_step.steps[0].push(   this.bodies.inters_step.steps[0][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
-      //this.bodies.inters_step.steps[1].push(   this.bodies.inters_step.steps[1][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles_pivots.push(this.bodies.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.rectangles.push(       this.bodies.bones.rectangles[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.rectangles.push(        this.bodies.geos.rectangles[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))
-      this.bodies.bones.trapezoids.push(       this.bodies.bones.trapezoids[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
-      this.bodies.geos.trapezoids.push(        this.bodies.geos.trapezoids[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))            
+      this.bodies.store.inters_step.steps[0].push(   this.bodies.store.inters_step.steps[0][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
+      //this.bodies.store.inters_step.steps[1].push(   this.bodies.store.inters_step.steps[1][0].get_duplicate(   m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.rectangles_pivots.push(this.bodies.store.bones.rectangles_pivots[0].get_duplicate(m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.rectangles.push(       this.bodies.store.bones.rectangles[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.geos.rectangles.push(        this.bodies.store.geos.rectangles[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.bones.trapezoids.push(       this.bodies.store.bones.trapezoids[0].get_duplicate(       m_ref, m_transform, name_search,name_replace))
+      this.bodies.store.geos.trapezoids.push(        this.bodies.store.geos.trapezoids[0].get_duplicate(        m_ref, m_transform, name_search,name_replace))            
     }
 
     
     if (this.is_dynamic) {
-      this.bodies.inters_step.steps[0][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
-      this.bodies.inters_step.steps[0][1].highlight_selection = [  this.bodies.geos.rectangles[1]]
-      this.bodies.inters_step.steps[0][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
-      this.bodies.inters_step.steps[0][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
+      this.bodies.store.inters_step.steps[0][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[0][1].highlight_selection = [  this.bodies.store.geos.rectangles[1]]
+      this.bodies.store.inters_step.steps[0][2].highlight_selection = [  this.bodies.store.geos.rectangles[2]]
+      this.bodies.store.inters_step.steps[0][3].highlight_selection = [  this.bodies.store.geos.rectangles[3]]
 
-      this.bodies.inters_step.steps[1][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
-      this.bodies.inters_step.steps[1][1].highlight_selection = [  this.bodies.geos.rectangles[1]]
-      this.bodies.inters_step.steps[1][2].highlight_selection = [  this.bodies.geos.rectangles[2]]
-      //this.bodies.inters_step.steps[1][3].highlight_selection = [  this.bodies.geos.rectangles[3]]
+      this.bodies.store.inters_step.steps[1][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[1][1].highlight_selection = [  this.bodies.store.geos.rectangles[1]]
+      this.bodies.store.inters_step.steps[1][2].highlight_selection = [  this.bodies.store.geos.rectangles[2]]
+      //this.bodies.store.inters_step.steps[1][3].highlight_selection = [  this.bodies.store.geos.rectangles[3]]
 
-      this.bodies.inters_step.steps[2].highlight_selection = [  
-                                                              this.bodies.geos.rectangles[0],
-                                                              this.bodies.geos.rectangles[1],
-                                                              this.bodies.geos.rectangles[2],
-                                                              this.bodies.geos.rectangles[3]]
+      this.bodies.store.inters_step.steps[2].highlight_selection = [  
+                                                              this.bodies.store.geos.rectangles[0],
+                                                              this.bodies.store.geos.rectangles[1],
+                                                              this.bodies.store.geos.rectangles[2],
+                                                              this.bodies.store.geos.rectangles[3]]
                                                                     
     }
 
     
     this.create_inter_from_geos(
       ['circle', 'trapezoids'],
-      this.bodies.inters.background,
+      this.bodies.store.inters.background,
       this.s
     )
     
@@ -711,10 +711,10 @@ export default class fidget_windmill extends fidget{
     if(this.is_dynamic)
      this.instance_each_others(
        [
-         this.bodies.inters_step.steps[0][0],
-         this.bodies.inters_step.steps[0][1],
-         this.bodies.inters_step.steps[0][2],
-         this.bodies.inters_step.steps[0][3]
+         this.bodies.store.inters_step.steps[0][0],
+         this.bodies.store.inters_step.steps[0][1],
+         this.bodies.store.inters_step.steps[0][2],
+         this.bodies.store.inters_step.steps[0][3]
        ],
        [false, false, 
         false, false, 
@@ -723,7 +723,7 @@ export default class fidget_windmill extends fidget{
      )
 
     /*
-    this.bodies.inters.B = new body_build({  
+    this.bodies.store.inters.B = new body_build({  
                                     m:this.m,
                                     m_offset:new Matrix(),
                                     x:0,
@@ -744,7 +744,7 @@ export default class fidget_windmill extends fidget{
                                     matter_engine: this.matter_engine,
                                     })
 
-    this.bodies.inters.B_mask = new body_build({
+    this.bodies.store.inters.B_mask = new body_build({
                                     m:this.m,
                                     m_offset:new Matrix(),
                                     x:0,
@@ -766,7 +766,7 @@ export default class fidget_windmill extends fidget{
                                     })                                    
 
 
-    this.bodies.geos.circle = new body_build({ 
+    this.bodies.store.geos.circle = new body_build({ 
                                       m:this.m,
                                       m_offset:new Matrix(),
                                       x:0,
@@ -813,7 +813,7 @@ export default class fidget_windmill extends fidget{
     let mo_rA = new Matrix()
     
     mo_rA.setTranslation(0,oRect.h)
-    this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+    this.bodies.store.geos.rectangles.push(new body_build({ ...oRect, 
                                                 m_offset:mo_rA,
                                                 y:oRect.h,
                                                 rot:0, 
@@ -822,7 +822,7 @@ export default class fidget_windmill extends fidget{
     
     let mo_rB = new Matrix()
     mo_rB.setTranslation(0,-oRect.h)
-    this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+    this.bodies.store.geos.rectangles.push(new body_build({ ...oRect, 
                                                  m_offset:mo_rB,
                                                 y:-oRect.h,
                                                 rot:180,   
@@ -830,7 +830,7 @@ export default class fidget_windmill extends fidget{
                                               })) 
     let mo_rC = new Matrix()
     mo_rC.setTranslation(-oRect.h,0)
-    this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+    this.bodies.store.geos.rectangles.push(new body_build({ ...oRect, 
                                                  m_offset:mo_rC,
                                                 x:-oRect.h,
                                                 rot:90,  
@@ -838,13 +838,13 @@ export default class fidget_windmill extends fidget{
                                               })) 
     let mo_rD = new Matrix()
     mo_rD.setTranslation(oRect.h,0)
-    this.bodies.geos.rectangles.push(new body_build({ ...oRect, 
+    this.bodies.store.geos.rectangles.push(new body_build({ ...oRect, 
                                                 m_offset:mo_rD,
                                                 x:oRect.h,
                                                 rot:-90,  
                                               })) 
 
-    this.bodies.inters.A_bg = new body_build({  
+    this.bodies.store.inters.A_bg = new body_build({  
                                     m:this.m,
                                     m_offset: new Matrix(),
                                     x:0,
@@ -867,7 +867,7 @@ export default class fidget_windmill extends fidget{
 
     let mo_iA = new Matrix()
     mo_iA.setTranslation(0,oRect.h)                                    
-    this.bodies.inters.A = new body_build({ 
+    this.bodies.store.inters.A = new body_build({ 
                                           m:this.m,
                                           m_offset:mo_iA,
                                           x:0,
@@ -895,7 +895,7 @@ export default class fidget_windmill extends fidget{
 
   let mo_iAh = new Matrix()                                    
   mo_iAh.setTranslation(0,oRect.h+oRect.axe_constraint.distPos/2.)       
-  this.bodies.helpers.stepA = new body_build({  m:this.m,
+  this.bodies.store.helpers.stepA = new body_build({  m:this.m,
                                                 m_offset:mo_iAh,
                                                 x:0,
                                                 y:0,                                                
@@ -922,7 +922,7 @@ export default class fidget_windmill extends fidget{
     // other
     let mo_iC_bg = new Matrix()
     mo_iC_bg.setTranslation(50,0) 
-    this.bodies.inters.C_bg = new body_build({  
+    this.bodies.store.inters.C_bg = new body_build({  
                                     m:this.m,
                                     m_offset:mo_iC_bg,
                                     x:50,
@@ -946,7 +946,7 @@ export default class fidget_windmill extends fidget{
 
     let mo_iC = new Matrix()
     mo_iC.setTranslation(oRect.h,0)                                     
-    this.bodies.inters.C = new body_build({ 
+    this.bodies.store.inters.C = new body_build({ 
                                       m:this.m,
                                       m_offset:mo_iC,
                                       x:oRect.h,
@@ -970,14 +970,14 @@ export default class fidget_windmill extends fidget{
                                       screen_dims: this.screen_dims,
                                       matter_engine: this.matter_engine,
                                     })
-    this.bodies.inters.C.c_axe.pos_override =1
-    this.bodies.inters.C.c_axe.apply()
-    this.bodies.inters.C.c_axe.pos_override =null
+    this.bodies.store.inters.C.c_axe.pos_override =1
+    this.bodies.store.inters.C.c_axe.apply()
+    this.bodies.store.inters.C.c_axe.pos_override =null
 
 
     let mo_iCh = new Matrix()                                    
     mo_iCh.setTranslation(oRect.h+oRect.axe_constraint.distPos/2.,0.)       
-    this.bodies.helpers.stepC = new body_build({  m:this.m,
+    this.bodies.store.helpers.stepC = new body_build({  m:this.m,
                                                   m_offset:mo_iCh,
                                                   x:0,
                                                   y:0,  
@@ -1001,7 +1001,7 @@ export default class fidget_windmill extends fidget{
                                                   }) 
     let mo_iBh = new Matrix()                                    
     mo_iBh.setTranslation(0,0.)   
-    this.bodies.helpers.stepB = new body_build({  m:this.m,
+    this.bodies.store.helpers.stepB = new body_build({  m:this.m,
                                                   m_offset:mo_iBh,
                                                   x:0,
                                                   y:0,                                                
@@ -1051,7 +1051,7 @@ export default class fidget_windmill extends fidget{
     let mo_background_L = new Matrix()                                    
     mo_background_L.setTranslation(this.screen_dims.x/4,this.screen_dims.y/2)   
 
-    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground, 
+    this.bodies.store.geos.backgrounds.push(new body_build({ ...oBackground, 
                                                 m_offset:mo_background_L,
                                                 rot:0, 
                                                 collision:false,                                               
@@ -1059,7 +1059,7 @@ export default class fidget_windmill extends fidget{
 
     let mo_background_R = new Matrix()                                    
     mo_background_R.setTranslation(this.screen_dims.x/4*3,this.screen_dims.y/2)                                                
-    this.bodies.geos.backgrounds.push(new body_build({ ...oBackground,
+    this.bodies.store.geos.backgrounds.push(new body_build({ ...oBackground,
                                                 m_offset:mo_background_R, 
                                                 rot:0, 
                                                 collision:false,                                               
@@ -1097,7 +1097,7 @@ export default class fidget_windmill extends fidget{
   let mo_tA = new Matrix()
   mo_tA.setTranslation(oRect.h*0.7,
                        oRect.h*0.7)             
-  this.bodies.geos.trapezoids.push(new body_build({ ...oTrap,
+  this.bodies.store.geos.trapezoids.push(new body_build({ ...oTrap,
                                           m_offset:mo_tA, 
                                           x:oRect.h*oTrap.posCoef,
                                           y:oRect.h*oTrap.posCoef,
@@ -1107,7 +1107,7 @@ export default class fidget_windmill extends fidget{
   let mo_tB = new Matrix()
   mo_tB.setTranslation(-oRect.h*oTrap.posCoef,
                        oRect.h*oTrap.posCoef)   
-  this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
+  this.bodies.store.geos.trapezoids.push(new body_build({ ...oTrap, 
                                           m_offset:mo_tB,
                                           x:-oRect.h*oTrap.posCoef,
                                           y:oRect.h*oTrap.posCoef,
@@ -1116,7 +1116,7 @@ export default class fidget_windmill extends fidget{
   let mo_tC = new Matrix()
   mo_tC.setTranslation(-oRect.h*oTrap.posCoef,
                        -oRect.h*oTrap.posCoef)   
-  this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
+  this.bodies.store.geos.trapezoids.push(new body_build({ ...oTrap, 
                                           m_offset:mo_tC,
                                           x:-oRect.h*oTrap.posCoef,
                                           y:-oRect.h*oTrap.posCoef,
@@ -1126,7 +1126,7 @@ export default class fidget_windmill extends fidget{
   let mo_tD = new Matrix()
   mo_tD.setTranslation(+oRect.h*oTrap.posCoef,
                        -oRect.h*oTrap.posCoef)   
-  this.bodies.geos.trapezoids.push(new body_build({ ...oTrap, 
+  this.bodies.store.geos.trapezoids.push(new body_build({ ...oTrap, 
                                           m_offset:mo_tD,
                                           x:+oRect.h*oTrap.posCoef,
                                           y:-oRect.h*oTrap.posCoef,
@@ -1140,78 +1140,78 @@ export default class fidget_windmill extends fidget{
 
 
 
-    this.bodies_draw_order = [
-      this.bodies.geos.backgrounds[0],
-      this.bodies.geos.backgrounds[1],
-      this.bodies.inters.background,
-      this.bodies.inters.circle,
-      this.bodies.inters.trapezoids[0],
-      this.bodies.inters.trapezoids[1],
-      this.bodies.inters.trapezoids[2],
-      this.bodies.inters.trapezoids[3],
-      this.bodies.inters_step.steps_help[0],
-      this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[1][0]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[1][1]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[1][2]:null,
-      //this.is_dynamic ? this.bodies.inters_step.steps[1][3]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[2]:null,
-      this.bodies.geos.circle,
+    this.bodies.draw_order = [
+      this.bodies.store.geos.backgrounds[0],
+      this.bodies.store.geos.backgrounds[1],
+      this.bodies.store.inters.background,
+      this.bodies.store.inters.circle,
+      this.bodies.store.inters.trapezoids[0],
+      this.bodies.store.inters.trapezoids[1],
+      this.bodies.store.inters.trapezoids[2],
+      this.bodies.store.inters.trapezoids[3],
+      this.bodies.store.inters_step.steps_help[0],
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][0]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][1]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][2]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][3]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[1][0]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[1][1]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[1][2]:null,
+      //this.is_dynamic ? this.bodies.store.inters_step.steps[1][3]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[2]:null,
+      this.bodies.store.geos.circle,
       // this.effects.trailA,
       // this.effects.trailB,
-      this.bodies.geos.trapezoids[0],
-      this.bodies.geos.trapezoids[1],
-      this.bodies.geos.trapezoids[2],
-      this.bodies.geos.trapezoids[3],
-      this.bodies.geos.rectangles[0],
-      this.bodies.geos.rectangles[1],
-      this.bodies.geos.rectangles[2],
-      this.bodies.geos.rectangles[3],
+      this.bodies.store.geos.trapezoids[0],
+      this.bodies.store.geos.trapezoids[1],
+      this.bodies.store.geos.trapezoids[2],
+      this.bodies.store.geos.trapezoids[3],
+      this.bodies.store.geos.rectangles[0],
+      this.bodies.store.geos.rectangles[1],
+      this.bodies.store.geos.rectangles[2],
+      this.bodies.store.geos.rectangles[3],
       // this.effects.sparcles_shock_A,
       // this.effects.sparcles_shock_B,
       // this.effects.sparcles_shock_C,
-      this.bodies.bones.world,
-      this.bodies.bones.traj,
-      this.bodies.bones.root,
-      this.bodies.bones.circle,
-      this.bodies.bones.trapezoids_center,
-      this.bodies.bones.trapezoids[0],
-      this.bodies.bones.trapezoids[1],
-      this.bodies.bones.trapezoids[2],
-      this.bodies.bones.trapezoids[3],
-      this.bodies.bones.rectangles_center,
-      this.bodies.bones.rectangles_pivots[0],
-      this.bodies.bones.rectangles_pivots[1],
-      this.bodies.bones.rectangles_pivots[2],
-      this.bodies.bones.rectangles_pivots[3],
-      this.bodies.bones.rectangles[0],
-      this.bodies.bones.rectangles[1],
-      this.bodies.bones.rectangles[2],
-      this.bodies.bones.rectangles[3]
+      this.bodies.store.bones.world,
+      this.bodies.store.bones.traj,
+      this.bodies.store.bones.root,
+      this.bodies.store.bones.circle,
+      this.bodies.store.bones.trapezoids_center,
+      this.bodies.store.bones.trapezoids[0],
+      this.bodies.store.bones.trapezoids[1],
+      this.bodies.store.bones.trapezoids[2],
+      this.bodies.store.bones.trapezoids[3],
+      this.bodies.store.bones.rectangles_center,
+      this.bodies.store.bones.rectangles_pivots[0],
+      this.bodies.store.bones.rectangles_pivots[1],
+      this.bodies.store.bones.rectangles_pivots[2],
+      this.bodies.store.bones.rectangles_pivots[3],
+      this.bodies.store.bones.rectangles[0],
+      this.bodies.store.bones.rectangles[1],
+      this.bodies.store.bones.rectangles[2],
+      this.bodies.store.bones.rectangles[3]
     ]
     let z_depth = args.z_depth_start
     let z_depth_incr = 0.5 //0.1
-    for (let i = 0; i < this.bodies_draw_order.length; i++)
+    for (let i = 0; i < this.bodies.draw_order.length; i++)
     {
-      if (this.bodies_draw_order[i] == null)
+      if (this.bodies.draw_order[i] == null)
       {
         if (this.debug_mode.show_warning_log)
-          console.log(  ' z_order - this.bodies_draw_order[' + i + '] doesnt exists')
+          console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
         continue
       }
-      this.bodies_draw_order[i].z = z_depth
+      this.bodies.draw_order[i].z = z_depth
       z_depth += z_depth_incr
     }
     this.z_depth_end = z_depth
 
     this.Mouse.z = this.z_depth_end
 
-    this.bodies_build_order = this.bodies_get_build_order()
+    this.bodies.build_order = this.bodies.get_build_order()
 
-    this.bodies_eval_order = [
+    this.bodies.eval_order = [
       'bones','world',
       'geos','backgrounds',
 
@@ -1241,46 +1241,46 @@ export default class fidget_windmill extends fidget{
       ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable: [
-          this.bodies.inters_step.steps_help[0],
-          this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
-          this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
-          this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
-          this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
-          this.bodies.inters.trapezoids[0],
-          this.bodies.inters.trapezoids[1],
-          this.bodies.inters.trapezoids[2],
-          this.bodies.inters.trapezoids[3],
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj,
-          this.bodies.bones.root,
-          this.bodies.bones.circle,
-          this.bodies.bones.trapezoids_center,
-          this.bodies.bones.trapezoids[0],
-          this.bodies.bones.trapezoids[1],
-          this.bodies.bones.trapezoids[2],
-          this.bodies.bones.trapezoids[3],
-          this.bodies.bones.rectangles_center,
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3]
+          this.bodies.store.inters_step.steps_help[0],
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][0]:null,
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][1]:null,
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][2]:null,
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][3]:null,
+          this.bodies.store.inters.background,
+          this.bodies.store.inters.circle,
+          this.bodies.store.inters.trapezoids[0],
+          this.bodies.store.inters.trapezoids[1],
+          this.bodies.store.inters.trapezoids[2],
+          this.bodies.store.inters.trapezoids[3],
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3],
+          this.bodies.store.bones.rectangles[0],
+          this.bodies.store.bones.rectangles[1],
+          this.bodies.store.bones.rectangles[2],
+          this.bodies.store.bones.rectangles[3],
+          this.bodies.store.bones.world,
+          this.bodies.store.bones.traj,
+          this.bodies.store.bones.root,
+          this.bodies.store.bones.circle,
+          this.bodies.store.bones.trapezoids_center,
+          this.bodies.store.bones.trapezoids[0],
+          this.bodies.store.bones.trapezoids[1],
+          this.bodies.store.bones.trapezoids[2],
+          this.bodies.store.bones.trapezoids[3],
+          this.bodies.store.bones.rectangles_center,
+          this.bodies.store.bones.rectangles_pivots[0],
+          this.bodies.store.bones.rectangles_pivots[1],
+          this.bodies.store.bones.rectangles_pivots[2],
+          this.bodies.store.bones.rectangles_pivots[3]
         ],
 
         constraints_disable: [
@@ -1291,42 +1291,42 @@ export default class fidget_windmill extends fidget{
       }, ///////////////////////////////////////////////////////////////////////////////////// 1
       {
         bodies_enable: [
-          this.bodies.inters_step.steps_help[0],
-          this.bodies.inters_step.steps[1][0],
-          this.bodies.inters_step.steps[1][1],
-          this.bodies.inters_step.steps[1][2],
-          //this.bodies.inters_step.steps[1][3],
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj,
-          this.bodies.bones.root,
-          this.bodies.bones.circle,
-          this.bodies.bones.trapezoids_center,
-          this.bodies.bones.trapezoids[0],
-          this.bodies.bones.trapezoids[1],
-          this.bodies.bones.trapezoids[2],
-          this.bodies.bones.trapezoids[3],
-          this.bodies.bones.rectangles_center,
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3]
+          this.bodies.store.inters_step.steps_help[0],
+          this.bodies.store.inters_step.steps[1][0],
+          this.bodies.store.inters_step.steps[1][1],
+          this.bodies.store.inters_step.steps[1][2],
+          //this.bodies.store.inters_step.steps[1][3],
+          this.bodies.store.inters.background,
+          this.bodies.store.inters.circle,
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3],
+          this.bodies.store.bones.rectangles[0],
+          this.bodies.store.bones.rectangles[1],
+          this.bodies.store.bones.rectangles[2],
+          this.bodies.store.bones.rectangles[3],
+          this.bodies.store.bones.world,
+          this.bodies.store.bones.traj,
+          this.bodies.store.bones.root,
+          this.bodies.store.bones.circle,
+          this.bodies.store.bones.trapezoids_center,
+          this.bodies.store.bones.trapezoids[0],
+          this.bodies.store.bones.trapezoids[1],
+          this.bodies.store.bones.trapezoids[2],
+          this.bodies.store.bones.trapezoids[3],
+          this.bodies.store.bones.rectangles_center,
+          this.bodies.store.bones.rectangles_pivots[0],
+          this.bodies.store.bones.rectangles_pivots[1],
+          this.bodies.store.bones.rectangles_pivots[2],
+          this.bodies.store.bones.rectangles_pivots[3]
         ],
         constraints_disable: [
           //'geos', 'rectangle', null, 'connect_ty_iC'
@@ -1335,56 +1335,56 @@ export default class fidget_windmill extends fidget{
       }, ///////////////////////////////////////////////////////////////////////////////////// 2
       {
         bodies_enable: [
-          this.bodies.inters_step.steps_help[0],
-          this.is_dynamic ? this.bodies.inters_step.steps[2] : null,
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj,
-          this.bodies.bones.root,
-          this.bodies.bones.circle,
-          this.bodies.bones.trapezoids_center,
-          this.bodies.bones.trapezoids[0],
-          this.bodies.bones.trapezoids[1],
-          this.bodies.bones.trapezoids[2],
-          this.bodies.bones.trapezoids[3],
-          this.bodies.bones.rectangles_center,
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3]
+          this.bodies.store.inters_step.steps_help[0],
+          this.is_dynamic ? this.bodies.store.inters_step.steps[2] : null,
+          this.bodies.store.inters.background,
+          this.bodies.store.inters.circle,
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3],
+          this.bodies.store.bones.rectangles[0],
+          this.bodies.store.bones.rectangles[1],
+          this.bodies.store.bones.rectangles[2],
+          this.bodies.store.bones.rectangles[3],
+          this.bodies.store.bones.world,
+          this.bodies.store.bones.traj,
+          this.bodies.store.bones.root,
+          this.bodies.store.bones.circle,
+          this.bodies.store.bones.trapezoids_center,
+          this.bodies.store.bones.trapezoids[0],
+          this.bodies.store.bones.trapezoids[1],
+          this.bodies.store.bones.trapezoids[2],
+          this.bodies.store.bones.trapezoids[3],
+          this.bodies.store.bones.rectangles_center,
+          this.bodies.store.bones.rectangles_pivots[0],
+          this.bodies.store.bones.rectangles_pivots[1],
+          this.bodies.store.bones.rectangles_pivots[2],
+          this.bodies.store.bones.rectangles_pivots[3]
         ],
         constraints_disable: [],
         switch_selection_transition:true,
       }, ///////////////////////////////////////////////////////////////////////////////////// 3
       {
         bodies_enable: [
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3]
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3]
         ],
         constraints_disable: [
           //'inters_step', 'steps', 2, 'point'
@@ -1392,8 +1392,8 @@ export default class fidget_windmill extends fidget{
       }
     ]
 
-    this.bodies_init_physics()
-    this.bodies_init_constraints()
+    this.bodies.init_physics()
+    this.bodies.init_constraints()
 
     
 
@@ -1447,9 +1447,9 @@ export default class fidget_windmill extends fidget{
   {
     
 
-    let A = clamp(this.bodies.inters.A.c_axe.current_pos     ,0,1)
-    let B = clamp(deg(this.bodies.inters.B.body.angle)/270   ,0,1)
-    let C = clamp(1 - this.bodies.inters.C.c_axe.current_pos ,0,1) 
+    let A = clamp(this.bodies.store.inters.A.c_axe.current_pos     ,0,1)
+    let B = clamp(deg(this.bodies.store.inters.B.body.angle)/270   ,0,1)
+    let C = clamp(1 - this.bodies.store.inters.C.c_axe.current_pos ,0,1) 
     let D = 0
     if ( this.anim_mode )
     {
@@ -1482,64 +1482,64 @@ export default class fidget_windmill extends fidget{
 
   set_phase_resolution_control_0( res_coef )
   {
-      for( let i = 0; i < this.bodies.geos.rectangles.length; i++ )
-      this.bodies.geos.rectangles[i].c_axe.pos_override = res_coef
+      for( let i = 0; i < this.bodies.store.geos.rectangles.length; i++ )
+      this.bodies.store.geos.rectangles[i].c_axe.pos_override = res_coef
 
-    for( let i = 0; i < this.bodies.geos.trapezoids.length; i++ )
-      this.bodies.geos.trapezoids[i].c_axe.pos_override = res_coef
+    for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++ )
+      this.bodies.store.geos.trapezoids[i].c_axe.pos_override = res_coef
 
     if(  this.anim_mode )   
     {
-      this.bodies.inters.A.c_axe.pos_override = res_coef
+      this.bodies.store.inters.A.c_axe.pos_override = res_coef
     }
   }
 
   set_phase_resolution_control_2( res_coef)
   {  
-      for( let i = 0; i < this.bodies.geos.trapezoids.length; i++ )
-        this.bodies.geos.trapezoids[i].c_axe.pos_override = res_coef*-2+1
+      for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++ )
+        this.bodies.store.geos.trapezoids[i].c_axe.pos_override = res_coef*-2+1
 
       let max_angle = 270
       if( max_angle-1    < res_coef*max_angle )
-        this.bodies.geos.rectangles[0].enable(0)
+        this.bodies.store.geos.rectangles[0].enable(0)
       else                          
-        this.bodies.geos.rectangles[0].enable(1)
+        this.bodies.store.geos.rectangles[0].enable(1)
       if( max_angle/3-1  < res_coef*max_angle )
-        this.bodies.geos.rectangles[1].enable(0)
+        this.bodies.store.geos.rectangles[1].enable(0)
       else                          
-        this.bodies.geos.rectangles[1].enable(1)
+        this.bodies.store.geos.rectangles[1].enable(1)
       if( max_angle/3*2-1 < res_coef*max_angle )
-        this.bodies.geos.rectangles[2].enable(0)
+        this.bodies.store.geos.rectangles[2].enable(0)
       else                          
-        this.bodies.geos.rectangles[2].enable(1)
+        this.bodies.store.geos.rectangles[2].enable(1)
   
       if(  this.anim_mode )   
       {
-        this.bodies.inters.B.rot_override = rad(res_coef*270)
+        this.bodies.store.inters.B.rot_override = rad(res_coef*270)
       }
   }
 
   set_phase_resolution_control_4( res_coef)
   {  
-    this.bodies.geos.rectangles[3].c_axe.pos_override = 1 - res_coef
+    this.bodies.store.geos.rectangles[3].c_axe.pos_override = 1 - res_coef
 
         
     let rot_coef = 1.15
     var rot_tmp = (res_coef*rot_coef) 
 
-    for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
+    for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
     {
-      let current_r = this.bodies.geos.trapezoids[i].rot
+      let current_r = this.bodies.store.geos.trapezoids[i].rot
       let r = current_r+ rad(270)+rot_tmp*rad(45);
-      this.bodies.geos.trapezoids[i].rot_override = r
+      this.bodies.store.geos.trapezoids[i].rot_override = r
 
       
-      this.bodies.geos.trapezoids[i].c_axe.pos_override = -1      
+      this.bodies.store.geos.trapezoids[i].c_axe.pos_override = -1      
     }
 
     if( this.anim_mode )   
     {
-      this.bodies.inters.C.c_axe.pos_override = 1-res_coef
+      this.bodies.store.inters.C.c_axe.pos_override = 1-res_coef
     }    
   } 
 
@@ -1551,11 +1551,11 @@ export default class fidget_windmill extends fidget{
     var selected_body = this.mouse_constraint.constraint.bodyB
     
     // clean
-    this.bodies_axe_enable( ['inters'])
-    this.bodies_axe_clean_override()
-    //this.bodies_cns_modif(1.0)
-    this.bodies_rot_clean_override()
-    this.bodies_enable( 0,  ['inters'] )
+    this.bodies.axe_enable( ['inters'])
+    this.bodies.axe_clean_override()
+    //this.bodies.cns_modif(1.0)
+    this.bodies.rot_clean_override()
+    this.bodies.enable( 0,  ['inters'] )
 
     ////////////////////////////////////////////////////////////////////////////////////
     let step = 0
@@ -1564,10 +1564,10 @@ export default class fidget_windmill extends fidget{
     if( do_it )
     {
       //_________________________________________________________________Clean Inter
-      this.bodies.inters.A.enable(1) 
-      this.bodies.inters.A_bg.enable(1) 
-      this.bodies.inters.B.rot_override = 0
-      this.bodies.inters.C.c_axe.pos_override = 1    
+      this.bodies.store.inters.A.enable(1) 
+      this.bodies.store.inters.A_bg.enable(1) 
+      this.bodies.store.inters.B.rot_override = 0
+      this.bodies.store.inters.C.c_axe.pos_override = 1    
       //_________________________________________________________________Clean Other
 
       //_________________________________________________________________Control
@@ -1585,20 +1585,20 @@ export default class fidget_windmill extends fidget{
     if( do_it )
     {         
       //_________________________________________________________________Clean Inter
-      this.bodies.inters.B.enable(1) 
-      this.bodies.inters.B_mask.enable(1) 
+      this.bodies.store.inters.B.enable(1) 
+      this.bodies.store.inters.B_mask.enable(1) 
   
-      this.bodies.inters.A.c_axe.pos_override = 1
-      this.bodies.inters.C.c_axe.pos_override = 1
+      this.bodies.store.inters.A.c_axe.pos_override = 1
+      this.bodies.store.inters.C.c_axe.pos_override = 1
 
       //_________________________________________________________________Clean Other
-      for( let i = 0; i < this.bodies.geos.rectangles.length; i++ )
-        this.bodies.geos.rectangles[i].c_axe.pos_override = 1
+      for( let i = 0; i < this.bodies.store.geos.rectangles.length; i++ )
+        this.bodies.store.geos.rectangles[i].c_axe.pos_override = 1
 
       //_________________________________________________________________Control
       this.set_phase_resolution_control_2( res_coef)
       //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.inters.A, this.bodies.inters.B)
+      this.switch_selection_transition( step, selected_body, this.bodies.store.inters.A, this.bodies.store.inters.B)
       //_________________________________________________________________Update
       this.update_step_count(step)
     
@@ -1611,21 +1611,21 @@ export default class fidget_windmill extends fidget{
     if( do_it )
     {
       //_________________________________________________________________Clean Inter
-      this.bodies.inters.C.enable(1) 
-      this.bodies.inters.C_bg.enable(1) 
+      this.bodies.store.inters.C.enable(1) 
+      this.bodies.store.inters.C_bg.enable(1) 
 
-      this.bodies.inters.A.c_axe.pos_override = 1
-      this.bodies.inters.B.rot_override = rad(270)
+      this.bodies.store.inters.A.c_axe.pos_override = 1
+      this.bodies.store.inters.B.rot_override = rad(270)
 
       //_________________________________________________________________Clean Other
-      this.bodies.geos.rectangles[0].enable(0)
-      this.bodies.geos.rectangles[1].enable(0)
-      this.bodies.geos.rectangles[2].enable(0)
+      this.bodies.store.geos.rectangles[0].enable(0)
+      this.bodies.store.geos.rectangles[1].enable(0)
+      this.bodies.store.geos.rectangles[2].enable(0)
 
       //_________________________________________________________________Control
       this.set_phase_resolution_control_4( res_coef)
       //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+      this.switch_selection_transition( step, selected_body, this.bodies.store.inters.B, this.bodies.store.inters.C) 
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
       this.update_step_count(step)        
@@ -1640,22 +1640,22 @@ export default class fidget_windmill extends fidget{
     if( do_it )
     {
       //_________________________________________________________________Clean Inter
-      this.bodies.inters.A.c_axe.pos_override = 1
-      this.bodies.inters.B.rot_override = rad(270)
-      this.bodies.inters.C.c_axe.pos_override = -1
+      this.bodies.store.inters.A.c_axe.pos_override = 1
+      this.bodies.store.inters.B.rot_override = rad(270)
+      this.bodies.store.inters.C.c_axe.pos_override = -1
 
       //_________________________________________________________________Clean Other
-      this.bodies.geos.rectangles[0].enable(0)
-      this.bodies.geos.rectangles[1].enable(0)
-      this.bodies.geos.rectangles[2].enable(0)
+      this.bodies.store.geos.rectangles[0].enable(0)
+      this.bodies.store.geos.rectangles[1].enable(0)
+      this.bodies.store.geos.rectangles[2].enable(0)
 
-      for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
-        this.bodies.geos.trapezoids[i].rot_override = this.bodies.geos.trapezoids[i].rot+ rad(270)+rad(45)   
+      for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
+        this.bodies.store.geos.trapezoids[i].rot_override = this.bodies.store.geos.trapezoids[i].rot+ rad(270)+rad(45)   
 
       //_________________________________________________________________Control
       
       //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.inters.B, this.bodies.inters.C) 
+      this.switch_selection_transition( step, selected_body, this.bodies.store.inters.B, this.bodies.store.inters.C) 
       //_________________________________________________________________Update
       //this.state.switch_selection_happened_step = step
       this.update_step_count(step) 
@@ -1677,18 +1677,18 @@ export default class fidget_windmill extends fidget{
       {
         //this.set_phase_resolution_control_4( 0.95)
 
-        //this.bodies_cns_modif(0.0001, false, true)
-        //this.bodies_axe_enable(false, false, true)   
+        //this.bodies.cns_modif(0.0001, false, true)
+        //this.bodies.axe_enable(false, false, true)   
         
         let y_offset = res_coef * this.screen_dims.y/2.*1.3 
         this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2+y_offset)
 
-        //this.bodies.geos.circle.body.position.y = this.bodies.geos.circle.y + y_offset   
-        //for( let i=0; i < this.bodies.geos.rectangles.length; i++ )
-        //  this.bodies.geos.rectangles[i].body.position.y = this.bodies.geos.rectangles[i].y + y_offset     
+        //this.bodies.store.geos.circle.body.position.y = this.bodies.store.geos.circle.y + y_offset   
+        //for( let i=0; i < this.bodies.store.geos.rectangles.length; i++ )
+        //  this.bodies.store.geos.rectangles[i].body.position.y = this.bodies.store.geos.rectangles[i].y + y_offset     
         //
-        //for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
-        //  this.bodies.geos.trapezoids[i].body.position.y = this.bodies.geos.trapezoids[i].y + y_offset     
+        //for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
+        //  this.bodies.store.geos.trapezoids[i].body.position.y = this.bodies.store.geos.trapezoids[i].y + y_offset     
             
       
         }
@@ -1714,34 +1714,34 @@ export default class fidget_windmill extends fidget{
       c1[1]*(1-a)+c2[1]*a,
       c1[2]*(1-a)+c2[2]*a]
  
-    this.bodies_override_color(cInterp ['geos'])
-    this.bodies_override_color_three(cInterp, ['geos'])
+    this.bodies.override_color(cInterp ['geos'])
+    this.bodies.override_color_three(cInterp, ['geos'])
     
    
   }
 
   do_explode(step)
   {
-    this.bodies_cns_modif(0.0001, ['geos'])
-    this.bodies_axe_enable(false, ['geos'])
+    this.bodies.cns_modif(0.0001, ['geos'])
+    this.bodies.axe_enable(false, ['geos'])
     
     // custom color
-    this.bodies_override_color(null, ['geos'])
-    this.bodies_override_color_three(null, ['geos'])
+    this.bodies.override_color(null, ['geos'])
+    this.bodies.override_color_three(null, ['geos'])
 
 
     //gravity
-    this.bodies.geos.circle.apply_force( this.bodies.geos.circle.get_out_position('world'),
+    this.bodies.store.geos.circle.apply_force( this.bodies.store.geos.circle.get_out_position('world'),
                                           new Vector(0, 0.05*0.13) )
 
 
-    for( let i=0; i < this.bodies.geos.rectangles.length; i++ )
-      this.bodies.geos.rectangles[i].apply_force( this.bodies.geos.rectangles[i].get_out_position('world'),
+    for( let i=0; i < this.bodies.store.geos.rectangles.length; i++ )
+      this.bodies.store.geos.rectangles[i].apply_force( this.bodies.store.geos.rectangles[i].get_out_position('world'),
                                                   new Vector(0, 0.05*0.03) )  
 
 
-    for( let i=0; i < this.bodies.geos.trapezoids.length; i++ )
-      this.bodies.geos.trapezoids[i].apply_force( this.bodies.geos.trapezoids[i].get_out_position('world'),
+    for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
+      this.bodies.store.geos.trapezoids[i].apply_force( this.bodies.store.geos.trapezoids[i].get_out_position('world'),
                                                   new Vector(0, 0.05*0.03) )  
 
 
@@ -1755,19 +1755,19 @@ export default class fidget_windmill extends fidget{
 
       let _v = null
 
-      this.bodies.geos.rectangles[3].apply_force(p_force,v_force)
+      this.bodies.store.geos.rectangles[3].apply_force(p_force,v_force)
 
 
       _v = new Vector(0,-0.01)
-      this.bodies.geos.circle.apply_force( p_force, _v.add(v_force.getMult(2)) )
+      this.bodies.store.geos.circle.apply_force( p_force, _v.add(v_force.getMult(2)) )
       _v = new Vector(0.05,-0.05)
-      this.bodies.geos.trapezoids[0].apply_force( p_force, _v.add(v_force.getMult(2)) )
+      this.bodies.store.geos.trapezoids[0].apply_force( p_force, _v.add(v_force.getMult(2)) )
       _v = new Vector(0.05,0.05)
-      this.bodies.geos.trapezoids[1].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
+      this.bodies.store.geos.trapezoids[1].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
       _v = new Vector(-0.05,0.05)
-      this.bodies.geos.trapezoids[2].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
+      this.bodies.store.geos.trapezoids[2].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
       _v = new Vector(-0.05,-0.05)
-      this.bodies.geos.trapezoids[3].apply_force( p_force, _v.add(v_force.getMult(2)) )
+      this.bodies.store.geos.trapezoids[3].apply_force( p_force, _v.add(v_force.getMult(2)) )
       
       this.state.steps[step].apply_force_happened = true
     }
@@ -1775,26 +1775,26 @@ export default class fidget_windmill extends fidget{
 
   set_across_steps()
   {
-    let a_inter2 = deg(this.bodies.inters.B.body.angle)
+    let a_inter2 = deg(this.bodies.store.inters.B.body.angle)
     let center_tmp = new Vector(this.m.get_row(2))
 
-    for( let i = 0; i < this.bodies.geos.rectangles.length; i++)
-      this.bodies.geos.rectangles[i].c_axe.axe_rotation_center = center_tmp
-    for( let i = 0; i < this.bodies.geos.trapezoids.length; i++)
-      this.bodies.geos.trapezoids[i].c_axe.axe_rotation_center = center_tmp
+    for( let i = 0; i < this.bodies.store.geos.rectangles.length; i++)
+      this.bodies.store.geos.rectangles[i].c_axe.axe_rotation_center = center_tmp
+    for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++)
+      this.bodies.store.geos.trapezoids[i].c_axe.axe_rotation_center = center_tmp
 
-    this.bodies.geos.rectangles[0].c_axe.axe_rotation = Math.min( 270, a_inter2)
-    this.bodies.geos.rectangles[1].c_axe.axe_rotation = Math.min( 90 , a_inter2)
-    this.bodies.geos.rectangles[2].c_axe.axe_rotation = Math.min( 180, a_inter2)
-    this.bodies.geos.rectangles[3].c_axe.axe_rotation = Math.min( 0  , a_inter2)
+    this.bodies.store.geos.rectangles[0].c_axe.axe_rotation = Math.min( 270, a_inter2)
+    this.bodies.store.geos.rectangles[1].c_axe.axe_rotation = Math.min( 90 , a_inter2)
+    this.bodies.store.geos.rectangles[2].c_axe.axe_rotation = Math.min( 180, a_inter2)
+    this.bodies.store.geos.rectangles[3].c_axe.axe_rotation = Math.min( 0  , a_inter2)
 
-    for( let i = 0; i < this.bodies.geos.trapezoids.length; i++)
-      this.bodies.geos.trapezoids[i].c_axe.axe_rotation = a_inter2
+    for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++)
+      this.bodies.store.geos.trapezoids[i].c_axe.axe_rotation = a_inter2
   
-    this.bodies.inters.A.c_axe.axe_rotation = Math.min( 270, a_inter2) 
-    this.bodies.inters.A.c_axe.axe_rotation_center = center_tmp
-    this.bodies.inters.C.c_axe.axe_rotation = Math.min( 0  , a_inter2)
-    this.bodies.inters.C.c_axe.axe_rotation_center = center_tmp
+    this.bodies.store.inters.A.c_axe.axe_rotation = Math.min( 270, a_inter2) 
+    this.bodies.store.inters.A.c_axe.axe_rotation_center = center_tmp
+    this.bodies.store.inters.C.c_axe.axe_rotation = Math.min( 0  , a_inter2)
+    this.bodies.store.inters.C.c_axe.axe_rotation_center = center_tmp
   }
 
   track_user_drag_error()
@@ -1819,20 +1819,20 @@ export default class fidget_windmill extends fidget{
         if( 0.01 < v_delta.mag() )
         {
           
-          let A = this.bodies.inters.A.is_selected
-          let B = this.bodies.inters.B.is_selected
-          let C = this.bodies.inters.C.is_selected
+          let A = this.bodies.store.inters.A.is_selected
+          let B = this.bodies.store.inters.B.is_selected
+          let C = this.bodies.store.inters.C.is_selected
           if( (A == false)&&
               (B == false)&&
               (C == false))
           {
-            this.bodies_override_color(utils.color.black, ['geos'])
-            this.bodies_override_color_three(utils.color.black, ['geos'])
+            this.bodies.override_color(utils.color.black, ['geos'])
+            this.bodies.override_color_three(utils.color.black, ['geos'])
 
-            this.bodies.geos.backgrounds[0].color = utils.color.red
-            this.bodies.geos.backgrounds[1].color = utils.color.red
-            this.bodies.geos.backgrounds[0].update_color_three()
-            this.bodies.geos.backgrounds[1].update_color_three()
+            this.bodies.store.geos.backgrounds[0].color = utils.color.red
+            this.bodies.store.geos.backgrounds[1].color = utils.color.red
+            this.bodies.store.geos.backgrounds[0].update_color_three()
+            this.bodies.store.geos.backgrounds[1].update_color_three()
           }
           else
           {
@@ -1846,8 +1846,8 @@ export default class fidget_windmill extends fidget{
     }
     else if( 0 < this.mouse_pressed_positions_at_update.length )
     {
-      this.bodies_override_color(null, ['geos'])
-      this.bodies_override_color_three(null, ['geos'])
+      this.bodies.override_color(null, ['geos'])
+      this.bodies.override_color_three(null, ['geos'])
       this.color_background = utils.color.dark
       this.mouse_pressed_positions_at_update = []
     }
@@ -1866,7 +1866,7 @@ export default class fidget_windmill extends fidget{
     this.get_resolution_coef_info()
     this.set_step_resolution()
     this.track_user_drag_error()
-    this.bodies_update()
+    this.bodies.update()
     this.draw_background()
     this.state.update_count += 1
   }
@@ -1885,25 +1885,25 @@ export default class fidget_windmill extends fidget{
     if(this.show_step_helpers[0] )
     {
       let coef = this.show_step_helpers[0] / 100 
-      this.bodies.helpers.stepA.transparency_line = 1.-coef
+      this.bodies.store.helpers.stepA.transparency_line = 1.-coef
       this.show_step_helpers[0] -= 2
-      this.bodies.helpers.stepA.update_color_three()
+      this.bodies.store.helpers.stepA.update_color_three()
     }
 
     if(this.show_step_helpers[1] )
     {
       let coef = this.show_step_helpers[1] / 100 
-      this.bodies.helpers.stepB.transparency_line = 1.-coef
+      this.bodies.store.helpers.stepB.transparency_line = 1.-coef
       this.show_step_helpers[1] -= 2
-      this.bodies.helpers.stepB.update_color_three()
+      this.bodies.store.helpers.stepB.update_color_three()
     }
 
     if(this.show_step_helpers[2] )
     {
       let coef = this.show_step_helpers[2] / 100 
-      this.bodies.helpers.stepC.transparency_line = 1.-coef
+      this.bodies.store.helpers.stepC.transparency_line = 1.-coef
       this.show_step_helpers[2] -= 2
-      this.bodies.helpers.stepC.update_color_three()
+      this.bodies.store.helpers.stepC.update_color_three()
     }
     
 
@@ -1911,12 +1911,12 @@ export default class fidget_windmill extends fidget{
 
   setup_shapes_three()
   {
-    this.bodies_setup_shapes_three()
+    this.bodies.setup_shapes_three()
   }
 
   animate_three()
   {
-    this.bodies_animate_three()
+    this.bodies.animate_three()
     this.draw_help_three()
   }
 

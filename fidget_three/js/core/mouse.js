@@ -264,13 +264,20 @@ export class Mouse_manager
             
 
           let texts_to_draw = [
+                '_______________________user_interaction_info',
+                'isMousePressed         : ' + user_interaction_info.isMousePressed,
+                'isScreenTouched        : ' + user_interaction_info.isScreenTouched,
+                'userIsInteracting      : ' + user_interaction_info.userIsInteracting,
+                'userIsInteracting_last : ' + user_interaction_info.userIsInteracting_last,
+                'userInteractionChange  : ' + user_interaction_info.userInteractionChange,
+                'mouseX                 : ' + user_interaction_info.mouseX,
+                'mouseY                 : ' + user_interaction_info.mouseY,
+
+                '_______________________fidget_interaction_info',
                 'selected_fidget : ' + this.fidget.fidget_sequence_i,
                 'selected_body : ' + body_name,
 
                 'update_count :' + this.update_count,
-                'isMousePressed : ' + user_interaction_info.isMousePressed,
-                'isScreenTouched : ' + user_interaction_info.isScreenTouched,
-                'user_interaction_info.userIsInteracting : ' + user_interaction_info.userIsInteracting,
 
                 'p_mouse_current : ' + Math.round(p_mouse_current.x()) + ' | ' + Math.round(p_mouse_current.y()),
                 'p_mouse_current_coef : ' + Math.round(p_mouse_current.x()/this.screen_dims.x*100) + ' | ' + Math.round(p_mouse_current.y()/this.screen_dims.y*100),
@@ -486,44 +493,8 @@ window.onload = function() {
 ////////////////////////////////////////////////// mouse pressed
 
 
-/*
-// Get the status div
-const statusDiv = document.getElementById('status');
-
-// Function to update status
-function updateStatus(message) {
-    statusDiv.textContent = message;
-}
-
-// Add touch event listeners to the document
-document.addEventListener('touchstart', function(event) {
-    updateStatus('Screen touched');
-    console.log('Touch start:', event.touches);
-    user_interaction_info.isMousePressed = true;
-    user_interaction_info.isScreenTouched = true;
-}, false);
-
-document.addEventListener('touchmove', function(event) {
-    updateStatus('Touch moving');
-    console.log('Touch move:', event.touches);
-    user_interaction_info.isMousePressed = true;
-}, false);
-
-document.addEventListener('touchend', function(event) {
-    updateStatus('Touch ended');
-    console.log('Touch end:', event.changedTouches);
-    user_interaction_info.isMousePressed = false;
-    user_interaction_info.isScreenTouched = false;
-}, false);
-
-*/
-
-
-
 export function create_mouse_constraint(matter_engine, dom_canvas)
 {
-
-
     return mouse_constraint   
 }
 

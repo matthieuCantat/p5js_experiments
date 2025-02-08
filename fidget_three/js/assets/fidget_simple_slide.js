@@ -176,7 +176,7 @@ export default class fidget_simple_slide extends fidget{
   
       this.title = 'simple_slide'
   
-      this.bodies = {
+      this.bodies.store = {
         inters: {
           background: null,
           circle: null,
@@ -218,40 +218,40 @@ export default class fidget_simple_slide extends fidget{
   
       //////////////////////////////////////////////////////////////////////////////////////////// BASE
   
-      this.bodies.bones.world = new body_build({
+      this.bodies.store.bones.world = new body_build({
         ...opts_bones_main,
         name: 'bones_world',
       })
   
-      this.bodies.geos.backgrounds.push( new body_build({
+      this.bodies.store.geos.backgrounds.push( new body_build({
         ...opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,
         dynamic: false,
         name: 'geos_background_L_',
-        parent: this.bodies.bones.world,
+        parent: this.bodies.store.bones.world,
         m_offset: new Matrix().setTranslation(this.screen_dims.x/4,this.screen_dims.y/2),
         m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
         type: utils.shape.rectangle,
         material_three: materials.old_custom_exemple, //materials.background.space_grid ,
         visibility: this.do_background,
       }) )
-      this.bodies.geos.backgrounds.push(this.bodies.geos.backgrounds[0].get_mirror(false, true))
+      this.bodies.store.geos.backgrounds.push(this.bodies.store.geos.backgrounds[0].get_mirror(false, true))
   
-      this.bodies.bones.traj = new body_build({
+      this.bodies.store.bones.traj = new body_build({
         ...opts_bones_main,
         name: 'bones_traj',
-        parent: this.bodies.bones.world,
+        parent: this.bodies.store.bones.world,
         constraint_to_parent: true,
         m_offset: this.m,
       })
       
       if (this.is_dynamic)
-        this.bodies.inters.background = new body_build({
+        this.bodies.store.inters.background = new body_build({
           ...opts_inter_step,
           ...opts_collision_no_interaction,
           name: 'inters_background',
-          parent: this.bodies.bones.traj,
+          parent: this.bodies.store.bones.traj,
           m_offset: new Matrix(),
           m_shape: new Matrix().setScale(145*this.s,92*this.s),
           type: utils.shape.rectangle,
@@ -260,7 +260,7 @@ export default class fidget_simple_slide extends fidget{
             {
               name: 'point',
               type: 'dyn_point',
-              target: this.bodies.bones.traj,
+              target: this.bodies.store.bones.traj,
               stiffness: 0.05,
               damping: 0.01,
               length: 0.01
@@ -268,7 +268,7 @@ export default class fidget_simple_slide extends fidget{
             {
               name: 'orient',
               type: 'dyn_orient',
-              target: this.bodies.bones.traj,
+              target: this.bodies.store.bones.traj,
               stiffness: 0.2,
               damping: 0.01,
               length: 0.01
@@ -276,7 +276,7 @@ export default class fidget_simple_slide extends fidget{
             //{
             //  name: 'rot_limit',
             //  type: 'kin_limit',
-            //  target: this.bodies.bones.traj,
+            //  target: this.bodies.store.bones.traj,
             //  x_min: -50,
             //  x_max: 50,
             //  y_min: -50,
@@ -288,11 +288,11 @@ export default class fidget_simple_slide extends fidget{
           ],
         })
       
-      this.bodies.bones.root = new body_build({
+      this.bodies.store.bones.root = new body_build({
         ...opts_bones_main,
         dynamic: false,
         name: 'bones_root',
-        parent: this.is_dynamic ? this.bodies.inters.background : this.bodies.bones.traj,
+        parent: this.is_dynamic ? this.bodies.store.inters.background : this.bodies.store.bones.traj,
         constraint_to_parent: true,
       })
       
@@ -301,17 +301,17 @@ export default class fidget_simple_slide extends fidget{
     if( this.is_dynamic )
     {
 
-      this.bodies.inters_step.steps.push([
+      this.bodies.store.inters_step.steps.push([
         new body_build({       
           ...opts_inter_step,
           name: 'inters_A_S_',
-          parent: this.bodies.inters.background,
+          parent: this.bodies.store.inters.background,
           m_offset: new Matrix().setTranslation(-30*this.s,0*this.s),
           m_shape: new Matrix().setScale(30*this.s+inter_size,7*this.s+inter_size),
           type: utils.shape.rectangle,
           constraints: [
-            { name: 'point', type: 'dyn_point', target: this.bodies.inters.background, ...opts_cns_disable_at_select},
-            { name: 'orient', type: 'kin_orient', target: this.bodies.inters.background},
+            { name: 'point', type: 'dyn_point', target: this.bodies.store.inters.background, ...opts_cns_disable_at_select},
+            { name: 'orient', type: 'kin_orient', target: this.bodies.store.inters.background},
             
             {
               name: 'axe',
@@ -327,17 +327,17 @@ export default class fidget_simple_slide extends fidget{
 
         })
       ])
-      this.bodies.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
-      this.bodies.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
+      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
       
 
 
-      this.bodies.inters_step.steps_help.push(
+      this.bodies.store.inters_step.steps_help.push(
         new body_build({
           ...opts_inter_step,
           ...opts_collision_no_interaction,
           name: 'inters_B_S_help',
-          parent: this.bodies.inters.background,
+          parent: this.bodies.store.inters.background,
           m_offset: new Matrix().setRotation(rad(1)),
           m_shape: new Matrix().setScale(100*this.s),
           type: utils.shape.circle,
@@ -345,12 +345,12 @@ export default class fidget_simple_slide extends fidget{
             {
                   name: 'point',
                   type: 'dyn_point',
-                  target: this.bodies.inters.background,
+                  target: this.bodies.store.inters.background,
                   stiffness: 0.999,
                   damping: 0.1,
                   length: 0.01
             },
-            //{ name: 'orient', type: 'dyn_orient', target: this.bodies.inters.background, stiffness: 0.1,},
+            //{ name: 'orient', type: 'dyn_orient', target: this.bodies.store.inters.background, stiffness: 0.1,},
             {
               name: 'rot_limit',
               type: 'kin_limit',
@@ -376,10 +376,10 @@ export default class fidget_simple_slide extends fidget{
 
 
 
-    this.bodies.bones.rectangles_center = new body_build({
+    this.bodies.store.bones.rectangles_center = new body_build({
       ...opts_visual_bones,
       name: 'bones_rectangle_center',
-      parent: this.bodies.bones.root,
+      parent: this.bodies.store.bones.root,
       constraint_to_parent: true,
       constraints:[]
     })
@@ -388,7 +388,7 @@ export default class fidget_simple_slide extends fidget{
     let rectangle_pivot_opts = {
       ...opts_visual_bones,
       name: 'bones_rectangle_pivot_T__S_',
-      parent: this.bodies.bones.rectangles_center,
+      parent: this.bodies.store.bones.rectangles_center,
       constraint_to_parent: true,
       constraints: [
       ],
@@ -399,7 +399,7 @@ export default class fidget_simple_slide extends fidget{
       rectangle_pivot_opts.constraints.push({
         name: 'connect_rot_iA',
         type: 'connect',
-        target: this.bodies.inters_step.steps_help[0],
+        target: this.bodies.store.inters_step.steps_help[0],
         attr: 'r',
         target_attr: 'r',
         target_space: 'base',
@@ -419,20 +419,20 @@ export default class fidget_simple_slide extends fidget{
     }
     
 
-    this.bodies.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
+    this.bodies.store.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
 
-    this.bodies.bones.rectangles.push(
+    this.bodies.store.bones.rectangles.push(
       new body_build({
         ...opts_visual_bones,
         name: 'bones_rectangle_T__S_',
-        parent: this.bodies.bones.rectangles_pivots[0],
+        parent: this.bodies.store.bones.rectangles_pivots[0],
         constraint_to_parent: true,
         m_offset: new Matrix().setTranslation(-30*this.s,0*this.s),
         constraints: [
           {
             name: 'connect_tx_iA',
             type: 'connect',
-            target: this.bodies.inters_step.steps[0][0],
+            target: this.bodies.store.inters_step.steps[0][0],
             attr: 'tx',
             target_attr: 'tx',
             target_space: 'base',
@@ -446,76 +446,76 @@ export default class fidget_simple_slide extends fidget{
       ...opts_geo,
       name: 'geos_rectangle_T__S_',
       type: utils.shape.rectangle,
-      parent: this.bodies.bones.rectangles[0],
+      parent: this.bodies.store.bones.rectangles[0],
       constraint_to_parent: true,
       m_shape: new Matrix().setScale(30*this.s,7*this.s),
       material_three: materials.raw_shader_exemple, //materials.simple.gradient_yellow_green_oblique_line_A ,
     }
-    this.bodies.geos.rectangles.push(new body_build(opts_rectangles))
+    this.bodies.store.geos.rectangles.push(new body_build(opts_rectangles))
 
     if (this.is_dynamic) {
-      this.bodies.inters_step.steps[0][0].highlight_selection = [  this.bodies.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[0][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
     }
 
 
-    this.bodies_draw_order = [
-      this.bodies.geos.backgrounds[0],
-      this.bodies.geos.backgrounds[1],
-      this.bodies.inters.background,
-      this.bodies.inters.circle,
-      this.bodies.inters.trapezoids[0],
-      this.bodies.inters.trapezoids[1],
-      this.bodies.inters.trapezoids[2],
-      this.bodies.inters.trapezoids[3],
-      this.bodies.inters_step.steps_help[0],
-      this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
-      this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
-      this.bodies.geos.circle,
+    this.bodies.draw_order = [
+      this.bodies.store.geos.backgrounds[0],
+      this.bodies.store.geos.backgrounds[1],
+      this.bodies.store.inters.background,
+      this.bodies.store.inters.circle,
+      this.bodies.store.inters.trapezoids[0],
+      this.bodies.store.inters.trapezoids[1],
+      this.bodies.store.inters.trapezoids[2],
+      this.bodies.store.inters.trapezoids[3],
+      this.bodies.store.inters_step.steps_help[0],
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][0]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][1]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][2]:null,
+      this.is_dynamic ? this.bodies.store.inters_step.steps[0][3]:null,
+      this.bodies.store.geos.circle,
       // this.effects.trailA,
       // this.effects.trailB,
-      this.bodies.geos.trapezoids[0],
-      this.bodies.geos.trapezoids[1],
-      this.bodies.geos.trapezoids[2],
-      this.bodies.geos.trapezoids[3],
-      this.bodies.geos.rectangles[0],
-      this.bodies.bones.world,
-      this.bodies.bones.traj,
-      this.bodies.bones.root,
-      this.bodies.bones.circle,
-      this.bodies.bones.trapezoids_center,
-      this.bodies.bones.trapezoids[0],
-      this.bodies.bones.trapezoids[1],
-      this.bodies.bones.trapezoids[2],
-      this.bodies.bones.trapezoids[3],
-      this.bodies.bones.rectangles_center,
-      this.bodies.bones.rectangles_pivots[0],
-      this.bodies.bones.rectangles_pivots[1],
-      this.bodies.bones.rectangles_pivots[2],
-      this.bodies.bones.rectangles_pivots[3],
-      this.bodies.bones.rectangles[0],
+      this.bodies.store.geos.trapezoids[0],
+      this.bodies.store.geos.trapezoids[1],
+      this.bodies.store.geos.trapezoids[2],
+      this.bodies.store.geos.trapezoids[3],
+      this.bodies.store.geos.rectangles[0],
+      this.bodies.store.bones.world,
+      this.bodies.store.bones.traj,
+      this.bodies.store.bones.root,
+      this.bodies.store.bones.circle,
+      this.bodies.store.bones.trapezoids_center,
+      this.bodies.store.bones.trapezoids[0],
+      this.bodies.store.bones.trapezoids[1],
+      this.bodies.store.bones.trapezoids[2],
+      this.bodies.store.bones.trapezoids[3],
+      this.bodies.store.bones.rectangles_center,
+      this.bodies.store.bones.rectangles_pivots[0],
+      this.bodies.store.bones.rectangles_pivots[1],
+      this.bodies.store.bones.rectangles_pivots[2],
+      this.bodies.store.bones.rectangles_pivots[3],
+      this.bodies.store.bones.rectangles[0],
     ]
     let z_depth = args.z_depth_start
     let z_depth_incr = 0.5 //0.1
-    for (let i = 0; i < this.bodies_draw_order.length; i++)
+    for (let i = 0; i < this.bodies.draw_order.length; i++)
     {
-      if (this.bodies_draw_order[i] == null)
+      if (this.bodies.draw_order[i] == null)
       {
         if (this.debug_mode.show_warning_log)
-          console.log(  ' z_order - this.bodies_draw_order[' + i + '] doesnt exists')
+          console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
         continue
       }
-      this.bodies_draw_order[i].z = z_depth
+      this.bodies.draw_order[i].z = z_depth
       z_depth += z_depth_incr
     }
     this.z_depth_end = z_depth
 
     this.Mouse.z = this.z_depth_end
 
-    this.bodies_build_order = this.bodies_get_build_order()
+    this.bodies.build_order = this.bodies.get_build_order()
 
-    this.bodies_eval_order = [
+    this.bodies.eval_order = [
       'bones','world',
       'geos','backgrounds',
 
@@ -545,46 +545,46 @@ export default class fidget_simple_slide extends fidget{
       ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable: [
-          this.bodies.inters_step.steps_help[0],
-          this.is_dynamic ? this.bodies.inters_step.steps[0][0]:null,
-          this.is_dynamic ? this.bodies.inters_step.steps[0][1]:null,
-          this.is_dynamic ? this.bodies.inters_step.steps[0][2]:null,
-          this.is_dynamic ? this.bodies.inters_step.steps[0][3]:null,
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
-          this.bodies.inters.trapezoids[0],
-          this.bodies.inters.trapezoids[1],
-          this.bodies.inters.trapezoids[2],
-          this.bodies.inters.trapezoids[3],
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj,
-          this.bodies.bones.root,
-          this.bodies.bones.circle,
-          this.bodies.bones.trapezoids_center,
-          this.bodies.bones.trapezoids[0],
-          this.bodies.bones.trapezoids[1],
-          this.bodies.bones.trapezoids[2],
-          this.bodies.bones.trapezoids[3],
-          this.bodies.bones.rectangles_center,
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3]
+          this.bodies.store.inters_step.steps_help[0],
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][0]:null,
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][1]:null,
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][2]:null,
+          this.is_dynamic ? this.bodies.store.inters_step.steps[0][3]:null,
+          this.bodies.store.inters.background,
+          this.bodies.store.inters.circle,
+          this.bodies.store.inters.trapezoids[0],
+          this.bodies.store.inters.trapezoids[1],
+          this.bodies.store.inters.trapezoids[2],
+          this.bodies.store.inters.trapezoids[3],
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3],
+          this.bodies.store.bones.rectangles[0],
+          this.bodies.store.bones.rectangles[1],
+          this.bodies.store.bones.rectangles[2],
+          this.bodies.store.bones.rectangles[3],
+          this.bodies.store.bones.world,
+          this.bodies.store.bones.traj,
+          this.bodies.store.bones.root,
+          this.bodies.store.bones.circle,
+          this.bodies.store.bones.trapezoids_center,
+          this.bodies.store.bones.trapezoids[0],
+          this.bodies.store.bones.trapezoids[1],
+          this.bodies.store.bones.trapezoids[2],
+          this.bodies.store.bones.trapezoids[3],
+          this.bodies.store.bones.rectangles_center,
+          this.bodies.store.bones.rectangles_pivots[0],
+          this.bodies.store.bones.rectangles_pivots[1],
+          this.bodies.store.bones.rectangles_pivots[2],
+          this.bodies.store.bones.rectangles_pivots[3]
         ],
 
         constraints_disable: [
@@ -595,38 +595,38 @@ export default class fidget_simple_slide extends fidget{
       }, ///////////////////////////////////////////////////////////////////////////////////// 1
       {
         bodies_enable: [
-          this.bodies.inters_step.steps_help[0],
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj,
-          this.bodies.bones.root,
-          this.bodies.bones.circle,
-          this.bodies.bones.trapezoids_center,
-          this.bodies.bones.trapezoids[0],
-          this.bodies.bones.trapezoids[1],
-          this.bodies.bones.trapezoids[2],
-          this.bodies.bones.trapezoids[3],
-          this.bodies.bones.rectangles_center,
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3]
+          this.bodies.store.inters_step.steps_help[0],
+          this.bodies.store.inters.background,
+          this.bodies.store.inters.circle,
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3],
+          this.bodies.store.bones.rectangles[0],
+          this.bodies.store.bones.rectangles[1],
+          this.bodies.store.bones.rectangles[2],
+          this.bodies.store.bones.rectangles[3],
+          this.bodies.store.bones.world,
+          this.bodies.store.bones.traj,
+          this.bodies.store.bones.root,
+          this.bodies.store.bones.circle,
+          this.bodies.store.bones.trapezoids_center,
+          this.bodies.store.bones.trapezoids[0],
+          this.bodies.store.bones.trapezoids[1],
+          this.bodies.store.bones.trapezoids[2],
+          this.bodies.store.bones.trapezoids[3],
+          this.bodies.store.bones.rectangles_center,
+          this.bodies.store.bones.rectangles_pivots[0],
+          this.bodies.store.bones.rectangles_pivots[1],
+          this.bodies.store.bones.rectangles_pivots[2],
+          this.bodies.store.bones.rectangles_pivots[3]
         ],
         constraints_disable: [
           //'geos', 'rectangle', null, 'connect_ty_iC'
@@ -635,55 +635,55 @@ export default class fidget_simple_slide extends fidget{
       }, ///////////////////////////////////////////////////////////////////////////////////// 2
       {
         bodies_enable: [
-          this.bodies.inters_step.steps_help[0],
-          this.bodies.inters.background,
-          this.bodies.inters.circle,
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3],
-          this.bodies.bones.rectangles[0],
-          this.bodies.bones.rectangles[1],
-          this.bodies.bones.rectangles[2],
-          this.bodies.bones.rectangles[3],
-          this.bodies.bones.world,
-          this.bodies.bones.traj,
-          this.bodies.bones.root,
-          this.bodies.bones.circle,
-          this.bodies.bones.trapezoids_center,
-          this.bodies.bones.trapezoids[0],
-          this.bodies.bones.trapezoids[1],
-          this.bodies.bones.trapezoids[2],
-          this.bodies.bones.trapezoids[3],
-          this.bodies.bones.rectangles_center,
-          this.bodies.bones.rectangles_pivots[0],
-          this.bodies.bones.rectangles_pivots[1],
-          this.bodies.bones.rectangles_pivots[2],
-          this.bodies.bones.rectangles_pivots[3]
+          this.bodies.store.inters_step.steps_help[0],
+          this.bodies.store.inters.background,
+          this.bodies.store.inters.circle,
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3],
+          this.bodies.store.bones.rectangles[0],
+          this.bodies.store.bones.rectangles[1],
+          this.bodies.store.bones.rectangles[2],
+          this.bodies.store.bones.rectangles[3],
+          this.bodies.store.bones.world,
+          this.bodies.store.bones.traj,
+          this.bodies.store.bones.root,
+          this.bodies.store.bones.circle,
+          this.bodies.store.bones.trapezoids_center,
+          this.bodies.store.bones.trapezoids[0],
+          this.bodies.store.bones.trapezoids[1],
+          this.bodies.store.bones.trapezoids[2],
+          this.bodies.store.bones.trapezoids[3],
+          this.bodies.store.bones.rectangles_center,
+          this.bodies.store.bones.rectangles_pivots[0],
+          this.bodies.store.bones.rectangles_pivots[1],
+          this.bodies.store.bones.rectangles_pivots[2],
+          this.bodies.store.bones.rectangles_pivots[3]
         ],
         constraints_disable: [],
         switch_selection_transition:true,
       }, ///////////////////////////////////////////////////////////////////////////////////// 3
       {
         bodies_enable: [
-          this.bodies.geos.backgrounds[0],
-          this.bodies.geos.backgrounds[1],
-          this.bodies.geos.circle,
-          this.bodies.geos.trapezoids[0],
-          this.bodies.geos.trapezoids[1],
-          this.bodies.geos.trapezoids[2],
-          this.bodies.geos.trapezoids[3],
-          this.bodies.geos.rectangles[0],
-          this.bodies.geos.rectangles[1],
-          this.bodies.geos.rectangles[2],
-          this.bodies.geos.rectangles[3]
+          this.bodies.store.geos.backgrounds[0],
+          this.bodies.store.geos.backgrounds[1],
+          this.bodies.store.geos.circle,
+          this.bodies.store.geos.trapezoids[0],
+          this.bodies.store.geos.trapezoids[1],
+          this.bodies.store.geos.trapezoids[2],
+          this.bodies.store.geos.trapezoids[3],
+          this.bodies.store.geos.rectangles[0],
+          this.bodies.store.geos.rectangles[1],
+          this.bodies.store.geos.rectangles[2],
+          this.bodies.store.geos.rectangles[3]
         ],
         constraints_disable: [
           //'inters_step', 'steps', 2, 'point'
@@ -691,8 +691,8 @@ export default class fidget_simple_slide extends fidget{
       }
     ]
 
-    this.bodies_init_physics()
-    this.bodies_init_constraints()
+    this.bodies.init_physics()
+    this.bodies.init_constraints()
 
     
 
