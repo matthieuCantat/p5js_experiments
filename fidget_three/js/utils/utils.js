@@ -120,9 +120,11 @@ export function apply_force_to_all( bodies, pCenter, toggle )
   
   if( vFromCenter.mag() < 20 )
   {
-    for( let B of bodies )
+    for( let body of bodies )
     {
-      let pB = new Vector(B.body.position.x,B.body.position.y)
+      let pB = new Vector(
+        body.physics.body.position.x, 
+        body.physics.body.position.y)
 
       var v = pB.getSub(pCenter)
       if(toggle)
@@ -130,7 +132,7 @@ export function apply_force_to_all( bodies, pCenter, toggle )
       v.normalize()
       v.mult(0.02)
 
-      B.apply_force(B.get_out_position('world'),v)
+      body.physics.apply_force(body.physics.get_out_position('world'),v)
 
     }
   }
@@ -166,7 +168,7 @@ export function create_boundary_wall_collision(matter_engine, width, height, gro
 export function change_selected_obj(mouse_cns,obj)
 {
 
-  let p_body = obj.get_out_position('world')
+  let p_body = obj.physics.get_out_position('world')
   let p_mouse = new Vector( 
     mouse_cns.constraint.pointA.x,
     mouse_cns.constraint.pointA.y)
@@ -654,4 +656,26 @@ export function flatten_list( list_input )
   }
 
   return array
+}
+
+
+export function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function strictObject(obj) {
+  return new Proxy(obj, {
+    get(target, prop, receiver) {
+      if (!(prop in target)) {
+        throw new Error(`Property "${prop}" does not exist on the object.`);
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+    set(target, prop, value) {
+      if (!(prop in target)) {
+        throw new Error(`Cannot add new property "${prop}". Object is strict.`);
+      }
+      return Reflect.set(target, prop, value);
+    }
+  });
 }

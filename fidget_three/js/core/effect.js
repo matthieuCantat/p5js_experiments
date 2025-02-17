@@ -61,8 +61,8 @@ export class effect{
     {
       for( let body of bodies)
       {
-        body.z = this.z
-        body.setup_shapes_three(group_three)    
+        body.render.z = this.z
+        body.render.setup_shapes_three(group_three)    
       }
     }
         
@@ -72,7 +72,7 @@ export class effect{
   {
     for( let bodies of this.bodies)
       for( let body of bodies)
-        body.clean_shapes_three(group_three)    
+        body.render.clean_shapes_three(group_three)    
   }
 
 
@@ -80,21 +80,30 @@ export class effect{
   {
     for( let bodies of this.bodies)
       for( let body of bodies)
-        body.update()
+        body.physics.update()
   }
 
   animate_three()
   {
     for( let bodies of this.bodies)
+    {
       for( let body of bodies)
-        body.animate_three()    
+      {
+        let pos   = body.physics.get_out_position('world')
+        let rot   = body.physics.get_out_rotation('world')
+        let scale = body.physics.state.scale        
+        body.render.animate_three( pos, rot, scale)  
+      }
+    }
+
+          
   }
 
   init_physics()  
   {
     for( let bodies of this.bodies)
       for( let body of bodies)
-        body.init_physics()
+        body.physics.init_physics()
   }
 
 
@@ -104,8 +113,8 @@ export class effect{
     { 
       for( let body of bodies)
       {
-        body.set_out_matrix(body.get_init_matrix())
-        body.init_constraints()
+        body.physics.set_out_matrix(body.physics.get_init_matrix())
+        body.physics.init_constraints()
       }
     }
   }
@@ -140,11 +149,11 @@ export class effect{
                 for( let i=0; i < sparcles.length; i++)
                 {
                     let force = new Vector(0.001, 0)
-                    force = force.rotate(sparcles[i].get_out_rotation('world'))
-                    let pos = sparcles[i].get_out_position('world')
+                    force = force.rotate(sparcles[i].physics.get_out_rotation('world'))
+                    let pos = sparcles[i].physics.get_out_position('world')
                     
-                    sparcles[i].apply_force( pos, force )
-                    shapes[i].apply_force( pos, force.getMult(0.1) )
+                    sparcles[i].physics.apply_force( pos, force )
+                    shapes[i].physics.apply_force( pos, force.getMult(0.1) )
                 }
             }
             
@@ -155,9 +164,11 @@ export class effect{
                 {
                     wall.enable(1)
                     
-                    let m = new Matrix(wall.m_shape_init)
+                    let m = new Matrix(wall.properties.m_shape_init)
                     m = m.scale(0.01+this.count*0.1,1)
-                    wall.update_shape_coords(m)
+                    
+                    wall.set_shape_matrix(m)
+              
                 }
             }
             
@@ -441,81 +452,6 @@ function build_effects_wall(opts)
   return body                              
 }
 
-/*
-anim_effect({
-  count:this.state.steps[step].update_count,
-  sparcles:this.bodies.effects.colA_sparcles,
-  shapes:this.bodies.effects.colA_shapes,
-  wall:this.bodies.effects.colA_wall,
-  trails:this.bodies.effects.movA_trails,
-})
-
-
-
-
-function anim_effect(opts)
-{
-  if( opts.wall != null)
-    opts.wall.enable(0)
-
-  for( let i=0; i < opts.sparcles.length; i++)
-    opts.sparcles[i].enable(0) 
-
-  for( let i=0; i < opts.shapes.length; i++)
-    opts.shapes[i].enable(0)
-  for( let i=0; i < opts.trails.length; i++)
-    opts.trails[i].enable(0)
-
-  if(opts.count == 0)
-    return false  
-
-  if(opts.count == 1)  
-  {      
-    for( let i=0; i < opts.sparcles.length; i++)
-    {
-      let force = new Vector(0.001, 0)
-      force = force.rotate(opts.sparcles[i].get_out_rotation('world'))
-      let pos = opts.sparcles[i].get_out_position('world')
-
-      opts.sparcles[i].apply_force( pos, force )
-      opts.shapes[i].apply_force( pos, force.getMult(0.1) )
-    }
-  }
-
-  if( opts.count < 10) 
-  {
-    if( opts.wall != null)
-    {
-      opts.wall.enable(1)
-
-      let m = new Matrix(opts.wall.m_shape_init)
-      m = m.scale(0.01+opts.count*0.1,1)
-      opts.wall.update_shape_coords(m)
-    }
-  }
-
-
-  if( opts.count < 20) 
-  {
-    for( let i=0; i < opts.sparcles.length; i++)
-      opts.sparcles[i].enable(1)       
-  }
-
-
-  if( opts.count < 40) 
-  {
-
-    for( let i=0; i < opts.shapes.length; i++)
-      opts.shapes[i].enable(1)   
-      
-    for( let i=0; i < opts.trails.length; i++)
-      opts.trails[i].enable(1)    
-              
-  }    
-
-  return true
-}
-*/
 
 function build_effects_trail(opts, body_target)
 {

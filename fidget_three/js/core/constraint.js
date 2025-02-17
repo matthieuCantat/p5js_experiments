@@ -16,6 +16,57 @@ import {
 
 
 
+export function build_body_physics_modifier( body_physics, args)
+{
+
+  let cns = null
+  if((args.type == 'dyn_point')&&(body_physics.dynamic))
+  { 
+    cns = new dyn_constraint_build({obj: body_physics, ...args})//build_constraint(this,args)          
+  }
+
+  if((args.type == 'dyn_orient')&&(body_physics.dynamic))
+  {
+    cns = new dyn_constraint_build_custom_orient({obj: body_physics, ...args, y_offset:300})//build_constraint(this,args,offset)                 
+  }
+
+  if(args.type == 'kin_point')
+  { 
+    cns = new constraint_build({obj: body_physics, ...args,do_position:true,do_orientation:false})//build_constraint(this,args)          
+  }
+
+  if(args.type == 'kin_orient')
+  {
+    cns = new constraint_build({obj: body_physics, ...args,do_position:false,do_orientation:true})//build_constraint(this,args,offset)                 
+  }
+
+  /////////////////// axe
+  if((args.type == 'kin_axe')&&(body_physics.dynamic))
+  {
+    cns =  new cns_axe({ Follower: body_physics, ...args })   
+  }
+
+  if(args.type == 'kin_limit')
+  {
+    cns =  new limit({ Follower: body_physics, ...args, obj:body_physics })   
+  }
+
+  if(args.type == 'connect')
+  {
+    cns =  new connect({ ...args, obj:body_physics })   
+  }
+
+  if(args.type == 'connect_multi')
+  {
+    cns =  new connect_multi({ ...args, obj:body_physics })   
+  }
+
+  return cns
+
+}
+
+
+
 export class dyn_constraint_build_custom_orient{
   
   constructor( in_options ){
@@ -32,7 +83,7 @@ export class dyn_constraint_build_custom_orient{
       };
       const args = { ...defaultOptions, ...in_options };
 
-      this.matter_engine = args.obj.matter_engine
+      this.matter_engine = args.obj.ref.matter_engine
 
       this.obj = args.obj
       this.target = args.target
@@ -43,9 +94,9 @@ export class dyn_constraint_build_custom_orient{
 
       let m_target = null
       if(this.target != null)
-        m_target = this.target.get_init_matrix()
+        m_target = this.target.physics.get_init_matrix()
       else
-        m_target = this.obj.m
+        m_target = this.obj.state.m
 
       let m_obj = this.obj.get_init_matrix()
       //m_target.log()
@@ -63,7 +114,7 @@ export class dyn_constraint_build_custom_orient{
 
   rebind()
   {
-    let m_target = this.target.get_out_matrix()
+    let m_target = this.target.physics.get_out_matrix()
     let m_obj = this.obj.get_out_matrix()
     let m_delta = m_obj.getMult(m_target.getInverse())
     this.target_pos_offset = m_delta
@@ -77,9 +128,9 @@ export class dyn_constraint_build_custom_orient{
 
       let m_target_out = null
       if(this.target != null)
-        m_target_out = this.target.get_out_matrix()
+        m_target_out = this.target.physics.get_out_matrix()
       else
-        m_target_out = this.obj.m          
+        m_target_out = this.obj.state.m          
       
       let m_target  = this.target_pos_offset.getMult(m_target_out)
       let m_current = this.obj.get_out_matrix()
@@ -89,7 +140,7 @@ export class dyn_constraint_build_custom_orient{
       let stiffness = this.stiffness
       if(this.stiffness_at_selection != null)
       {
-        if((this.obj.is_selected)||(this.obj.instance_is_selected))
+        if((this.obj.state.is_selected)||(this.obj.state.instance_is_selected))
         {
           stiffness = this.stiffness_at_selection
           if( stiffness == 0 )
@@ -109,7 +160,7 @@ export class dyn_constraint_build_custom_orient{
 
       if(this.stiffness_after_selection != null)
       {
-        if((!this.obj.is_selected)&&(!this.obj.instance_is_selected))
+        if((!this.obj.state.is_selected)&&(!this.obj.state.instance_is_selected))
         {
           if(this.selection_occured)
             stiffness = this.stiffness_after_selection
@@ -130,9 +181,9 @@ export class dyn_constraint_build_custom_orient{
       {
         let m_target = null
         if(this.target != null)
-          m_target = this.target.get_init_matrix()
+          m_target = this.target.physics.get_init_matrix()
         else
-          m_target = this.obj.m
+          m_target = this.obj.state.m
   
         let m_obj = this.obj.get_out_matrix()
         //m_target.log()
@@ -172,7 +223,7 @@ export class dyn_constraint_build{
         };
         const args = { ...defaultOptions, ...in_options };
 
-        this.matter_engine = args.obj.matter_engine
+        this.matter_engine = args.obj.ref.matter_engine
 
         this.obj = args.obj
         this.obj_pos_offset = args.obj_pos_offset
@@ -190,7 +241,7 @@ export class dyn_constraint_build{
         this.target_pos_offset = new Vector()
         if( this.target != null)
         {
-          let m_target = this.target.get_init_matrix()
+          let m_target = this.target.physics.get_init_matrix()
           let m_obj = this.obj.get_init_matrix()
           let m_delta = m_obj.getMult(m_target.getInverse())
           this.target_pos_offset = m_delta.get_row(2)         
@@ -211,9 +262,9 @@ export class dyn_constraint_build{
             opt.length = this.length
 
         if(this.target!=null)
-            opt.bodyB = this.target.body
+            opt.bodyB = this.target.physics.body
         else
-            opt.pointB = this.obj.m.get_row(2).get_value()
+            opt.pointB = this.obj.state.m.get_row(2).get_value()
 
         opt.pointA.y += this.y_offset
         opt.pointB.y += this.y_offset
@@ -237,17 +288,20 @@ export class dyn_constraint_build{
 
     rebind()
     {
-      let m_target = this.target.get_out_matrix()
+      
+      let m_target = this.target.physics.get_out_matrix()
       let m_obj = this.obj.get_out_matrix()
       let m_delta = m_obj.getMult(m_target.getInverse())
       this.cns.pointB = m_delta.get_row(2).get_value()
+      
     }
 
     apply()
     {
+      
       if(this.stiffness_at_selection != null)
       {
-        if((this.obj.is_selected)||(this.obj.instance_is_selected))
+        if((this.obj.state.is_selected)||(this.obj.state.instance_is_selected))
         {
           
           this.cns.stiffness = this.stiffness_at_selection
@@ -282,13 +336,14 @@ export class dyn_constraint_build{
 
       if(this.stiffness_after_selection != null)
       {
-        if((!this.obj.is_selected)&&(!this.obj.instance_is_selected))
+        if((!this.obj.state.is_selected)&&(!this.obj.state.instance_is_selected))
         {
           if(this.selection_occured)
             this.cns.stiffness = this.stiffness_after_selection
         }
         
       }
+        
 
 
         //this.cns.pointB = this.pB
@@ -561,10 +616,10 @@ export class cns_axe{
         this.current_pos = 1
         this.Follower.set_out_position(pLimitPos,'world', 'override')
  
-        if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
+        if((this.transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
         {
           let v_delta = p_out_before.getSub(pLimitPos)
-          this.Follower.parent.apply_force(pLimitPos,v_delta)
+          this.Follower.relations.parent.physics.apply_force(pLimitPos,v_delta)
         }
                 
         return true
@@ -577,10 +632,10 @@ export class cns_axe{
         this.Follower.set_out_position(pLimitNeg,'world', 'override')
 
  
-        if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
+        if((this.transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
         {
           let v_delta = p_out_before.getSub(pLimitNeg)
-          this.Follower.parent.apply_force(pLimitNeg,v_delta)
+          this.Follower.relations.parent.physics.apply_force(pLimitNeg,v_delta)
         }
                 
         return true
@@ -691,10 +746,10 @@ export class cns_axe{
       }
 
     
-      if((this.transfer_delta_as_parent_force)&&(this.Follower.is_touch))
+      if((this.transfer_delta_as_parent_force)&&(this.Follower.stats.is_touch))
       {
         let v_delta = p_out_before.getSub(p_out)
-        this.Follower.parent.apply_force(p_out,v_delta)
+        this.Follower.relations.parent.physics.apply_force(p_out,v_delta)
       }
       
       
@@ -762,7 +817,7 @@ export class limit{
 
         let p_out = null
         let p_out_before = null
-        if( this.obj.is_touch )
+        if( this.obj.state.is_touch )
         {
           if(this.p_touch_local==null)
           {
@@ -790,47 +845,17 @@ export class limit{
           this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
           this.obj.set_anglular_velocity(0) 
           
-          if((this.transfer_delta_as_parent_force)&&(this.obj.is_touch)&&(this.p_touch_local!=null) )
+          if((this.transfer_delta_as_parent_force)&&(this.obj.state.is_touch)&&(this.p_touch_local!=null) )
           {
             p_out = this.p_touch_local.getMult(m_limit)
             let v_delta = p_out_before.getSub(p_out)
-            this.obj.parent.apply_force(p_out,v_delta)
+            this.obj.relations.parent.physics.apply_force(p_out,v_delta)
           }                
 
           return true           
         }
 
 
-        /*
-        if((this.x_min!=null)&&( p.x() < p_parent.x()+this.x_min ))
-        {
-            p.v.x = p_parent.x()+this.x_min
-            v.v.x = 0
-            this.obj.set_out_position(p,'dyn', 'world', 'override')
-            this.obj.set_velocity(v) 
-        }  
-        if((this.x_max!=null)&&( p_parent.x()+this.x_max < p.x() ))
-        {
-            p.v.x = p_parent.x()+this.x_max
-            v.v.x = 0
-            this.obj.set_out_position(p,'world', 'override')
-            this.obj.set_velocity(v) 
-        }  
-        if((this.y_min!=null)&&( p.y() < p_parent.y()+this.y_min ))
-        {
-            p.v.y = p_parent.y()+this.y_min
-            v.v.y = 0
-            this.obj.set_out_position(p,'world', 'override')
-            this.obj.set_velocity(v) 
-        } 
-        if((this.y_max!=null)&&( p_parent.y()+this.y_max < p.y() ))
-        {
-            p.v.y = p_parent.y()+this.y_max
-            v.v.y = 0
-            this.obj.set_out_position(p,'world', 'override')
-            this.obj.set_velocity(v) 
-        } 
-        */
 
         if((this.rot_min!=null)&&(this.rot_max!=null)&&(this.clockwize_mode))
         {
@@ -904,11 +929,11 @@ export class limit{
         }
 
 
-        if((this.transfer_delta_as_parent_force)&&(this.obj.is_touch)&&(this.p_touch_local!=null))
+        if((this.transfer_delta_as_parent_force)&&(this.obj.state.is_touch)&&(this.p_touch_local!=null))
         {
           p_out = this.p_touch_local.getMult(m_limit)
           let v_delta = p_out_before.getSub(p_out)
-          this.obj.parent.apply_force(p_out,v_delta)
+          this.obj.relations.parent.physics.apply_force(p_out,v_delta)
         }                
       
     
@@ -942,11 +967,12 @@ export class constraint_build{
         };
         const args = { ...defaultOptions, ...in_options };
 
-        this.matter_engine = args.obj.matter_engine
+        
+        this.matter_engine = args.obj.ref.matter_engine
 
         this.obj = args.obj
         this.target = args.target
-        let m_target = this.target.get_init_matrix()
+        let m_target = this.target.physics.get_init_matrix()
         let m_obj = this.obj.get_init_matrix()
         //m_target.log()
 
@@ -972,7 +998,7 @@ export class constraint_build{
 
 
         
-        let m_target = this.target.get_out_matrix()
+        let m_target = this.target.physics.get_out_matrix()
         let m = this.target_pos_offset.getMult(m_target)
 
 
@@ -1084,33 +1110,15 @@ export class connect{
       let m = null
       if( ['tx','ty','r'].includes(this.target_attr) )
       {
-        /*
-        let m_target_parent_world = this.target.parent.get_out_matrix()
-        let m_target_world = this.target.get_out_matrix()
-        let m_local = m_target_world.getMult(m_target_parent_world.getInverse())
-        
-        if(this.target_space == 'local')
-        {
-          let m_target_parent_world_init = this.target.parent.get_init_matrix()
-          let m_target_world_init = this.target.get_init_matrix()
-          let m_local_init = m_target_world_init.getMult(m_target_parent_world_init.getInverse())
-  
-          m = m_local.getMult(m_local_init.getInverse())
-        }
-        else{
-          m = m_local
-        }
-        */
-
-        m = this.target.get_out_matrix( this.target_space )
+        m = this.target.physics.get_out_matrix( this.target_space )
       }
 
       let value = null
       if( this.target_attr == 'tx'          )value = m.get_row(2).x()      
       if( this.target_attr == 'ty'          )value = m.get_row(2).y()
       if( this.target_attr == 'r'           )value = deg(m.getRotation(this.clockwize_mode))
-      if( this.target_attr == 's'           )value = this.target.scale
-      if( this.target_attr == 'is_selected' )value = this.target.is_selected
+      if( this.target_attr == 's'           )value = this.target.physics.state.scale
+      if( this.target_attr == 'is_selected' )value = this.target.physics.state.is_selected
 
 
       //REMAP
@@ -1148,15 +1156,15 @@ export class connect{
       let value = this.get_out_value()   
 
       //SET VALUE
-      if( (this.activate_when_target_is_selected)&&(this.target.is_selected == false))
+      if( (this.activate_when_target_is_selected)&&(this.target.physics.state.is_selected == false))
         return false
       
-      if((this.instance_mode)&&(this.target.is_last_instance_selected == false))
+      if((this.instance_mode)&&(this.target.physics.state.is_last_instance_selected == false))
         return false
 
 
       if( this.attr == 's' )
-        this.obj.scale = value 
+        this.obj.state.scale = value 
       if( this.attr == 'r' )
         this.obj.set_out_rotation(rad(value),this.space, 'override')  
       if( this.attr == 'tx' )
@@ -1164,7 +1172,7 @@ export class connect{
       if( this.attr == 'ty' )
         this.obj.set_out_position_Y(value ,this.space, 'override')  
       if( this.attr == 'is_selected' )
-        this.obj.instance_is_selected = value
+        this.obj.state.instance_is_selected = value
 
       return true
 
@@ -1239,10 +1247,10 @@ export class connect_multi{
     {
       
       //SET VALUE
-      if( (this.activate_when_target_is_selected)&&(this.targets[i].is_selected == false))
+      if( (this.activate_when_target_is_selected)&&(this.targets[i].physics.state.is_selected == false))
         continue
 
-      if((this.instance_mode)&&(this.targets[i].is_last_instance_selected == false))
+      if((this.instance_mode)&&(this.targets[i].physics.state.is_last_instance_selected == false))
         continue
 
       value += this.cns_list[i].get_out_value()
@@ -1262,7 +1270,7 @@ export class connect_multi{
 
 
       if( this.attr == 's' )
-        this.obj.scale = value 
+        this.obj.state.scale = value 
       if( this.attr == 'r' )
         this.obj.set_out_rotation(rad(value),this.space, 'override')  
       if( this.attr == 'tx' )
@@ -1270,7 +1278,7 @@ export class connect_multi{
       if( this.attr == 'ty' )
         this.obj.set_out_position_Y(value ,this.space, 'override')  
       if( this.attr == 'is_selected' )
-        this.obj.instance_is_selected = value
+        this.obj.state.instance_is_selected = value
       
       return true
 

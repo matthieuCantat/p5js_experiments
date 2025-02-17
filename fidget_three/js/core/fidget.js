@@ -4,7 +4,8 @@ import Vector from '../utils/vector.js';
 import { utils, 
   create_physics_engine,
   create_physics_engine_runner,
-  create_boundary_wall_collision
+  create_boundary_wall_collision,
+  strictObject,
 } from '../utils/utils.js';
 import * as THREE from 'three';
 import { 
@@ -60,20 +61,20 @@ export default class fidget{
     this.m = args.m
     this.s = args.s
     this.screen_dims = args.screen_dims
-    this.state = {
+    this.state = strictObject({
       update_count : 0,
       resolution_coef : 0, 
       resolution_coef_last:0,
       switch_selection_happened_step : 0,
       current_step : 0,
       steps:[ 
-        new state_step_tpl, 
-        new state_step_tpl, 
-        new state_step_tpl, 
-        new state_step_tpl,
-        new state_step_tpl,
-        new state_step_tpl]
-    }
+        strictObject(new state_step_tpl), 
+        strictObject(new state_step_tpl), 
+        strictObject(new state_step_tpl), 
+        strictObject(new state_step_tpl),
+        strictObject(new state_step_tpl),
+        strictObject(new state_step_tpl)]
+    })
     this.set_debug_init(args.debug)
     this.force_way = null
     this.resolution_coef_override = null
@@ -82,18 +83,20 @@ export default class fidget{
     this.touch_enable = true
     this.anim_mode = false
     this.do_background = args.do_background
+    this.debug_mode = args.debug
+
 
     this.matter_engine = matter_engine
     this.matter_engine_runner = matter_engine_runner     
-    this.Mouse = new Mouse_manager( 
+    this.Mouse = strictObject(new Mouse_manager( 
       this.matter_engine, 
       args.dom_canvas, 
       this.screen_dims, 
       this, 
-      this.debug_mode.mouse_info)    
+      this.debug_mode.mouse_info))    
     /////////////////////////////////////////////////////////////////// build
 
-    this.bodies = new bodies() 
+    this.bodies = strictObject(new bodies() )
     this.bodies.debug_mode = this.debug_mode
     this.bodies.fidget_sequence_i = this.fidget_sequence_i
     this.bodies.group_three = this.bodies.group_three
@@ -118,9 +121,9 @@ export default class fidget{
   {     
     console.log('setup : fidget')  
     this.set_debug_setup()                      
-    this.bodies.init_out_matrix()
+    this.bodies.physics.init_out_matrix()
 
-    this.bodies.setup_shapes_three()
+    this.bodies.render.setup_shapes_three()
     scene.add( this.bodies.group_three )    
   }
 
@@ -136,11 +139,11 @@ export default class fidget{
     this.Mouse.set_debug(this.debug_mode.mouse_info)
 
     this.bodies.set_debug( this.debug_mode )
-    this.bodies.set_visibility_secondary(this.debug_mode.show_inters, ['inters'])  
-    this.bodies.set_visibility_secondary(this.debug_mode.show_inters_steps, ['inters_step']) 
-    this.bodies.set_visibility_secondary(this.debug_mode.show_geos, ['geos']) 
-    this.bodies.set_visibility_secondary(this.debug_mode.show_effects, ['effects']) 
-    this.bodies.set_visibility_secondary(this.debug_mode.show_bones, ['bones']) 
+    this.bodies.render.set_visibility_secondary(this.debug_mode.show_inters, ['inters'])  
+    this.bodies.render.set_visibility_secondary(this.debug_mode.show_inters_steps, ['inters_step']) 
+    this.bodies.render.set_visibility_secondary(this.debug_mode.show_geos, ['geos']) 
+    this.bodies.render.set_visibility_secondary(this.debug_mode.show_effects, ['effects']) 
+    this.bodies.render.set_visibility_secondary(this.debug_mode.show_bones, ['bones']) 
   }
 
   set_debug(debug)
@@ -220,7 +223,7 @@ export default class fidget{
       })
    
     }
-    this.bodies.update()
+    this.bodies.physics.update()
     this.draw_background()
 
     //countElements(this.matter_engine.world);
@@ -246,27 +249,15 @@ export default class fidget{
     // a 0-->200
     let pA = new Vector(this.screen_dims.x/4,this.screen_dims.y/2)
     pA.v.x -= a
-    this.bodies.store.geos.backgrounds[0].set_out_position(pA, 'world', 'override')
-    /*
-    if(( 0 < this.state.steps[this.end_step-1].update_count-15)&&(this.anim_mode==false))
-    {
-      this.bodies.store.geos.backgrounds[0].color = [50,140,50]
-      this.bodies.store.geos.backgrounds[0].update_color_three_shape()
-    }
-    */
+    this.bodies.store.geos.backgrounds[0].physics.set_out_position(pA, 'world', 'override')
+  
       
 
 
     let pB = new Vector(this.screen_dims.x/4*3,this.screen_dims.y/2)
     pB.v.x += a
-    this.bodies.store.geos.backgrounds[1].set_out_position(pB,'world', 'override')  
-    /*
-    if(( 0 < this.state.steps[this.end_step-1].update_count-15)&&(this.anim_mode==false))
-    {
-      this.bodies.store.geos.backgrounds[1].color = [50,140,50] 
-      this.bodies.store.geos.backgrounds[1].update_color_three_shape()      
-    }
-    */
+    this.bodies.store.geos.backgrounds[1].physics.set_out_position(pB,'world', 'override')  
+   
   }
 
 
@@ -314,7 +305,7 @@ export default class fidget{
           }
           
         connect_to_dupli_ty.target_remap = r
-        bodies[j].constraints_args.push(connect_to_dupli_ty)
+        bodies[j].physics.relations.constraints_args.push(connect_to_dupli_ty)
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -329,8 +320,8 @@ export default class fidget{
           target_attr:'is_selected', 
           activate_when_target_is_selected: true }
 
-        bodies[j].constraints_args.push(connect_to_dupli_is_selected)
-        bodies[j].instances.push(bodies[i])
+        bodies[j].physics.relations.constraints_args.push(connect_to_dupli_is_selected)
+        bodies[j].relations.instances.push(bodies[i])
         
       }      
     }
@@ -386,23 +377,23 @@ export default class fidget{
   
           if(current_way == 1)
           {
-            if(selected_body != obj_next.body)
+            if(selected_body != obj_next.physics.body)
               this.Mouse.switch_selection( obj_next)
           }
           else
           {
-            if(selected_body != obj_last.body)
+            if(selected_body != obj_last.physics.body)
               this.Mouse.switch_selection(obj_last)     
           }
         }
         else if(this.force_way == 1)
         {
-          if(selected_body != obj_next.body)
+          if(selected_body != obj_next.physics.body)
             this.Mouse.switch_selection( obj_next )
         }
         else if(this.force_way == -1)
         {
-          if(selected_body != obj_last.body)
+          if(selected_body != obj_last.physics.body)
             this.Mouse.switch_selection(obj_last) 
         }
       }
@@ -410,85 +401,9 @@ export default class fidget{
     }
   }
 
-  /*
-  bodies_log_body_ids( body_type_filter = [] )
-  {
-    
-    for( let i =0; i < this.bodies.eval_order.length; i+=2)
-    {   
-      let b_type = this.bodies.eval_order[i+0]
-      let key = this.bodies.eval_order[i+1]
-      if( ( this.bodies.store[b_type][key] === null)||( this.bodies.store[b_type][key].length === 0))
-      {
-        if(this.debug_mode.show_warning_log)console.log('bodies_log_body_ids - this.bodies.'+b_type+'.'+key+' doesnt exists')
-        continue
-      }
-
-      if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-      {
-        if( this.bodies.store[b_type][key].constructor === Array)
-        {
-          for( let i = 0; i < this.bodies.store[b_type][key].length; i++)
-            console.log( this.fidget_sequence_i,b_type,key,i,this.bodies.store[b_type][key][i].body.id)
-        }
-        else
-        {
-          console.log( this.fidget_sequence_i,b_type,key,this.bodies.store[b_type][key].body.id)
-        }       
-      } 
-    }
-  }
-
-
-  bodies_update_matrix( m, body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.m = m  
-  }
-
-  bodies_update( body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.update()
-
-    for( let effect in this.effects)
-      if(this.effects[effect] != null)this.effects[effect].update()      
-  }
-
-  bodies_setup_shapes_three( body_type_filter = [] )
-  {
-    this.bodies.group_three = new THREE.Group();
-
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.setup_shapes_three(this.bodies.group_three)  
-
-    for( let effect in this.effects)
-      if(this.effects[effect] != null)this.effects[effect].setup(this.bodies.group_three)  
-
-    this.Mouse.setup(this.bodies.group_three)
-  }  
-
-  bodies_clean_physics(body_type_filter = [])
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.clean_physics() 
-    
-    Matter.Composite.clear(this.matter_engine.world, true);
-  }
-
-  bodies_clean_shapes_three(body_type_filter = [])
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.clean_shapes_three(this.bodies.group_three) 
-
-    for( let effect in this.effects)
-      if(this.effects[effect] != null)this.effects[effect].clean(this.bodies.group_three)        
-  }
-    */
-
   clean_physics()
   {
-    this.bodies.clean_physics()
+    this.bodies.physics.clean_physics()
     this.Mouse.clean()
 
     Matter.Events.off(this.matter_engine);  // Remove all events attached to the engine
@@ -498,12 +413,6 @@ export default class fidget{
 
   }
 
-  clean_shapes_three(three_scene)
-  {
-    this.bodies.clean_shapes_three()
-    three_scene.remove(this.bodies.group_three)
-    this.bodies.group_three = null
-  }
 
   clean_scene(scene)
   {
@@ -512,58 +421,7 @@ export default class fidget{
   }
   
 
-  animate_three()
-  {
-    this.bodies.animate_three()
-  }
-  /*
 
-  bodies_animate_three( body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.animate_three()
-    
-    for( let effect in this.effects)
-      if(this.effects[effect] != null)this.effects[effect].animate_three()    
-
-    this.Mouse.update()
-  }  
- 
-
-  bodies_override_color(new_color = null,body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.color = new_color || body.color_base
-  }
-  bodies_override_color_three(new_color = null,body_type_filter = [] )
-  {
-    this.bodies.override_color(new_color, body_type_filter)
-    this.bodies.color_update_three_shape(body_type_filter)
-  }
-
-  bodies_color_update_three_line( body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.update_color_three_line()
-  }
-
-
-  bodies_color_update_three_shape( body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.update_color_three_shape()
-  }
-    */
-
-  /*
-  bodies_constraints_enable(value,body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      for( let cns in body.constraints )
-        body.constraints[cns].enable(value) 
-
-  }
-  */
 
   constraints_enable(value, body_cns_list = [] )
   {
@@ -579,23 +437,30 @@ export default class fidget{
         if(this.debug_mode.show_warning_log)console.log('constraint enable - '+b_type+'.'+key+' doesnt exists')
         continue
       }      
+
       if( j === null)
       {
-        if( this.bodies.store[b_type][key]['constraints'][cns] == null )
+        const body = this.bodies.store[b_type][key]
+        const constraint = body.physics.relations.constraints[cns]
+        if(constraint == null )
         {
-          if(this.debug_mode.show_warning_log)console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'.constraints.'+cns+' doesnt exists')
+          if(this.debug_mode.show_warning_log)
+            console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'.constraints.'+cns+' doesnt exists')
           continue
         }        
-        this.bodies.store[b_type][key]['constraints'][cns].enable(value)
+        constraint.enable(value)
       }
       else 
       {
-        if( this.bodies.store[b_type][key][j]['constraints'][cns] == null )
+        const body = this.bodies.store[b_type][key][j]
+        const constraint = body.physics.relations.constraints[cns]        
+        if( constraint == null )
         {
-          if(this.debug_mode.show_warning_log)console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'['+j+'].constraints.'+cns+' doesnt exists')
+          if(this.debug_mode.show_warning_log)
+            console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'['+j+'].constraints.'+cns+' doesnt exists')
           continue
         }         
-        this.bodies.store[b_type][key][j]['constraints'][cns].enable(value)
+        constraint.enable(value)
       }
         
     }
@@ -664,8 +529,8 @@ export default class fidget{
     let name = geo_args.name.split('_')[1]
 
     // m_offset
-    let m_geo_body   = geo_body.get_init_matrix()
-    let m_inter_body = inter_body_parent.get_init_matrix()
+    let m_geo_body   = geo_body.physics.get_init_matrix()
+    let m_inter_body = inter_body_parent.physics.get_init_matrix()
 
     let inter_args = {
       ...geo_args,
@@ -673,7 +538,7 @@ export default class fidget{
       ...opts_visual_inter,
 
       name:'inters_'+name,
-      highlight_selection:[geo_body],  
+      highlight_bodies_when_selected:[geo_body],  
 
       parent: inter_body_parent,
       m_offset: m_geo_body.getMult( m_inter_body.getInverse() ),//get_matrix('base', 'world'),
@@ -690,125 +555,19 @@ export default class fidget{
     return new body_build(inter_args)
   }
 
-  /*
-  bodies_init_physics()
-  {   
-    for( let body of this.bodies.get_list_filtered( 'eval' ))
-      body.init_physics()   
   
-    for( let effect in this.effects)
-      if(this.effects[effect] != null)this.effects[effect].init_physics()     
-
+  clean_shapes_three(three_scene)
+  {
+    this.bodies.render.clean_shapes_three()
+    three_scene.remove(this.bodies.group_three)
+    this.bodies.group_three = null
   }
-
-  bodies_init_constraints()
-  {   
-    for( let body of this.bodies.get_list_filtered( 'build' ))
-    {
-      //console.log(body.name,body.build_order,body.constraints_args)
-      body.set_out_matrix(body.get_init_matrix())
-      body.init_constraints()
-    }
-
-    for( let effect in this.effects)
-      if(this.effects[effect] != null)this.effects[effect].init_constraints()     
   
-
+  animate_three()
+  {
+    this.bodies.render.animate_three()
   }
-
-  bodies_get_build_order()
-  {
-    let default_list = this.bodies.get_list_filtered('default')
-    let indexes = []
-    let indexes_sorted = []
-    for( let b of default_list )
-    {
-      let i = b.build_order
-      indexes.push(i)
-      indexes_sorted.push(i)
-    }
-    indexes_sorted.sort(function (a, b) {  return a - b;  })
-
-    let build_order = []
-    for(let i of indexes_sorted)
-      build_order.push( default_list[indexes.indexOf(i)] )
-
-    return build_order
-  }
-
-  
-
-  bodies_set_debug( value, body_type_filter = [] )
-  {
-
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.debug = value     
-  }
-
-  bodies_set_visibility_secondary( value,body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-    {
-      body.visibility_secondary = value 
-    }
-      
-      
-      
-  }  
-
-  bodies_set_visibility_override( value,body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.debug_force_visibility = value        
-  }  
-
-
-
-
-  bodies_set_visibility( value = null ,body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-    {
-      if( value == null )
-      {
-        body.visibility = body.visibility_default
-      }
-      else
-      {
-        body.visibility = value
-      }
-      if( body.mesh_three != null )
-        body.mesh_three.group.visible = body.get_visibility() == 1       
-    }
-  }  
-
-
-
-
-  bodies_set_dynamic( value = null ,body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-    {
-      if( value == null )
-      {
-        body.dynamic = body.dynamic_default
-      }
-      else
-      {
-        body.dynamic = value
-      }      
-    }
-  }  
-
-
-
-  bodies_init_out_matrix( body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.init_out_matrix()
-
-  }  
-  */
+ 
 
   enable(value)
   {
@@ -816,88 +575,14 @@ export default class fidget{
     this.bodies.enable(value)
     this.bodies.do_update( value)
     if( value == false )
-      this.bodies.set_visibility(false)
+      this.bodies.render.set_visibility(false)
     else
-      this.bodies.set_visibility()
+      this.bodies.render.set_visibility()
 
     if(value == true)
       this.update_step_count(-1)
   }
 
-  /*
-  bodies_do_update( value, body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.do_update = value
-  }
-
-  bodies_enable( value, body_type_filter = [] )
-  {
-
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      body.enable(value)
-
-  }
-
-  bodies_apply_material( material = null, body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      if( body.mesh_three.shape != null)
-        body.mesh_three.shape.material = material || body.three_material
-  }
-
-
-  bodies_apply_force_at_center( force, adjust_with_mass = false, body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-    {
-      let p_center = body.get_out_position('world')
-      if(adjust_with_mass)
-        body.apply_force( p_center, force.getMult(body.get_mass()) )
-      else
-        body.apply_force( p_center, force)
-    }
-  }
-
-
-
-  bodies_apply_exlode_force_from_point( explode_point, explode_power, default_dir, adjust_with_mass = false, body_type_filter = [] )
-  {
-    for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-    {
-      let p_center = body.get_out_position('world')
-      let v_dir = p_center.getSub(explode_point)
-      if(v_dir.mag() < 0.001)
-        v_dir = default_dir
-      v_dir.normalize()
-      v_dir.mult(explode_power)
-      if(adjust_with_mass)
-        v_dir.mult(body.get_mass())
-        
-      
-      body.apply_force( p_center, v_dir)
-    }
-  }
-
-
-
-  bodies_search_by_name( name, body_type_filter = [] )
-  {
-    let bodies_found = []
-
-    for( let body of this.bodies.get_list_filtered( 'build', body_type_filter ))
-    {
-      let body_name = body.name
-      if(body_name.indexOf(name) != -1 )
-        bodies_found.push(body)
-    }
-
-
-    return bodies_found
-
-  }
-
-  */
 
   explode_effect(opts)
   {
@@ -922,172 +607,36 @@ export default class fidget{
       c1[1]*(1-a)+c2[1]*a,
       c1[2]*(1-a)+c2[2]*a]
  
-    this.bodies.override_color(cInterp ['geos'])
-    this.bodies.override_color_three(cInterp, ['geos'])   
+    this.bodies.render.override_color(cInterp ['geos'])
+    this.bodies.render.override_color_three(cInterp, ['geos'])   
   }
 
   do_explode()
   {
     this.bodies.enable(false,['effects'])
-    this.bodies.constraints_enable(false, ['geos'])
+    this.bodies.physics.constraints_enable(false, ['geos'])
     
     // custom color
-    this.bodies.override_color(null, ['geos'])
-    this.bodies.override_color_three(null, ['geos'])
+    this.bodies.render.override_color(null, ['geos'])
+    this.bodies.render.override_color_three(null, ['geos'])
     
-    this.bodies.apply_force_at_center(new Vector(0,0.003),true,['geos'])
+    this.bodies.physics.apply_force_at_center(new Vector(0,0.003),true,['geos'])
                                  
     if( this.explode_happened == false )
     {
-      this.bodies.apply_exlode_force_from_point(new Vector(this.screen_dims.x/2,this.screen_dims.y/2),0.09,new Vector(0,-1),true,['geos'])
+      this.bodies.physics.apply_exlode_force_from_point(new Vector(this.screen_dims.x/2,this.screen_dims.y/2),0.09,new Vector(0,-1),true,['geos'])
       this.explode_happened = true
     }
   }  
 
   
-  /*
-  bodies_get_list_filtered( order = 'eval', body_type_filter = [] )//eval // draw
-  {
-
-    let bodies_list = []
-
-    if( order == 'eval' )
-    {
-      for( let i =0; i < this.bodies.eval_order.length; i+=2)
-      {   
-        let b_type = this.bodies.eval_order[i+0]
-        let key = this.bodies.eval_order[i+1]
-        if( ( this.bodies.store[b_type][key] === null)||( this.bodies.store[b_type][key].length === 0))
-        {
-          if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-          continue
-        }
-        
-        if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-        {
-      
-
-            let bodies = this.bodies.store[b_type][key]
-            if( bodies.constructor === Array)
-            {
-              let bodies_ordered = bodies
-              if( (bodies[0].constructor !== Array )&&(bodies[0].instances.length != 0))
-                bodies_ordered = put_selected_instance_first(bodies_ordered)
-
-
-              for( let i = 0; i < bodies_ordered.length; i++)
-              {
-                if( bodies_ordered[i].constructor === Array)
-                {
-                  let bodies_ordered_B = bodies_ordered[i]
-                  if( (bodies_ordered[i][0].constructor !== Array )&&( bodies_ordered[i][0].instances.length != 0 ))
-                    bodies_ordered_B = put_selected_instance_first(bodies_ordered_B)
-
-
-                  for( let j = 0; j < bodies_ordered_B.length; j++)
-                    bodies_list.push(bodies_ordered_B[j])
-                }
-                else{
-                  bodies_list.push(bodies_ordered[i])
-                }
-              }
-
-
-
-            }
-            else
-            {
-              bodies_list.push(bodies)       
-            }
-          
-        }
-
-  
-      } 
-
-    }
-   
-
-    if( order == 'draw' )
-    {
-      bodies_list = this.bodies.draw_order
-    }    
-
-    if( order == 'build' )
-    {
-      bodies_list = this.bodies.get_build_order()
-    }  
-
-    if( order == 'default' )
-    {
-      for( let b_type in this.bodies)
-      {   
-        for( let key in this.bodies.store[b_type])
-        {   
-          if( ( this.bodies.store[b_type][key] === null)||( this.bodies.store[b_type][key].length === 0))
-          {
-            if( this.debug_mode.show_warning_log )console.log('bodies_enable - this.bodies.'+b_type+'.'+key+' doesnt exists')
-            continue
-          }
-          
-          if( (body_type_filter.length === 0)||( body_type_filter.includes(b_type) ) )
-            for( let elem of flatten_list(this.bodies.store[b_type][key]) )
-              bodies_list.push(elem) 
-    
-        } 
-      } 
-    }
-
-    // //remove none
-    // let bodies_list_clean = []
-    // for( let elem of bodies_list)
-    //   if(elem != null)
-    //     bodies_list_clean.push(elem)
-  
-    return bodies_list
-
-  }
-
-
-  bodies_get_list_attr_value_filtered( attr, value , body_type_filter = [] , inverse = false)
-  {
-    for( let body of this.bodies.get_list_filtered( 'build', body_type_filter ))
-    {
-      if((inverse == true)&&( body[attr] != value))
-      {   
-        body_list.push(body)       
-      }
-      if((inverse == false)&&( body[attr] == value))
-      {   
-        body_list.push(body)       
-      }
-    }
-
-    return body_list
-
-  }
-
-
-  bodies_list_enable( value, bodies_list = [] )
-  {
-    for( let i = 0; i < bodies_list.length; i++ )
-    {
-      if(bodies_list[i] == null)
-      {
-        if(this.debug_mode.show_warning_log)console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
-        continue
-      }
-      bodies_list[i].enable(value) 
-    }
-  }
-  */
 
   get_selected_body(body_type_filter = [] )
   {
     let selected_body = null
     for( let body of this.bodies.get_list_filtered( 'build', body_type_filter ))
     {
-      if(body.is_selected)
+      if(body.physics.state.is_selected)
       {
         selected_body = body
         break
@@ -1112,30 +661,30 @@ export default class fidget{
     
     for( let body of this.bodies.get_list_filtered( 'build', body_type_filter ))
     {
-      body.is_touch = false
+      body.physics.state.is_touch = false
 
-      if(( this.Mouse.matter_constraint != null )&&( body.body == this.Mouse.matter_constraint.constraint.bodyB ))
+      if(( this.Mouse.matter_constraint != null )&&( body.physics.body == this.Mouse.matter_constraint.constraint.bodyB ))
       {
-        body.color = utils.color.redLight
-        body.is_selected = true
+        body.render.color = utils.color.redLight
+        body.set_is_selected( true )
         if(user_interaction_info.userIsInteracting)
         {
-          body.is_touch = true
+          body.physics.state.is_touch = true
         }
           
   
 
-        for( let j = 0; j < body.highlight_selection.length; j++)
-          body_to_highlight.push(body.highlight_selection[j])  
+        for( let j = 0; j < body.relations.highlight_bodies_when_selected.length; j++)
+          body_to_highlight.push( body.relations.highlight_bodies_when_selected[j] )  
 
       }
       else
       {
-        body.color = body.color_base 
-        body.is_selected = false
+        body.render.color = body.render.color_base 
+        body.set_is_selected( false )
 
-        for( let j = 0; j < body.highlight_selection.length; j++)
-          body_to_reduce.push(body.highlight_selection[j])  
+        for( let j = 0; j < body.relations.highlight_bodies_when_selected.length; j++)
+          body_to_reduce.push(body.relations.highlight_bodies_when_selected[j])  
 
       }    
       
@@ -1144,18 +693,18 @@ export default class fidget{
 
     for( let i = 0 ; i < body_to_reduce.length; i++)
     {
-      body_to_reduce[i].color_line = [0,0,0]
-      body_to_reduce[i].update_color_three_line()
+      body_to_reduce[i].render.color_line = [0,0,0]
+      body_to_reduce[i].render.update_color_three_line()
       if(this.do_bloom_selected)
-        body_to_reduce[i].bloom = body_to_reduce[i].bloom_default
+        body_to_reduce[i].render.bloom = body_to_reduce[i].render.bloom_default
     }
 
     for( let i = 0 ; i < body_to_highlight.length; i++)
     {
-      body_to_highlight[i].color_line = [255,255,255]
-      body_to_highlight[i].update_color_three_line()
+      body_to_highlight[i].render.color_line = [255,255,255]
+      body_to_highlight[i].render.update_color_three_line()
       if(this.do_bloom_selected)
-        body_to_highlight[i].bloom = true
+        body_to_highlight[i].render.bloom = true
     }
 
 
@@ -1171,26 +720,26 @@ export default class fidget{
     let color_lines = []
     for( let i = 0 ; i < bodies.length; i++)
     {
-      color_lines.push(bodies[i].color_line )
-      bodies[i].color_line = [0,0,0]
-      bodies[i].update_color_three_line()
+      color_lines.push(bodies[i].render.color_line )
+      bodies[i].render.color_line = [0,0,0]
+      bodies[i].render.update_color_three_line()
     }
-    this.bodies.apply_material( this.darkMaterial,  ['geos','effects'] )
-    for( let b of this.bodies.get_list_attr_value_filtered( 'bloom', true, ['geos','effects'] ) )
-      b.reset_material()
+    this.bodies.render.apply_material( this.darkMaterial,  ['geos','effects'] )
+    for( let body of this.bodies.get_list_attr_value_filtered( 'bloom', true, ['geos','effects'] ) )
+      body.render.reset_material()
 
       return {color_lines:color_lines}
   }
 
   clean_bloom_pass( save_state )
   {
-    this.bodies.apply_material( null,['geos','effects'] )
+    this.bodies.render.apply_material( null,['geos','effects'] )
 
     let bodies = this.bodies.get_list_filtered( ['geos','effects'] )
     for( let i = 0 ; i < bodies.length; i++)
     {
-      bodies[i].color_line = save_state.color_lines[i]
-      bodies[i].update_color_three_line()
+      bodies[i].render.color_line = save_state.color_lines[i]
+      bodies[i].render.update_color_three_line()
     }    
   }
 
@@ -1232,7 +781,7 @@ export default class fidget{
           this.bodies.enable( 0 )  
           this.bodies.list_enable( 1,this.steps_info[step].bodies_enable )
   
-          this.bodies.constraints_enable( true ) 
+          this.bodies.physics.constraints_enable( true ) 
           this.constraints_enable(false, this.steps_info[step].constraints_disable )
   
           this.set_resolution_coef_from_step(step)   
@@ -1316,10 +865,35 @@ export default class fidget{
   {
     for( let i = 0; i < this.bodies.store.inters_step.steps.length; i++)
     {
-      if( this.bodies.store.inters_step.steps[i].is_selected)
+      if( this.bodies.store.inters_step.steps[i].physics.state.is_selected)
         return i
     }    
     return null
+  }
+
+  draw_order_to_body_z(z_depth_start,z_depth_incr = 0.5)
+  {
+    let z_depth = z_depth_start
+    for (let i = 0; i < this.bodies.draw_order.length; i++)
+    {
+      if (this.bodies.draw_order[i] == null)
+      {
+        if (this.debug_mode.show_warning_log)
+          console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
+        continue
+      }
+      
+      if( this.bodies.draw_order[i].type == 'body')
+        this.bodies.draw_order[i].render.z = z_depth
+      else
+        this.bodies.draw_order[i].z = z_depth
+
+      z_depth += z_depth_incr
+    }
+    
+    this.z_depth_end = z_depth    
+
+    return this.z_depth_end
   }
 
 

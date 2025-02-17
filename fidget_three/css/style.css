@@ -23,7 +23,7 @@ canvas {
 
 #debug_info {
 	position: absolute;
-	top: 200px;
+	top: 100px;
 	width: 100%;
 	text-align: left;
 	z-index: 2;

@@ -87,10 +87,10 @@ export default class fidget_simple_slide extends fidget{
       }
   
       let opts_debug = {
-        debug_matrix_info: false,
-        debug_matrix_axes: this.debug_mode.matrix_axes,
-        debug_cns_axes: this.debug_mode.cns_axes,
-        debug_force_visibility: this.debug_mode.force_visibility
+        matrix_info: false,
+        matrix_axes: this.debug_mode.matrix_axes,
+        cns_axes: this.debug_mode.cns_axes,
+        force_visibility: this.debug_mode.force_visibility
       }
   
       let opts_cns_disable_at_select = {
@@ -118,13 +118,13 @@ export default class fidget_simple_slide extends fidget{
         ...opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
-        visibility: true,
+        visibility: false,
         do_shape: false,
         do_line: true,
         color: utils.color.blue,
         color_line: utils.color.blue,
         type: utils.shape.circle,
-        debug_matrix_axes: true,
+        matrix_axes: true,
         m_shape: new Matrix().setScale(visual_bones_main_size),
         density: bones_density_value,      
       }
@@ -133,13 +133,13 @@ export default class fidget_simple_slide extends fidget{
         ...opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
-        visibility: true,
+        visibility: false,
         do_shape: true,
         do_line: true,
         color: utils.color.blue,
         color_line: utils.color.black,
         type: utils.shape.circle,
-        debug_matrix_axes: true,
+        matrix_axes: true,
         dynamic: false,      
         density: bones_density_value,      
         m_shape: new Matrix().setScale(4*this.s), 
@@ -149,7 +149,7 @@ export default class fidget_simple_slide extends fidget{
         ...opts_global,
         ...opts_collision_mouse_interaction,
         ...opts_debug,         
-        visibility: true,
+        visibility: false,
         do_shape: true,
         do_line: true,
         color: utils.color.grey,
@@ -310,6 +310,7 @@ export default class fidget_simple_slide extends fidget{
           m_shape: new Matrix().setScale(30*this.s+inter_size,7*this.s+inter_size),
           type: utils.shape.rectangle,
           constraints: [
+            
             { name: 'point', type: 'dyn_point', target: this.bodies.store.inters.background, ...opts_cns_disable_at_select},
             { name: 'orient', type: 'kin_orient', target: this.bodies.store.inters.background},
             
@@ -323,12 +324,14 @@ export default class fidget_simple_slide extends fidget{
               transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
             }
             
+            
           ],
 
         })
       ])
-      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
-      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
+      
+      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.physics.relations.constraints.axe.update_and_get_current_pos(), 0, 1)}
+      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.physics.relations.constraints.axe.current_pos = res}
       
 
 
@@ -362,6 +365,8 @@ export default class fidget_simple_slide extends fidget{
               transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
             }
           ],
+          
+          
 
         })
       )
@@ -390,8 +395,7 @@ export default class fidget_simple_slide extends fidget{
       name: 'bones_rectangle_pivot_T__S_',
       parent: this.bodies.store.bones.rectangles_center,
       constraint_to_parent: true,
-      constraints: [
-      ],
+      constraints: [],
     }
     
     if (this.is_dynamic) {
@@ -417,6 +421,7 @@ export default class fidget_simple_slide extends fidget{
       })
 
     }
+      
     
 
     this.bodies.store.bones.rectangles_pivots.push(new body_build(rectangle_pivot_opts))
@@ -426,7 +431,7 @@ export default class fidget_simple_slide extends fidget{
         ...opts_visual_bones,
         name: 'bones_rectangle_T__S_',
         parent: this.bodies.store.bones.rectangles_pivots[0],
-        constraint_to_parent: true,
+        constraint_to_parent: false,
         m_offset: new Matrix().setTranslation(-30*this.s,0*this.s),
         constraints: [
           {
@@ -438,7 +443,7 @@ export default class fidget_simple_slide extends fidget{
             target_space: 'base',
             target_remap: [0, 200, 0, 200]
           },
-        ]
+        ] 
       })
     )
 
@@ -454,8 +459,9 @@ export default class fidget_simple_slide extends fidget{
     this.bodies.store.geos.rectangles.push(new body_build(opts_rectangles))
 
     if (this.is_dynamic) {
-      this.bodies.store.inters_step.steps[0][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[0][0].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[0]]
     }
+    
 
 
     this.bodies.draw_order = [
@@ -496,20 +502,11 @@ export default class fidget_simple_slide extends fidget{
       this.bodies.store.bones.rectangles_pivots[3],
       this.bodies.store.bones.rectangles[0],
     ]
-    let z_depth = args.z_depth_start
-    let z_depth_incr = 0.5 //0.1
-    for (let i = 0; i < this.bodies.draw_order.length; i++)
-    {
-      if (this.bodies.draw_order[i] == null)
-      {
-        if (this.debug_mode.show_warning_log)
-          console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
-        continue
-      }
-      this.bodies.draw_order[i].z = z_depth
-      z_depth += z_depth_incr
-    }
-    this.z_depth_end = z_depth
+
+    
+
+
+    this.z_depth_end = this.draw_order_to_body_z( args.z_depth_start,0.5)
 
     this.Mouse.z = this.z_depth_end
 
@@ -691,8 +688,8 @@ export default class fidget_simple_slide extends fidget{
       }
     ]
 
-    this.bodies.init_physics()
-    this.bodies.init_constraints()
+    this.bodies.physics.init_physics()
+    this.bodies.physics.init_constraints()
 
     
 

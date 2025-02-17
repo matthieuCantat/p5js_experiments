@@ -116,7 +116,7 @@ export default class fidget_daft_i extends fidget {
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,      
-      visibility: true,
+      visibility: false,
       do_shape: false,
       do_line: true,
       color: utils.color.blue,
@@ -131,7 +131,7 @@ export default class fidget_daft_i extends fidget {
       ...opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,      
-      visibility: true,
+      visibility: false,
       do_shape: true,
       do_line: true,
       color: utils.color.blue,
@@ -147,7 +147,7 @@ export default class fidget_daft_i extends fidget {
       ...opts_global,
       ...opts_collision_mouse_interaction,
       ...opts_debug,         
-      visibility: true,
+      visibility: false,
       do_shape: true,
       do_line: true,
       color: utils.color.grey,
@@ -323,8 +323,10 @@ export default class fidget_daft_i extends fidget {
 
         })
       ])
-      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
-      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){
+        return clamp(this.physics.relations.constraints.axe.update_and_get_current_pos(), 0, 1)
+      }
+      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.physics.relations.constraints.axe.current_pos = res}
 
       this.bodies.store.inters_step.steps.push(
         new body_build({
@@ -361,11 +363,11 @@ export default class fidget_daft_i extends fidget {
       )
       
 
-      this.bodies.store.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.get_out_rotation('base')) / 90.0, 0, 1)}
-      this.bodies.store.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.set_out_rotation(rad(res * 90.5), 'world', 'override')}
+      this.bodies.store.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.physics.get_out_rotation('base')) / 90.0, 0, 1)}
+      this.bodies.store.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.physics.set_out_rotation(rad(res * 90.5), 'world', 'override')}
 
       if (this.debug_mode.inter_step_physics == false)
-        this.bodies.store.inters_step.steps[1].constraints_args.push({name: 'point_no_dyn', type: 'kin_point', target: this.is_dynamic ? this.bodies.store.inters.background : this.bodies.store.bones.traj})
+        this.bodies.store.inters_step.steps[1].physics.relations.constraints_args.push({name: 'point_no_dyn', type: 'kin_point', target: this.is_dynamic ? this.bodies.store.inters.background : this.bodies.store.bones.traj})
 
 
       this.bodies.store.inters_step.steps.push(
@@ -395,8 +397,8 @@ export default class fidget_daft_i extends fidget {
 
         })
       )
-      this.bodies.store.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
-      this.bodies.store.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.physics.relations.constraints.axe.current_pos, 0, 1)}
+      this.bodies.store.inters_step.steps[2].set_resolution_coef = function (res = null) {this.physics.relations.constraints.axe.current_pos = res}
     }
 
     
@@ -562,10 +564,10 @@ export default class fidget_daft_i extends fidget {
     this.bodies.store.geos.rectangles.push(  this.bodies.store.geos.rectangles[0].get_mirror(axe_x, axe_y))
 
     if (this.is_dynamic) {
-      this.bodies.store.inters_step.steps[0][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
-      this.bodies.store.inters_step.steps[0][1].highlight_selection = [  this.bodies.store.geos.rectangles[1]]
-      this.bodies.store.inters_step.steps[0][2].highlight_selection = [  this.bodies.store.geos.rectangles[2]]
-      this.bodies.store.inters_step.steps[0][3].highlight_selection = [  this.bodies.store.geos.rectangles[3]]
+      this.bodies.store.inters_step.steps[0][0].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[0][1].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[1]]
+      this.bodies.store.inters_step.steps[0][2].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[2]]
+      this.bodies.store.inters_step.steps[0][3].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[3]]
     }
     
     this.bodies.store.bones.rectangle = new body_build({
@@ -614,8 +616,8 @@ export default class fidget_daft_i extends fidget {
     if (this.is_dynamic)
     {
 
-      this.bodies.store.inters_step.steps[1].highlight_selection = [  this.bodies.store.geos.rectangle]
-      this.bodies.store.inters_step.steps[2].highlight_selection = [  this.bodies.store.geos.rectangle]
+      this.bodies.store.inters_step.steps[1].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangle]
+      this.bodies.store.inters_step.steps[2].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangle]
 
     this.effects.trailB = new effect({
         ...oRectangle,
@@ -731,20 +733,11 @@ export default class fidget_daft_i extends fidget {
       this.bodies.store.bones.rectangles[2],
       this.bodies.store.bones.rectangles[3]
     ]
-    let z_depth = args.z_depth_start
-    let z_depth_incr = 0.5 //0.1
-    for (let i = 0; i < this.bodies.draw_order.length; i++)
-    {
-      if (this.bodies.draw_order[i] == null)
-      {
-        if (this.debug_mode.show_warning_log)
-          console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
-        continue
-      }
-      this.bodies.draw_order[i].z = z_depth
-      z_depth += z_depth_incr
-    }
-    this.z_depth_end = z_depth
+    
+
+    this.z_depth_end = this.draw_order_to_body_z( args.z_depth_start,0.5)
+
+    this.Mouse.z = this.z_depth_end
 
     this.Mouse.z = this.z_depth_end
 
@@ -910,45 +903,45 @@ export default class fidget_daft_i extends fidget {
       }
     ]
 
-    this.bodies.init_physics()
-    this.bodies.init_constraints()
+    this.bodies.physics.init_physics()
+    this.bodies.physics.init_constraints()
 
     
   }
 
   animation_idle() {
     
-    this.bodies.set_dynamic(false)
-    this.bodies.constraints_enable(false, ['bones'])
+    this.bodies.physics.set_dynamic(false)
+    this.bodies.physics.constraints_enable(false, ['bones'])
 
     let t = this.state.update_count
-    this.bodies.store.bones.traj.set_out_position(
+    this.bodies.store.bones.traj.physics.set_out_position(
       new Vector(Math.sin(t * 0.01) * 10, Math.sin(t * 0.05) * 10),
       'base',
       'override'
     )
-    this.bodies.store.bones.traj.set_out_rotation(
+    this.bodies.store.bones.traj.physics.set_out_rotation(
       Math.sin(t * 0.03) * 0.1,
       'base',
       'override'
     )
 
-    this.bodies.store.bones.rectangles_pivots[0].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[0].physics.set_out_rotation(
       Math.sin(t * 0.04) * rad(-10),
       'base',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[1].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[1].physics.set_out_rotation(
       Math.sin(t * 0.04) * rad(10),
       'base',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[2].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[2].physics.set_out_rotation(
       Math.sin(t * 0.04) * rad(-10),
       'base',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[3].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[3].physics.set_out_rotation(
       Math.sin(t * 0.04) * rad(10),
       'base',
       'override'
@@ -961,8 +954,8 @@ export default class fidget_daft_i extends fidget {
     let anim_duration = 100
 
     if (start_time + anim_duration == t) {
-      this.bodies.set_dynamic()
-      this.bodies.constraints_enable(true, ['bones'])
+      this.bodies.physics.set_dynamic()
+      this.bodies.physics.constraints_enable(true, ['bones'])
       this.constraints_enable(false, this.steps_info[0].constraints_disable)
       return false
     }
@@ -970,8 +963,8 @@ export default class fidget_daft_i extends fidget {
       return false
     }
 
-    this.bodies.set_dynamic(false)
-    this.bodies.constraints_enable(false, ['bones'])
+    this.bodies.physics.set_dynamic(false)
+    this.bodies.physics.constraints_enable(false, ['bones'])
 
     let times = [start_time + 0, start_time + 20]
     let positions = [new Vector(0, 500), new Vector(0, 0)]
@@ -979,7 +972,7 @@ export default class fidget_daft_i extends fidget {
     let scales = []
     let interp_modes = ['linear']
 
-    this.bodies.store.bones.traj.set_out_position(
+    this.bodies.store.bones.traj.physics.set_out_position(
       anim_vectors(t, times, positions, interp_modes),
       'base',
       'override'
@@ -991,12 +984,12 @@ export default class fidget_daft_i extends fidget {
     scales = []
     interp_modes = ['linear', 'smooth']
 
-    this.bodies.store.bones.rectangle.set_out_position(
+    this.bodies.store.bones.rectangle.physics.set_out_position(
       anim_vectors(t, times, positions, interp_modes),
       'base',
       'override'
     )
-    this.bodies.store.bones.rectangle.set_out_rotation(
+    this.bodies.store.bones.rectangle.physics.set_out_rotation(
       anim_values(t, times, rotations, interp_modes),
       'base',
       'override'
@@ -1007,7 +1000,7 @@ export default class fidget_daft_i extends fidget {
     scales = [0.45, 2, 1]
     interp_modes = ['linear', 'smooth']
 
-    this.bodies.store.bones.circle.set_out_scale(
+    this.bodies.store.bones.circle.physics.set_out_scale(
       anim_values(t, times, scales, interp_modes),
       'base',
       'override'
@@ -1018,12 +1011,12 @@ export default class fidget_daft_i extends fidget {
 
     rotations = [rad(35), rad(35), rad(0)]
     positions = [new Vector(-75, 0), new Vector(65, 0), new Vector(65, 0)]
-    this.bodies.store.bones.rectangles_pivots[0].set_out_position(
+    this.bodies.store.bones.rectangles_pivots[0].physics.set_out_position(
       anim_vectors(t, times, positions, interp_modes),
       'parent',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[0].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[0].physics.set_out_rotation(
       anim_values(t, times, rotations, interp_modes),
       'base',
       'override'
@@ -1031,12 +1024,12 @@ export default class fidget_daft_i extends fidget {
 
     rotations = [rad(35), rad(35), rad(0)]
     positions = [new Vector(75, 0), new Vector(-65, 0), new Vector(-65, 0)]
-    this.bodies.store.bones.rectangles_pivots[2].set_out_position(
+    this.bodies.store.bones.rectangles_pivots[2].physics.set_out_position(
       anim_vectors(t, times, positions, interp_modes),
       'parent',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[2].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[2].physics.set_out_rotation(
       anim_values(t, times, rotations, interp_modes),
       'base',
       'override'
@@ -1044,12 +1037,12 @@ export default class fidget_daft_i extends fidget {
 
     rotations = [rad(-35), rad(-35), rad(0)]
     positions = [new Vector(-75, 0), new Vector(65, 0), new Vector(65, 0)]
-    this.bodies.store.bones.rectangles_pivots[1].set_out_position(
+    this.bodies.store.bones.rectangles_pivots[1].physics.set_out_position(
       anim_vectors(t, times, positions, interp_modes),
       'parent',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[1].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[1].physics.set_out_rotation(
       anim_values(t, times, rotations, interp_modes),
       'base',
       'override'
@@ -1057,12 +1050,12 @@ export default class fidget_daft_i extends fidget {
 
     rotations = [rad(-35), rad(-35), rad(0)]
     positions = [new Vector(75, 0), new Vector(-65, 0), new Vector(-65, 0)]
-    this.bodies.store.bones.rectangles_pivots[3].set_out_position(
+    this.bodies.store.bones.rectangles_pivots[3].physics.set_out_position(
       anim_vectors(t, times, positions, interp_modes),
       'parent',
       'override'
     )
-    this.bodies.store.bones.rectangles_pivots[3].set_out_rotation(
+    this.bodies.store.bones.rectangles_pivots[3].physics.set_out_rotation(
       anim_values(t, times, rotations, interp_modes),
       'base',
       'override'

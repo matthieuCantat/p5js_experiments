@@ -118,7 +118,7 @@ export default class fidget_windmill extends fidget{
         ...opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
-        visibility: true,
+        visibility: false,
         do_shape: false,
         do_line: true,
         color: utils.color.blue,
@@ -133,7 +133,7 @@ export default class fidget_windmill extends fidget{
         ...opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
-        visibility: true,
+        visibility: false,
         do_shape: true,
         do_line: true,
         color: utils.color.blue,
@@ -149,7 +149,7 @@ export default class fidget_windmill extends fidget{
         ...opts_global,
         ...opts_collision_mouse_interaction,
         ...opts_debug,         
-        visibility: true,
+        visibility: false,
         do_shape: true,
         do_line: true,
         color: utils.color.grey,
@@ -327,8 +327,10 @@ export default class fidget_windmill extends fidget{
 
         })
       ])
-      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){return clamp(this.constraints.axe.update_and_get_current_pos(), 0, 1)}
-      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[0][0].get_resolution_coef = function(){
+        return clamp(this.physics.relations.constraints.axe.update_and_get_current_pos(), 0, 1)
+      }
+      this.bodies.store.inters_step.steps[0][0].set_resolution_coef = function(res = null){this.physics.relations.constraints.axe.current_pos = res}
       
 
 
@@ -401,7 +403,7 @@ export default class fidget_windmill extends fidget{
         let min_value = 0
         let middle_value = 315.0
 
-        let angle = deg(this.body_coef_ref.get_out_rotation('base',true))
+        let angle = deg(this.body_coef_ref.physics.get_out_rotation('base',true))
         if( middle_value < angle )
           angle = 0
         
@@ -438,8 +440,8 @@ export default class fidget_windmill extends fidget{
 
         })
       )
-      this.bodies.store.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.constraints.axe.current_pos, 0, 1)}
-      this.bodies.store.inters_step.steps[2].set_resolution_coef = function (res = null) {this.constraints.axe.current_pos = res}
+      this.bodies.store.inters_step.steps[2].get_resolution_coef = function () {return clamp(this.physics.relations.constraints.axe.current_pos, 0, 1)}
+      this.bodies.store.inters_step.steps[2].set_resolution_coef = function (res = null) {this.physics.relations.constraints.axe.current_pos = res}
       
     }
 
@@ -681,17 +683,17 @@ export default class fidget_windmill extends fidget{
 
     
     if (this.is_dynamic) {
-      this.bodies.store.inters_step.steps[0][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
-      this.bodies.store.inters_step.steps[0][1].highlight_selection = [  this.bodies.store.geos.rectangles[1]]
-      this.bodies.store.inters_step.steps[0][2].highlight_selection = [  this.bodies.store.geos.rectangles[2]]
-      this.bodies.store.inters_step.steps[0][3].highlight_selection = [  this.bodies.store.geos.rectangles[3]]
+      this.bodies.store.inters_step.steps[0][0].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[0][1].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[1]]
+      this.bodies.store.inters_step.steps[0][2].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[2]]
+      this.bodies.store.inters_step.steps[0][3].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[3]]
 
-      this.bodies.store.inters_step.steps[1][0].highlight_selection = [  this.bodies.store.geos.rectangles[0]]
-      this.bodies.store.inters_step.steps[1][1].highlight_selection = [  this.bodies.store.geos.rectangles[1]]
-      this.bodies.store.inters_step.steps[1][2].highlight_selection = [  this.bodies.store.geos.rectangles[2]]
-      //this.bodies.store.inters_step.steps[1][3].highlight_selection = [  this.bodies.store.geos.rectangles[3]]
+      this.bodies.store.inters_step.steps[1][0].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[0]]
+      this.bodies.store.inters_step.steps[1][1].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[1]]
+      this.bodies.store.inters_step.steps[1][2].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[2]]
+      //this.bodies.store.inters_step.steps[1][3].relations.highlight_bodies_when_selected = [  this.bodies.store.geos.rectangles[3]]
 
-      this.bodies.store.inters_step.steps[2].highlight_selection = [  
+      this.bodies.store.inters_step.steps[2].relations.highlight_bodies_when_selected = [  
                                                               this.bodies.store.geos.rectangles[0],
                                                               this.bodies.store.geos.rectangles[1],
                                                               this.bodies.store.geos.rectangles[2],
@@ -1192,20 +1194,12 @@ export default class fidget_windmill extends fidget{
       this.bodies.store.bones.rectangles[2],
       this.bodies.store.bones.rectangles[3]
     ]
-    let z_depth = args.z_depth_start
-    let z_depth_incr = 0.5 //0.1
-    for (let i = 0; i < this.bodies.draw_order.length; i++)
-    {
-      if (this.bodies.draw_order[i] == null)
-      {
-        if (this.debug_mode.show_warning_log)
-          console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
-        continue
-      }
-      this.bodies.draw_order[i].z = z_depth
-      z_depth += z_depth_incr
-    }
-    this.z_depth_end = z_depth
+    
+    
+
+    this.z_depth_end = this.draw_order_to_body_z( args.z_depth_start,0.5)
+
+    this.Mouse.z = this.z_depth_end
 
     this.Mouse.z = this.z_depth_end
 
@@ -1392,8 +1386,8 @@ export default class fidget_windmill extends fidget{
       }
     ]
 
-    this.bodies.init_physics()
-    this.bodies.init_constraints()
+    this.bodies.physics.init_physics()
+    this.bodies.physics.init_constraints()
 
     
 
@@ -1439,489 +1433,5 @@ export default class fidget_windmill extends fidget{
 
 
 
-
-
-/*
-
-  get_resolution_coef_info()
-  {
-    
-
-    let A = clamp(this.bodies.store.inters.A.c_axe.current_pos     ,0,1)
-    let B = clamp(deg(this.bodies.store.inters.B.body.angle)/270   ,0,1)
-    let C = clamp(1 - this.bodies.store.inters.C.c_axe.current_pos ,0,1) 
-    let D = 0
-    if ( this.anim_mode )
-    {
-      let s = [0,1,2,3]   
-      A = clamp(this.resolution_coef_override ,s[0],s[0]+1)
-      B = clamp(this.resolution_coef_override ,s[1],s[1]+1)-s[1]
-      C = clamp(this.resolution_coef_override ,s[2],s[2]+1)-s[2]
-      D = clamp(this.resolution_coef_override ,s[3],s[3]+1)-s[3]
-    }
-    
-    let coef = A + B + C + D
-
-    // fill resolution coef info
-    this.state.resolution_coef = coef
-    this.state.steps[0].resoluton_coef = A
-    this.state.steps[1].resoluton_coef = B
-    this.state.steps[2].resoluton_coef = C
-    this.state.steps[3].resoluton_coef = D
-
-    this.state.current_step = 0
-    if(A==1)
-      this.state.current_step = 1
-    if(B==1)
-      this.state.current_step = 2   
-    if(C==1)
-      this.state.current_step = 3      
-    if((D==1)&&(!this.anim_mode))
-      this.state.current_step = 4        
-  }
-
-  set_phase_resolution_control_0( res_coef )
-  {
-      for( let i = 0; i < this.bodies.store.geos.rectangles.length; i++ )
-      this.bodies.store.geos.rectangles[i].c_axe.pos_override = res_coef
-
-    for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++ )
-      this.bodies.store.geos.trapezoids[i].c_axe.pos_override = res_coef
-
-    if(  this.anim_mode )   
-    {
-      this.bodies.store.inters.A.c_axe.pos_override = res_coef
-    }
-  }
-
-  set_phase_resolution_control_2( res_coef)
-  {  
-      for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++ )
-        this.bodies.store.geos.trapezoids[i].c_axe.pos_override = res_coef*-2+1
-
-      let max_angle = 270
-      if( max_angle-1    < res_coef*max_angle )
-        this.bodies.store.geos.rectangles[0].enable(0)
-      else                          
-        this.bodies.store.geos.rectangles[0].enable(1)
-      if( max_angle/3-1  < res_coef*max_angle )
-        this.bodies.store.geos.rectangles[1].enable(0)
-      else                          
-        this.bodies.store.geos.rectangles[1].enable(1)
-      if( max_angle/3*2-1 < res_coef*max_angle )
-        this.bodies.store.geos.rectangles[2].enable(0)
-      else                          
-        this.bodies.store.geos.rectangles[2].enable(1)
-  
-      if(  this.anim_mode )   
-      {
-        this.bodies.store.inters.B.rot_override = rad(res_coef*270)
-      }
-  }
-
-  set_phase_resolution_control_4( res_coef)
-  {  
-    this.bodies.store.geos.rectangles[3].c_axe.pos_override = 1 - res_coef
-
-        
-    let rot_coef = 1.15
-    var rot_tmp = (res_coef*rot_coef) 
-
-    for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
-    {
-      let current_r = this.bodies.store.geos.trapezoids[i].rot
-      let r = current_r+ rad(270)+rot_tmp*rad(45);
-      this.bodies.store.geos.trapezoids[i].rot_override = r
-
-      
-      this.bodies.store.geos.trapezoids[i].c_axe.pos_override = -1      
-    }
-
-    if( this.anim_mode )   
-    {
-      this.bodies.store.inters.C.c_axe.pos_override = 1-res_coef
-    }    
-  } 
-
-
-
-  set_step_resolution()
-  {
-    // utils
-    var selected_body = this.mouse_constraint.constraint.bodyB
-    
-    // clean
-    this.bodies.axe_enable( ['inters'])
-    this.bodies.axe_clean_override()
-    //this.bodies.cns_modif(1.0)
-    this.bodies.rot_clean_override()
-    this.bodies.enable( 0,  ['inters'] )
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    let step = 0
-    let res_coef = this.state.steps[step].resoluton_coef
-    let do_it = this.state.current_step == step
-    if( do_it )
-    {
-      //_________________________________________________________________Clean Inter
-      this.bodies.store.inters.A.enable(1) 
-      this.bodies.store.inters.A_bg.enable(1) 
-      this.bodies.store.inters.B.rot_override = 0
-      this.bodies.store.inters.C.c_axe.pos_override = 1    
-      //_________________________________________________________________Clean Other
-
-      //_________________________________________________________________Control
-      this.set_phase_resolution_control_0( res_coef)
-
-      //_________________________________________________________________Update
-      this.state.switch_selection_happened_step = step
-      this.update_step_count(step)
-    }
-    
-    ////////////////////////////////////////////////////////////////////////////////////
-    step = 1
-    res_coef = this.state.steps[step].resoluton_coef
-    do_it = this.state.current_step == step
-    if( do_it )
-    {         
-      //_________________________________________________________________Clean Inter
-      this.bodies.store.inters.B.enable(1) 
-      this.bodies.store.inters.B_mask.enable(1) 
-  
-      this.bodies.store.inters.A.c_axe.pos_override = 1
-      this.bodies.store.inters.C.c_axe.pos_override = 1
-
-      //_________________________________________________________________Clean Other
-      for( let i = 0; i < this.bodies.store.geos.rectangles.length; i++ )
-        this.bodies.store.geos.rectangles[i].c_axe.pos_override = 1
-
-      //_________________________________________________________________Control
-      this.set_phase_resolution_control_2( res_coef)
-      //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.store.inters.A, this.bodies.store.inters.B)
-      //_________________________________________________________________Update
-      this.update_step_count(step)
-    
-    }  
-  
-    ////////////////////////////////////////////////////////////////////////////////////
-    step = 2
-    res_coef = this.state.steps[step].resoluton_coef
-    do_it = this.state.current_step == step
-    if( do_it )
-    {
-      //_________________________________________________________________Clean Inter
-      this.bodies.store.inters.C.enable(1) 
-      this.bodies.store.inters.C_bg.enable(1) 
-
-      this.bodies.store.inters.A.c_axe.pos_override = 1
-      this.bodies.store.inters.B.rot_override = rad(270)
-
-      //_________________________________________________________________Clean Other
-      this.bodies.store.geos.rectangles[0].enable(0)
-      this.bodies.store.geos.rectangles[1].enable(0)
-      this.bodies.store.geos.rectangles[2].enable(0)
-
-      //_________________________________________________________________Control
-      this.set_phase_resolution_control_4( res_coef)
-      //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.store.inters.B, this.bodies.store.inters.C) 
-      //_________________________________________________________________Update
-      //this.state.switch_selection_happened_step = step
-      this.update_step_count(step)        
-      
-      if( this.anim_mode )
-        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2)
-    } 
-    ////////////////////////////////////////////////////////////////////////////////////
-    step = 3
-    res_coef = this.state.steps[step].resoluton_coef
-    do_it = this.state.current_step == step
-    if( do_it )
-    {
-      //_________________________________________________________________Clean Inter
-      this.bodies.store.inters.A.c_axe.pos_override = 1
-      this.bodies.store.inters.B.rot_override = rad(270)
-      this.bodies.store.inters.C.c_axe.pos_override = -1
-
-      //_________________________________________________________________Clean Other
-      this.bodies.store.geos.rectangles[0].enable(0)
-      this.bodies.store.geos.rectangles[1].enable(0)
-      this.bodies.store.geos.rectangles[2].enable(0)
-
-      for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
-        this.bodies.store.geos.trapezoids[i].rot_override = this.bodies.store.geos.trapezoids[i].rot+ rad(270)+rad(45)   
-
-      //_________________________________________________________________Control
-      
-      //_________________________________________________________________Mouse
-      this.switch_selection_transition( step, selected_body, this.bodies.store.inters.B, this.bodies.store.inters.C) 
-      //_________________________________________________________________Update
-      //this.state.switch_selection_happened_step = step
-      this.update_step_count(step) 
-
-      //
-      if( this.anim_mode == false )
-      {
-        let wait_time = 20
-        let t = this.state.steps[step].update_count
-        if( t < wait_time )
-        {
-          this.do_pre_explode_animation(t,0,wait_time)
-        }
-        else{
-          this.do_explode(step)
-        }  
-      }
-      else
-      {
-        //this.set_phase_resolution_control_4( 0.95)
-
-        //this.bodies.cns_modif(0.0001, false, true)
-        //this.bodies.axe_enable(false, false, true)   
-        
-        let y_offset = res_coef * this.screen_dims.y/2.*1.3 
-        this.m.setTranslation(this.screen_dims.x/2,this.screen_dims.y/2+y_offset)
-
-        //this.bodies.store.geos.circle.body.position.y = this.bodies.store.geos.circle.y + y_offset   
-        //for( let i=0; i < this.bodies.store.geos.rectangles.length; i++ )
-        //  this.bodies.store.geos.rectangles[i].body.position.y = this.bodies.store.geos.rectangles[i].y + y_offset     
-        //
-        //for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
-        //  this.bodies.store.geos.trapezoids[i].body.position.y = this.bodies.store.geos.trapezoids[i].y + y_offset     
-            
-      
-        }
-    } 
-   
-
-   
-
-
-  }
-
-  do_pre_explode_animation(t,start_time,end_time)
-  {
-    let a = t - start_time
-    a -= end_time/4
-    a /= (end_time/4)
-    a = Math.min(1,Math.max(0,a))
-    
-    let c1 = utils.color.gold    
-    let c2 = utils.color.white
-    let cInterp = [
-      c1[0]*(1-a)+c2[0]*a,
-      c1[1]*(1-a)+c2[1]*a,
-      c1[2]*(1-a)+c2[2]*a]
- 
-    this.bodies.override_color(cInterp ['geos'])
-    this.bodies.override_color_three(cInterp, ['geos'])
-    
-   
-  }
-
-  do_explode(step)
-  {
-    this.bodies.cns_modif(0.0001, ['geos'])
-    this.bodies.axe_enable(false, ['geos'])
-    
-    // custom color
-    this.bodies.override_color(null, ['geos'])
-    this.bodies.override_color_three(null, ['geos'])
-
-
-    //gravity
-    this.bodies.store.geos.circle.apply_force( this.bodies.store.geos.circle.get_out_position('world'),
-                                          new Vector(0, 0.05*0.13) )
-
-
-    for( let i=0; i < this.bodies.store.geos.rectangles.length; i++ )
-      this.bodies.store.geos.rectangles[i].apply_force( this.bodies.store.geos.rectangles[i].get_out_position('world'),
-                                                  new Vector(0, 0.05*0.03) )  
-
-
-    for( let i=0; i < this.bodies.store.geos.trapezoids.length; i++ )
-      this.bodies.store.geos.trapezoids[i].apply_force( this.bodies.store.geos.trapezoids[i].get_out_position('world'),
-                                                  new Vector(0, 0.05*0.03) )  
-
-
-
-
-    if( this.state.steps[step].apply_force_happened == false )
-    {
-      
-      let p_force = new Vector(this.m.get_row(2))
-      let v_force = new Vector(-0.05,0)
-
-      let _v = null
-
-      this.bodies.store.geos.rectangles[3].apply_force(p_force,v_force)
-
-
-      _v = new Vector(0,-0.01)
-      this.bodies.store.geos.circle.apply_force( p_force, _v.add(v_force.getMult(2)) )
-      _v = new Vector(0.05,-0.05)
-      this.bodies.store.geos.trapezoids[0].apply_force( p_force, _v.add(v_force.getMult(2)) )
-      _v = new Vector(0.05,0.05)
-      this.bodies.store.geos.trapezoids[1].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
-      _v = new Vector(-0.05,0.05)
-      this.bodies.store.geos.trapezoids[2].apply_force( p_force, _v.add(v_force.getMult(2)) ) 
-      _v = new Vector(-0.05,-0.05)
-      this.bodies.store.geos.trapezoids[3].apply_force( p_force, _v.add(v_force.getMult(2)) )
-      
-      this.state.steps[step].apply_force_happened = true
-    }
-  }  
-
-  set_across_steps()
-  {
-    let a_inter2 = deg(this.bodies.store.inters.B.body.angle)
-    let center_tmp = new Vector(this.m.get_row(2))
-
-    for( let i = 0; i < this.bodies.store.geos.rectangles.length; i++)
-      this.bodies.store.geos.rectangles[i].c_axe.axe_rotation_center = center_tmp
-    for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++)
-      this.bodies.store.geos.trapezoids[i].c_axe.axe_rotation_center = center_tmp
-
-    this.bodies.store.geos.rectangles[0].c_axe.axe_rotation = Math.min( 270, a_inter2)
-    this.bodies.store.geos.rectangles[1].c_axe.axe_rotation = Math.min( 90 , a_inter2)
-    this.bodies.store.geos.rectangles[2].c_axe.axe_rotation = Math.min( 180, a_inter2)
-    this.bodies.store.geos.rectangles[3].c_axe.axe_rotation = Math.min( 0  , a_inter2)
-
-    for( let i = 0; i < this.bodies.store.geos.trapezoids.length; i++)
-      this.bodies.store.geos.trapezoids[i].c_axe.axe_rotation = a_inter2
-  
-    this.bodies.store.inters.A.c_axe.axe_rotation = Math.min( 270, a_inter2) 
-    this.bodies.store.inters.A.c_axe.axe_rotation_center = center_tmp
-    this.bodies.store.inters.C.c_axe.axe_rotation = Math.min( 0  , a_inter2)
-    this.bodies.store.inters.C.c_axe.axe_rotation_center = center_tmp
-  }
-
-  track_user_drag_error()
-  {
-    //for( let i = 0; i < this.show_step_helpers.length; i++)
-    //  this.show_step_helpers[i] = 0
-    
-    if ( this.touch_enable == false )
-      return 
-
-    if( userIsInteracting )
-    {
-      
-      this.mouse_pressed_positions_at_update.push( new Vector( mouseX , mouseY ) )    
-      let size = this.mouse_pressed_positions_at_update.length
-      if( 1 < size )
-      {
-        let p_first = this.mouse_pressed_positions_at_update[0]
-        let p_last = this.mouse_pressed_positions_at_update[size-1]
-        let v_delta = p_last.sub(p_first)
-        
-        if( 0.01 < v_delta.mag() )
-        {
-          
-          let A = this.bodies.store.inters.A.is_selected
-          let B = this.bodies.store.inters.B.is_selected
-          let C = this.bodies.store.inters.C.is_selected
-          if( (A == false)&&
-              (B == false)&&
-              (C == false))
-          {
-            this.bodies.override_color(utils.color.black, ['geos'])
-            this.bodies.override_color_three(utils.color.black, ['geos'])
-
-            this.bodies.store.geos.backgrounds[0].color = utils.color.red
-            this.bodies.store.geos.backgrounds[1].color = utils.color.red
-            this.bodies.store.geos.backgrounds[0].update_color_three()
-            this.bodies.store.geos.backgrounds[1].update_color_three()
-          }
-          else
-          {
-            if(A && this.state.current_step == 0)this.show_step_helpers[0] = 100
-            if(B && this.state.current_step == 1)this.show_step_helpers[1] = 100
-            if(C && this.state.current_step == 2)this.show_step_helpers[2] = 100
-          }
-              
-        }
-      }
-    }
-    else if( 0 < this.mouse_pressed_positions_at_update.length )
-    {
-      this.bodies.override_color(null, ['geos'])
-      this.bodies.override_color_three(null, ['geos'])
-      this.color_background = utils.color.dark
-      this.mouse_pressed_positions_at_update = []
-    }
-    else
-    {
-      this.mouse_pressed_positions_at_update = []
-    }
-  }
-
-  update()
-  {
-    this.anim_mode =  this.resolution_coef_override != null
-    this.set_across_steps()
-    // resolution
-    this.state.resolution_coef_last = this.state.resolution_coef
-    this.get_resolution_coef_info()
-    this.set_step_resolution()
-    this.track_user_drag_error()
-    this.bodies.update()
-    this.draw_background()
-    this.state.update_count += 1
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////// DRAW
-  ////////////////////////////////////////////////////////////////////////////////////
-
-
-
-  draw_help_three()
-  {
-
-    /////////////////////////////////////////////////
-    if(this.show_step_helpers[0] )
-    {
-      let coef = this.show_step_helpers[0] / 100 
-      this.bodies.store.helpers.stepA.transparency_line = 1.-coef
-      this.show_step_helpers[0] -= 2
-      this.bodies.store.helpers.stepA.update_color_three()
-    }
-
-    if(this.show_step_helpers[1] )
-    {
-      let coef = this.show_step_helpers[1] / 100 
-      this.bodies.store.helpers.stepB.transparency_line = 1.-coef
-      this.show_step_helpers[1] -= 2
-      this.bodies.store.helpers.stepB.update_color_three()
-    }
-
-    if(this.show_step_helpers[2] )
-    {
-      let coef = this.show_step_helpers[2] / 100 
-      this.bodies.store.helpers.stepC.transparency_line = 1.-coef
-      this.show_step_helpers[2] -= 2
-      this.bodies.store.helpers.stepC.update_color_three()
-    }
-    
-
-  }  
-
-  setup_shapes_three()
-  {
-    this.bodies.setup_shapes_three()
-  }
-
-  animate_three()
-  {
-    this.bodies.animate_three()
-    this.draw_help_three()
-  }
-
-
-
-*/
 }
 

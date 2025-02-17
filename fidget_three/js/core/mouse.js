@@ -59,6 +59,9 @@ export class Mouse_manager
         this.screen_dims = screen_dims
         this.fidget = fidget
         this.mesh_line = null
+        this.group_circle = null
+        this.group_cross = null
+        this.group = null
 
         this.p_mouse_grap_from_body = null
         this.mouse_lock_selection = false
@@ -183,8 +186,8 @@ export class Mouse_manager
 
                 if( fidget_selected_body != null)
                 {
-                    m = fidget_selected_body.get_out_matrix()
-                    break_dist = fidget_selected_body.selection_break_length
+                    m = fidget_selected_body.physics.get_out_matrix()
+                    break_dist = fidget_selected_body.physics.selection_break_length
     
                     do_save_p_mouse_grap_from_body = ((this.p_mouse_grap_from_body == null )||(this.selected_body_last_eval_name != fidget_selected_body.name))
                     if(do_save_p_mouse_grap_from_body)
@@ -310,12 +313,12 @@ export class Mouse_manager
     }
 
 
-    switch_selection( next_elem = null , hack = false)
+    switch_selection( next_body = null , hack = false)
     {
         if( this.matter_mouse == null )
             return false
 
-      if ( next_elem == null)
+      if ( next_body == null)
       {
         this.matter_constraint.body = null
         this.matter_constraint.constraint.bodyB = null
@@ -325,11 +328,11 @@ export class Mouse_manager
       }
       
       let p = new Vector( 
-        this.matter_constraint.constraint.pointA.x - next_elem.body.position.x,
-        this.matter_constraint.constraint.pointA.y - next_elem.body.position.y)
+        this.matter_constraint.constraint.pointA.x - next_body.physics.body.position.x,
+        this.matter_constraint.constraint.pointA.y - next_body.physics.body.position.y)
 
-      this.matter_constraint.body = next_elem.body
-      this.matter_constraint.constraint.bodyB = next_elem.body
+      this.matter_constraint.body = next_body.physics.body
+      this.matter_constraint.constraint.bodyB = next_body.physics.body
       this.matter_constraint.constraint.pointB = {x: p.x() , y: p.y()}
 
       if(hack)

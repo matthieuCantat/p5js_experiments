@@ -108,6 +108,7 @@ const asset_args = {
     shdrs : shdrs,
     debug : debug,
     dom_canvas : document.getElementById("three_canvas"),
+    fidget_choice : "fidget_simple_slide",
 }
 var asset = new fidgets_sequence(asset_args)
 
