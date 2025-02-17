@@ -663,7 +663,10 @@ export function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// ONLY FOR DEBUG
 export function strictObject(obj) {
+  return obj
+
   return new Proxy(obj, {
     get(target, prop, receiver) {
       if (!(prop in target)) {
