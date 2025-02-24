@@ -141,7 +141,8 @@ export default class fidgets_grid
         this.fidgets[i].setup_shapes_three()
         
         scene_three.add( this.fidgets[i].group_three )
-        this.fidgets[i].mouse_select_highlight()
+        this.fidgets[i].physics.update_bodies_select_state()
+        this.fidgets[i].render.mouse_select_highlight()
       }
     }
 
@@ -373,7 +374,8 @@ export default class fidgets_grid
           continue  
         this.fidgets[i].update()
         if( user_interaction_info.userInteractionChange)
-          this.fidgets[i].mouse_select_highlight()
+          this.fidgets[i].physics.update_bodies_select_state()
+          this.fidgets[i].render.mouse_select_highlight()
       }
 
 
@@ -387,7 +389,7 @@ export default class fidgets_grid
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
-        this.fidgets[i].animate_three()
+        this.fidgets[i].render.update()
       }
 
       this.update_chrono_three()
@@ -395,7 +397,7 @@ export default class fidgets_grid
       {
         let texts_to_draw = [
           
-          'count : ' + this.fidgets[0].state.update_count,
+          'count : ' + this.fidgets[0].Game_engine.time,
           'res : ' + Math.round( this.fidgets[0].state.resolution_coef*100, 2 )/100 + ' / 4',
           'last selection switch step : ' + this.fidgets[0].state.switch_selection_happened_step,
           '0 - count: ' + this.fidgets[0].state.steps[0].update_count,

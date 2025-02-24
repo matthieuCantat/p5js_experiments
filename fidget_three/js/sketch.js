@@ -258,12 +258,13 @@ function getAssetsInfo()
 
 // Reference to the button and fieldset
 const toggleButton = document.getElementById("debug_menu_show");
+var debug_modified = { ...debug }
 
 function debug_choice_window_fill()
 {
     const menu = document.getElementById("debug_menu");
     // Create checkboxes dynamically (only once)
-    for (const [key, value] of Object.entries(debug))
+    for (const [key, value] of Object.entries(debug_modified))
     {
         const checkbox_and_text = document.createElement("label");
 
@@ -309,22 +310,26 @@ function toggle_debug_choice_window()
     }
 }    
 
-    // Event listener for the button
-    toggleButton.addEventListener("click", toggle_debug_choice_window );
+// Event listener for the button
+toggleButton.addEventListener("click", toggle_debug_choice_window );
 
-    var debug_modified = { ...debug }
-    // Function to handle checkbox selection
-    function handleCheckboxChange() {
+
+debug_info_get_from_local()
+debug_choice_window_fill()
+game_engine.asset.set_debug( debug_modified )
+
+// Function to handle checkbox selection
+function handleCheckboxChange() {
         
     const debug_elements = Array.from(document.querySelectorAll("input[name='debug']"))
-
-    
     for( let elem of debug_elements)
     {
         if( elem.value == "mouse_selection_break_length")
             continue
-        console.log(elem.value, elem.checked)
+        //console.log(elem.value, elem.checked)
         debug_modified[elem.value] = elem.checked
+
+        
         /*
         if( ( 0 < debug_elements_to_activate.length )&&( elem.includes( debug_elements_to_activate) ))
         {
@@ -344,5 +349,31 @@ function toggle_debug_choice_window()
 
     //debug.selected = checkbox.value
     game_engine.asset.set_debug( debug_modified )
+
     
+    debug_info_save_to_local()
+
+}
+
+function debug_info_save_to_local()
+{
+    for( let elem in debug_modified )
+        localStorage.setItem(elem,debug_modified[elem])
+
+}
+
+function debug_info_get_from_local()
+{
+    for( let elem in debug_modified )
+    {
+        if( elem == "mouse_selection_break_length")
+            continue
+        const checked = localStorage.getItem(elem)
+        if( checked != null )
+        {
+            debug_modified[elem] = checked == 'true'
+            //console.log('local value found : ', elem , checked)
+        }
+            
     }
+}

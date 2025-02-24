@@ -665,7 +665,7 @@ export function getRandomInt(min, max) {
 
 // ONLY FOR DEBUG
 export function strictObject(obj) {
-  return obj
+  //return obj
 
   return new Proxy(obj, {
     get(target, prop, receiver) {

@@ -92,7 +92,7 @@ export class effect{
         let pos   = body.physics.get_out_position('world')
         let rot   = body.physics.get_out_rotation('world')
         let scale = body.physics.state.scale        
-        body.render.animate_three( pos, rot, scale)  
+        body.render.update( pos, rot, scale)  
       }
     }
 

@@ -4,6 +4,7 @@ import Matrix from '../utils/matrix.js';
 import { Chrono, 
   Draw_text_debug, 
   clamp, 
+  strictObject,
 } from '../utils/utils.js';
 import {
   user_interaction_info
@@ -24,7 +25,7 @@ export default class fidgets_sequence
           fidget_choice : null };
 
         const args = {...args_default, ...args_in}
-        console.log(args)
+        
         // hard coded
         this.chrono_appears_start = 250
         this.chrono_appears_end   = 290  
@@ -59,16 +60,17 @@ export default class fidgets_sequence
         this.fidgets = []
         this.draw_text_debug = null
         this.scene = null
+        this.Game_engine = null
 
         this.fidget_choice = args.fidget_choice
         this.dom_canvas = args.dom_canvas
     }
 
 
-    setup(scene = null)
+    setup( Game_engine = null )
     {
-      if(scene != null)
-        this.scene = scene
+      if( Game_engine != null )
+        this.Game_engine = Game_engine
       
       console.log('setup : fidgets_sequence')
 
@@ -96,7 +98,7 @@ export default class fidgets_sequence
       this.draw_text_debug = null
 
       // build  
-      this.chrono = new Chrono(this.screen_dims)  
+      this.chrono = strictObject(new Chrono(this.screen_dims) )
 
 
         
@@ -113,22 +115,24 @@ export default class fidgets_sequence
             is_dynamic:true,
             debug : this.debug_mode,  
             play_animation:null,   
-            dom_canvas : this.dom_canvas 
+            dom_canvas : this.dom_canvas ,
+            Game_engine : this.Game_engine,
+            fidget_sequence_index : i +1,
+            force_way : this.force_way,
           }
           var fidget = null
           if( this.fidget_choice == "fidget_windmill" )
-            fidget = new fidget_windmill(opts)
+            fidget = strictObject( new fidget_windmill(opts) )
           else if( this.fidget_choice == "fidget_daft_i" )
-            fidget = new fidget_daft_i(opts)
+            fidget = strictObject ( new fidget_daft_i(opts) )
           else if( this.fidget_choice == "fidget_simple_slide" )
-            fidget = new fidget_simple_slide(opts);
+            fidget = strictObject( new fidget_simple_slide(opts) )
           else
-            fidget = this.get_random_fidget(opts)
+            fidget = strictObject( this.get_random_fidget(opts) )
           
           z_depth = fidget.z_depth_end
           
-          fidget.force_way = this.force_way
-          fidget.fidget_sequence_i = i + 1
+          //fidget.force_way = this.force_way
           this.fidgets.push(fidget)
       }
   
@@ -137,13 +141,13 @@ export default class fidgets_sequence
       // setup
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
-        this.fidgets[i].setup(this.scene);
+        this.fidgets[i].setup();
         this.fidgets_do_computation.push(null)
         this.fidgets_do_computation_last.push(null)
       }
 
       // add to scene
-      this.setup_chrono_three(this.scene)
+      this.setup_chrono_three(this.Game_engine.render_scene)
       
       this.set_debug(this.debug_mode)
     }
@@ -151,16 +155,16 @@ export default class fidgets_sequence
     reset()
     {
       console.log('fidgets_sequence - reset')
-      this.clean_scene(this.scene)
-      this.setup(this.scene)
+      this.clean()
+      this.setup()
     }
 
-    clean_scene(scene)
+    clean()
     {
       for( let fidget of this.fidgets)
-        fidget.clean_scene(scene)
+        fidget.clean()
 
-      this.chrono.clean_scene(scene)
+      this.chrono.clean_scene(this.Game_engine.render_scene)
     }
 
     get_random_fidget(in_options)
@@ -178,12 +182,17 @@ export default class fidgets_sequence
       this.chrono.setup_three(scene_three)
     }
     
+    set_game_engine_ref(Game_engine)
+    {
+      this.Game_engine = Game_engine
+    }
+
     set_debug( debug )
     {
       this.debug_mode = debug
 
       
-      this.fidgets[this.fidget_focus_id].set_debug(this.debug_mode)
+      this.fidgets[this.fidget_focus_id].render.set_debug(this.debug_mode)
 
       if(this.debug_mode.fidget_steps_info)
           this.draw_text_debug = new Draw_text_debug(this.screen_dims)
@@ -196,7 +205,7 @@ export default class fidgets_sequence
         }
           
       } 
-      this.setup_debug_three(this.scene)      
+      this.setup_debug_three(this.Game_engine.render_scene)      
     }
 
     setup_debug_three(scene_three)
@@ -257,7 +266,7 @@ export default class fidgets_sequence
         {
           let anim_local = clamp(anim_global-i,0,1)
           
-          this.fidgets[i_max-i].do_anim_override(anim_local)
+          this.fidgets[i_max-i].physics.do_anim_override(anim_local)
 
           
           if( anim_local <=1)
@@ -276,7 +285,7 @@ export default class fidgets_sequence
         
         this.anim_mode = false
         for( let i = 0; i < this.fidgets_nbr; i++ )
-          this.fidgets[i].do_anim_override(null)
+          this.fidgets[i].physics.do_anim_override(null)
 
       }
 
@@ -287,7 +296,7 @@ export default class fidgets_sequence
       let fidgets_resolution_coef = []
       for( let i = 0; i < this.fidgets_nbr; i++ )
       {
-        let coef_normalized = this.fidgets[i].state.resolution_coef / (this.fidgets[i].end_step-1)
+        let coef_normalized = this.fidgets[i].physics.state.resolution_coef / (this.fidgets[i].get_end_step()-1)
         fidgets_resolution_coef.push(coef_normalized)
       }
 
@@ -364,7 +373,6 @@ export default class fidgets_sequence
       let chrono_start = ( (user_interaction_start < this.update_count )&&( this.chrono.is_at_start() ) )
       if( chrono_start )
       {
-        //if((this.chrono.is_at_start())&&(this.get_resolution_coef_info() < 0.99 ))
         this.chrono.start()
         this.do_anim_override(null) 
       }
@@ -477,12 +485,13 @@ export default class fidgets_sequence
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
-        this.fidgets[i].update()
+        this.fidgets[i].physics.update()
         
 
         if(user_interaction_info.userInteractionChange)
         {
-          this.fidgets[i].mouse_select_highlight()
+          this.fidgets[i].physics.update_bodies_select_state()
+          this.fidgets[i].render.mouse_select_highlight()
         }
         
           
@@ -500,30 +509,31 @@ export default class fidgets_sequence
       {   
         if((this.anim_mode == false)&&(this.fidgets_do_computation[i] == false))
           continue  
-        this.fidgets[i].animate_three()
+        this.fidgets[i].render.update()
       }
 
       this.update_chrono_three()
 
       if(this.debug_mode.fidget_steps_info)
       {
-        let F = this.fidgets[this.fidget_focus_id].state;
+        let F = this.fidgets[this.fidget_focus_id].physics.state;
+        const time = this.fidgets[this.fidget_focus_id].Game_engine.time
         let texts_to_draw = [
           
-          'count : ' + F.update_count,
+          'count : ' + time,
           'res : ' + Math.round( F.resolution_coef*100, 2 )/100 + ' / 4',
           'last selection switch step : ' + F.switch_selection_happened_step,
-          '0 - count: ' + F.steps[0].update_count,
+          '0 - count: ' + Math.max( 0, time - F.steps[0].time_start ),
           '0 - res: ' + Math.round( F.steps[0].resoluton_coef*100, 2)/100 + ' / 1',
-          '1 - count: ' + F.steps[1].update_count,
+          '1 - count: ' + Math.max( 0, time - F.steps[1].time_start ),
           '1 - res Coef: ' + Math.round( F.steps[1].resoluton_coef*100, 2)/100 + ' / 1',
-          '2 - count: ' + F.steps[2].update_count ,
+          '2 - count: ' + Math.max( 0, time - F.steps[2].time_start ) ,
           '2 - res Coef: ' + Math.round( F.steps[2].resoluton_coef*100, 2)/100 + ' / 1',
-          '3 - count: ' + F.steps[3].update_count ,
+          '3 - count: ' + Math.max( 0, time - F.steps[3].time_start ) ,
           '3 - res Coef: ' + Math.round( F.steps[3].resoluton_coef*100, 2)/100 + ' / 1' ,
-          '4 - count: ' + F.steps[4].update_count,
+          '4 - count: ' + Math.max( 0, time - F.steps[4].time_start ),
           '4 - res Coef: ' + Math.round( F.steps[4].resoluton_coef*100, 2)/100 + ' / 1',
-          '5 - count: ' + F.steps[5].update_count,
+          '5 - count: ' + Math.max( 0, time - F.steps[5].time_start ),
           '5 - res Coef: ' + Math.round( F.steps[5].resoluton_coef*100, 2)/100 + ' / 1',
           
           

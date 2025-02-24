@@ -35,7 +35,8 @@ export default class fidget_daft_i extends fidget {
     let bones_density_value = 0.44/this.s
     let inter_step_denstity = 0.022/this.s 
     let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
-    this.end_step = 4
+    //this.end_step = 4
+    this.set_end_step( 4 )
     ///////////////////////////////////////////////////////////////////////////////////////////
     this.is_dynamic = args.is_dynamic
     
@@ -58,14 +59,6 @@ export default class fidget_daft_i extends fidget {
       (this.colors[0][1] + 0.2) * 0.3,
       (this.colors[0][2] + 0.2) * 0.3
     ]
-
-    let opts_global = {
-      screen_dims: this.screen_dims,
-      matter_engine: this.matter_engine,
-      Mouse: this.Mouse,
-      fidget: this,
-      dynamic: this.is_dynamic
-    }
 
     let opts_collision_no_interaction = {
       collision: false,
@@ -106,14 +99,14 @@ export default class fidget_daft_i extends fidget {
     }
 
     let opts_sparcles_shock = {
-      ...opts_global,
+      ...this.opts_global,
       ...opts_debug,
       scale_shape: this.s,
       type: 'sparcle_shock'
     }
 
     let opts_bones_main = {
-      ...opts_global,
+      ...this.opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,      
       visibility: false,
@@ -128,7 +121,7 @@ export default class fidget_daft_i extends fidget {
     }
 
     let opts_visual_bones = {
-      ...opts_global,
+      ...this.opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,      
       visibility: false,
@@ -144,7 +137,7 @@ export default class fidget_daft_i extends fidget {
     }
 
     let opts_inter_step = {
-      ...opts_global,
+      ...this.opts_global,
       ...opts_collision_mouse_interaction,
       ...opts_debug,         
       visibility: false,
@@ -158,7 +151,7 @@ export default class fidget_daft_i extends fidget {
     }
 
     let opts_geo = {
-    ...opts_global,
+    ...this.opts_global,
     ...opts_collision_activate,
     ...opts_debug,
     m_offset: new Matrix(),
@@ -220,7 +213,7 @@ export default class fidget_daft_i extends fidget {
     })
 
     this.bodies.store.geos.backgrounds.push( new body_build({
-      ...opts_global,
+      ...this.opts_global,
       ...opts_collision_no_interaction,
       ...opts_debug,
       dynamic: false,
@@ -662,7 +655,7 @@ export default class fidget_daft_i extends fidget {
         r: 0
       })
 
-      this.create_inter_from_geos(
+      this.bodies.create_inter_from_geos(
         ['circle', 'rectangle', 'rectangles'],
         this.bodies.store.inters.background,
         this.s
@@ -677,7 +670,7 @@ export default class fidget_daft_i extends fidget {
     }
     
     if(this.is_dynamic)
-      this.instance_each_others(
+      this.bodies.instance_each_others(
         [
           this.bodies.store.inters_step.steps[0][0],
           this.bodies.store.inters_step.steps[0][1],
@@ -735,11 +728,11 @@ export default class fidget_daft_i extends fidget {
     ]
     
 
-    this.z_depth_end = this.draw_order_to_body_z( args.z_depth_start,0.5)
+    this.z_depth_end = this.render.draw_order_to_body_z( args.z_depth_start,0.5)
 
-    this.Mouse.z = this.z_depth_end
+    this.physics.Mouse.z = this.z_depth_end
 
-    this.Mouse.z = this.z_depth_end
+    this.physics.Mouse.z = this.z_depth_end
 
     this.bodies.build_order = this.bodies.get_build_order()
 
@@ -769,7 +762,7 @@ export default class fidget_daft_i extends fidget {
       'geos','rectangles'
     ]
     
-    this.steps_info = [
+    this.physics.steps_info = [
       ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable: [
@@ -914,7 +907,7 @@ export default class fidget_daft_i extends fidget {
     this.bodies.physics.set_dynamic(false)
     this.bodies.physics.constraints_enable(false, ['bones'])
 
-    let t = this.state.update_count
+    let t = this.Game_engine.time
     this.bodies.store.bones.traj.physics.set_out_position(
       new Vector(Math.sin(t * 0.01) * 10, Math.sin(t * 0.05) * 10),
       'base',
@@ -950,13 +943,13 @@ export default class fidget_daft_i extends fidget {
 
   animation_entrance() {
     let start_time = 0
-    let t = this.state.update_count
+    let t = this.Game_engine.time
     let anim_duration = 100
 
     if (start_time + anim_duration == t) {
       this.bodies.physics.set_dynamic()
       this.bodies.physics.constraints_enable(true, ['bones'])
-      this.constraints_enable(false, this.steps_info[0].constraints_disable)
+      this.physics.constraints_enable(false, this.physics.steps_info[0].constraints_disable)
       return false
     }
     if (start_time + anim_duration < t) {

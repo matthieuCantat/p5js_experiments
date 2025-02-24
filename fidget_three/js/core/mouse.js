@@ -339,7 +339,7 @@ export class Mouse_manager
         this.matter_constraint.constraint.pointB = {x: - p.y(), y: p.x()}
       this.matter_constraint.constraint.angleB = 0
       
-      this.fidget.mouse_select_highlight(this.matter_constraint)
+      //this.fidget.render.mouse_select_highlight(this.matter_constraint)
 
       return true
     

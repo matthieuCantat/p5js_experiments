@@ -1,10 +1,15 @@
-import { flatten_list,
+import { 
+  utils,
+  flatten_list,
   strictObject
   } from '../utils/utils.js';
 
+
+
 import * as THREE from 'three';
-
-
+import Matrix from '../utils/matrix.js';
+import { materials,} from '../core/shader.js';
+import { body_build } from '../core/body.js';
 
 
 
@@ -67,15 +72,15 @@ export class bodies_physics
         body.physics.update()
   
       for( let effect in this.bodies.effects)
-        if(this.bodies.effects[effect] != null)this.bodies.effects[effect].update()      
+        if(this.bodies.effects[effect] != null)
+          this.bodies.effects[effect].update()      
     }
 
-    clean_physics(body_type_filter = [])
+    clean(body_type_filter = [])
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-        body.physics.clean_physics() 
+        body.physics.clean() 
       
-      Matter.Composite.clear(this.bodies.matter_engine.world, true);
     }
  
   
@@ -164,25 +169,21 @@ export class bodies_render
     }  
   
   
-    clean_shapes_three(body_type_filter = [])
+    clean(body_type_filter = [])
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-        body.render.clean_shapes_three(this.bodies.group_three) 
+        body.render.clean(this.bodies.group_three) 
   
       for( let effect in this.bodies.effects)
         if(this.bodies.effects[effect] != null)this.bodies.effects[effect].clean(this.bodies.group_three)        
     }
 
 
-    animate_three( body_type_filter = [] )
+    update( body_type_filter = [] )
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-      {
-        let pos   = body.physics.get_out_position('world')
-        let rot   = body.physics.get_out_rotation('world')
-        let scale = body.physics.state.scale
-        body.render.animate_three( pos, rot, scale)
-      }
+        body.render.update()
+      
 
       
       for( let effect in this.bodies.effects)
@@ -281,6 +282,7 @@ export class bodies
         this.effects = null
         this.matter_engine = null
         this.Mouse = null
+        this.Game_engine = null
 
         
             
@@ -288,6 +290,33 @@ export class bodies
         this.render = strictObject(new bodies_render( { bodies_main:this }))
                 
     }
+
+
+    set_completion_step(step)
+    {
+      const bodies = this.store.inters_step.steps;
+  
+      for( let i = 0; i < bodies.length; i++)
+      {
+        if( bodies[step] == null )
+          continue 
+  
+        let body = null
+        if( bodies[step].constructor === Array )
+          body = bodies[step][0]
+        else
+          body = bodies[step]
+                
+  
+        if(i < step)
+          body.set_resolution_coef(1)
+        else if(step < i)
+          body.set_resolution_coef(0)
+        else
+          body.set_resolution_coef(null)
+      }      
+  
+    }    
 
     get_list_filtered( order = 'eval', body_type_filter = [] )//eval // draw
     {
@@ -525,6 +554,162 @@ export class bodies
         }
         bodies_list[i].enable(value) 
       }
+    }  
+    
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////// utils body create
+    /////////////////////////////////////////////////////////////////////////////////////////
+
+    instance_each_others( bodies, mirror_info )
+    {
+  
+      //bA-->bB
+      for(let i = 0 ; i < bodies.length ; i++)
+      {
+        
+        let iA = [mirror_info[i*2],mirror_info[i*2+1]]
+        for(let j = 0 ; j < bodies.length ; j++)
+        {
+          if(i==j)
+            continue
+          let iB = [mirror_info[j*2],mirror_info[j*2+1]]
+  
+          let connect_to_dupli_ty ={
+            name:'instance_ty_'+bodies[i].name+'_to_'+bodies[j].name, 
+            type:'connect', 
+            target:bodies[i], 
+            attr:'ty',
+            target_attr:'ty', 
+            target_space:'anim',
+            target_remap:[-1000,1000,-1000,1000],
+            instance_mode: true }
+            
+            // reciever
+            let reciever_axe_x = iB[0]
+            let reciever_axe_y = iB[1]
+            let emetor_axe_x = iA[0]
+            let emetor_axe_y = iA[1]
+            
+            let r = connect_to_dupli_ty.target_remap
+            if(reciever_axe_y == emetor_axe_y)
+            {
+              r = [r[0], r[1], r[2]*-1, r[3]*-1]
+            }
+            if(reciever_axe_x == emetor_axe_x)
+            {
+              r = [r[0], r[1], r[2]*-1, r[3]*-1]
+            }
+            
+          connect_to_dupli_ty.target_remap = r
+          bodies[j].physics.relations.constraints_args.push(connect_to_dupli_ty)
+  
+          ///////////////////////////////////////////////////////////////////////
+  
+  
+  
+          ///////////////////////////////////////////////////////////////////////
+          let connect_to_dupli_is_selected ={
+            name:'instance_is_selected_'+bodies[i].name+'_to_'+bodies[j].name, 
+            type:'connect', 
+            target:bodies[i], 
+            attr:'is_selected',
+            target_attr:'is_selected', 
+            activate_when_target_is_selected: true }
+  
+          bodies[j].physics.relations.constraints_args.push(connect_to_dupli_is_selected)
+          bodies[j].relations.instances.push(bodies[i])
+          
+        }      
+      }
+  
+    }
+  
+    create_inter_from_geos( bodies_geos, inter_body_parent,scale)
+    {
+      
+  
+      for( let i = 0 ; i < bodies_geos.length; i += 1 )
+      {
+        let n = bodies_geos[i]
+  
+        if( this.store.geos[n].constructor === Array)
+        {
+          for( let j = 0 ; j < this.store.geos[n].length; j += 1 )
+            this.store.inters[n][j] = this.build_inter_from_geo( this.store.geos[n][j], inter_body_parent, scale)
+        }
+        else
+        {
+          this.store.inters[n] = this.build_inter_from_geo( this.store.geos[n], inter_body_parent, scale)
+        }
+      }
+  
+    }
+  
+  
+    build_inter_from_geo(geo_body,inter_body_parent,scale)
+    {
+      // info
+      let opts_collision_mouse_interaction = {   
+        collision_category: utils.collision_category.inter,
+        collision_mask: utils.collision_category.mouse, 
+      }
+  
+      let opts_visual_inter = {
+        visibility:true,
+        do_shape: true,
+        do_line:true,                                           
+        color:utils.color.grey,
+        color_line: utils.color.black,
+        material_three: materials.simple.text_checker_three_grey ,
+      }  
+  
+      let scale_inter = 40.0 
+  
+  
+      // build inter
+      let geo_args = geo_body.get_args()
+  
+      // m_shape
+      let vX = geo_args.m_shape.get_row(0)
+      let vY = geo_args.m_shape.get_row(1)
+      let vX_length = vX.mag()
+      let vY_length = vY.mag()
+      vX.normalize().mult(vX_length+scale_inter)
+      vY.normalize().mult(vY_length+scale_inter)
+  
+      let m_shape = new Matrix(geo_args.m_shape)
+      m_shape.set_row(0,vX)
+      m_shape.set_row(1,vY)
+  
+      // name
+      let name = geo_args.name.split('_')[1]
+  
+      // m_offset
+      let m_geo_body   = geo_body.physics.get_init_matrix()
+      let m_inter_body = inter_body_parent.physics.get_init_matrix()
+  
+      let inter_args = {
+        ...geo_args,
+        ...opts_collision_mouse_interaction,
+        ...opts_visual_inter,
+  
+        name:'inters_'+name,
+        highlight_bodies_when_selected:[geo_body],  
+  
+        parent: inter_body_parent,
+        m_offset: m_geo_body.getMult( m_inter_body.getInverse() ),//get_matrix('base', 'world'),
+        m_shape: m_shape,
+  
+        constraints:[
+          {  name:'point' ,type:'dyn_point',target: inter_body_parent, stiffness: 0.999,damping:0.1,length:0.01},
+          {  name:'orient',type:'kin_orient',target: inter_body_parent,stiffness: 1.0,damping:0.1,length:0.01},                                          
+        ],                                      
+        density:0.01/(scale/2.2), 
+        selection_break_length: 60.*(scale/2.2),  
+      }    
+  
+      return new body_build(inter_args)
     }    
 }
 

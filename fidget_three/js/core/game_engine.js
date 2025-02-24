@@ -17,20 +17,21 @@ export default class Game_engine
         // attribute
         this.name = 'three_scene'
         this.camera = null
-        this.scene = null
+        this.render_scene = null
         this.renderer = null
         this.finalComposer = null
         this.bloomComposer = null
         this.light_lens_flare = null
         this.stats = null
         this.asset = null
-        this.update_loop_eval_count = 0
+        this.time = 0
+        this.time_step = 1
         //build
 
 
         // scene setup
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
+        this.render_scene = new THREE.Scene();
+        this.render_scene.background = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
 
         this.camera = new THREE.OrthographicCamera(
             this.args.screen_dims.x / -2, 
@@ -45,7 +46,7 @@ export default class Game_engine
         //this.camera.position.set( 0, 0, 500 );
         //this.camera.rotation.set( 0, 0, 0 );
         
-        this.scene.add( this.camera );
+        this.render_scene.add( this.camera );
 
         //let light_group = new THREE.Group();
         //const light = new THREE.PointLight( 0xffffff, 2.5, 0, 0 );
@@ -59,7 +60,7 @@ export default class Game_engine
         light1.position.y = 200*2
         light1.position.z = 100*2
 
-        this.scene.add( light1 );
+        this.render_scene.add( light1 );
 
         this.build_special_effects()
 
@@ -73,7 +74,8 @@ export default class Game_engine
             return false
 
         this.asset = asset
-        this.asset.setup(this.scene)
+        this.asset.setup(this)
+        this.asset.set_game_engine_ref(this)
         this.setup_render()
 
         return true
@@ -83,7 +85,7 @@ export default class Game_engine
     {
         if( this.asset == null )
             return ;
-        this.asset.clean_scene(this.scene)
+        this.asset.clean()
         this.asset = null
         this.clean_render()
     }
@@ -149,13 +151,13 @@ export default class Game_engine
             light1.shadow.mapSize.set( 200, 200 );
 
             //let light2 = new THREE.AmbientLight( 0xffffff, 0.2 );
-            //this.scene.add( light2 );
+            //this.render_scene.add( light2 );
         }
 
         if( this.args.debug.do_flare )
         {
             this.light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
-            this.scene.add( this.light_lens_flare )
+            this.render_scene.add( this.light_lens_flare )
         }
     }
 
@@ -172,7 +174,7 @@ export default class Game_engine
         if(this.args.debug.do_bloom)
         {
             //render pass
-            const renderScene = new RenderPass( this.scene, this.camera );
+            const renderScene = new RenderPass( this.render_scene, this.camera );
             const outputPass = new OutputPass();
 
             const bloomPass = new UnrealBloomPass( new THREE.Vector2( this.args.screen_dims.x, this.args.screen_dims.y ), 1.5, 0.4, 0.85 );
@@ -220,8 +222,8 @@ export default class Game_engine
         if( this.args.debug.do_flare )
         {
             // light - change position
-            this.light_lens_flare.position.x = Math.sin(rad(45)+this.update_loop_eval_count*0.01)*120
-            this.light_lens_flare.position.y = Math.cos(rad(45)+this.update_loop_eval_count*0.01)*120
+            this.light_lens_flare.position.x = Math.sin(rad(45)+this.time*0.01)*120
+            this.light_lens_flare.position.y = Math.cos(rad(45)+this.time*0.01)*120
         }        
     
         if( this.asset != null )
@@ -247,16 +249,16 @@ export default class Game_engine
         {
             let save_states = []
             for( let i = 0 ; i < this.asset.fidgets.length; i++)
-                save_states.push( this.asset.fidgets[i].setup_bloom_pass() )
+                save_states.push( this.asset.fidgets[i].render.setup_bloom_pass() )
             this.bloomComposer.render()
             for( let i = 0 ; i < this.asset.fidgets.length; i++)
-                this.asset.fidgets[i].clean_bloom_pass(save_states[i])
+                this.asset.fidgets[i].render.clean_bloom_pass(save_states[i])
     
             this.finalComposer.render();
         }
         else
         {
-            this.renderer.render( this.scene, this.camera );
+            this.renderer.render( this.render_scene, this.camera );
         }
     
         if( this.stats != null)
@@ -268,7 +270,7 @@ export default class Game_engine
     update_loop_global()
     {
         this.update_loop()
-        this.update_loop_eval_count += 1
+        this.time += this.time_step
     }
 
 

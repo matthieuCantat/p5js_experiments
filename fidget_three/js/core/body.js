@@ -356,7 +356,10 @@ class body_physics{
   } 
   get_init_matrix( )
   {
-    let m = this.properties.m_transform.getMult(this.properties.m_offset.getMult(this.get_parent_in_matrix()))
+    const m_parent = this.get_parent_in_matrix()
+    const m_offset = this.properties.m_offset.getMult(m_parent)
+    const m  = this.properties.m_transform.getMult(m_offset)
+    //let m = this.properties.m_transform.getMult(this.properties.m_offset.getMult(this.get_parent_in_matrix()))
     return m
   }
 
@@ -780,10 +783,8 @@ class body_physics{
 
   update()
   {
-      
     if( !this.opts.do_update )
       return false
-
     
     for( let i = 0; i < this.relations.constraints_order.length; i++)
     {
@@ -792,12 +793,18 @@ class body_physics{
 
     if(this.state.rot_override!=null)
       this.set_out_rotation(this.state.rot_override, 'world', 'override')
+
+
+    this.body_main.state.pos   = this.get_out_position('world')
+    this.body_main.state.rot = this.get_out_rotation('world')
+    this.body_main.state.scale = this.state.scale
+
     return true
    
   }  
 
 
-  clean_physics()
+  clean()
   {
     if( this.body != null )
       Matter.Composite.remove( this.ref.matter_engine.world, this.body) 
@@ -904,7 +911,6 @@ export class body_render{
       visibility : args.visibility,
       visibility_secondary : false,
 
-      draw_count: 0,      
     }
 
   
@@ -952,7 +958,7 @@ export class body_render{
   }
   
 
-  clean_shapes_three(group_fidget)
+  clean(group_fidget)
   {
     if(this.do_shape)
     {
@@ -1159,8 +1165,11 @@ export class body_render{
 
   
 
-  animate_three( pos, rot, scale )
+  update()
   {
+    let pos = this.body_main.state.pos   
+    let rot = this.body_main.state.rot 
+    let scale = this.body_main.state.scale 
 
     let converted_pos = convert_coords_matter_to_three(pos,this.body_main.ref.screen_dims)
     this.mesh_three.group.position.x = converted_pos.x()
@@ -1174,7 +1183,7 @@ export class body_render{
     
     
     if(this.ref.material_three!=null)
-      this.ref.material_three.update(this.mesh_three.shape,this.state.draw_count)
+      this.ref.material_three.update(this.mesh_three.shape, this.body_main.Game_engine.time )
 
     
     if(this.debug.debug_matrix_info)
@@ -1205,17 +1214,6 @@ export class body_render{
         'p_out   : '+Math.round(p_out.x())+' '+Math.round(p_out.y()) ,
         'r_out   : '+Math.round(deg(r_out)),
         'vel_out : '+Math.round(vel_out.x())+' '+Math.round(vel_out.y()) ,
-        //'0 - res: ' + Math.round( this.fidgets[0].state.steps[0].resoluton_coef, 2) + ' / 1',
-        //'1 - count: ' + this.fidgets[0].state.steps[1].update_count,
-        //'1 - res Coef: ' + Math.round( this.fidgets[0].state.steps[1].resoluton_coef, 2) + ' / 1',
-        //'2 - count: ' + this.fidgets[0].state.steps[2].update_count ,
-        //'2 - res Coef: ' + Math.round( this.fidgets[0].state.steps[2].resoluton_coef, 2) + ' / 1',
-        //'3 - count: ' + this.fidgets[0].state.steps[3].update_count ,
-        //'3 - res Coef: ' + Math.round( this.fidgets[0].state.steps[3].resoluton_coef, 2) + ' / 1' ,
-        //'4 - count: ' + this.fidgets[0].state.steps[4].update_count,
-        //'4 - res Coef: ' + Math.round( this.fidgets[0].state.steps[4].resoluton_coef, 2) + ' / 1',
-        //'5 - count: ' + this.fidgets[0].state.steps[5].update_count,
-        //'5 - res Coef: ' + Math.round( this.fidgets[0].state.steps[5].resoluton_coef, 2) + ' / 1',
       ]
       this.debug.draw_text_debug.update_three(texts_to_draw)
     }  
@@ -1223,7 +1221,6 @@ export class body_render{
     
     
 
-    this.state.draw_count += 1
     
   }
 
@@ -1340,6 +1337,7 @@ export class body_build{
       
       this.physics = strictObject( new body_physics(args, this) )
       this.render = strictObject( new body_render(args, this, this.physics))
+      this.Game_engine = args.Game_engine
 
       this.ref = strictObject({
         screen_dims : args.screen_dims,
@@ -1364,6 +1362,13 @@ export class body_build{
         build_order: build_order,
         fidget : args.fidget,          
       })
+
+      this.state = 
+      {
+        pos : [0,0,0],
+        rot : 0,
+        scale :1 ,
+      }
 
       build_order += 1
 
@@ -1392,6 +1397,11 @@ export class body_build{
       this.physics.state.is_selected = value
     }
 
+    get_is_selected()
+    {
+      return this.physics.state.is_selected
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////// dyn specific
 
@@ -1404,6 +1414,7 @@ export class body_build{
         name:this.name,
         m_shape:this.properties.m_shape,
         slop:this.properties.trapezoid_slop,
+       Game_engine: this.Game_engine,
 
         highlight_bodies_when_selected:this.relations.highlight_bodies_when_selected,    
         screen_dims:this.ref.screen_dims,
@@ -1458,7 +1469,7 @@ export class body_build{
     }
 
       
-    update_instance_is_selected_attr()
+    update_is_selected_for_instance()
     {
       if( 0 < this.relations.instances.length)
       {

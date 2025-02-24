@@ -37,7 +37,8 @@ export default class fidget_simple_slide extends fidget{
       let bones_density_value = 0.44/this.s
       let inter_step_denstity = 0.022/this.s 
       let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
-      this.end_step = 2
+      //this.end_step = 2
+      this.set_end_step( 2 )
       ///////////////////////////////////////////////////////////////////////////////////////////
       this.is_dynamic = args.is_dynamic
       
@@ -61,13 +62,6 @@ export default class fidget_simple_slide extends fidget{
         (this.colors[0][2] + 0.2) * 0.3
       ]
   
-      let opts_global = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,
-        Mouse: this.Mouse,
-        fidget: this,
-        dynamic: this.is_dynamic
-      }
   
       let opts_collision_no_interaction = {
         collision: false,
@@ -87,10 +81,10 @@ export default class fidget_simple_slide extends fidget{
       }
   
       let opts_debug = {
-        matrix_info: false,
-        matrix_axes: this.debug_mode.matrix_axes,
-        cns_axes: this.debug_mode.cns_axes,
-        force_visibility: this.debug_mode.force_visibility
+        debug_matrix_info: false,
+        debug_matrix_axes: this.debug_mode.matrix_axes,
+        debug_cns_axes: this.debug_mode.cns_axes,
+        debug_force_visibility: this.debug_mode.force_visibility
       }
   
       let opts_cns_disable_at_select = {
@@ -108,14 +102,14 @@ export default class fidget_simple_slide extends fidget{
       }
   
       let opts_sparcles_shock = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_debug,
         scale_shape: this.s,
         type: 'sparcle_shock'
       }
   
       let opts_bones_main = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
         visibility: false,
@@ -124,13 +118,13 @@ export default class fidget_simple_slide extends fidget{
         color: utils.color.blue,
         color_line: utils.color.blue,
         type: utils.shape.circle,
-        matrix_axes: true,
+        debug_matrix_axes: true,
         m_shape: new Matrix().setScale(visual_bones_main_size),
         density: bones_density_value,      
       }
   
       let opts_visual_bones = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
         visibility: false,
@@ -139,14 +133,14 @@ export default class fidget_simple_slide extends fidget{
         color: utils.color.blue,
         color_line: utils.color.black,
         type: utils.shape.circle,
-        matrix_axes: true,
+        debug_matrix_axes: true,
         dynamic: false,      
         density: bones_density_value,      
         m_shape: new Matrix().setScale(4*this.s), 
       }
   
       let opts_inter_step = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_mouse_interaction,
         ...opts_debug,         
         visibility: false,
@@ -160,7 +154,7 @@ export default class fidget_simple_slide extends fidget{
       }
   
       let opts_geo = {
-      ...opts_global,
+      ...this.opts_global,
       ...opts_collision_activate,
       ...opts_debug,
       m_offset: new Matrix(),
@@ -224,7 +218,7 @@ export default class fidget_simple_slide extends fidget{
       })
   
       this.bodies.store.geos.backgrounds.push( new body_build({
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,
         dynamic: false,
@@ -506,9 +500,9 @@ export default class fidget_simple_slide extends fidget{
     
 
 
-    this.z_depth_end = this.draw_order_to_body_z( args.z_depth_start,0.5)
+    this.z_depth_end = this.render.draw_order_to_body_z( args.z_depth_start,0.5)
 
-    this.Mouse.z = this.z_depth_end
+    this.physics.Mouse.z = this.z_depth_end
 
     this.bodies.build_order = this.bodies.get_build_order()
 
@@ -538,7 +532,7 @@ export default class fidget_simple_slide extends fidget{
       'geos','rectangles'
     ]
     
-    this.steps_info = [
+    this.physics.steps_info = [
       ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable: [

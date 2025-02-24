@@ -37,7 +37,7 @@ export default class fidget_windmill extends fidget{
       let bones_density_value = 0.44/this.s
       let inter_step_denstity = 0.022/this.s 
       let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
-      this.end_step = 4
+      this.set_end_step( 4 )
       ///////////////////////////////////////////////////////////////////////////////////////////
       this.is_dynamic = args.is_dynamic
       
@@ -60,14 +60,6 @@ export default class fidget_windmill extends fidget{
         (this.colors[0][1] + 0.2) * 0.3,
         (this.colors[0][2] + 0.2) * 0.3
       ]
-  
-      let opts_global = {
-        screen_dims: this.screen_dims,
-        matter_engine: this.matter_engine,
-        Mouse: this.Mouse,
-        fidget: this,
-        dynamic: this.is_dynamic
-      }
   
       let opts_collision_no_interaction = {
         collision: false,
@@ -108,14 +100,14 @@ export default class fidget_windmill extends fidget{
       }
   
       let opts_sparcles_shock = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_debug,
         scale_shape: this.s,
         type: 'sparcle_shock'
       }
   
       let opts_bones_main = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
         visibility: false,
@@ -130,7 +122,7 @@ export default class fidget_windmill extends fidget{
       }
   
       let opts_visual_bones = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,      
         visibility: false,
@@ -146,7 +138,7 @@ export default class fidget_windmill extends fidget{
       }
   
       let opts_inter_step = {
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_mouse_interaction,
         ...opts_debug,         
         visibility: false,
@@ -160,7 +152,7 @@ export default class fidget_windmill extends fidget{
       }
   
       let opts_geo = {
-      ...opts_global,
+      ...this.opts_global,
       ...opts_collision_activate,
       ...opts_debug,
       m_offset: new Matrix(),
@@ -224,7 +216,7 @@ export default class fidget_windmill extends fidget{
       })
   
       this.bodies.store.geos.backgrounds.push( new body_build({
-        ...opts_global,
+        ...this.opts_global,
         ...opts_collision_no_interaction,
         ...opts_debug,
         dynamic: false,
@@ -702,7 +694,7 @@ export default class fidget_windmill extends fidget{
     }
 
     
-    this.create_inter_from_geos(
+    this.bodies.create_inter_from_geos(
       ['circle', 'trapezoids'],
       this.bodies.store.inters.background,
       this.s
@@ -711,7 +703,7 @@ export default class fidget_windmill extends fidget{
 
 
     if(this.is_dynamic)
-     this.instance_each_others(
+     this.bodies.instance_each_others(
        [
          this.bodies.store.inters_step.steps[0][0],
          this.bodies.store.inters_step.steps[0][1],
@@ -1197,11 +1189,11 @@ export default class fidget_windmill extends fidget{
     
     
 
-    this.z_depth_end = this.draw_order_to_body_z( args.z_depth_start,0.5)
+    this.z_depth_end = this.render.draw_order_to_body_z( args.z_depth_start,0.5)
 
-    this.Mouse.z = this.z_depth_end
+    this.physics.Mouse.z = this.z_depth_end
 
-    this.Mouse.z = this.z_depth_end
+    this.physics.Mouse.z = this.z_depth_end
 
     this.bodies.build_order = this.bodies.get_build_order()
 
@@ -1231,7 +1223,7 @@ export default class fidget_windmill extends fidget{
       'geos','rectangles'
     ]
     
-    this.steps_info = [
+    this.physics.steps_info = [
       ///////////////////////////////////////////////////////////////////////////////////// 0
       {
         bodies_enable: [
