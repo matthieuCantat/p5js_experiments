@@ -1177,7 +1177,9 @@ export class body_render{
     let visibility = this.body_main.state.visibility
     if( use_recoded_state != null )
     {
-      const i = clamp(0, this.body_main.recorded_states.length -1, use_recoded_state)
+      const size_max = this.body_main.recorded_states.length -1
+      let i = use_recoded_state % size_max
+      
       pos = this.body_main.recorded_states[i].pos   
       rot = this.body_main.recorded_states[i].rot 
       scale = this.body_main.recorded_states[i].scale 

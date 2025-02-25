@@ -377,3 +377,38 @@ function debug_info_get_from_local()
             
     }
 }
+
+
+
+/////////////////////////////// record
+
+function record_btn()
+{
+    console.log("record_btn")
+    game_engine.record_state = !game_engine.record_state
+}
+
+function play_btn()
+{
+    console.log("play_btn")
+    game_engine.read_record_state = 1
+}
+
+function play_reverse_btn()
+{
+    console.log("play_reverse_btn")
+    game_engine.read_record_state = -1
+}
+
+function delete_record_btn()
+{
+    console.log("delete_record_btn")
+    game_engine.read_record_state = null
+}
+
+document.getElementById("record_btn").addEventListener("click", record_btn );
+document.getElementById("play_btn").addEventListener("click", play_btn );
+document.getElementById("play_reverse_btn").addEventListener("click", play_reverse_btn );
+document.getElementById("delete_record_btn").addEventListener("click", delete_record_btn );
+game_engine.record_info_dom = document.getElementById("record_info")
+game_engine.record_info_dom.innerHTML = "toto"

@@ -26,6 +26,11 @@ export default class Game_engine
         this.asset = null
         this.time = 0
         this.time_step = 1
+        this.record_state = false
+        this.read_record_state = null
+        this.start_read_record_state = null
+        this.record_info_dom = null
+        this.recording_size = 0
         //build
 
 
@@ -224,24 +229,51 @@ export default class Game_engine
             // light - change position
             this.light_lens_flare.position.x = Math.sin(rad(45)+this.time*0.01)*120
             this.light_lens_flare.position.y = Math.cos(rad(45)+this.time*0.01)*120
+        }     
+        
+        // record
+        if( (this.read_record_state != null)&&(this.start_read_record_state == null))
+            this.start_read_record_state = this.time
+
+        let frame_recorded = null
+        if( this.start_read_record_state != null ) 
+        {
+            if( this.read_record_state == 1 )
+                frame_recorded = this.time - this.start_read_record_state
+            else if( this.read_record_state == -1 )
+                frame_recorded = this.recording_size - (this.time - this.start_read_record_state)
         }        
+        
+        this.record_info_dom.innerHTML = ""
     
+
+
         if( this.asset != null )
         {
             
-            if( this.time < 500 )
+            
+
+                
+
+            if( frame_recorded == null )
             {
-                const record_state = true
-                this.asset.physics.update(record_state)
+                if(this.record_state)
+                {
+                    this.record_info_dom.innerHTML = "recording... " + this.recording_size
+                    this.recording_size += 1 
+                }
+                    
+                this.asset.physics.update(this.record_state)
                 this.asset.render.update()
             }
             else
             {
-                const use_recoded_state = this.time - 500
-                this.asset.render.update(use_recoded_state)
+                this.record_info_dom.innerHTML = "reading " + frame_recorded % this.recording_size + " / "+ this.recording_size
+                this.asset.render.update(frame_recorded)
             }
-            
-            
+                
+
+        
         }
     
         //uniforms[ 'time' ].value = performance.now() / 1000;
