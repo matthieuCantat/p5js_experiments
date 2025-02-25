@@ -316,7 +316,7 @@ toggleButton.addEventListener("click", toggle_debug_choice_window );
 
 debug_info_get_from_local()
 debug_choice_window_fill()
-game_engine.asset.set_debug( debug_modified )
+game_engine.asset.render.set_debug( debug_modified )
 
 // Function to handle checkbox selection
 function handleCheckboxChange() {
@@ -348,7 +348,7 @@ function handleCheckboxChange() {
     */
 
     //debug.selected = checkbox.value
-    game_engine.asset.set_debug( debug_modified )
+    game_engine.asset.render.set_debug( debug_modified )
 
     
     debug_info_save_to_local()

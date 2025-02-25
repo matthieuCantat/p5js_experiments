@@ -387,6 +387,11 @@ class fidget_physics{
       this.state.steps[i].time_start = null     
   }
 
+  get_completion_coef()
+  {
+    return this.state.resolution_coef / (this.end_step-1)
+  }
+  
 
   update_bodies_select_state(body_type_filter = [])
   {
@@ -784,11 +789,6 @@ export default class fidget{
   set_end_step( end_step )
   {
     this.physics.end_step = end_step
-  }
-
-  get_end_step()
-  {
-    return this.physics.end_step
   }
 
 

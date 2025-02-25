@@ -228,8 +228,8 @@ export default class Game_engine
     
         if( this.asset != null )
         {
-            this.asset.update()
-            this.asset.animate_three()
+            this.asset.physics.update()
+            this.asset.render.update()
     
             //console.log('__________________' + animate_count)
             //console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
