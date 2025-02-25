@@ -7,7 +7,8 @@ import {
   getRandomInt, 
   Draw_text_debug,
   convert_coords_matter_to_three,
-  strictObject} from '../utils/utils.js';
+  strictObject,
+  array_loop} from '../utils/utils.js';
 import { 
   build_body_physics_modifier} from './constraint.js';
 import * as ut from '../utils/utils_three.js';
@@ -1177,13 +1178,12 @@ export class body_render{
     let visibility = this.body_main.state.visibility
     if( use_recoded_state != null )
     {
-      const size_max = this.body_main.recorded_states.length -1
-      let i = use_recoded_state % size_max
-      
-      pos = this.body_main.recorded_states[i].pos   
-      rot = this.body_main.recorded_states[i].rot 
-      scale = this.body_main.recorded_states[i].scale 
-      visibility = this.body_main.recorded_states[i].visibility     
+
+      const state = array_loop( this.body_main.recorded_states, use_recoded_state)
+      pos = state.pos   
+      rot = state.rot 
+      scale = state.scale 
+      visibility = state.visibility     
     }
 
     

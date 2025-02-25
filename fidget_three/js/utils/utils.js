@@ -483,6 +483,15 @@ export class Chrono
 
 }
 
+export function array_loop(array,i)
+{
+  const size_max = array.length -1
+  if( 0 <= i )
+    return array[i % size_max]
+  else
+    return array[(i + size_max * 100 )% size_max]
+}
+
 export function clamp(value,min_value,max_value)
 {
   return Math.min(max_value,Math.max(min_value,value))

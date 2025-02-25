@@ -28,6 +28,7 @@ export default class Game_engine
         this.time_step = 1
         this.record_state = false
         this.read_record_state = null
+        this.read_record_state_last = null
         this.start_read_record_state = null
         this.record_info_dom = null
         this.recording_size = 0
@@ -232,8 +233,12 @@ export default class Game_engine
         }     
         
         // record
-        if( (this.read_record_state != null)&&(this.start_read_record_state == null))
+        if( this.read_record_state != this.read_record_state_last )
+        {
             this.start_read_record_state = this.time
+            this.read_record_state_last = this.read_record_state
+        }
+            
 
         let frame_recorded = null
         if( this.start_read_record_state != null ) 
@@ -268,7 +273,7 @@ export default class Game_engine
             }
             else
             {
-                this.record_info_dom.innerHTML = "reading " + frame_recorded % this.recording_size + " / "+ this.recording_size
+                this.record_info_dom.innerHTML = "reading " + (frame_recorded+100*this.recording_size) % this.recording_size + " / "+ this.recording_size
                 this.asset.render.update(frame_recorded)
             }
                 
