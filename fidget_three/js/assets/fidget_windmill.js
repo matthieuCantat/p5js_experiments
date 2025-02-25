@@ -228,7 +228,9 @@ export default class fidget_windmill extends fidget{
         material_three: materials.old_custom_exemple, //materials.background.space_grid ,
         visibility: this.do_background,
       }) )
-      this.bodies.store.geos.backgrounds.push(this.bodies.store.geos.backgrounds[0].get_mirror(false, true))
+
+      const mirror_point_ref = new Vector( this.screen_dims.x/2,this.screen_dims.y/2)
+      this.bodies.store.geos.backgrounds.push(this.bodies.store.geos.backgrounds[0].get_mirror(false, true, mirror_point_ref))
   
       this.bodies.store.bones.traj = new body_build({
         ...opts_bones_main,
@@ -1378,7 +1380,7 @@ export default class fidget_windmill extends fidget{
       }
     ]
 
-    this.bodies.physics.init_physics()
+    this.bodies.physics.setup()
     this.bodies.physics.init_constraints()
 
     

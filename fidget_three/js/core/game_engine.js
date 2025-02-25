@@ -228,18 +228,20 @@ export default class Game_engine
     
         if( this.asset != null )
         {
-            this.asset.physics.update()
-            this.asset.render.update()
-    
-            //console.log('__________________' + animate_count)
-            //console.log(`THREE Number of elements in the scene: ${countObjects(scene)}`);
-            //console.log('Elements in the scene:', scene.children);
-            //for( let F of current_asset.fidgets)
-            //{
-            //    //console.log( F.title , 'Mouse canvas element' , F.mouse_constraint.mouse.element);
-            //    //console.log(F.mouse_constraint.world === F.matter_engine.world); // Should log true
-            //}
-                
+            
+            if( this.time < 500 )
+            {
+                const record_state = true
+                this.asset.physics.update(record_state)
+                this.asset.render.update()
+            }
+            else
+            {
+                const use_recoded_state = this.time - 500
+                this.asset.render.update(use_recoded_state)
+            }
+            
+            
         }
     
         //uniforms[ 'time' ].value = performance.now() / 1000;

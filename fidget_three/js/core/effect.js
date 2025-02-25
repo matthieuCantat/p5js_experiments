@@ -103,7 +103,7 @@ export class effect{
   {
     for( let bodies of this.bodies)
       for( let body of bodies)
-        body.physics.init_physics()
+        body.physics.setup()
   }
 
 

@@ -31,10 +31,10 @@ export class bodies_physics
     }
 
 
-    init_physics()
+    setup()
     {   
       for( let body of this.bodies.get_list_filtered( 'eval' ))
-        body.physics.init_physics()   
+        body.physics.setup()   
     
       for( let effect in this.bodies.effects)
         if(this.bodies.effects[effect] != null)this.bodies.effects[effect].init_physics()     
@@ -66,10 +66,10 @@ export class bodies_physics
     }
       */
   
-    update( body_type_filter = [] )
+    update( body_type_filter = [], record_state = false )
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-        body.physics.update()
+        body.physics.update(record_state)
   
       for( let effect in this.bodies.effects)
         if(this.bodies.effects[effect] != null)
@@ -179,10 +179,10 @@ export class bodies_render
     }
 
 
-    update( body_type_filter = [] )
+    update( body_type_filter = [],  use_recoded_state = null )
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
-        body.render.update()
+        body.render.update( use_recoded_state )
       
 
       
@@ -237,14 +237,14 @@ export class bodies_render
       {
         if( value == null )
         {
-          body.render.state.visibility = body.render.state.visibility_default
+          body.state.visibility = body.render.state.visibility_default
         }
         else
         {
-          body.render.state.visibility = value
+          body.state.visibility = value
         }
-        if( body.render.mesh_three != null )
-          body.render.mesh_three.group.visible = body.render.get_visibility() === 1       
+        //if( body.render.mesh_three != null )
+        //  body.render.mesh_three.group.visible = body.state.visibility      
       }
     }  
   

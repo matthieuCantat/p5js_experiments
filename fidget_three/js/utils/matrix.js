@@ -560,11 +560,14 @@ Matrix.prototype = {
 		}
 	},
 
-	get_mirror(axe_x = false, axe_y = true){
+	get_mirror(axe_x = false, axe_y = true, mirror_point_ref = null ){
 		let m_mirrored = new Matrix(this)
 
 		// point
         let p = this.get_row(2)
+		if( mirror_point_ref != null )
+			p = p.getSub(mirror_point_ref)
+
         let p_mirrored = null
 		if( (axe_x == false)&&(axe_y == true))
 			p_mirrored = new Vector(p.x()*-1,p.y())
@@ -572,6 +575,10 @@ Matrix.prototype = {
 			p_mirrored = new Vector(p.x(),p.y()*-1)
 		else if( (axe_x == true)&&(axe_y == true))
 			p_mirrored = new Vector(p.x()*-1,p.y()*-1)
+
+		if( mirror_point_ref != null )
+			p_mirrored = p_mirrored.getAdd(mirror_point_ref)
+
         m_mirrored.set_row(2,p_mirrored)
 
 		//orient	
@@ -649,3 +656,4 @@ Matrix.prototype = {
 		p5.circle(p.x(),p.y(),10)
 	}	
 };
+

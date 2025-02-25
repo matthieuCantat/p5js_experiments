@@ -93,7 +93,7 @@ class fidgets_sequence_physics
       }
     }
 
-    update()
+    update( record_state = false)
     { 
       this.get_resolution_coef_info()
       this.fidgets_do_computation = this.get_fidget_to_compute()
@@ -105,7 +105,7 @@ class fidgets_sequence_physics
       {   
         if(this.fidgets_do_computation[i] == false)
           continue  
-        this.main.fidgets[i].physics.update()
+        this.main.fidgets[i].physics.update( record_state )
         
         if( user_interaction_info.userInteractionChange )
         {
@@ -186,14 +186,14 @@ class fidgets_sequence_render
     }
 
 
-    update()
+    update( use_recoded_state = null )
     {
 
       for( let i = 0; i < this.main.fidgets.length; i++ )
       {   
         if(this.physics.fidgets_do_computation[i] == false)
           continue  
-        this.main.fidgets[i].render.update()
+        this.main.fidgets[i].render.update( use_recoded_state )
       }
 
 

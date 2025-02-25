@@ -98,7 +98,7 @@ class fidget_physics{
     this.fidget_main.bodies.physics.init_out_matrix()
   }
 
-  update()
+  update( record_state = false)
   {
     if(this.is_dynamic)
     {
@@ -119,7 +119,7 @@ class fidget_physics{
     this.update_completion_info( ) 
     this.reset_current_step_completion()
 
-    this.fidget_main.bodies.physics.update()
+    this.fidget_main.bodies.physics.update([],record_state)
 
     this.animate_background_doors()
     let physics_engine_delta_ms = 16.666
@@ -565,11 +565,11 @@ class fidget_render{
   }
 
   
-  update()
+  update( use_recoded_state = null )
   {
     this.fidget_main.bodies.render.override_color(this.fidget_main.state.geos_color_override, ['geos'])
     this.fidget_main.bodies.render.override_color_three(this.fidget_main.state.geos_color_override, ['geos'])      
-    this.fidget_main.bodies.render.update()
+    this.fidget_main.bodies.render.update( [] , use_recoded_state )
   }
 
 

@@ -3,6 +3,7 @@ import Matrix from '../utils/matrix.js';
 import { 
   utils , 
   rad, 
+  clamp,
   getRandomInt, 
   Draw_text_debug,
   convert_coords_matter_to_three,
@@ -203,7 +204,7 @@ class body_physics{
   }
 
   
-  init_physics()
+  setup()
   {
     if(!this.dynamic)
       return false
@@ -781,7 +782,7 @@ class body_physics{
 
 
 
-  update()
+  update( record_state = false )
   {
     if( !this.opts.do_update )
       return false
@@ -796,8 +797,11 @@ class body_physics{
 
 
     this.body_main.state.pos   = this.get_out_position('world')
-    this.body_main.state.rot = this.get_out_rotation('world')
+    this.body_main.state.rot   = this.get_out_rotation('world')
     this.body_main.state.scale = this.state.scale
+
+    if( record_state )
+      this.body_main.recorded_states.push({...this.body_main.state})
 
     return true
    
@@ -908,7 +912,7 @@ export class body_render{
       extra_rotation : 0,
       rot_override : null,
       scale : 1.0,
-      visibility : args.visibility,
+      //visibility : args.visibility,
       visibility_secondary : false,
 
     }
@@ -1165,18 +1169,32 @@ export class body_render{
 
   
 
-  update()
+  update( use_recoded_state = null )
   {
     let pos = this.body_main.state.pos   
     let rot = this.body_main.state.rot 
     let scale = this.body_main.state.scale 
+    let visibility = this.body_main.state.visibility
+    if( use_recoded_state != null )
+    {
+      const i = clamp(0, this.body_main.recorded_states.length -1, use_recoded_state)
+      pos = this.body_main.recorded_states[i].pos   
+      rot = this.body_main.recorded_states[i].rot 
+      scale = this.body_main.recorded_states[i].scale 
+      visibility = this.body_main.recorded_states[i].visibility     
+    }
+
+    
+    if(this.debug.force_visibility)
+      this.body_main.state.visibility = true
+    
 
     let converted_pos = convert_coords_matter_to_three(pos,this.body_main.ref.screen_dims)
     this.mesh_three.group.position.x = converted_pos.x()
     this.mesh_three.group.position.y = converted_pos.y()
     this.mesh_three.group.position.z = this.z
     this.mesh_three.group.rotation.z = rot*-1
-    this.mesh_three.group.visible = this.get_visibility() === 1  //<<< 
+    this.mesh_three.group.visible = visibility//this.get_visibility() === 1  //<<< 
     this.mesh_three.group.scale.x = scale  
     this.mesh_three.group.scale.y = scale  
     //this.mesh_three.group.scale.z = scale 
@@ -1250,19 +1268,11 @@ export class body_render{
   enable(value)
   {
     if(value)
-      this.state.visibility = this.properties.visibility_default
+      this.body_main.state.visibility = this.properties.visibility_default
     else
-      this.state.visibility = false    
+      this.body_main.state.visibility = false    
   }
 
-  get_visibility()
-  {
-    if(this.debug.force_visibility)
-      return 1
-    if( this.state.visibility || this.state.visibility_secondary ) 
-      return 1
-    return 0
-  }
 
 
 }
@@ -1365,14 +1375,20 @@ export class body_build{
 
       this.state = 
       {
-        pos : [0,0,0],
+        pos : { x:0 , y:0 , z:0 },
         rot : 0,
-        scale :1 ,
+        scale : 1 ,
+        visibility : this.render.properties.visibility_default,
       }
+      this.recorded_states = []
 
       build_order += 1
 
-     
+      // init state
+      let m_init = this.physics.get_init_matrix()
+      this.state.pos = m_init.get_row(2)
+      this.state.rot = m_init.getRotation()
+  
     }
 
     
@@ -1796,7 +1812,7 @@ export class body_build{
     }
 
 
-    get_mirror(  axe_x = false, axe_y = true)
+    get_mirror(  axe_x = false, axe_y = true, mirror_point_ref = null)
     {
       let args = this.get_args()
 
@@ -2099,9 +2115,9 @@ export class body_build{
       
       if( parent_is_sided == false)
       {
-        let m_transform_offset_mirrored = m_transform.getMult(m_offset).get_mirror(axe_x,axe_y)
+        let m_transform_offset_mirrored = m_transform.getMult(m_offset).get_mirror(axe_x,axe_y,mirror_point_ref)
 
-        m_offset = m_offset.get_mirror(axe_x,axe_y)
+        m_offset = m_offset.get_mirror(axe_x,axe_y,mirror_point_ref)
 
         let angleA = m_transform.getRotation()
         m_transform = m_transform_offset_mirrored.getMult(m_offset.getInverse())
