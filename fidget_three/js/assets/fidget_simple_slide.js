@@ -36,7 +36,7 @@ export default class fidget_simple_slide extends fidget{
       let visual_bones_main_size = 150*this.s
       let bones_density_value = 0.44/this.s
       let inter_step_denstity = 0.022/this.s 
-      let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
+      let inter_step_selection_break_length = this.debug_mode.options.mouse_selection_break_length * (this.s / 2.2)
       //this.end_step = 2
       this.set_end_step( 2 )
       ///////////////////////////////////////////////////////////////////////////////////////////
@@ -82,9 +82,9 @@ export default class fidget_simple_slide extends fidget{
   
       let opts_debug = {
         debug_matrix_info: false,
-        debug_matrix_axes: this.debug_mode.matrix_axes,
-        debug_cns_axes: this.debug_mode.cns_axes,
-        debug_force_visibility: this.debug_mode.force_visibility
+        debug_matrix_axes: this.debug_mode.options.matrix_axes,
+        debug_cns_axes: this.debug_mode.options.cns_axes,
+        debug_force_visibility: this.debug_mode.options.force_visibility
       }
   
       let opts_cns_disable_at_select = {
@@ -316,7 +316,7 @@ export default class fidget_simple_slide extends fidget{
               distPos: 60 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
-              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
             
             
@@ -357,7 +357,7 @@ export default class fidget_simple_slide extends fidget{
               rot_max: rad(270),
               clockwize_mode:true,
               limit_lock: true,
-              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
           

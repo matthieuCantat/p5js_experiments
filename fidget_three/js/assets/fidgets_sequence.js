@@ -165,7 +165,7 @@ class fidgets_sequence_render
       
       this.main.fidgets[this.physics.fidget_focus_id].render.set_debug(this.debug_mode)
 
-      if(this.debug_mode.fidget_steps_info)
+      if(this.debug_mode.options.fidget_steps_info)
           this.draw_text_debug = new Draw_text_debug(this.main.screen_dims)
       else
       {
@@ -181,7 +181,7 @@ class fidgets_sequence_render
 
     setup_debug_three(scene_three)
     {
-      if(this.debug_mode.fidget_steps_info)
+      if(this.debug_mode.options.fidget_steps_info)
         this.draw_text_debug.setup_three(scene_three)
     }
 
@@ -197,7 +197,7 @@ class fidgets_sequence_render
       }
 
 
-      if(this.debug_mode.fidget_steps_info)
+      if(this.debug_mode.options.fidget_steps_info)
       {
         let F = this.main.fidgets[this.physics.fidget_focus_id].physics.state;
         const time = this.main.fidgets[this.physics.fidget_focus_id].Game_engine.time

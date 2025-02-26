@@ -64,7 +64,7 @@ class fidget_physics{
       args.dom_canvas, 
       this.screen_dims, 
       this, 
-      this.debug_mode.mouse_info) )  
+      this.debug_mode.options.mouse_info) )  
 
     this.state = strictObject({
       resolution_coef : 0, 
@@ -183,7 +183,7 @@ class fidget_physics{
 
       if( (bodies[b_type][key] === null)||(bodies[b_type][key].length === 0))
       {
-        if(this.debug_mode.show_warning_log)
+        if(this.debug_mode.options.show_warning_log)
           console.log('constraint enable - '+b_type+'.'+key+' doesnt exists')
         continue
       }      
@@ -194,7 +194,7 @@ class fidget_physics{
         const constraint = body.physics.relations.constraints[cns]
         if(constraint == null )
         {
-          if(this.debug_mode.show_warning_log)
+          if(this.debug_mode.options.show_warning_log)
             console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'.constraints.'+cns+' doesnt exists')
           continue
         }        
@@ -206,7 +206,7 @@ class fidget_physics{
         const constraint = body.physics.relations.constraints[cns]        
         if( constraint == null )
         {
-          if(this.debug_mode.show_warning_log)
+          if(this.debug_mode.options.show_warning_log)
             console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'['+j+'].constraints.'+cns+' doesnt exists')
           continue
         }         
@@ -335,7 +335,7 @@ class fidget_physics{
       
     
     
-    if((this.debug_mode.switch_selected_inter_help)||(this.steps_info[step].switch_selection_transition))
+    if((this.debug_mode.options.switch_selected_inter_help)||(this.steps_info[step].switch_selection_transition))
     {
       if((step == 0)||(step == inter_step_bodies.length))
       {
@@ -541,14 +541,14 @@ class fidget_render{
     
   set_debug_setup()
   {
-    this.physics.Mouse.set_debug(this.debug_mode.mouse_info)
+    this.physics.Mouse.set_debug(this.debug_mode.options.mouse_info)
 
     this.fidget_main.bodies.set_debug( this.debug_mode )
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.show_inters, ['inters'])  
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.show_inters_steps, ['inters_step']) 
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.show_geos, ['geos']) 
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.show_effects, ['effects']) 
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.show_bones, ['bones']) 
+    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_inters, ['inters'])  
+    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_inters_steps, ['inters_step']) 
+    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_geos, ['geos']) 
+    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_effects, ['effects']) 
+    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_bones, ['bones']) 
   }
 
   set_debug(debug)
@@ -662,7 +662,7 @@ class fidget_render{
     {
       if (this.fidget_main.bodies.draw_order[i] == null)
       {
-        if (this.debug_mode.show_warning_log)
+        if (this.debug_mode.options.show_warning_log)
           console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
         continue
       }

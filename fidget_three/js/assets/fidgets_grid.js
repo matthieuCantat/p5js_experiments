@@ -79,7 +79,7 @@ export default class fidgets_grid
         }
     
         this.draw_text_debug = null
-        if(this.debug_mode.fidget_steps_info)
+        if(this.debug_mode.options.fidget_steps_info)
         {
             this.draw_text_debug = new Draw_text_debug(this.screen_dims)
             //this.draw_text_debug.mouse_cns = this.mouse_constraint
@@ -154,7 +154,7 @@ export default class fidgets_grid
     
     setup_debug_three(scene_three)
     {
-      if(this.debug_mode.fidget_steps_info)
+      if(this.debug_mode.options.fidget_steps_info)
         this.draw_text_debug.setup_three(scene_three)
     }
 
@@ -255,7 +255,7 @@ export default class fidgets_grid
 
 
       var user_interaction_start = 290
-      if(this.debug_mode.disable_animation)
+      if(this.debug_mode.options.disable_animation)
       {
         //this.do_anim_override(0)
         if(this.update_count < user_interaction_start)
@@ -393,7 +393,7 @@ export default class fidgets_grid
       }
 
       this.update_chrono_three()
-      if(this.debug_mode.fidget_steps_info)
+      if(this.debug_mode.options.fidget_steps_info)
       {
         let texts_to_draw = [
           

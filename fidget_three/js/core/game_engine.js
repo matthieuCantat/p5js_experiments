@@ -90,7 +90,7 @@ export default class Game_engine
     }
 
 
-    setup_asset_from_name( class_name, screen_dims, debug_options)
+    setup_asset_from_name( class_name)
     {
     
       // Remove existing objects
@@ -99,7 +99,7 @@ export default class Game_engine
       // Add 
     
         let m = new Matrix()
-        m.setTranslation(screen_dims.x/2, screen_dims.y/2 )
+        m.setTranslation(this.args.screen_dims.x/2, this.args.screen_dims.y/2 )
     
         let s = 2.2
     
@@ -107,9 +107,9 @@ export default class Game_engine
         nbr : 5,
         m : m,
         s : s,
-        screen_dims : screen_dims, 
+        screen_dims : this.args.screen_dims, 
         shdrs : [],
-        debug : debug_options,
+        debug : this.args.debug,
       }
       
       let asset = null;

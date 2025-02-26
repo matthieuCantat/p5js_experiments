@@ -34,7 +34,7 @@ export default class fidget_daft_i extends fidget {
     let visual_bones_main_size = 150*this.s
     let bones_density_value = 0.44/this.s
     let inter_step_denstity = 0.022/this.s 
-    let inter_step_selection_break_length = this.debug_mode.mouse_selection_break_length * (this.s / 2.2)
+    let inter_step_selection_break_length = this.debug_mode.options.mouse_selection_break_length * (this.s / 2.2)
     //this.end_step = 4
     this.set_end_step( 4 )
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -79,9 +79,9 @@ export default class fidget_daft_i extends fidget {
 
     let opts_debug = {
       debug_matrix_info: false,
-      debug_matrix_axes: this.debug_mode.matrix_axes,
-      debug_cns_axes: this.debug_mode.cns_axes,
-      debug_force_visibility: this.debug_mode.force_visibility
+      debug_matrix_axes: this.debug_mode.options.matrix_axes,
+      debug_cns_axes: this.debug_mode.options.cns_axes,
+      debug_force_visibility: this.debug_mode.options.force_visibility
     }
 
     let opts_cns_disable_at_select = {
@@ -312,7 +312,7 @@ export default class fidget_daft_i extends fidget {
               distPos: 25 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
-              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
 
@@ -332,7 +332,7 @@ export default class fidget_daft_i extends fidget {
           m_shape: new Matrix().setScale(83*this.s,21*this.s),
           type: utils.shape.rectangle,
           constraints: [
-            this.debug_mode.inter_step_physics
+            this.debug_mode.options.inter_step_physics
               ? {
                   name: 'point',
                   type: 'dyn_point',
@@ -350,7 +350,7 @@ export default class fidget_daft_i extends fidget {
               rot_min: rad(0),
               rot_max: rad(90.5),
               limit_lock: true,
-              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
 
@@ -361,7 +361,7 @@ export default class fidget_daft_i extends fidget {
       this.bodies.store.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.physics.get_out_rotation('base')) / 90.0, 0, 1)}
       this.bodies.store.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.physics.set_out_rotation(rad(res * 90.5), 'world', 'override')}
 
-      if (this.debug_mode.inter_step_physics == false)
+      if (this.debug_mode.options.inter_step_physics == false)
         this.bodies.store.inters_step.steps[1].physics.relations.constraints_args.push({name: 'point_no_dyn', type: 'kin_point', target: this.is_dynamic ? this.bodies.store.inters.background : this.bodies.store.bones.traj})
 
 
@@ -386,7 +386,7 @@ export default class fidget_daft_i extends fidget {
               distPos: 50 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
-              transfer_delta_as_parent_force: this.debug_mode.inter_step_physics
+              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
 

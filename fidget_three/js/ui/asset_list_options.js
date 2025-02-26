@@ -22,7 +22,7 @@ export default class Asset_list_options
                 
         this.menu.addEventListener('change', (event) =>{
             this.current_asset = event.target.value;
-            game_engine.setup_asset_from_name( this.current_asset, screen_dims, debug_options)
+            game_engine.setup_asset_from_name( this.current_asset)
             this.save_to_local()
         })
   

@@ -42,7 +42,7 @@ export default class Debug_options
     set_game_engine(game_engine)
     {
         this.game_engine = game_engine
-        this.game_engine.asset.render.set_debug( this.options )
+        this.game_engine.asset.render.set_debug( this )
     }
 
     handleCheckboxChange() {
@@ -55,7 +55,7 @@ export default class Debug_options
             this.options[elem.value] = elem.checked
         }
       
-        this.game_engine.asset.render.set_debug( this.options )  
+        this.game_engine.asset.render.set_debug( this )  
         this.save_to_local()
     }
     
@@ -123,10 +123,10 @@ export default class Debug_options
         {
             if( elem == "mouse_selection_break_length")
                 continue
-            const checked = localStorage.getItem(elem)
+            const checked = localStorage.getItem(this.local_storage_key + elem)
             if( checked != null )
             {
-                this.options[this.local_storage_key + elem] = checked == 'true'
+                this.options[elem] = checked == 'true'
                 //console.log('local value found : ', elem , checked)
             }
                 

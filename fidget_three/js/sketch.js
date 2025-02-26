@@ -9,6 +9,7 @@ import Vector from './utils/vector.js'
 import Game_engine from './core/game_engine.js';     
 import Debug_options from './ui/debug_options.js'; 
 import Asset_list_options from './ui/asset_list_options.js'; 
+import Record_state_panel from './ui/record_state_panel.js'
 
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
 import { RenderPass } from './libraries/jsm/postprocessing/RenderPass.js';
@@ -44,7 +45,31 @@ let screen_dims = {
     pixelRatio : window.devicePixelRatio}
 
 /////////////////////////////////////////// setup game
-var nbr = 5
+
+
+
+// Disable pull-to-refresh using JavaScript
+
+function disable_pull_to_refresh(event)
+{
+    const menu = document.getElementById("debug_menu");
+    const debug_menu_is_open = menu.style.display === "block";
+    if( debug_menu_is_open)
+    {
+        //console.log('debug_menu_is_open')
+        return false
+    }
+        
+
+    // Disable pull-to-refresh
+    event.preventDefault();
+
+    return true
+}
+document.body.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
+
+
+
 const debug_options = new Debug_options()
 
 
@@ -60,10 +85,14 @@ const Game_engine_args = {
     debug : debug_options,
 }
 var game_engine = new Game_engine( Game_engine_args )
+
 const asset_list_options = new Asset_list_options(game_engine, screen_dims, debug_options)
-game_engine.setup_asset_from_name( asset_list_options.current_asset, screen_dims, debug_options)
+
+game_engine.setup_asset_from_name( asset_list_options.current_asset )
 
 debug_options.set_game_engine(game_engine)
+
+const record_state_panel = new Record_state_panel(game_engine)
 
 
 ////////////////////////////////////////////////////////////CALLBACKS
@@ -78,22 +107,6 @@ document.ontouchmove = function(event) {
 */
 
 
-
-// Disable pull-to-refresh using JavaScript
-
-function disable_pull_to_refresh(event)
-{
-    const menu = document.getElementById("debug_menu");
-    const debug_menu_is_open = menu.style.display === "block";
-    if( debug_menu_is_open)
-        return false
-
-    // Disable pull-to-refresh
-    event.preventDefault();
-
-    return true
-}
-document.body.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
 
   
 window.addEventListener( 'resize', () => { game_engine.resize_render( width, height )} );
@@ -133,68 +146,3 @@ function getAssetsInfo()
 
 
 /////////////////////////////// record
-
-function record_btn()
-{
-    
-    if( game_engine.record_state != "record" )
-    {
-        console.log("start recording")
-        game_engine.record_state = "record"
-    }
-    else if( game_engine.record_state != "pause record" )
-    {
-        console.log("stop recording")
-        game_engine.record_state = "pause record"
-    }
-    else if( game_engine.record_state != "record" )
-    {
-        console.log("restart recording")
-        game_engine.record_state = "record"
-    }
-        
-
-    
-}
-
-function play_btn()
-{
-    if( game_engine.record_state == "play" )
-    {
-        console.log("pause")
-        game_engine.record_state = "pause"
-    }
-    else
-    {
-        console.log("play")
-        game_engine.record_state = "play"
-    }
-    
-}
-
-function play_reverse_btn()
-{
-    if( game_engine.record_state == "play reverse" )
-        {
-            console.log("pause")
-            game_engine.record_state = "pause"
-        }
-        else
-        {
-            console.log("play reverse")
-            game_engine.record_state = "play reverse"
-        }
-}
-
-function delete_record_btn()
-{
-    console.log("delete_record")
-    game_engine.record_state = "delete"
-}
-
-document.getElementById("record_btn").addEventListener("click", record_btn );
-document.getElementById("play_btn").addEventListener("click", play_btn );
-document.getElementById("play_reverse_btn").addEventListener("click", play_reverse_btn );
-document.getElementById("delete_record_btn").addEventListener("click", delete_record_btn );
-game_engine.record_info_dom = document.getElementById("record_info")
-game_engine.record_info_dom.innerHTML = ""

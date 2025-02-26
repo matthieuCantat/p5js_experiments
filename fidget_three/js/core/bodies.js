@@ -331,7 +331,7 @@ export class bodies
           let key = this.eval_order[i+1]
           if( ( this.store[b_type][key] === null)||( this.store[b_type][key].length === 0))
           {
-            if( this.debug_mode.show_warning_log )
+            if( this.debug_mode.options.show_warning_log )
               console.log('bodies_enable - this.store.'+b_type+'.'+key+' doesnt exists')
             continue
           }
@@ -391,7 +391,7 @@ export class bodies
           {   
             if( ( this.store[b_type][key] === null)||( this.store[b_type][key].length === 0))
             {
-              if( this.debug_mode.show_warning_log )
+              if( this.debug_mode.options.show_warning_log )
                 console.log('bodies_enable - this.store.'+b_type+'.'+key+' doesnt exists')
               continue
             }
@@ -446,7 +446,7 @@ export class bodies
         let key = this.eval_order[i+1]
         if( ( this.store[b_type][key] === null)||( this.store[b_type][key].length === 0))
         {
-          if(this.debug_mode.show_warning_log)
+          if(this.debug_mode.options.show_warning_log)
             console.log('bodies_log_body_ids - this.store.'+b_type+'.'+key+' doesnt exists')
           continue
         }
@@ -548,7 +548,7 @@ export class bodies
       {
         if(bodies_list[i] == null)
         {
-          if(this.debug_mode.show_warning_log)
+          if(this.debug_mode.options.show_warning_log)
             console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
           continue
         }
