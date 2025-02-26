@@ -1176,7 +1176,7 @@ export class body_render{
     let rot = this.body_main.state.rot 
     let scale = this.body_main.state.scale 
     let visibility = this.body_main.state.visibility
-    if( use_recoded_state != null )
+    if(( use_recoded_state != null )&&( 0 <= use_recoded_state  ))
     {
 
       const state = array_loop( this.body_main.recorded_states, use_recoded_state)
@@ -1184,6 +1184,11 @@ export class body_render{
       rot = state.rot 
       scale = state.scale 
       visibility = state.visibility     
+    }
+    else if( use_recoded_state == -1 )
+    {
+      if( 0 < this.body_main.recorded_states.length)
+        this.body_main.recorded_states = []
     }
 
     

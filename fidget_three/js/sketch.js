@@ -384,26 +384,60 @@ function debug_info_get_from_local()
 
 function record_btn()
 {
-    console.log("record_btn")
-    game_engine.record_state = !game_engine.record_state
+    
+    if( game_engine.record_state != "record" )
+    {
+        console.log("start recording")
+        game_engine.record_state = "record"
+    }
+    else if( game_engine.record_state != "pause record" )
+    {
+        console.log("stop recording")
+        game_engine.record_state = "pause record"
+    }
+    else if( game_engine.record_state != "record" )
+    {
+        console.log("restart recording")
+        game_engine.record_state = "record"
+    }
+        
+
+    
 }
 
 function play_btn()
 {
-    console.log("play_btn")
-    game_engine.read_record_state = 1
+    if( game_engine.record_state == "play" )
+    {
+        console.log("pause")
+        game_engine.record_state = "pause"
+    }
+    else
+    {
+        console.log("play")
+        game_engine.record_state = "play"
+    }
+    
 }
 
 function play_reverse_btn()
 {
-    console.log("play_reverse_btn")
-    game_engine.read_record_state = -1
+    if( game_engine.record_state == "play reverse" )
+        {
+            console.log("pause")
+            game_engine.record_state = "pause"
+        }
+        else
+        {
+            console.log("play reverse")
+            game_engine.record_state = "play reverse"
+        }
 }
 
 function delete_record_btn()
 {
-    console.log("delete_record_btn")
-    game_engine.read_record_state = null
+    console.log("delete_record")
+    game_engine.record_state = "delete"
 }
 
 document.getElementById("record_btn").addEventListener("click", record_btn );

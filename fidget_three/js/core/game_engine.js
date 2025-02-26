@@ -26,10 +26,9 @@ export default class Game_engine
         this.asset = null
         this.time = 0
         this.time_step = 1
-        this.record_state = false
-        this.read_record_state = null
-        this.read_record_state_last = null
-        this.start_read_record_state = null
+        this.record_state = null
+        this.record_state_last = null
+        this.play_recorded_state_start = null
         this.record_info_dom = null
         this.recording_size = 0
         //build
@@ -233,21 +232,20 @@ export default class Game_engine
         }     
         
         // record
-        if( this.read_record_state != this.read_record_state_last )
+        let frame_to_play = null
+        if( ( this.record_state == "play" )||( this.record_state == "play reverse" ))
         {
-            this.start_read_record_state = this.time
-            this.read_record_state_last = this.read_record_state
-        }
+            if( this.record_state != this.record_state_last )
+                this.play_recorded_state_start = this.time
             
-
-        let frame_recorded = null
-        if( this.start_read_record_state != null ) 
-        {
-            if( this.read_record_state == 1 )
-                frame_recorded = this.time - this.start_read_record_state
-            else if( this.read_record_state == -1 )
-                frame_recorded = this.recording_size - (this.time - this.start_read_record_state)
-        }        
+            if( this.record_state == "play" )
+                frame_to_play = this.time - this.play_recorded_state_start
+            else if( this.record_state == "play reverse" )
+                frame_to_play = this.recording_size - (this.time - this.play_recorded_state_start)
+            
+            frame_to_play = (frame_to_play+100*this.recording_size) % this.recording_size
+        }
+      
         
         this.record_info_dom.innerHTML = ""
     
@@ -256,30 +254,40 @@ export default class Game_engine
         if( this.asset != null )
         {
             
-            
-
-                
-
-            if( frame_recorded == null )
+            if(this.record_state == "record" )
             {
-                if(this.record_state)
-                {
-                    this.record_info_dom.innerHTML = "recording... " + this.recording_size
-                    this.recording_size += 1 
-                }
-                    
+                this.record_info_dom.innerHTML = "recording... " + this.recording_size
+                this.recording_size += 1 
+
                 this.asset.physics.update(this.record_state)
-                this.asset.render.update()
+                this.asset.render.update()                
+            }     
+            else if ( ( this.record_state == "play" )||( this.record_state == "play reverse" ))
+            {
+                this.record_info_dom.innerHTML = "reading " + frame_to_play + " / "+ this.recording_size
+                this.asset.render.update(frame_to_play)
+            }  
+            else if(this.record_state == "delete")
+            {
+                this.recording_size = 0
+                this.record_state = null
+                frame_to_play = -1
+
+                this.asset.physics.update()
+                this.asset.render.update( frame_to_play )   
             }
             else
             {
-                this.record_info_dom.innerHTML = "reading " + (frame_recorded+100*this.recording_size) % this.recording_size + " / "+ this.recording_size
-                this.asset.render.update(frame_recorded)
+                this.recording_size = 0
+
+                this.asset.physics.update()
+                this.asset.render.update()    
             }
-                
 
         
         }
+
+        this.record_state_last = this.record_state
     
         //uniforms[ 'time' ].value = performance.now() / 1000;
         //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
