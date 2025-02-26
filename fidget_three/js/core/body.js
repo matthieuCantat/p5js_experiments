@@ -801,7 +801,7 @@ class body_physics{
     this.body_main.state.rot   = this.get_out_rotation('world')
     this.body_main.state.scale = this.state.scale
 
-    if( record_state )
+    if( record_state == "record" )
       this.body_main.recorded_states.push({...this.body_main.state})
 
     return true

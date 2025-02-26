@@ -1,6 +1,8 @@
 
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
+import fidgets_sequence from '../assets/fidgets_sequence.js'
+import Matrix from '../utils/matrix.js'
 
 export default class Game_engine
 {
@@ -29,6 +31,7 @@ export default class Game_engine
         this.record_state = null
         this.record_state_last = null
         this.play_recorded_state_start = null
+        this.record_frame_to_play = 0
         this.record_info_dom = null
         this.recording_size = 0
         //build
@@ -85,6 +88,40 @@ export default class Game_engine
 
         return true
     }
+
+
+    setup_asset_from_name( class_name, screen_dims, debug_options)
+    {
+    
+      // Remove existing objects
+      this.remove_asset()
+    
+      // Add 
+    
+        let m = new Matrix()
+        m.setTranslation(screen_dims.x/2, screen_dims.y/2 )
+    
+        let s = 2.2
+    
+      const args = {
+        nbr : 5,
+        m : m,
+        s : s,
+        screen_dims : screen_dims, 
+        shdrs : [],
+        debug : debug_options,
+      }
+      
+      let asset = null;
+      if      (class_name === 'fidgets_grid'    )asset = new fidgets_grid(args) 
+      else if (class_name === 'fidgets_sequence')asset = new fidgets_sequence(args)
+      else if (class_name === 'fidget_daft_i'   )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
+      else if (class_name === 'fidget_windmill' )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
+      else if (class_name === 'fidget_simple_slide'    )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
+      this.setup_asset(asset)
+    
+    }
+    
 
     remove_asset()
     {
@@ -232,20 +269,17 @@ export default class Game_engine
         }     
         
         // record
-        let frame_to_play = null
-        if( ( this.record_state == "play" )||( this.record_state == "play reverse" ))
+        if( this.record_state == "play" )
         {
-            if( this.record_state != this.record_state_last )
-                this.play_recorded_state_start = this.time
-            
-            if( this.record_state == "play" )
-                frame_to_play = this.time - this.play_recorded_state_start
-            else if( this.record_state == "play reverse" )
-                frame_to_play = this.recording_size - (this.time - this.play_recorded_state_start)
-            
-            frame_to_play = (frame_to_play+100*this.recording_size) % this.recording_size
+            this.record_frame_to_play += 1
+            this.record_frame_to_play = this.record_frame_to_play % this.recording_size
         }
-      
+        else if( this.record_state == "play reverse" )
+        {
+            this.record_frame_to_play -= 1
+            if( this.record_frame_to_play < 0 )
+                this.record_frame_to_play = this.recording_size -1   
+        }
         
         this.record_info_dom.innerHTML = ""
     
@@ -262,19 +296,22 @@ export default class Game_engine
                 this.asset.physics.update(this.record_state)
                 this.asset.render.update()                
             }     
-            else if ( ( this.record_state == "play" )||( this.record_state == "play reverse" ))
+            else if ( 
+                  ( this.record_state == "play" )
+                ||( this.record_state == "play reverse" )
+                ||( this.record_state == "pause" ))
             {
-                this.record_info_dom.innerHTML = "reading " + frame_to_play + " / "+ this.recording_size
-                this.asset.render.update(frame_to_play)
+                this.record_info_dom.innerHTML = "reading " + this.record_frame_to_play + " / "+ this.recording_size
+                this.asset.render.update(this.record_frame_to_play)
             }  
             else if(this.record_state == "delete")
             {
                 this.recording_size = 0
                 this.record_state = null
-                frame_to_play = -1
+                this.record_frame_to_play = 0
 
                 this.asset.physics.update()
-                this.asset.render.update( frame_to_play )   
+                this.asset.render.update( -1 )   
             }
             else
             {
