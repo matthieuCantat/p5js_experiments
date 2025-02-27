@@ -120,6 +120,7 @@ export default class Game_engine
         nbr : 5,
         m : m,
         s : s,
+        dom_canvas : this.args.dom_canvas,
         screen_dims : this.args.screen_dims, 
         shdrs : [],
         //debug : this.args.debug,
@@ -294,7 +295,8 @@ export default class Game_engine
                 this.record_frame_to_play = this.recording_size -1   
         }
         
-        this.record_info_dom.innerHTML = ""
+        if( this.record_info_dom != null )
+            this.record_info_dom.innerHTML = ""
     
 
 
@@ -303,7 +305,8 @@ export default class Game_engine
             
             if(this.record_state == "record" )
             {
-                this.record_info_dom.innerHTML = "recording... " + this.recording_size
+                if( this.record_info_dom != null )
+                    this.record_info_dom.innerHTML = "recording... " + this.recording_size
                 this.recording_size += 1 
 
                 this.asset.physics.update(this.record_state)
@@ -314,7 +317,8 @@ export default class Game_engine
                 ||( this.record_state == "play reverse" )
                 ||( this.record_state == "pause" ))
             {
-                this.record_info_dom.innerHTML = "reading " + this.record_frame_to_play + " / "+ this.recording_size
+                if( this.record_info_dom != null )
+                    this.record_info_dom.innerHTML = "reading " + this.record_frame_to_play + " / "+ this.recording_size
                 this.asset.render.update(this.record_frame_to_play)
             }  
             else if(this.record_state == "delete")
