@@ -1,7 +1,7 @@
 
 export default class Asset_list_options
 {
-    constructor(game_engine, screen_dims, debug_options)
+    constructor(game_engine)
     {
 
         this.assets_name = [
@@ -18,8 +18,9 @@ export default class Asset_list_options
         
         this.get_from_local()
         this.fill_ui()
+        game_engine.setup_asset_from_name( this.current_asset)
 
-                
+        // callbacks 
         this.menu.addEventListener('change', (event) =>{
             this.current_asset = event.target.value;
             game_engine.setup_asset_from_name( this.current_asset)

@@ -894,17 +894,20 @@ export class body_render{
     })
     
     
-    this.debug = strictObject({
+    this.debug = null
+    this.debug_matrix_axes = args.debug_matrix_axes
+    /*
+    strictObject({
         debug_matrix_info : args.debug_matrix_info,//<<<<<
         debug_matrix_axes : args.debug_matrix_axes,//<<<<<
         debug_cns_axes : args.debug_cns_axes, //<<<<<
         force_visibility : args.debug_force_visibility, 
         draw_text_debug : null
       })
+        */
 
-    //this.debug.draw_text_debug = null
-    if(this.debug.debug_matrix_info)
-      this.debug.draw_text_debug = new Draw_text_debug(this.body_main.ref.screen_dims)
+    this.draw_text_debug = null
+
 
 
         
@@ -1080,93 +1083,45 @@ export class body_render{
 
 
     group_fidget.add(this.mesh_three.group)
-    
 
-    
-    if(this.debug.debug_cns_axes)
-    {
-
-      const cns_axe = this.body_physics.relations.constraints.axe
-      if(( cns_axe != null)&&(cns_axe.enable == true ))
-      {
-        cns_axe.update_debug()
-        let shape = ut.line( 
-          convert_coords_matter_to_three(cns_axe.debug_pts[0],this.body_main.ref.screen_dims), 
-          convert_coords_matter_to_three(cns_axe.debug_pts[1],this.body_main.ref.screen_dims) );
-          
-        //let axes_grp = new THREE.Group();
-        //group_fidget.add(axes_grp)
-
-        let mesh = ut.addShape_line(  
-          shape, 
-          [255,0,255])
-
-          group_fidget.add( mesh ) 
-      }
-    }
-
-    if(this.debug.debug_matrix_axes)
-    {        
-      let len = 10
-      let wid = 2
-
-      let shape = null
-      let mesh = null  
+    if(this.debug_matrix_axes)
+      this.build_matrix_axes()
       
-      // X
-      shape = ut.rect( len, wid )
-      mesh = ut.addShape_polygon(  
-        shape, 
-        null,
-        null,
-        null,
-        null,
-        null,
-        [255,0,0],
-        0,
-        false,
-        false,
-        0)
-
-      this.mesh_three.group.add( mesh ) 
-      mesh.position.x =  len/2.0
-
-      mesh = ut.addShape_line(  
-        shape, 
-        [0,0,0])
-      this.mesh_three.group.add( mesh ) 
-      mesh.position.x =  len/2.0
-
-      // Y
-      shape = ut.rect( wid, len )
-      mesh = ut.addShape_polygon(   
-        shape, 
-        null,
-        null,
-        null,          
-        null,
-        null,
-        [0,255,0],
-        0,
-        false,
-        false,
-        0)
-
-      this.mesh_three.group.add( mesh ) 
-      mesh.position.y =  len/2.0
-
-      mesh = ut.addShape_line(  
-        shape, 
-        [0,0,0])
-      this.mesh_three.group.add( mesh ) 
-      mesh.position.y =  len/2.0
-      
-    }
-
-    if(this.debug.debug_matrix_info)
-      this.debug.draw_text_debug.setup_three(this.mesh_three.group)
-    
   }  
+
+  set_debug(debug_options)
+  {
+    this.debug = debug_options
+
+    if( ( this.debug != null)&&(this.debug.options.matrix_axes))
+      this.build_matrix_axes()
+
+  
+
+      if( ( this.debug != null)&&(this.debug.options.cns_axes))
+        {
+    
+          const cns_axe = this.body_physics.relations.constraints.axe
+          if(( cns_axe != null)&&(cns_axe.enable == true ))
+          {
+            cns_axe.update_debug()
+            let shape = ut.line( 
+              convert_coords_matter_to_three(cns_axe.debug_pts[0],this.body_main.ref.screen_dims), 
+              convert_coords_matter_to_three(cns_axe.debug_pts[1],this.body_main.ref.screen_dims) );
+              
+            //let axes_grp = new THREE.Group();
+            //group_fidget.add(axes_grp)
+    
+            let mesh = ut.addShape_line(  
+              shape, 
+              [255,0,255])
+    
+              group_fidget.add( mesh ) 
+          }
+        }
+         
+          
+  }
 
   
 
@@ -1192,8 +1147,13 @@ export class body_render{
     }
 
     
-    if(this.debug.force_visibility)
-      this.body_main.state.visibility = true
+    if(this.debug != null)
+    {
+      if(this.debug.options.force_visibility)
+        this.body_main.state.visibility = true
+      else
+        this.body_main.state.visibility = this.state.visibility_secondary
+    }
     
 
     let converted_pos = convert_coords_matter_to_three(pos,this.body_main.ref.screen_dims)
@@ -1211,7 +1171,8 @@ export class body_render{
       this.ref.material_three.update(this.mesh_three.shape, this.body_main.Game_engine.time )
 
     
-    if(this.debug.debug_matrix_info)
+    
+    if( ( this.debug != null)&&(this.debug.options.matrix_info))
     {
       console.log('debug_matrix_info')
       let parent_name = 'null'
@@ -1240,12 +1201,88 @@ export class body_render{
         'r_out   : '+Math.round(deg(r_out)),
         'vel_out : '+Math.round(vel_out.x())+' '+Math.round(vel_out.y()) ,
       ]
-      this.debug.draw_text_debug.update_three(texts_to_draw)
+
+
+
+      if(this.draw_text_debug == null )
+      {
+        this.draw_text_debug = new Draw_text_debug(this.body_main.ref.screen_dims)      
+        this.draw_text_debug.setup_three(this.mesh_three.group)
+      }
+
+      this.draw_text_debug.update_three(texts_to_draw)
     }  
+    else
+    {
+      if( this.draw_text_debug != null )
+        {
+          this.draw_text_debug.clean()
+          this.draw_text_debug = null
+        }
+    }
       
     
     
 
+    
+  }
+
+
+  build_matrix_axes()
+  {
+    let len = 10
+    let wid = 2
+
+    let shape = null
+    let mesh = null  
+    
+    // X
+    shape = ut.rect( len, wid )
+    mesh = ut.addShape_polygon(  
+      shape, 
+      null,
+      null,
+      null,
+      null,
+      null,
+      [255,0,0],
+      0,
+      false,
+      false,
+      0)
+
+    this.mesh_three.group.add( mesh ) 
+    mesh.position.x =  len/2.0
+
+    mesh = ut.addShape_line(  
+      shape, 
+      [0,0,0])
+    this.mesh_three.group.add( mesh ) 
+    mesh.position.x =  len/2.0
+
+    // Y
+    shape = ut.rect( wid, len )
+    mesh = ut.addShape_polygon(   
+      shape, 
+      null,
+      null,
+      null,          
+      null,
+      null,
+      [0,255,0],
+      0,
+      false,
+      false,
+      0)
+
+    this.mesh_three.group.add( mesh ) 
+    mesh.position.y =  len/2.0
+
+    mesh = ut.addShape_line(  
+      shape, 
+      [0,0,0])
+    this.mesh_three.group.add( mesh ) 
+    mesh.position.y =  len/2.0
     
   }
 
@@ -1442,14 +1479,8 @@ export class body_build{
         highlight_bodies_when_selected:this.relations.highlight_bodies_when_selected,    
         screen_dims:this.ref.screen_dims,
         fidget:this.relations.fidget,
-          
 
-   
-        debug_force_visibility:this.render.debug.force_visibility,    
-        debug_matrix_info:this.render.debug.debug_matrix_info,
-        debug_matrix_axes:this.render.debug.debug_matrix_axes,
-        debug_cns_axes:this.render.debug.debug_cns_axes,
-        
+          
         m_offset:this.physics.properties.m_offset,
         m_transform:this.physics.properties.m_transform,
         parent:this.physics.relations.parent,

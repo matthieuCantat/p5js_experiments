@@ -42,15 +42,13 @@ class fidget_physics{
       m:null, 
       s:1, 
       screen_dims:null, 
-      do_background: true, 
-      debug : false,   
+      do_background: true,  
       dom_canvas : null   
     }
     const args = { ...defaultOptions, ...in_options };
 
     this.fidget_main = fidget_main     
     this.screen_dims = args.screen_dims
-    this.debug_mode = args.debug
 
     this.matter_engine        = create_physics_engine()
     create_boundary_wall_collision( 
@@ -63,8 +61,7 @@ class fidget_physics{
       this.matter_engine, 
       args.dom_canvas, 
       this.screen_dims, 
-      this, 
-      this.debug_mode.options.mouse_info) )  
+      this) )  
 
     this.state = strictObject({
       resolution_coef : 0, 
@@ -90,8 +87,12 @@ class fidget_physics{
     this.is_dynamic = args.is_dynamic
 
     this.steps_info = {} // to fill in children
+
+
+    this.debug = null
     
   }
+
 
   setup()
   {
@@ -183,7 +184,7 @@ class fidget_physics{
 
       if( (bodies[b_type][key] === null)||(bodies[b_type][key].length === 0))
       {
-        if(this.debug_mode.options.show_warning_log)
+        if((this.debug != null)&&(this.debug.options.show_warning_log) )
           console.log('constraint enable - '+b_type+'.'+key+' doesnt exists')
         continue
       }      
@@ -194,7 +195,7 @@ class fidget_physics{
         const constraint = body.physics.relations.constraints[cns]
         if(constraint == null )
         {
-          if(this.debug_mode.options.show_warning_log)
+          if((this.debug != null)&&(this.debug.options.show_warning_log))
             console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'.constraints.'+cns+' doesnt exists')
           continue
         }        
@@ -206,7 +207,7 @@ class fidget_physics{
         const constraint = body.physics.relations.constraints[cns]        
         if( constraint == null )
         {
-          if(this.debug_mode.options.show_warning_log)
+          if((this.debug != null)&&(this.debug.options.show_warning_log))
             console.log('constraints_enable - this.bodies.'+b_type+'.'+key+'['+j+'].constraints.'+cns+' doesnt exists')
           continue
         }         
@@ -334,8 +335,8 @@ class fidget_physics{
     this.fidget_main.bodies.set_completion_step(step)
       
     
-    
-    if((this.debug_mode.options.switch_selected_inter_help)||(this.steps_info[step].switch_selection_transition))
+    const switch_selected_inter_help = ((this.debug != null)&&(this.debug.options.switch_selected_inter_help))
+    if((switch_selected_inter_help)||(this.steps_info[step].switch_selection_transition))
     {
       if((step == 0)||(step == inter_step_bodies.length))
       {
@@ -509,7 +510,6 @@ class fidget_render{
       s:1, 
       screen_dims:null, 
       do_background: true, 
-      debug : false,   
       dom_canvas : null   
     }
     const args = { ...defaultOptions, ...in_options };
@@ -517,44 +517,27 @@ class fidget_render{
     this.fidget_main = fidget_main
     this.physics = fidget_physics
 
-    this.set_debug_init(args.debug)
     
-    this.debug_mode = args.debug
     this.darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
     this.z_depth_end = 0
+
+    this.debug = null
     
   }
 
   setup()
   {
-    this.set_debug_setup()  
     this.fidget_main.bodies.render.setup_shapes_three()
     this.fidget_main.Game_engine.render_scene.add( this.fidget_main.bodies.group_three )      
   }
 
-  set_debug_init(debug)
-  {
-    this.debug_mode = debug
-    this.do_bloom_selected = debug.do_bloom_selected
-    this.do_bloom = debug.do_bloom   
-  }
-    
-  set_debug_setup()
-  {
-    this.physics.Mouse.set_debug(this.debug_mode.options.mouse_info)
-
-    this.fidget_main.bodies.set_debug( this.debug_mode )
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_inters, ['inters'])  
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_inters_steps, ['inters_step']) 
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_geos, ['geos']) 
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_effects, ['effects']) 
-    this.fidget_main.bodies.render.set_visibility_secondary(this.debug_mode.options.show_bones, ['bones']) 
-  }
-
   set_debug(debug)
   {
-    this.set_debug_init(debug)
-    this.set_debug_setup()
+    this.debug = debug
+
+    this.physics.Mouse.set_debug(this.debug)
+
+    this.fidget_main.bodies.set_debug( this.debug )
   }
 
   clean()
@@ -570,6 +553,15 @@ class fidget_render{
     this.fidget_main.bodies.render.override_color(this.fidget_main.state.geos_color_override, ['geos'])
     this.fidget_main.bodies.render.override_color_three(this.fidget_main.state.geos_color_override, ['geos'])      
     this.fidget_main.bodies.render.update( [] , use_recoded_state )
+
+    if(this.debug != null)
+    {
+      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_inters, ['inters'])  
+      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_inters_steps, ['inters_step']) 
+      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_geos, ['geos']) 
+      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_effects, ['effects']) 
+      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_bones, ['bones'])
+    }     
   }
 
 
@@ -605,7 +597,7 @@ class fidget_render{
     {
       body_to_reduce[i].render.color_line = [0,0,0]
       body_to_reduce[i].render.update_color_three_line()
-      if(this.do_bloom_selected)
+      if(( this.debug != null )&&(this.debug.options.do_bloom_selected))
         body_to_reduce[i].render.bloom = body_to_reduce[i].render.bloom_default
     }
 
@@ -613,7 +605,7 @@ class fidget_render{
     {
       body_to_highlight[i].render.color_line = [255,255,255]
       body_to_highlight[i].render.update_color_three_line()
-      if(this.do_bloom_selected)
+      if(( this.debug != null )&&(this.debug.options.do_bloom_selected))
         body_to_highlight[i].render.bloom = true
     }
     //this.bodies.color_update_three(body_type_filter)
@@ -662,7 +654,7 @@ class fidget_render{
     {
       if (this.fidget_main.bodies.draw_order[i] == null)
       {
-        if (this.debug_mode.options.show_warning_log)
+        if( ( this.debug != null )&&(this.debug.options.show_warning_log))
           console.log(  ' z_order - this.bodies.draw_order[' + i + '] doesnt exists')
         continue
       }
@@ -697,8 +689,7 @@ export default class fidget{
       m:null, 
       s:1, 
       screen_dims:null, 
-      do_background: true, 
-      debug : false,   
+      do_background: true,   
       dom_canvas : null, 
       Game_engine : null,
     }
@@ -715,9 +706,7 @@ export default class fidget{
       selection_changed : false,
     })
 
-  
-  
-    this.debug_mode = args.debug
+
     this.screen_dims = args.screen_dims
 
     this.m = args.m // for child class
@@ -728,7 +717,6 @@ export default class fidget{
     /////////////////////////////////////////////////////////////////// build
 
     this.bodies = strictObject(new bodies() )
-    this.bodies.debug_mode = this.debug_mode
     this.bodies.fidget_sequence_i = args.fidget_sequence_index
     this.bodies.group_three = this.bodies.group_three
     this.bodies.effects = this.effects
@@ -747,8 +735,17 @@ export default class fidget{
       Game_engine: this.Game_engine,
     }
 
+    this.debug = null
+
 
     
+  }
+
+  set_debug(debug)
+  {
+    this.debug = debug
+    this.physics.debug = this.debug
+    this.render.set_debug(debug)
   }
 
   setup()

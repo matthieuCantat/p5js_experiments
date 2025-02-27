@@ -145,7 +145,7 @@ class fidgets_sequence_render
     constructor( args_in,  main, physics  )
     {
         const args_default = {
-          debug : false};
+          };
 
         const args = {...args_default, ...args_in}
         
@@ -153,36 +153,15 @@ class fidgets_sequence_render
         this.physics = physics
 
         // init memory
-        this.debug_mode = args.debug
+        this.debug = null
         this.draw_text_debug = null
     }
     
 
     set_debug( debug )
     {
-      this.debug_mode = debug
-
-      
-      this.main.fidgets[this.physics.fidget_focus_id].render.set_debug(this.debug_mode)
-
-      if(this.debug_mode.options.fidget_steps_info)
-          this.draw_text_debug = new Draw_text_debug(this.main.screen_dims)
-      else
-      {
-        if( this.draw_text_debug != null )
-        {
-          this.draw_text_debug.clean()
-          this.draw_text_debug = null
-        }
+      this.debug = debug
           
-      } 
-      this.setup_debug_three(this.main.Game_engine.render_scene)      
-    }
-
-    setup_debug_three(scene_three)
-    {
-      if(this.debug_mode.options.fidget_steps_info)
-        this.draw_text_debug.setup_three(scene_three)
     }
 
 
@@ -197,7 +176,7 @@ class fidgets_sequence_render
       }
 
 
-      if(this.debug_mode.options.fidget_steps_info)
+      if((this.debug != null)&&(this.debug.options.fidget_steps_info))
       {
         let F = this.main.fidgets[this.physics.fidget_focus_id].physics.state;
         const time = this.main.fidgets[this.physics.fidget_focus_id].Game_engine.time
@@ -221,13 +200,29 @@ class fidgets_sequence_render
           
           
         ]
+        if(this.draw_text_debug == null)
+        {
+          this.draw_text_debug = new Draw_text_debug(this.main.screen_dims)
+          this.draw_text_debug.setup_three(this.main.Game_engine.render_scene)
+        }
+          
         this.draw_text_debug.update_three(texts_to_draw)
       }
+      else
+      {
+        if( this.draw_text_debug != null )
+          {
+            this.draw_text_debug.clean()
+            this.draw_text_debug = null
+          }
+      }
+
+
     }  
     
   setup()
   {
-    this.set_debug(this.debug_mode)
+    //this.set_debug(this.debug)
   }
 }
 
@@ -241,7 +236,6 @@ export default class fidgets_sequence
     {
         const args_default = {
           shaders : [],
-          debug : false,
           fidget_choice : null };
 
         const args = {...args_default, ...args_in}
@@ -256,7 +250,7 @@ export default class fidgets_sequence
         this.fidgets_nbr = args.nbr
         this.m = args.m
         this.s = args.s
-        this.debug_mode = args.debug
+        this.debug = null
         this.force_way = 1
         this.screen_dims = args.screen_dims
         this.fidget_choice = args.fidget_choice
@@ -274,6 +268,14 @@ export default class fidgets_sequence
         return new fidget_windmill(in_options)
       else
         return new fidget_daft_i(in_options)   
+    }
+
+    set_debug(debug)
+    {
+      this.debug = debug
+      for( let F of this.fidgets )
+        F.set_debug(this.debug)
+      this.render.set_debug( debug )
     }
 
     setup( Game_engine = null )
@@ -298,7 +300,7 @@ export default class fidgets_sequence
             z_depth_start:z_depth,
             do_background: true, 
             is_dynamic:true,
-            debug : this.debug_mode,  
+            //debug : this.debug_mode,  
             play_animation:null,   
             dom_canvas : this.dom_canvas ,
             Game_engine : this.Game_engine,

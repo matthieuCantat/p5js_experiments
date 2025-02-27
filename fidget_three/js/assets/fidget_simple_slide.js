@@ -36,7 +36,7 @@ export default class fidget_simple_slide extends fidget{
       let visual_bones_main_size = 150*this.s
       let bones_density_value = 0.44/this.s
       let inter_step_denstity = 0.022/this.s 
-      let inter_step_selection_break_length = this.debug_mode.options.mouse_selection_break_length * (this.s / 2.2)
+      //let inter_step_selection_break_length = this.debug_mode.options.mouse_selection_break_length * (this.s / 2.2)
       //this.end_step = 2
       this.set_end_step( 2 )
       ///////////////////////////////////////////////////////////////////////////////////////////
@@ -79,14 +79,7 @@ export default class fidget_simple_slide extends fidget{
         collision_category: utils.collision_category.inter,
         collision_mask: utils.collision_category.mouse
       }
-  
-      let opts_debug = {
-        debug_matrix_info: false,
-        debug_matrix_axes: this.debug_mode.options.matrix_axes,
-        debug_cns_axes: this.debug_mode.options.cns_axes,
-        debug_force_visibility: this.debug_mode.options.force_visibility
-      }
-  
+ 
       let opts_cns_disable_at_select = {
                 stiffness: 1.0,
                 stiffness_at_selection: 0.0,
@@ -103,7 +96,6 @@ export default class fidget_simple_slide extends fidget{
   
       let opts_sparcles_shock = {
         ...this.opts_global,
-        ...opts_debug,
         scale_shape: this.s,
         type: 'sparcle_shock'
       }
@@ -111,7 +103,6 @@ export default class fidget_simple_slide extends fidget{
       let opts_bones_main = {
         ...this.opts_global,
         ...opts_collision_no_interaction,
-        ...opts_debug,      
         visibility: false,
         do_shape: false,
         do_line: true,
@@ -126,7 +117,6 @@ export default class fidget_simple_slide extends fidget{
       let opts_visual_bones = {
         ...this.opts_global,
         ...opts_collision_no_interaction,
-        ...opts_debug,      
         visibility: false,
         do_shape: true,
         do_line: true,
@@ -141,8 +131,7 @@ export default class fidget_simple_slide extends fidget{
   
       let opts_inter_step = {
         ...this.opts_global,
-        ...opts_collision_mouse_interaction,
-        ...opts_debug,         
+        ...opts_collision_mouse_interaction,     
         visibility: false,
         do_shape: true,
         do_line: true,
@@ -150,13 +139,12 @@ export default class fidget_simple_slide extends fidget{
         color_line: utils.color.black,
         material_three: materials.simple.text_checker_three_grey,
         density: inter_step_denstity,
-        selection_break_length: inter_step_selection_break_length      
+        //selection_break_length: inter_step_selection_break_length      
       }
   
       let opts_geo = {
       ...this.opts_global,
       ...opts_collision_activate,
-      ...opts_debug,
       m_offset: new Matrix(),
       do_shape: true,
       do_line: true,
@@ -220,7 +208,6 @@ export default class fidget_simple_slide extends fidget{
       this.bodies.store.geos.backgrounds.push( new body_build({
         ...this.opts_global,
         ...opts_collision_no_interaction,
-        ...opts_debug,
         dynamic: false,
         name: 'geos_background_L_',
         parent: this.bodies.store.bones.world,
@@ -316,7 +303,6 @@ export default class fidget_simple_slide extends fidget{
               distPos: 60 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
-              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
             
             
@@ -357,7 +343,6 @@ export default class fidget_simple_slide extends fidget{
               rot_max: rad(270),
               clockwize_mode:true,
               limit_lock: true,
-              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
           

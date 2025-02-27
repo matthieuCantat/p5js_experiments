@@ -1,7 +1,7 @@
 
 export default class Debug_options
 {
-    constructor( )
+    constructor( game_engine )
     {
         this.options = { 
             disable_animation:true,
@@ -31,19 +31,15 @@ export default class Debug_options
 
         this.toggleButton = document.getElementById("debug_menu_show");
         this.menu = document.getElementById("debug_menu");
-        this.game_engine = null
+        
+        
 
         this.toggleButton.addEventListener("click", () =>{ this.toggle_menu() } );
-                
         this.get_from_local()
         this.fill_ui()
+        game_engine.set_debug( this )
     }
 
-    set_game_engine(game_engine)
-    {
-        this.game_engine = game_engine
-        this.game_engine.asset.render.set_debug( this )
-    }
 
     handleCheckboxChange() {
         
@@ -55,7 +51,6 @@ export default class Debug_options
             this.options[elem.value] = elem.checked
         }
       
-        this.game_engine.asset.render.set_debug( this )  
         this.save_to_local()
     }
     

@@ -108,8 +108,15 @@ export class dyn_constraint_build_custom_orient{
       this.is_enable = true
       this.selection_change_do_rebind = false
       this.selection_occured = false
+
+      this.debug = null
       
   
+  }
+
+  set_debug(debug_options)
+  {
+    this.debug = debug_options
   }
 
   rebind()
@@ -281,10 +288,16 @@ export class dyn_constraint_build{
         this.selection_change_do_rebind = false        
         this.selection_occured = false
 
-
+        this.debug = null
 
 
     }
+
+
+    set_debug(debug_options)
+    {
+      this.debug = debug_options
+    }    
 
     rebind()
     {
@@ -428,7 +441,15 @@ export class cns_axe{
       if( ( this.pLineBase == null )&&( this.Follower != null) )
         this.pLineBase = this.Follower.get_matrix('anim','world').get_row(2)
   
+      this.debug = null
     }
+
+
+
+    set_debug(debug_options)
+    {
+      this.debug = debug_options
+    }      
   
     update_debug()
     {
@@ -570,6 +591,10 @@ export class cns_axe{
       if(( this.Follower == null)||( this.is_enable == false))
         return false
 
+      let transfer_delta_as_parent_force = this.transfer_delta_as_parent_force
+      if( this.debug != null)
+        transfer_delta_as_parent_force = this.debug.options.transfer_delta_as_parent_force
+
 
       let m_parent       = this.Follower.get_parent_matrix()
 
@@ -616,7 +641,7 @@ export class cns_axe{
         this.current_pos = 1
         this.Follower.set_out_position(pLimitPos,'world', 'override')
  
-        if((this.transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
+        if((transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
         {
           let v_delta = p_out_before.getSub(pLimitPos)
           this.Follower.relations.parent.physics.apply_force(pLimitPos,v_delta)
@@ -632,7 +657,7 @@ export class cns_axe{
         this.Follower.set_out_position(pLimitNeg,'world', 'override')
 
  
-        if((this.transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
+        if((transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
         {
           let v_delta = p_out_before.getSub(pLimitNeg)
           this.Follower.relations.parent.physics.apply_force(pLimitNeg,v_delta)
@@ -746,7 +771,7 @@ export class cns_axe{
       }
 
     
-      if((this.transfer_delta_as_parent_force)&&(this.Follower.stats.is_touch))
+      if((transfer_delta_as_parent_force)&&(this.Follower.state.is_touch))
       {
         let v_delta = p_out_before.getSub(p_out)
         this.Follower.relations.parent.physics.apply_force(p_out,v_delta)
@@ -796,12 +821,27 @@ export class limit{
       this.p_touch_local = null
 
   
+      this.debug = null
     }
+
+
+
+
+    set_debug(debug_options)
+    {
+      this.debug = debug_options
+    }          
 
     apply()
     {
         if(this.is_enable == false)
             return false
+
+
+        let transfer_delta_as_parent_force = this.transfer_delta_as_parent_force
+        if( this.debug != null)
+          transfer_delta_as_parent_force = this.debug.options.transfer_delta_as_parent_force
+  
         
         let m_parent = this.obj.get_parent_matrix()
         let m        = this.obj.get_out_matrix()
@@ -845,7 +885,7 @@ export class limit{
           this.obj.set_out_rotation(m_limit.getRotation(), 'world', 'override')
           this.obj.set_anglular_velocity(0) 
           
-          if((this.transfer_delta_as_parent_force)&&(this.obj.state.is_touch)&&(this.p_touch_local!=null) )
+          if((transfer_delta_as_parent_force)&&(this.obj.state.is_touch)&&(this.p_touch_local!=null) )
           {
             p_out = this.p_touch_local.getMult(m_limit)
             let v_delta = p_out_before.getSub(p_out)
@@ -929,7 +969,7 @@ export class limit{
         }
 
 
-        if((this.transfer_delta_as_parent_force)&&(this.obj.state.is_touch)&&(this.p_touch_local!=null))
+        if((transfer_delta_as_parent_force)&&(this.obj.state.is_touch)&&(this.p_touch_local!=null))
         {
           p_out = this.p_touch_local.getMult(m_limit)
           let v_delta = p_out_before.getSub(p_out)
@@ -988,8 +1028,16 @@ export class constraint_build{
         this.name = args.name
         this.out_multiplier = args.out_multiplier
         
+        this.debug = null
     
     }
+
+
+
+    set_debug(debug_options)
+    {
+      this.debug = debug_options
+    }         
 
     apply()
     {
@@ -1100,8 +1148,18 @@ export class connect{
     this.clockwize_mode = args.clockwize_mode
 
     this.value_old = null
+
+    this.debug = null
  
   }
+
+
+
+
+  set_debug(debug_options)
+  {
+    this.debug = debug_options
+  }     
 
   get_out_value()
   {
@@ -1237,8 +1295,17 @@ export class connect_multi{
       }
       this.cns_list.push(new connect(args_cns) )
     }
+
+    this.debug = null
  
   }
+
+
+
+  set_debug(debug_options)
+  {
+    this.debug = debug_options
+  }     
 
   get_out_value()
   {

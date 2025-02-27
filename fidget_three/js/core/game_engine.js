@@ -12,7 +12,7 @@ export default class Game_engine
         const default_args = {
             dom_canvas : null,
             screen_dims :null,
-            debug : null
+            asset_name : null
         }
 
         this.args = {...default_args, ...in_args}
@@ -34,6 +34,7 @@ export default class Game_engine
         this.record_frame_to_play = 0
         this.record_info_dom = null
         this.recording_size = 0
+        this.debug = null
         //build
 
 
@@ -74,6 +75,9 @@ export default class Game_engine
 
         this.debug_set_stats_windows()
 
+        if( this.args.asset_name != null)
+            this.setup_asset_from_name( this.args.asset_name )
+
     }
 
     setup_asset(asset)
@@ -86,11 +90,20 @@ export default class Game_engine
         this.asset.set_game_engine_ref(this)
         this.setup_render()
 
+        if(this.debug!=null)
+            this.asset.set_debug(this.debug)
+
         return true
     }
 
+    set_debug(debug_options)
+    {
+        this.debug = debug_options
+        this.asset.set_debug(this.debug)
+    }
 
-    setup_asset_from_name( class_name)
+
+    setup_asset_from_name( asset_name)
     {
     
       // Remove existing objects
@@ -109,15 +122,15 @@ export default class Game_engine
         s : s,
         screen_dims : this.args.screen_dims, 
         shdrs : [],
-        debug : this.args.debug,
+        //debug : this.args.debug,
       }
       
       let asset = null;
-      if      (class_name === 'fidgets_grid'    )asset = new fidgets_grid(args) 
-      else if (class_name === 'fidgets_sequence')asset = new fidgets_sequence(args)
-      else if (class_name === 'fidget_daft_i'   )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
-      else if (class_name === 'fidget_windmill' )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
-      else if (class_name === 'fidget_simple_slide'    )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
+      if      (asset_name === 'fidgets_grid'    )asset = new fidgets_grid(args) 
+      else if (asset_name === 'fidgets_sequence')asset = new fidgets_sequence(args)
+      else if (asset_name === 'fidget_daft_i'   )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
+      else if (asset_name === 'fidget_windmill' )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
+      else if (asset_name === 'fidget_simple_slide'    )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
       this.setup_asset(asset)
     
     }
@@ -167,7 +180,7 @@ export default class Game_engine
 
         this.renderer.setSize( this.args.screen_dims.x, this.args.screen_dims.y);
 
-        if(debug.do_bloom)
+        if((this.debug != null)&&(this.debug.options.do_bloom))
         {
             this.bloomComposer.setSize( this.args.screen_dims.x, this.args.screen_dims.y );
             this.finalComposer.setSize( this.args.screen_dims.x, this.args.screen_dims.y );
@@ -179,7 +192,7 @@ export default class Game_engine
         //light_group.add(light)
         //light.position.set( Math.sin(0*0.01)*100, Math.cos(0*0.01)*100, -200)
         //three_global_obj.camera.add( light1 );
-        if(this.args.debug.do_shadows)
+        if((this.debug != null)&&(this.debug.options.do_shadows))
         {
             light1.castShadow = true
             //light1.shadow.radius = 5;  
@@ -196,7 +209,7 @@ export default class Game_engine
             //this.render_scene.add( light2 );
         }
 
-        if( this.args.debug.do_flare )
+        if((this.debug != null)&&(this.debug.options.do_flare ))
         {
             this.light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
             this.render_scene.add( this.light_lens_flare )
@@ -207,13 +220,13 @@ export default class Game_engine
     setup_render_special_effect()
     {
 
-        if(this.args.debug.do_shadows)
+        if((this.debug != null)&&(this.debug.options.do_shadows))
         {
             this.renderer.shadowMap.enabled = true;
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
         }
 
-        if(this.args.debug.do_bloom)
+        if((this.debug != null)&&(this.debug.options.do_bloom))
         {
             //render pass
             const renderScene = new RenderPass( this.render_scene, this.camera );
@@ -261,7 +274,7 @@ export default class Game_engine
     
     update_loop()
     {
-        if( this.args.debug.do_flare )
+        if((this.debug != null)&&(this.debug.options.do_flare ))
         {
             // light - change position
             this.light_lens_flare.position.x = Math.sin(rad(45)+this.time*0.01)*120
@@ -329,7 +342,7 @@ export default class Game_engine
         //uniforms[ 'time' ].value = performance.now() / 1000;
         //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
     
-        if(this.args.debug.do_bloom)
+        if((this.debug != null)&&(this.debug.options.do_bloom))
         {
             let save_states = []
             for( let i = 0 ; i < this.asset.fidgets.length; i++)

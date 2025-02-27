@@ -276,7 +276,7 @@ export class bodies
         this.draw_order = []//in_options.draw_order
         this.build_order = []
 
-        this.debug_mode = null
+        
         this.fidget_sequence_i = null
         this.group_three = null
         this.effects = null
@@ -288,6 +288,8 @@ export class bodies
             
         this.physics = strictObject(new bodies_physics( { bodies_main:this }))
         this.render = strictObject(new bodies_render( { bodies_main:this }))
+
+        this.debug = null
                 
     }
 
@@ -331,7 +333,7 @@ export class bodies
           let key = this.eval_order[i+1]
           if( ( this.store[b_type][key] === null)||( this.store[b_type][key].length === 0))
           {
-            if( this.debug_mode.options.show_warning_log )
+            if((this.debug != null)&&( this.debug.options.show_warning_log ) )
               console.log('bodies_enable - this.store.'+b_type+'.'+key+' doesnt exists')
             continue
           }
@@ -391,7 +393,7 @@ export class bodies
           {   
             if( ( this.store[b_type][key] === null)||( this.store[b_type][key].length === 0))
             {
-              if( this.debug_mode.options.show_warning_log )
+              if((this.debug != null )&&( this.debug.options.show_warning_log ) )
                 console.log('bodies_enable - this.store.'+b_type+'.'+key+' doesnt exists')
               continue
             }
@@ -446,7 +448,7 @@ export class bodies
         let key = this.eval_order[i+1]
         if( ( this.store[b_type][key] === null)||( this.store[b_type][key].length === 0))
         {
-          if(this.debug_mode.options.show_warning_log)
+          if(( this.debug != null )&&(this.debug.options.show_warning_log) )
             console.log('bodies_log_body_ids - this.store.'+b_type+'.'+key+' doesnt exists')
           continue
         }
@@ -470,13 +472,25 @@ export class bodies
   
     
     
-    set_debug( value, body_type_filter = [] )
+    set_debug( debug_options, body_type_filter = [] )
     {
-  
+      this.debug = debug_options
+
       for( let body of this.get_list_filtered( 'eval', body_type_filter ))
+      {
+        body.render.set_debug(debug_options)
+
+        for( let cns in body.physics.relations.constraints)
+        {
+          body.physics.relations.constraints[cns].set_debug(debug_options)
+        }
+      }
+
+      /*
         for( let debug_title in value )
           if( debug_title in body.render.debug)
-            body.render.debug[debug_title] = value[debug_title]    
+            body.render.debug[debug_title] = value[debug_title]  
+          */  
     }
     
 
@@ -548,7 +562,7 @@ export class bodies
       {
         if(bodies_list[i] == null)
         {
-          if(this.debug_mode.options.show_warning_log)
+          if( ( this.debug != null )&&(this.debug.options.show_warning_log) )
             console.log( 'bodies_list_enable - '+ i +' doesnt exists' )
           continue
         }

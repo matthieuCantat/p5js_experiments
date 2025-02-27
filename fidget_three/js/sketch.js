@@ -59,18 +59,16 @@ function disable_pull_to_refresh(event)
         //console.log('debug_menu_is_open')
         return false
     }
-        
 
     // Disable pull-to-refresh
+    //console.log('debug_menu_is_close')
     event.preventDefault();
-
     return true
 }
 document.body.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
 
 
 
-const debug_options = new Debug_options()
 
 
 
@@ -82,16 +80,12 @@ const debug_options = new Debug_options()
 const Game_engine_args = {
     dom_canvas : document.getElementById("three_canvas"),
     screen_dims : screen_dims,
-    debug : debug_options,
+    asset_name : "fidget_simple_slide"
 }
 var game_engine = new Game_engine( Game_engine_args )
 
-const asset_list_options = new Asset_list_options(game_engine, screen_dims, debug_options)
-
-game_engine.setup_asset_from_name( asset_list_options.current_asset )
-
-debug_options.set_game_engine(game_engine)
-
+const asset_list_options = new Asset_list_options(game_engine)
+const debug_options = new Debug_options(game_engine)
 const record_state_panel = new Record_state_panel(game_engine)
 
 
@@ -134,8 +128,6 @@ function getAssetsInfo()
 }
 
 //getAssetsInfo()
-
-
 
 
 

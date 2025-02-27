@@ -17,8 +17,7 @@ export class Mouse_manager
         matter_engine,
         dom_canvas,
         screen_dims,
-        fidget,
-        debug)
+        fidget)
     {
         
         
@@ -67,32 +66,20 @@ export class Mouse_manager
         this.mouse_lock_selection = false
 
         this.draw_text_debug = null
-        this.set_debug(debug)
  
         this.update_count = 0 
         this.selected_body_last_eval_name = ''   
         this.z = 0
         this.circle_touch_radius = 20
         this.cross_apply_radius = 10
+
+        this.debug = null
     }
 
     set_debug( debug )
     {
         this.debug = debug
-        if(this.debug != false)
-        {
-            this.draw_text_debug = new Draw_text_debug(this.screen_dims)
-            this.draw_text_debug.mouse_cns = this.matter_constraint
-        }   
-        else
-        {
-            if( this.draw_text_debug != null )
-            {
-                this.draw_text_debug.clean()
-                this.draw_text_debug = null
-            }
-            
-        }  
+
     }
 
     setup(scene)
@@ -140,10 +127,6 @@ export class Mouse_manager
         scene.add( this.group )
 
         
-
-        if(this.debug != false)
-            this.draw_text_debug.setup_three(scene)        
-    
     }
 
     update()
@@ -302,9 +285,27 @@ export class Mouse_manager
             ]   
             
 
-          this.draw_text_debug.update_three(texts_to_draw)
-        }  
+          
+          if(this.draw_text_debug == null)
+            {
+                this.draw_text_debug = new Draw_text_debug(this.screen_dims)
+                this.draw_text_debug.mouse_cns = this.matter_constraint
+                
+
+                this.draw_text_debug.setup_three(scene)        
         
+            }   
+            this.draw_text_debug.update_three(texts_to_draw)            
+        }  
+        else
+        {
+            if( this.draw_text_debug != null )
+            {
+                this.draw_text_debug.clean()
+                this.draw_text_debug = null
+            }
+            
+        }        
         // next eval
         this.update_count += 1
 

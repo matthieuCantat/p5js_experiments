@@ -34,7 +34,7 @@ export default class fidget_daft_i extends fidget {
     let visual_bones_main_size = 150*this.s
     let bones_density_value = 0.44/this.s
     let inter_step_denstity = 0.022/this.s 
-    let inter_step_selection_break_length = this.debug_mode.options.mouse_selection_break_length * (this.s / 2.2)
+    //let inter_step_selection_break_length = this.debug_mode.options.mouse_selection_break_length * (this.s / 2.2)
     //this.end_step = 4
     this.set_end_step( 4 )
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -77,13 +77,6 @@ export default class fidget_daft_i extends fidget {
       collision_mask: utils.collision_category.mouse
     }
 
-    let opts_debug = {
-      debug_matrix_info: false,
-      debug_matrix_axes: this.debug_mode.options.matrix_axes,
-      debug_cns_axes: this.debug_mode.options.cns_axes,
-      debug_force_visibility: this.debug_mode.options.force_visibility
-    }
-
     let opts_cns_disable_at_select = {
               stiffness: 1.0,
               stiffness_at_selection: 0.0,
@@ -100,15 +93,13 @@ export default class fidget_daft_i extends fidget {
 
     let opts_sparcles_shock = {
       ...this.opts_global,
-      ...opts_debug,
       scale_shape: this.s,
       type: 'sparcle_shock'
     }
 
     let opts_bones_main = {
       ...this.opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,      
+      ...opts_collision_no_interaction,  
       visibility: false,
       do_shape: false,
       do_line: true,
@@ -122,8 +113,7 @@ export default class fidget_daft_i extends fidget {
 
     let opts_visual_bones = {
       ...this.opts_global,
-      ...opts_collision_no_interaction,
-      ...opts_debug,      
+      ...opts_collision_no_interaction,  
       visibility: false,
       do_shape: true,
       do_line: true,
@@ -138,8 +128,7 @@ export default class fidget_daft_i extends fidget {
 
     let opts_inter_step = {
       ...this.opts_global,
-      ...opts_collision_mouse_interaction,
-      ...opts_debug,         
+      ...opts_collision_mouse_interaction,       
       visibility: false,
       do_shape: true,
       do_line: true,
@@ -147,13 +136,12 @@ export default class fidget_daft_i extends fidget {
       color_line: utils.color.black,
       material_three: materials.simple.text_checker_three_grey,
       density: inter_step_denstity,
-      selection_break_length: inter_step_selection_break_length      
+      //selection_break_length: inter_step_selection_break_length      
     }
 
     let opts_geo = {
     ...this.opts_global,
     ...opts_collision_activate,
-    ...opts_debug,
     m_offset: new Matrix(),
     do_shape: true,
     do_line: true,
@@ -215,7 +203,6 @@ export default class fidget_daft_i extends fidget {
     this.bodies.store.geos.backgrounds.push( new body_build({
       ...this.opts_global,
       ...opts_collision_no_interaction,
-      ...opts_debug,
       dynamic: false,
       name: 'geos_background_L_',
       parent: this.bodies.store.bones.world,
@@ -312,7 +299,6 @@ export default class fidget_daft_i extends fidget {
               distPos: 25 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
-              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
 
@@ -332,7 +318,7 @@ export default class fidget_daft_i extends fidget {
           m_shape: new Matrix().setScale(83*this.s,21*this.s),
           type: utils.shape.rectangle,
           constraints: [
-            this.debug_mode.options.inter_step_physics
+            ((this.debug!=null)&&(this.debug.options.inter_step_physics))
               ? {
                   name: 'point',
                   type: 'dyn_point',
@@ -350,7 +336,6 @@ export default class fidget_daft_i extends fidget {
               rot_min: rad(0),
               rot_max: rad(90.5),
               limit_lock: true,
-              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
 
@@ -361,7 +346,7 @@ export default class fidget_daft_i extends fidget {
       this.bodies.store.inters_step.steps[1].get_resolution_coef = function () {return clamp(deg(this.physics.get_out_rotation('base')) / 90.0, 0, 1)}
       this.bodies.store.inters_step.steps[1].set_resolution_coef = function (res = null) {if (res != null)this.physics.set_out_rotation(rad(res * 90.5), 'world', 'override')}
 
-      if (this.debug_mode.options.inter_step_physics == false)
+      if ((this.debug != null)&&(this.debug.options.inter_step_physics == false))
         this.bodies.store.inters_step.steps[1].physics.relations.constraints_args.push({name: 'point_no_dyn', type: 'kin_point', target: this.is_dynamic ? this.bodies.store.inters.background : this.bodies.store.bones.traj})
 
 
@@ -386,7 +371,6 @@ export default class fidget_daft_i extends fidget {
               distPos: 50 * this.s,
               distNeg: 0.001,
               limit_lock: 1,
-              transfer_delta_as_parent_force: this.debug_mode.options.inter_step_physics
             }
           ],
 
