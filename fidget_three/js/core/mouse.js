@@ -74,6 +74,8 @@ export class Mouse_manager
         this.cross_apply_radius = 10
 
         this.debug = null
+
+        this.scene = null
     }
 
     set_debug( debug )
@@ -84,6 +86,7 @@ export class Mouse_manager
 
     setup(scene)
     {  
+        this.scene = scene
         let mouse_pos = new Vector( user_interaction_info.mouseX, user_interaction_info.mouseY) 
         let pos = new Vector( user_interaction_info.mouseX, user_interaction_info.mouseY) 
         
@@ -228,12 +231,12 @@ export class Mouse_manager
         
 
         
-        let fidget_skip = false
-        if((this.debug !== true)&&(this.debug !== false)&&(this.debug !== this.fidget.fidget_sequence_i))
-            fidget_skip = true
+        let fidget_skip_debug = false
+        if(this.fidget.is_in_focus() == false )
+            fidget_skip_debug = true
 
 
-        if( (this.debug !== false)&&(fidget_skip === false) )
+        if( (this.debug.options.mouse_info)&&(fidget_skip_debug === false) )
         {
           let p_mouse_grap_from_body = {x:0,y:0}
           if(this.p_mouse_grap_from_body != null)
@@ -292,7 +295,7 @@ export class Mouse_manager
                 this.draw_text_debug.mouse_cns = this.matter_constraint
                 
 
-                this.draw_text_debug.setup_three(scene)        
+                this.draw_text_debug.setup_three(this.scene)        
         
             }   
             this.draw_text_debug.update_three(texts_to_draw)            

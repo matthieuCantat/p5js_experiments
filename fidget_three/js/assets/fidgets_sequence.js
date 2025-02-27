@@ -175,6 +175,7 @@ class fidgets_sequence_render
         this.main.fidgets[i].render.update( use_recoded_state )
       }
 
+      
 
       if((this.debug != null)&&(this.debug.options.fidget_steps_info))
       {
@@ -304,6 +305,7 @@ export default class fidgets_sequence
             play_animation:null,   
             dom_canvas : this.dom_canvas ,
             Game_engine : this.Game_engine,
+            layout: this,
             fidget_sequence_index : i +1,
             force_way : this.force_way,
           }

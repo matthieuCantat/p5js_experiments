@@ -488,6 +488,12 @@ class fidget_physics{
       this.resolution_coef_override = null
   }
 
+
+  is_in_focus()
+  {
+    return this.fidget_main.relations.layout.physics.is_fidget_in_focus(this.fidget_main.relations.layout_position)
+  }  
+
 }
 
 
@@ -554,7 +560,7 @@ class fidget_render{
     this.fidget_main.bodies.render.override_color_three(this.fidget_main.state.geos_color_override, ['geos'])      
     this.fidget_main.bodies.render.update( [] , use_recoded_state )
 
-    if(this.debug != null)
+    if((this.debug != null)&&(this.physics.is_in_focus())) 
     {
       this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_inters, ['inters'])  
       this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_inters_steps, ['inters_step']) 
@@ -692,6 +698,7 @@ export default class fidget{
       do_background: true,   
       dom_canvas : null, 
       Game_engine : null,
+      layout : null
     }
     const args = { ...defaultOptions, ...in_options };
 
@@ -700,6 +707,11 @@ export default class fidget{
     this.physics = strictObject( new fidget_physics(args, this) )
     this.render  = strictObject( new fidget_render(args, this, this.physics) )
     this.Game_engine = args.Game_engine
+
+    this.relations = {
+      layout : args.layout,
+      layout_position : args.fidget_sequence_index
+    }
 
     this.state = strictObject({
       geos_color_override : null,
@@ -740,6 +752,7 @@ export default class fidget{
 
     
   }
+
 
   set_debug(debug)
   {
