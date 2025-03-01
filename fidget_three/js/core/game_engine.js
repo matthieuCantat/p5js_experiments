@@ -28,12 +28,17 @@ export default class Game_engine
         this.asset = null
         this.time = 0
         this.time_step = 1
-        this.record_state = null
-        this.record_state_last = null
-        this.play_recorded_state_start = null
-        this.record_frame_to_play = 0
-        this.record_info_dom = null
-        this.recording_size = 0
+
+        this.record_info = {
+            state : null,
+            state_last : null,
+            play_start : null,
+            play_current : null,
+            display_dom : null,
+            recording_size : 0,
+        }
+
+
         this.debug = null
         //build
 
@@ -282,66 +287,39 @@ export default class Game_engine
             this.light_lens_flare.position.y = Math.cos(rad(45)+this.time*0.01)*120
         }     
         
-        // record
-        if( this.record_state == "play" )
-        {
-            this.record_frame_to_play += 1
-            this.record_frame_to_play = this.record_frame_to_play % this.recording_size
-        }
-        else if( this.record_state == "play reverse" )
-        {
-            this.record_frame_to_play -= 1
-            if( this.record_frame_to_play < 0 )
-                this.record_frame_to_play = this.recording_size -1   
-        }
-        
-        if( this.record_info_dom != null )
-            this.record_info_dom.innerHTML = ""
-    
-
+        record_info_update( this.record_info, this.time )
 
         if( this.asset != null )
         {
-            
-            if(this.record_state == "record" )
+            this.asset.physics.update(this.record_info)
+            this.asset.render.update(this.record_info)           
+            /*
+            if(this.record_info.state == "record" )
             {
-                if( this.record_info_dom != null )
-                    this.record_info_dom.innerHTML = "recording... " + this.recording_size
-                this.recording_size += 1 
-
-                this.asset.physics.update(this.record_state)
-                this.asset.render.update()                
+                this.asset.physics.update(this.record_info)
+                this.asset.render.update()        
             }     
             else if ( 
-                  ( this.record_state == "play" )
-                ||( this.record_state == "play reverse" )
-                ||( this.record_state == "pause" ))
+                  ( this.record_info.state == "play" )
+                ||( this.record_info.state == "play reverse" )
+                ||( this.record_info.state == "pause" ))
             {
-                if( this.record_info_dom != null )
-                    this.record_info_dom.innerHTML = "reading " + this.record_frame_to_play + " / "+ this.recording_size
-                this.asset.render.update(this.record_frame_to_play)
+                this.asset.render.update(this.record_info)
             }  
-            else if(this.record_state == "delete")
+            else if(this.record_info.state == "delete")
             {
-                this.recording_size = 0
-                this.record_state = null
-                this.record_frame_to_play = 0
-
                 this.asset.physics.update()
-                this.asset.render.update( -1 )   
+                this.asset.render.update( this.record_info )   
             }
             else
             {
-                this.recording_size = 0
-
                 this.asset.physics.update()
                 this.asset.render.update()    
             }
-
-        
+            */        
         }
-
-        this.record_state_last = this.record_state
+        
+        this.record_info.state_last = this.record_info.state
     
         //uniforms[ 'time' ].value = performance.now() / 1000;
         //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
@@ -380,3 +358,59 @@ export default class Game_engine
 
 
 
+function record_info_update(record_info,time)
+{
+    // record
+    const delta = record_info.play_current - record_info.play_start
+    if( record_info.state == "play" )
+    {
+        record_info.play_current += 1
+
+        
+        if( record_info.size < delta )
+            record_info.play_current = delta % record_info.size + record_info.play_start
+    }
+    else if( record_info.state == "play reverse" )
+    {
+        record_info.play_current -= 1
+        if( record_info.play_current < record_info.play_start )
+            record_info.play_current = record_info.play_start + record_info.size  
+    }
+    
+    if( record_info.display_dom != null )
+        record_info.display_dom.innerHTML = ""
+
+    if(record_info.state == "record" )
+        {
+            if( record_info.display_dom != null )
+                record_info.display_dom.innerHTML = "recording... " + record_info.size
+            record_info.size += 1 
+            
+            if( record_info.play_current == null)
+            {
+                record_info.play_start = time
+                record_info.play_current = time
+            }
+                
+        }     
+        else if ( 
+                ( record_info.state == "play" )
+            ||( record_info.state == "play reverse" )
+            ||( record_info.state == "pause" ))
+        {
+            if( record_info.display_dom != null )
+                record_info.display_dom.innerHTML = "reading " + delta + " / "+ record_info.size
+        }  
+        else if(record_info.state == "delete")
+        {
+            record_info.size = 0
+            record_info.state = null
+            record_info.play_current = null
+            record_info.play_start = null   
+        }
+        else
+        {
+            record_info.size = 0  
+        }  
+
+}

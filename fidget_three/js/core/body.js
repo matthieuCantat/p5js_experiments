@@ -8,7 +8,7 @@ import {
   Draw_text_debug,
   convert_coords_matter_to_three,
   strictObject,
-  array_loop} from '../utils/utils.js';
+  array_clamp} from '../utils/utils.js';
 import { 
   build_body_physics_modifier} from './constraint.js';
 import * as ut from '../utils/utils_three.js';
@@ -783,7 +783,7 @@ class body_physics{
 
 
 
-  update( record_state = false )
+  update( record_info = null )
   {
     if( !this.opts.do_update )
       return false
@@ -801,8 +801,8 @@ class body_physics{
     this.body_main.state.rot   = this.get_out_rotation('world')
     this.body_main.state.scale = this.state.scale
 
-    if( record_state == "record" )
-      this.body_main.recorded_states.push({...this.body_main.state})
+    if( (record_info != null)&&( record_info.state == "record" ))
+      this.body_main.recorded_states.push( {...this.body_main.state , frame: this.body_main.Game_engine.time} )
 
     return true
    
@@ -1125,26 +1125,35 @@ export class body_render{
 
   
 
-  update( use_recoded_state = null )
+  update( record_info = null )
   {
     let pos = this.body_main.state.pos   
     let rot = this.body_main.state.rot 
     let scale = this.body_main.state.scale 
     let visibility = this.body_main.state.visibility
-    if(( use_recoded_state != null )&&( 0 <= use_recoded_state  ))
-    {
 
-      const state = array_loop( this.body_main.recorded_states, use_recoded_state)
-      pos = state.pos   
-      rot = state.rot 
-      scale = state.scale 
-      visibility = state.visibility     
-    }
-    else if( use_recoded_state == -1 )
+    if( ( record_info != null )&&( 0 < this.body_main.recorded_states.length ) )
     {
-      if( 0 < this.body_main.recorded_states.length)
-        this.body_main.recorded_states = []
+      if ( ( record_info.state == "play" )
+        ||( record_info.state == "play reverse" )
+        ||( record_info.state == "pause" ))
+        {
+
+          const state = get_state( this.body_main.recorded_states, record_info.play_current)
+
+          pos = state.pos   
+          rot = state.rot 
+          scale = state.scale 
+          visibility = state.visibility 
+        }
+      else if (record_info.state == "delete" )
+      {
+        if( 0 < this.body_main.recorded_states.length)
+          this.body_main.recorded_states = []
+      }
     }
+
+      
 
     
     if(this.debug != null)
@@ -2339,7 +2348,18 @@ function build_constraint(body,cns_opts,offset = 0)
 
 
 
-
+function get_state( states, request_frame)
+{
+  const states_last_i = states.length - 1
+  const start_frame = states[0].frame
+  const i = request_frame - start_frame
+  if( i < 0 )
+    return states[0]
+  else if ( states_last_i < i )
+    return states[states_last_i]
+  else
+    return states[i]
+}
 
 
 

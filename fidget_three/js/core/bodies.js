@@ -66,7 +66,7 @@ export class bodies_physics
     }
       */
   
-    update( body_type_filter = [], record_state = false )
+    update( body_type_filter = [], record_state = null )
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
         body.physics.update(record_state)

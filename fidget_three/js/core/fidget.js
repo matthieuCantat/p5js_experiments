@@ -99,7 +99,7 @@ class fidget_physics{
     this.fidget_main.bodies.physics.init_out_matrix()
   }
 
-  update( record_state = false)
+  update( record_state = null)
   {
     if(this.is_dynamic)
     {
