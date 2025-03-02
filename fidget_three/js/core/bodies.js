@@ -221,7 +221,7 @@ export class bodies_render
   
   
   
-  
+    /*
     set_visibility_secondary( value, body_type_filter = [] )
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
@@ -230,10 +230,13 @@ export class bodies_render
       }
           
     }   
+    */
   
-    set_visibility( value = null ,body_type_filter = [] )
+    enable( value = null ,body_type_filter = [] )
     {
       for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
+        body.render.enable(value)
+      /*
       {
         if( value == null )
         {
@@ -242,10 +245,12 @@ export class bodies_render
         else
         {
           body.state.visibility = value
-        }
+        
+          
         //if( body.render.mesh_three != null )
         //  body.render.mesh_three.group.visible = body.state.visibility      
       }
+      */
     }  
   
 
@@ -495,12 +500,13 @@ export class bodies
     
 
      
-  
+    /*
     set_visibility_override( value,body_type_filter = [] )
     {
       for( let body of this.get_list_filtered( 'eval', body_type_filter ))
         body.render.debug.force_visibility = value        
     }  
+      */
     
   
   
@@ -670,7 +676,7 @@ export class bodies
       }
   
       let opts_visual_inter = {
-        visibility:true,
+        visibility:false,
         do_shape: true,
         do_line:true,                                           
         color:utils.color.grey,

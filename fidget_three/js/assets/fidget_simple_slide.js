@@ -150,6 +150,7 @@ export default class fidget_simple_slide extends fidget{
       do_line: true,
       color_line: utils.color.black,
       density: 0.0022/this.s,
+      visibility : true,
       }
   
       //////////////////////////////////////////////////////////////////////////
@@ -207,6 +208,7 @@ export default class fidget_simple_slide extends fidget{
   
       this.bodies.store.geos.backgrounds.push( new body_build({
         ...this.opts_global,
+        ...opts_geo,
         ...opts_collision_no_interaction,
         dynamic: false,
         name: 'geos_background_L_',
@@ -215,7 +217,7 @@ export default class fidget_simple_slide extends fidget{
         m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
         type: utils.shape.rectangle,
         material_three: materials.old_custom_exemple, //materials.background.space_grid ,
-        visibility: this.do_background,
+        visibility: args.do_background,
       }) )
       const mirror_point_ref = new Vector( this.screen_dims.x/2,this.screen_dims.y/2)
       this.bodies.store.geos.backgrounds.push(this.bodies.store.geos.backgrounds[0].get_mirror(false, true, mirror_point_ref))

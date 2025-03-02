@@ -267,7 +267,7 @@ class body_physics{
   {
     if(this.dynamic)
     {
-      if(value)
+      if((value == null)||(value == true))
         this.body.collisionFilter.category = this.collision_category
       else
         this.body.collisionFilter.category = utils.collision_category.none
@@ -917,7 +917,7 @@ export class body_render{
       rot_override : null,
       scale : 1.0,
       //visibility : args.visibility,
-      visibility_secondary : false,
+      //visibility_secondary : false,
 
     }
 
@@ -1130,7 +1130,10 @@ export class body_render{
     let pos = this.body_main.state.pos   
     let rot = this.body_main.state.rot 
     let scale = this.body_main.state.scale 
-    let visibility = this.body_main.state.visibility
+    let visibility = false
+    if( this.body_main.relations.fidget.state.visibility )
+      if(this.body_main.state.visibility)
+        visibility = true
 
     if( ( record_info != null )&&( 0 < this.body_main.recorded_states.length ) )
     {
@@ -1154,14 +1157,13 @@ export class body_render{
     }
 
       
-
     
     if(this.debug != null)
     {
       if(this.debug.options.force_visibility)
         this.body_main.state.visibility = true
-      else
-        this.body_main.state.visibility = this.state.visibility_secondary
+      //else
+      //  this.body_main.state.visibility = this.state.visibility_secondary
     }
     
 
@@ -1318,12 +1320,12 @@ export class body_render{
 
   }
 
-  enable(value)
+  enable(value = null)
   {
-    if(value)
+    if(value == null)
       this.body_main.state.visibility = this.properties.visibility_default
     else
-      this.body_main.state.visibility = false    
+      this.body_main.state.visibility = value    
   }
 
 
@@ -1524,7 +1526,8 @@ export class body_build{
         shader:this.render.shader,
         castShadow:this.render.castShadow,
         receiveShadow:this.render.receiveShadow,
-        visibility:this.render.state.visibility,
+        visibility:this.render.properties.visibility_default,
+        
 
       }
       return args

@@ -205,6 +205,7 @@ export default class fidget_windmill extends fidget{
   
       this.bodies.store.geos.backgrounds.push( new body_build({
         ...this.opts_global,
+        ...opts_geo,
         ...opts_collision_no_interaction,
         dynamic: false,
         name: 'geos_background_L_',
@@ -213,7 +214,7 @@ export default class fidget_windmill extends fidget{
         m_shape: new Matrix().setScale(this.screen_dims.x/2, this.screen_dims.y),
         type: utils.shape.rectangle,
         material_three: materials.old_custom_exemple, //materials.background.space_grid ,
-        visibility: this.do_background,
+        visibility: args.do_background,
       }) )
 
       const mirror_point_ref = new Vector( this.screen_dims.x/2,this.screen_dims.y/2)

@@ -326,8 +326,8 @@ class fidget_physics{
   set_completion_step( step )
   {
     const inter_step_bodies = this.fidget_main.bodies.store.inters_step.steps
-    this.fidget_main.bodies.enable( 0 )  
-    this.fidget_main.bodies.list_enable( 1,this.steps_info[step].bodies_enable )
+    this.fidget_main.bodies.enable( false )  
+    this.fidget_main.bodies.list_enable( null ,this.steps_info[step].bodies_enable )
 
     this.fidget_main.bodies.physics.constraints_enable( true ) 
     this.constraints_enable(false, this.steps_info[step].constraints_disable )
@@ -560,14 +560,30 @@ class fidget_render{
     this.fidget_main.bodies.render.override_color_three(this.fidget_main.state.geos_color_override, ['geos'])      
     this.fidget_main.bodies.render.update( [] , use_recoded_state )
 
-    if((this.debug != null)&&(this.physics.is_in_focus())) 
+    
+    if(this.debug != null) 
     {
-      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_inters, ['inters'])  
-      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_inters_steps, ['inters_step']) 
-      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_geos, ['geos']) 
-      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_effects, ['effects']) 
-      this.fidget_main.bodies.render.set_visibility_secondary(this.debug.options.show_bones, ['bones'])
-    }     
+      const is_in_focus = this.physics.is_in_focus()
+      if( is_in_focus == true)
+      {
+        this.fidget_main.bodies.render.enable(this.debug.options.show_inters, ['inters'])  
+        this.fidget_main.bodies.render.enable(this.debug.options.show_inters_steps, ['inters_step']) 
+        this.fidget_main.bodies.render.enable(this.debug.options.show_geos, ['geos']) 
+        this.fidget_main.bodies.render.enable(this.debug.options.show_effects, ['effects']) 
+        this.fidget_main.bodies.render.enable(this.debug.options.show_bones, ['bones'])
+      }
+
+      if( is_in_focus == false)
+      {
+        this.fidget_main.bodies.render.enable(null, ['inters'])  
+        this.fidget_main.bodies.render.enable(null, ['inters_step']) 
+        this.fidget_main.bodies.render.enable(null, ['geos']) 
+        this.fidget_main.bodies.render.enable(null, ['effects']) 
+        this.fidget_main.bodies.render.enable(null, ['bones'])        
+      }
+      
+    } 
+       
   }
 
 
@@ -716,6 +732,7 @@ export default class fidget{
     this.state = strictObject({
       geos_color_override : null,
       selection_changed : false,
+      visibility : true,
     })
 
 
@@ -784,13 +801,15 @@ export default class fidget{
 
   enable(value)
   {
-
-    this.bodies.enable(value)
-    this.bodies.do_update(value)
+    this.state.visibility = value
+    //this.bodies.enable(value)
+    //this.bodies.do_update(value)
+    /*
     if( value == false )
       this.bodies.render.set_visibility(false)
     else
       this.bodies.render.set_visibility()
+    */
 
     if(value == true)
       this.physics.clean_completion_info()
