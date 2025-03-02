@@ -174,6 +174,8 @@ export class Mouse_manager
                 {
                     m = fidget_selected_body.physics.get_out_matrix()
                     break_dist = fidget_selected_body.physics.selection_break_length
+                    if(this.debug!= null)
+                        break_dist = this.debug.options.mouse_selection_break_length
     
                     do_save_p_mouse_grap_from_body = ((this.p_mouse_grap_from_body == null )||(this.selected_body_last_eval_name != fidget_selected_body.name))
                     if(do_save_p_mouse_grap_from_body)
