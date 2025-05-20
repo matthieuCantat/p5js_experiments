@@ -490,7 +490,7 @@ export default class fidget_simple_slide extends fidget{
 
     this.z_depth_end = this.render.draw_order_to_body_z( args.z_depth_start,0.5)
 
-    this.physics.Mouse.z = this.z_depth_end
+    //this.Game_engine.Mouse.z = this.z_depth_end
 
     this.bodies.build_order = this.bodies.get_build_order()
 

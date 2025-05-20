@@ -49,7 +49,7 @@ class fidget_physics{
 
     this.fidget_main = fidget_main     
     this.screen_dims = args.screen_dims
-
+    /*
     this.matter_engine        = create_physics_engine()
     create_boundary_wall_collision( 
       this.matter_engine, 
@@ -62,6 +62,7 @@ class fidget_physics{
       args.dom_canvas, 
       this.screen_dims, 
       this) )  
+      */
 
     this.state = strictObject({
       resolution_coef : 0, 
@@ -124,7 +125,8 @@ class fidget_physics{
 
     this.animate_background_doors()
     let physics_engine_delta_ms = 16.666
-    Matter.Engine.update(this.matter_engine, physics_engine_delta_ms)
+    Matter.Engine.update( this.fidget_main.Game_engine.matter_engine, 
+                          physics_engine_delta_ms)
     
   }
 
@@ -164,11 +166,12 @@ class fidget_physics{
   clean()
   {
     this.fidget_main.bodies.physics.clean()
+    /*
     this.Mouse.clean()
     Matter.Composite.clear(this.matter_engine.world, true);
     Matter.Events.off(this.matter_engine);  // Remove all events attached to the engine
     this.matter_engine = null
-
+    */
   }
 
   
@@ -239,23 +242,23 @@ class fidget_physics{
           if(current_way == 1)
           {
             if(selected_body != obj_next.physics.body)
-              this.Mouse.switch_selection( obj_next)
+              this.fidget_main.Game_engine.Mouse.switch_selection( obj_next)
           }
           else
           {
             if(selected_body != obj_last.physics.body)
-              this.Mouse.switch_selection(obj_last)     
+              this.fidget_main.Game_engine.Mouse.switch_selection(obj_last)     
           }
         }
         else if(this.force_way == 1)
         {
           if(selected_body != obj_next.physics.body)
-            this.Mouse.switch_selection( obj_next )
+            this.fidget_main.Game_engine.Mouse.switch_selection( obj_next )
         }
         else if(this.force_way == -1)
         {
           if(selected_body != obj_last.physics.body)
-            this.Mouse.switch_selection(obj_last) 
+            this.fidget_main.Game_engine.Mouse.switch_selection(obj_last) 
         }
       }
       this.state.switch_selection_happened_step = current_step  
@@ -340,7 +343,7 @@ class fidget_physics{
     {
       if((step == 0)||(step == inter_step_bodies.length))
       {
-        this.Mouse.switch_selection( null )
+        this.fidget_main.Game_engine.Mouse.switch_selection( null )
       }
       else
       {
@@ -357,7 +360,7 @@ class fidget_physics{
               if( i < inter_step_bodies.length )
                 this.switch_selection_transition( step, this.get_selected_body(), inter_step_bodies[step-1], inter_step_bodies[step][i])   
               else
-                this.Mouse.switch_selection(null)
+              this.fidget_main.Game_engine.Mouse.switch_selection(null)
 
 
             }
@@ -397,7 +400,7 @@ class fidget_physics{
   update_bodies_select_state(body_type_filter = [])
   {
     
-    if(this.Mouse.mouse_lock_selection)
+    if(this.fidget_main.Game_engine.Mouse.mouse_lock_selection)
       return []
 
     const selected_body_list = []
@@ -406,8 +409,8 @@ class fidget_physics{
       body.physics.state.is_touch = false
 
       let body_is_selected = false
-      if( this.Mouse.matter_constraint )
-        body_is_selected = body.physics.body == this.Mouse.matter_constraint.constraint.bodyB
+      if( this.fidget_main.Game_engine.Mouse.matter_constraint )
+        body_is_selected = body.physics.body == this.fidget_main.Game_engine.Mouse.matter_constraint.constraint.bodyB
 
       if( body_is_selected )
       {
@@ -541,7 +544,7 @@ class fidget_render{
   {
     this.debug = debug
 
-    this.physics.Mouse.set_debug(this.debug)
+    this.fidget_main.Game_engine.Mouse.set_debug(this.debug)
 
     this.fidget_main.bodies.set_debug( this.debug )
   }
@@ -592,7 +595,7 @@ class fidget_render{
   mouse_select_highlight(body_type_filter = [], bloom = true)
   {
     
-    if(this.physics.Mouse.mouse_lock_selection)
+    if(this.fidget_main.Game_engine.Mouse.mouse_lock_selection)
       return
 
     if( this.fidget_main.state.selection_changed == false )
@@ -749,16 +752,16 @@ export default class fidget{
     this.bodies.fidget_sequence_i = args.fidget_sequence_index
     this.bodies.group_three = this.bodies.group_three
     this.bodies.effects = this.effects
-    this.bodies.matter_engine = this.physics.matter_engine
-    this.bodies.Mouse = this.physics.Mouse
+    this.bodies.matter_engine = this.Game_engine.matter_engine
+    this.bodies.Mouse = this.Game_engine.Mouse
     this.bodies.Game_engine = this.Game_engine
 
 
     // body opts helper  
     this.opts_global = {
       screen_dims: this.screen_dims,
-      matter_engine: this.physics.matter_engine,
-      Mouse: this.physics.Mouse,
+      matter_engine: this.Game_engine.matter_engine,
+      Mouse: this.Game_engine.Mouse,
       fidget: this,
       dynamic: this.physics.is_dynamic,
       Game_engine: this.Game_engine,

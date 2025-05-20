@@ -3,6 +3,15 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import fidgets_sequence from '../assets/fidgets_sequence.js'
 import Matrix from '../utils/matrix.js'
+import {
+    create_physics_engine,
+    create_boundary_wall_collision,
+    strictObject,
+  } from '../utils/utils.js';
+import { 
+    Mouse_manager, 
+    user_interaction_info
+  } from '../core/mouse.js'
 
 export default class Game_engine
 {
@@ -21,6 +30,8 @@ export default class Game_engine
         this.camera = null
         this.render_scene = null
         this.renderer = null
+        this.matter_engine = null
+        this.Mouse = null
         this.finalComposer = null
         this.bloomComposer = null
         this.light_lens_flare = null
@@ -38,9 +49,41 @@ export default class Game_engine
             recording_size : 0,
         }
 
-
         this.debug = null
+
         //build
+        this.debug_set_stats_windows()
+
+        this.setup_render()
+        this.setup_physics()
+        
+
+        this.setup_update_loop() 
+
+        let asset = this.get_asset( this.args.asset_name )
+        this.load_asset(asset)
+
+        
+    }
+
+    set_debug(debug_options)
+    {
+        this.debug = debug_options
+        this.asset.set_debug(this.debug)
+    }
+
+    debug_set_stats_windows()
+    {
+        // stats
+        this.stats = new Stats();
+        this.args.dom_canvas.appendChild( this.stats.dom );
+    }
+    
+    setup_render()
+    {
+        if (!this.args.dom_canvas) {
+            throw new Error("Container element not found!");
+        }  
 
 
         // scene setup
@@ -74,73 +117,89 @@ export default class Game_engine
         light1.position.y = 200*2
         light1.position.z = 100*2
 
-        this.render_scene.add( light1 );
+        this.render_scene.add( light1 );        
+
+        ///////////////// render
+        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer.setPixelRatio( this.args.screen_dims.pixelRatio );
+
+        this.renderer.setSize( this.args.screen_dims.x, this.args.screen_dims.y );
+
+        this.args.dom_canvas.appendChild( this.renderer.domElement );
 
         this.build_special_effects()
-
-        this.debug_set_stats_windows()
-
-        if( this.args.asset_name != null)
-            this.setup_asset_from_name( this.args.asset_name )
-
     }
 
-    setup_asset(asset)
+    setup_physics()
     {
+            
+        this.matter_engine = create_physics_engine()
+        create_boundary_wall_collision( this.matter_engine, 
+                                        this.args.screen_dims.x,
+                                        this.args.screen_dims.y,
+                                        false)
+
+        this.Mouse = strictObject(new Mouse_manager(    this.matter_engine, 
+                                                        this.args.dom_canvas, 
+                                                        this.args.screen_dims) )                                          
+    }
+
+    clean_physics()
+    {
+        this.Mouse.clean()
+        Matter.Composite.clear(this.matter_engine.world, true);
+        Matter.Events.off(this.matter_engine);  // Remove all events attached to the engine
+        this.matter_engine = null
+    }
+
+    setup_update_loop()
+    {
+        this.renderer.setAnimationLoop( () => {this.update_loop() } );
+    }
+
+
+    get_asset( asset_name )
+    {
+        const args = {
+            nbr : 5,
+            m : new Matrix().setTranslation(this.args.screen_dims.x/2, this.args.screen_dims.y/2 ),
+            s : 2.2,
+            dom_canvas : this.args.dom_canvas,
+            screen_dims : this.args.screen_dims, 
+            shdrs : [],
+            //debug : this.args.debug,
+        }
+
+        let asset = null;
+        if      (asset_name === 'fidgets_grid'    )asset = new fidgets_grid(args) 
+        else if (asset_name === 'fidgets_sequence')asset = new fidgets_sequence(args)
+        else if (asset_name === 'fidget_daft_i'   )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
+        else if (asset_name === 'fidget_windmill' )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
+        else if (asset_name === 'fidget_simple_slide'    )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
+        return asset
+    }
+
+    load_asset(asset)
+    {
+        
+        //this.remove_asset()
+
         if(asset == null)
             return false
 
         this.asset = asset
-        this.asset.setup(this)
-        this.asset.set_game_engine_ref(this)
-        this.setup_render()
 
+        asset.setup(this)
+        asset.set_game_engine_ref(this)
         if(this.debug!=null)
-            this.asset.set_debug(this.debug)
+            asset.set_debug(this.debug)
+
+        this.Mouse.fidget = asset
 
         return true
     }
 
-    set_debug(debug_options)
-    {
-        this.debug = debug_options
-        this.asset.set_debug(this.debug)
-    }
-
-
-    setup_asset_from_name( asset_name)
-    {
-    
-      // Remove existing objects
-      this.remove_asset()
-    
-      // Add 
-    
-        let m = new Matrix()
-        m.setTranslation(this.args.screen_dims.x/2, this.args.screen_dims.y/2 )
-    
-        let s = 2.2
-    
-      const args = {
-        nbr : 5,
-        m : m,
-        s : s,
-        dom_canvas : this.args.dom_canvas,
-        screen_dims : this.args.screen_dims, 
-        shdrs : [],
-        //debug : this.args.debug,
-      }
-      
-      let asset = null;
-      if      (asset_name === 'fidgets_grid'    )asset = new fidgets_grid(args) 
-      else if (asset_name === 'fidgets_sequence')asset = new fidgets_sequence(args)
-      else if (asset_name === 'fidget_daft_i'   )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_daft_i'}}  )
-      else if (asset_name === 'fidget_windmill' )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_windmill'}}  )
-      else if (asset_name === 'fidget_simple_slide'    )asset = new fidgets_sequence({...args , ...{fidget_choice:'fidget_simple_slide'}}  )
-      this.setup_asset(asset)
-    
-    }
-    
+   
 
     remove_asset()
     {
@@ -149,27 +208,9 @@ export default class Game_engine
         this.asset.clean()
         this.asset = null
         this.clean_render()
+        this.clean_physics()
     }
-  
-
-    setup_render()
-    {
-        if (!this.args.dom_canvas) {
-            throw new Error("Container element not found!");
-        }  
-
-        ///////////////// render
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-        this.renderer.setPixelRatio( this.args.screen_dims.pixelRatio );
-
-        this.renderer.setSize( this.args.screen_dims.x, this.args.screen_dims.y );
-        this.renderer.setAnimationLoop( () => {this.update_loop_global() } );
-
-        this.args.dom_canvas.appendChild( this.renderer.domElement );
-
-        this.setup_render_special_effect()
-    }
-    
+      
     clean_render()
     {
         this.renderer.dispose();
@@ -220,11 +261,7 @@ export default class Game_engine
             this.light_lens_flare = addLight( 0.995, 0.5, 0.9,100, 100, 100 )
             this.render_scene.add( this.light_lens_flare )
         }
-    }
-
-
-    setup_render_special_effect()
-    {
+ 
 
         if((this.debug != null)&&(this.debug.options.do_shadows))
         {
@@ -270,12 +307,6 @@ export default class Game_engine
         }        
     }
 
-    debug_set_stats_windows()
-    {
-        // stats
-        this.stats = new Stats();
-        this.args.dom_canvas.appendChild( this.stats.dom );
-    }
 
     
     update_loop()
@@ -343,14 +374,10 @@ export default class Game_engine
         if( this.stats != null)
             this.stats.update();
         
+        this.time += this.time_step
     }
 
     
-    update_loop_global()
-    {
-        this.update_loop()
-        this.time += this.time_step
-    }
 
 
 }

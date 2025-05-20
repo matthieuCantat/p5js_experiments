@@ -68,7 +68,7 @@ class fidgets_sequence_physics
       return fidgets_to_compute
     }
 
-    get_fidget_in_focus()
+    get_fidget_id_in_focus()
     {
       let fidget_focus_id = 0
       for( let i = 0; i < this.main.fidgets.length; i++ )
@@ -80,6 +80,11 @@ class fidgets_sequence_physics
       return fidget_focus_id    
     }
 
+    get_fidget_in_focus()
+    {
+      return this.main.fidgets[this.get_fidget_id_in_focus()]
+    }
+    
     enable_fidgets_in_focus()
     {
       for( let i = 0; i < this.main.fidgets.length; i++ )
@@ -97,7 +102,7 @@ class fidgets_sequence_physics
     { 
       this.get_resolution_coef_info()
       this.fidgets_do_computation = this.get_fidget_to_compute()
-      this.fidget_focus_id = this.get_fidget_in_focus()
+      this.fidget_focus_id = this.get_fidget_id_in_focus()
       
       this.enable_fidgets_in_focus()
   

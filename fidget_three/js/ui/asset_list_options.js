@@ -18,12 +18,14 @@ export default class Asset_list_options
         
         this.get_from_local()
         this.fill_ui()
-        game_engine.setup_asset_from_name( this.current_asset)
+        let asset = game_engine.get_asset( this.current_asset)
+        game_engine.load_asset(asset)
 
         // callbacks 
         this.menu.addEventListener('change', (event) =>{
             this.current_asset = event.target.value;
-            game_engine.setup_asset_from_name( this.current_asset)
+            asset = game_engine.get_asset( this.current_asset)
+            game_engine.load_asset(asset)
             this.save_to_local()
         })
   

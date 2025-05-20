@@ -16,8 +16,7 @@ export class Mouse_manager
     constructor( 
         matter_engine,
         dom_canvas,
-        screen_dims,
-        fidget)
+        screen_dims)
     {
         
         
@@ -56,7 +55,7 @@ export class Mouse_manager
 
         //
         this.screen_dims = screen_dims
-        this.fidget = fidget
+        this.fidget = null
         this.mesh_line = null
         this.group_circle = null
         this.group_cross = null
@@ -163,12 +162,14 @@ export class Mouse_manager
         let m = null
         let do_save_p_mouse_grap_from_body = false
 
+        let fidget = this.fidget.physics.get_fidget_in_focus()
+        
         let break_dist = 0
         if( user_interaction_info.userIsInteracting )
         {
             if( selected_body != null  )
             {
-                fidget_selected_body = this.fidget.get_selected_body()
+                fidget_selected_body = fidget.physics.get_selected_body()
 
                 if( fidget_selected_body != null)
                 {
@@ -234,11 +235,11 @@ export class Mouse_manager
 
         
         let fidget_skip_debug = false
-        if(this.fidget.is_in_focus() == false )
+        if(fidget.physics.is_in_focus() == false )
             fidget_skip_debug = true
 
 
-        if( (this.debug.options.mouse_info)&&(fidget_skip_debug === false) )
+        if( (this.debug!=null)&&(this.debug.options.mouse_info)&&(fidget_skip_debug === false) )
         {
           let p_mouse_grap_from_body = {x:0,y:0}
           if(this.p_mouse_grap_from_body != null)
@@ -265,7 +266,7 @@ export class Mouse_manager
                 'mouseY                 : ' + user_interaction_info.mouseY,
 
                 '_______________________fidget_interaction_info',
-                'selected_fidget : ' + this.fidget.fidget_sequence_i,
+                'selected_fidget : ' + fidget.fidget_sequence_i,
                 'selected_body : ' + body_name,
 
                 'update_count :' + this.update_count,
@@ -345,8 +346,6 @@ export class Mouse_manager
         this.matter_constraint.constraint.pointB = {x: - p.y(), y: p.x()}
       this.matter_constraint.constraint.angleB = 0
       
-      //this.fidget.render.mouse_select_highlight(this.matter_constraint)
-
       return true
     
     }    
