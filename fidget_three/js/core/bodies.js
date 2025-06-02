@@ -24,7 +24,8 @@ export class bodies_physics
 
     constraints_enable(value,body_type_filter = [] )
     {
-      for( let body of this.bodies.get_list_filtered( 'eval', body_type_filter ))
+      let order = 'eval'
+      for( let body of this.bodies.get_list_filtered( order, body_type_filter ))
         for( let cns in body.physics.relations.constraints )
           body.physics.relations.constraints[cns].enable(value) 
   

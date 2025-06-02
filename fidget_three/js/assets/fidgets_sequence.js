@@ -110,6 +110,7 @@ class fidgets_sequence_physics
       {   
         if(this.fidgets_do_computation[i] == false)
           continue  
+        
         this.main.fidgets[i].physics.update( record_state )
         
         if( user_interaction_info.userInteractionChange )
@@ -304,27 +305,29 @@ export default class fidgets_sequence
       e_test_title.textContent = 'fidgets_sequence'
 
       //clean
+      let opts = 
+      {
+        m:new Matrix(this.m), 
+        s:this.s, 
+        screen_dims:this.screen_dims, 
+        do_background: true, 
+        is_dynamic:true,
+        //debug : this.debug_mode,  
+        play_animation:null,   
+        dom_canvas : this.dom_canvas ,
+        Game_engine : this.Game_engine,
+        layout: this,
+        force_way : this.force_way,
+      }
+
       this.fidgets = []
 
       let z_depth = 0
       for( let i = 0; i < this.fidgets_nbr; i++)
       {
-          let opts = 
-          {
-            m:new Matrix(this.m), 
-            s:this.s, 
-            screen_dims:this.screen_dims, 
-            z_depth_start:z_depth,
-            do_background: true, 
-            is_dynamic:true,
-            //debug : this.debug_mode,  
-            play_animation:null,   
-            dom_canvas : this.dom_canvas ,
-            Game_engine : this.Game_engine,
-            layout: this,
-            fidget_sequence_index : i +1,
-            force_way : this.force_way,
-          }
+          opts.z_depth_start = z_depth
+          opts.fidget_sequence_index = i +1
+          
           var fidget = null
           if( this.fidget_choice == "fidget_windmill" )
             fidget = strictObject( new fidget_windmill(opts) )
@@ -358,11 +361,6 @@ export default class fidgets_sequence
     {
       this.clean()
       this.setup()
-    }
-
-    set_game_engine_ref(Game_engine)
-    {
-      this.Game_engine = Game_engine
     }
 
 

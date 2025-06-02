@@ -7,9 +7,7 @@
 import './libraries/matter.js';
 import Vector from './utils/vector.js'
 import Game_engine from './core/game_engine.js';     
-import Debug_options from './ui/debug_options.js'; 
-import Asset_list_options from './ui/asset_list_options.js'; 
-import Record_state_panel from './ui/record_state_panel.js'
+
 
 import { OrbitControls } from './libraries/jsm/controls/OrbitControls.js';
 import { RenderPass } from './libraries/jsm/postprocessing/RenderPass.js';
@@ -61,11 +59,10 @@ const Game_engine_args = {
     screen_dims : screen_dims,
     asset_name : "fidget_simple_slide"
 }
-var game_engine = new Game_engine( Game_engine_args )
+var game_engine = new Game_engine()
+game_engine.initialize(Game_engine_args)
 
-const asset_list_options = new Asset_list_options(game_engine)
-const debug_options = new Debug_options(game_engine)
-const record_state_panel = new Record_state_panel(game_engine)
+
 
 
 ////////////////////////////////////////////////////////////CALLBACKS

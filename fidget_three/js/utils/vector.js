@@ -1,4 +1,5 @@
-import 'p5'
+//import p5 from '../libraries/p5.js'
+import '../libraries/p5.js'; // This adds p5 to the global scope
 const createVector = p5.prototype.createVector;
 
 class Matrix

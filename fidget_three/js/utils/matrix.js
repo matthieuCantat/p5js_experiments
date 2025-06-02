@@ -89,9 +89,17 @@ Matrix.prototype = {
 	 * @param {number} angle - angle in radians
 	 */
 	rotate: function(angle) {
-		var cos = Math.cos(angle),
-			sin = Math.sin(angle);
+
+		var current_angle = this.getRotation()
+		this.setRotation(current_angle+angle)
+		/*
+		var cos = Math.cos(rad(current_angle)),
+			sin = Math.sin(rad(current_angle));
+		
+		let scale = this.getScale()
 		this.transform(cos, sin, -sin, cos, 0, 0);
+		//this.setScale(scale[0],scale[1])
+		*/
 		return this;
 	},
 
@@ -197,7 +205,10 @@ Matrix.prototype = {
 	setRotation: function(angle) {
 		var cos = Math.cos(angle),
 			sin = Math.sin(angle);
+		
+		let scale = this.getScale()
 		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
+		this.setScale(scale[0],scale[1])
 		return this;
 	},
 	getRotation: function( clockwise = false) {
@@ -222,7 +233,7 @@ Matrix.prototype = {
 		return this;
 	},
 	getScale: function() {
-		return this.get_row(0).mag();
+		return [ this.get_row(0).mag(), this.get_row(1).mag() ]
 	},
 
 	setScale: function(x,y) {

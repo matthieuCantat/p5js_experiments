@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<head>
+		<title>Pendulum</title>
+		<style>
+			body {
+				font-family: verdana; 
+				font-size: 15px;
+			}			
+			.button {
+			background-color: #606060;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+		}
+		</style>
+	</head>
+	
+<body>
+	<button class="button" onclick="setupScene()">Restart</button>
+	<button class="button" onclick="run()">Run</button>
+	<button class="button" onclick="step()">Step</button>
+    <p>Number of sub-steps: <input type = "range" min = "0" max = "5" value = "5" id = "stepsSlider" class = "slider"> <span id = "steps">10000</span></p>
+
+	<canvas id = "myCanvas"></canvas>	
+    <script src="sketch.js"></script>
+  </body>
+</html>

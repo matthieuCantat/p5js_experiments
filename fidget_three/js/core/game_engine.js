@@ -12,19 +12,16 @@ import {
     Mouse_manager, 
     user_interaction_info
   } from '../core/mouse.js'
+  import Debug_options from '../ui/debug_options.js'; 
+  import Asset_list_options from '../ui/asset_list_options.js'; 
+  import Record_state_panel from '../ui/record_state_panel.js'
 
 export default class Game_engine
 {
-    constructor( in_args )
+    constructor()
     {
         // args
-        const default_args = {
-            dom_canvas : null,
-            screen_dims :null,
-            asset_name : null
-        }
-
-        this.args = {...default_args, ...in_args}
+        this.args = {}
         // attribute
         this.name = 'three_scene'
         this.camera = null
@@ -51,35 +48,43 @@ export default class Game_engine
 
         this.debug = null
 
-        //build
-        this.debug_set_stats_windows()
-
-        this.setup_render()
-        this.setup_physics()
-        
-
-        this.setup_update_loop() 
-
-        let asset = this.get_asset( this.args.asset_name )
-        this.load_asset(asset)
-
-        
     }
 
-    set_debug(debug_options)
+    initialize( in_args )
     {
-        this.debug = debug_options
-        this.asset.set_debug(this.debug)
+        const default_args = {
+            dom_canvas : null,
+            screen_dims :null,
+            asset_name : null
+        }
+        this.args = {...default_args, ...in_args}
+
+        // SETUP
+        this.initialize_physics()
+        this.initialize_render()   
+        this.setup_asset(this.args.asset_name)
+        this.initialize_GUI() 
+
+        // GAME LOOP
+        this.start_game_loop()
     }
 
-    debug_set_stats_windows()
+    initialize_physics()
     {
-        // stats
-        this.stats = new Stats();
-        this.args.dom_canvas.appendChild( this.stats.dom );
+            
+        this.matter_engine = create_physics_engine()
+        create_boundary_wall_collision( this.matter_engine, 
+                                        this.args.screen_dims.x,
+                                        this.args.screen_dims.y,
+                                        false)
+
+        this.Mouse = strictObject(new Mouse_manager(    this.matter_engine, 
+                                                        this.args.dom_canvas, 
+                                                        this.args.screen_dims) )                                          
     }
-    
-    setup_render()
+
+  
+    initialize_render()
     {
         if (!this.args.dom_canvas) {
             throw new Error("Container element not found!");
@@ -130,19 +135,125 @@ export default class Game_engine
         this.build_special_effects()
     }
 
-    setup_physics()
-    {
-            
-        this.matter_engine = create_physics_engine()
-        create_boundary_wall_collision( this.matter_engine, 
-                                        this.args.screen_dims.x,
-                                        this.args.screen_dims.y,
-                                        false)
 
-        this.Mouse = strictObject(new Mouse_manager(    this.matter_engine, 
-                                                        this.args.dom_canvas, 
-                                                        this.args.screen_dims) )                                          
+    setup_asset(asset_name)
+    {
+        this.args.asset_name = asset_name
+        let asset = this.get_asset( this.args.asset_name )
+
+        if(asset == null)
+            return false
+
+        this.asset = asset
+        asset.setup(this)
+        if(this.debug!=null)
+            asset.set_debug(this.debug)
+
+        this.Mouse.fidget = asset
+
+        return true
     }
+
+    initialize_GUI()
+    {
+        this.debug_set_stats_windows()
+        const asset_list_options = new Asset_list_options(this)
+        const debug_options = new Debug_options(this)
+        const record_state_panel = new Record_state_panel(this)  
+    }
+
+
+    
+    start_game_loop()
+    {
+        this.renderer.setAnimationLoop( () => {this.game_loop() } );
+    }
+
+    game_loop()
+    {
+        if((this.debug != null)&&(this.debug.options.do_flare ))
+        {
+            // light - change position
+            this.light_lens_flare.position.x = Math.sin(rad(45)+this.time*0.01)*120
+            this.light_lens_flare.position.y = Math.cos(rad(45)+this.time*0.01)*120
+        }     
+        
+        record_info_update( this.record_info, this.time )
+
+        if( this.asset != null )
+        {
+            this.asset.physics.update(this.record_info)
+            this.asset.render.update(this.record_info)           
+            /*
+            if(this.record_info.state == "record" )
+            {
+                this.asset.physics.update(this.record_info)
+                this.asset.render.update()        
+            }     
+            else if ( 
+                  ( this.record_info.state == "play" )
+                ||( this.record_info.state == "play reverse" )
+                ||( this.record_info.state == "pause" ))
+            {
+                this.asset.render.update(this.record_info)
+            }  
+            else if(this.record_info.state == "delete")
+            {
+                this.asset.physics.update()
+                this.asset.render.update( this.record_info )   
+            }
+            else
+            {
+                this.asset.physics.update()
+                this.asset.render.update()    
+            }
+            */        
+        }
+        
+        this.record_info.state_last = this.record_info.state
+    
+        //uniforms[ 'time' ].value = performance.now() / 1000;
+        //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
+    
+        if((this.debug != null)&&(this.debug.options.do_bloom))
+        {
+            let save_states = []
+            for( let i = 0 ; i < this.asset.fidgets.length; i++)
+                save_states.push( this.asset.fidgets[i].render.setup_bloom_pass() )
+            this.bloomComposer.render()
+            for( let i = 0 ; i < this.asset.fidgets.length; i++)
+                this.asset.fidgets[i].render.clean_bloom_pass(save_states[i])
+    
+            this.finalComposer.render();
+        }
+        else
+        {
+            this.renderer.render( this.render_scene, this.camera );
+        }
+    
+        if( this.stats != null)
+            this.stats.update();
+        
+        this.time += this.time_step
+    }
+
+
+    __________________________________________UTILS
+
+
+    set_debug(debug_options)
+    {
+        this.debug = debug_options
+        this.asset.set_debug(this.debug)
+    }
+
+    debug_set_stats_windows()
+    {
+        // stats
+        this.stats = new Stats();
+        this.args.dom_canvas.appendChild( this.stats.dom );
+    }
+  
 
     clean_physics()
     {
@@ -152,11 +263,8 @@ export default class Game_engine
         this.matter_engine = null
     }
 
-    setup_update_loop()
-    {
-        this.renderer.setAnimationLoop( () => {this.update_loop() } );
-    }
 
+    
 
     get_asset( asset_name )
     {
@@ -179,25 +287,6 @@ export default class Game_engine
         return asset
     }
 
-    load_asset(asset)
-    {
-        
-        //this.remove_asset()
-
-        if(asset == null)
-            return false
-
-        this.asset = asset
-
-        asset.setup(this)
-        asset.set_game_engine_ref(this)
-        if(this.debug!=null)
-            asset.set_debug(this.debug)
-
-        this.Mouse.fidget = asset
-
-        return true
-    }
 
    
 
@@ -307,75 +396,6 @@ export default class Game_engine
         }        
     }
 
-
-    
-    update_loop()
-    {
-        if((this.debug != null)&&(this.debug.options.do_flare ))
-        {
-            // light - change position
-            this.light_lens_flare.position.x = Math.sin(rad(45)+this.time*0.01)*120
-            this.light_lens_flare.position.y = Math.cos(rad(45)+this.time*0.01)*120
-        }     
-        
-        record_info_update( this.record_info, this.time )
-
-        if( this.asset != null )
-        {
-            this.asset.physics.update(this.record_info)
-            this.asset.render.update(this.record_info)           
-            /*
-            if(this.record_info.state == "record" )
-            {
-                this.asset.physics.update(this.record_info)
-                this.asset.render.update()        
-            }     
-            else if ( 
-                  ( this.record_info.state == "play" )
-                ||( this.record_info.state == "play reverse" )
-                ||( this.record_info.state == "pause" ))
-            {
-                this.asset.render.update(this.record_info)
-            }  
-            else if(this.record_info.state == "delete")
-            {
-                this.asset.physics.update()
-                this.asset.render.update( this.record_info )   
-            }
-            else
-            {
-                this.asset.physics.update()
-                this.asset.render.update()    
-            }
-            */        
-        }
-        
-        this.record_info.state_last = this.record_info.state
-    
-        //uniforms[ 'time' ].value = performance.now() / 1000;
-        //current_asset.fidgets[0].bodies.geos.rectangle.mesh_three.shape.material.uniforms.time.value = performance.now() / 1000;
-    
-        if((this.debug != null)&&(this.debug.options.do_bloom))
-        {
-            let save_states = []
-            for( let i = 0 ; i < this.asset.fidgets.length; i++)
-                save_states.push( this.asset.fidgets[i].render.setup_bloom_pass() )
-            this.bloomComposer.render()
-            for( let i = 0 ; i < this.asset.fidgets.length; i++)
-                this.asset.fidgets[i].render.clean_bloom_pass(save_states[i])
-    
-            this.finalComposer.render();
-        }
-        else
-        {
-            this.renderer.render( this.render_scene, this.camera );
-        }
-    
-        if( this.stats != null)
-            this.stats.update();
-        
-        this.time += this.time_step
-    }
 
     
 
