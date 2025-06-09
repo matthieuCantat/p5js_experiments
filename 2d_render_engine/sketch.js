@@ -225,25 +225,11 @@ class rectangle
 class User_interaction_info
 {
 	LOG_LISTENERS = false
+	BOT_MODE = false
     constructor()
     {
-		this.ON_COMPUTER = true
-
-		this.isPressed_draw_debug = {
-			count: 0,
-			max_count: 100,
-		}
-		this.isReleased_draw_debug = {
-			count: 0,
-			max_count: 100,
-		}
-
 		//
-        this._isMousePressed = false
-        this._isScreenTouched = false
         this._isInteracting_last = null
-
-        this._eventTimer = null;
 
 		// INTERACTION
 		this.isInteracting = false
@@ -269,56 +255,57 @@ class User_interaction_info
 		
     }
 
-    handleMouseDown(event)
+	interactionEvent_getPos(event, interaction_type, action )
 	{
-        if(this.LOG_LISTENERS)console.log('handleMouseDown')
-        this.isInteracting = true
-		this.add_mouse_coords( event.clientX, event.clientY)
-    }
+        if(this.LOG_LISTENERS)
+			console.log('interactionEvent_hande', interaction_type, action)
 
-    handleTouchDown(event)
-	{
-        if(this.LOG_LISTENERS)console.log('handleTouchDown')
-        this.isInteracting = true
-        const touch = event.touches[0] || event.changedTouches[0]; 
-		this.add_mouse_coords( touch.clientX, touch.clientY)
-    }	
+		if( ( interaction_type == 'mouse')&&( action == 'move')&&(this.p == null))
+			return
+
+		let e = event
+		if( interaction_type == 'touch')
+			e = event.touches[0] || event.changedTouches[0]
+		
+		if( ( action == 'down')||( action == 'move') )
+			this.p = this.get_input_coords_as_vector( e.clientX, e.clientY)
+		else if( action == 'up')
+			this.p = null	
+    }
     
-    handleMouseUp(event) {
-        if(this.LOG_LISTENERS)console.log('handleMouseUp')
-        this.isInteracting = false
-		this.p = null
-    }
-
-    handleTouchUp(event) {
-        if(this.LOG_LISTENERS)console.log('handleTouchUp')
-        this.isInteracting = false
-		this.p = null
-    }   
-    
-    handleMouseMove(event) 
-	{
-		if(this.LOG_LISTENERS)console.log('handleMouseMove')
-		if( ( this.ON_COMPUTER )&&(this.isInteracting == false) )
-			return 
-		this.add_mouse_coords( event.clientX, event.clientY)
-    }	
-    handleTouchMove(event)
-    {
-		if(this.LOG_LISTENERS)console.log('handleTouchMove')
-		const touch = event.touches[0] || event.changedTouches[0];      
-		this.add_mouse_coords( touch.clientX, touch.clientY)
-    }
-
 	// LISTENERS
-	addEventListeners(doc)
+	interactionEvent_addToListener(doc)
 	{
-		doc.addEventListener('mousedown',  (event) => {this.handleMouseDown(event)});
-		doc.addEventListener('mouseup',    (event) => {this.handleMouseUp(event)});
-		doc.addEventListener('mousemove',  (event) => {this.handleMouseMove(event)});
-		doc.addEventListener('touchstart', (event) => {this.handleTouchDown(event)});
-		doc.addEventListener('touchend',   (event) => {this.handleTouchUp(event)});
-		doc.addEventListener('touchmove',  (event) => {this.handleTouchMove(event)}); 
+		doc.addEventListener('mousedown',  (event) => {this.interactionEvent_getPos(event,'mouse','down')});
+		doc.addEventListener('mouseup',    (event) => {this.interactionEvent_getPos(event,'mouse','up')});
+		doc.addEventListener('mousemove',  (event) => {this.interactionEvent_getPos(event,'mouse','move')});
+		doc.addEventListener('touchstart', (event) => {this.interactionEvent_getPos(event,'touch','down')});
+		doc.addEventListener('touchend',   (event) => {this.interactionEvent_getPos(event,'touch','up')});
+		doc.addEventListener('touchmove',  (event) => {this.interactionEvent_getPos(event,'touch','move')}); 
+	}
+
+	override_pos()
+	{
+		let sinA_0 = Math.sin(draw_count*0.01)
+		let sinA_1 = Math.sin(draw_count*0.01+1)
+		let sinB_0 = Math.sin(draw_count*0.02)
+		let sinB_1 = Math.sin(draw_count*0.02+1)
+		let sinC_0 = Math.sin(draw_count*0.03)
+		let sinC_1 = Math.sin(draw_count*0.03+1)
+		let sinD_0 = Math.sin(draw_count*0.04)
+		let sinD_1 = Math.sin(draw_count*0.04+1)
+
+
+		let pSin = {	
+			x:sinA_1*600*sinB_1,
+			y:sinC_0*400*sinD_1
+		}
+
+		let activation = Math.abs(sinD_0) -0.1
+
+		this.p = new Vector(pSin.x,pSin.y)
+		if( activation < 0 )
+			this.p = null
 	}
 
 	trail_clear()
@@ -335,10 +322,12 @@ class User_interaction_info
 		this.trailPoints[0] = p
 	}
 
-	add_mouse_coords(x,y)
+	get_input_coords_as_vector(x,y)
 	{
-		this.p = new Vector( cX_inv( { x : x} ), cY_inv( { y : y} ) )
+		return new Vector( cX_inv( { x : x} ), cY_inv( { y : y} ) )
 	}
+
+
 
 	add_selection_info(obj)
 	{
@@ -352,8 +341,48 @@ class User_interaction_info
 		this.selection_info.vOffset = null
 	}
 
+	scan_for_selection(objs)
+	{
+
+		if( this.isInteracting )
+		{
+			if(( this.something_is_selected == false )&&(this.isPressed == true))
+			{
+						
+				for( let obj of objs )
+					obj.isSelected = false
+					
+				for( let i = objs.length -1 ; 0 <= i; i-- )
+				{
+					if( objs[i].isPointInside( this.p.v.x, 
+														this.p.v.y) )
+					{
+						objs[i].isSelected = true
+						this.something_is_selected = true
+						this.add_selection_info(objs[i])
+						break
+					}
+				}
+			}
+		}
+		else
+		{
+			this.something_is_selected = false
+			this.clear_selection_info()
+			for( let obj of objs )
+				obj.isSelected = false		
+		}		
+	}
+
 	update_state()
 	{
+		// is interacting
+		if( this.p != null)
+			this.isInteracting = true
+		else
+			this.isInteracting = false
+
+		// others
 		this.interactionChanged = false
 		this.isPressed = false
 		this.isReleased = false
@@ -366,6 +395,7 @@ class User_interaction_info
 				this.isReleased = true
 		}
      
+		// for next eval
 		this._isInteracting_last = this.isInteracting
 	}
 
@@ -406,12 +436,17 @@ class User_interaction_info
 		this.p_last = this.p
 	}
 
+	update()
+	{
+		if( this.BOT_MODE 	)
+			this.override_pos()
+		this.update_state()
+		this.update_counter()
+		this.update_coords()		
+	}
 
 	draw()
 	{
-		this.update_state()
-		this.update_counter()
-		this.update_coords()
 		
 		/*
 		if( true )
@@ -502,15 +537,9 @@ class User_interaction_info
 				2,
 			)
 
-			this.isPressed_draw_debug.count += 1
-			this.isReleased_draw_debug.count = 0
 		}
-		else
-		{
-			this.isPressed_draw_debug.count = 0
-			this.isReleased_draw_debug.count += 1
 
-		}
+
 	}
 
 }
@@ -537,45 +566,30 @@ function setup()
 }
 
 function update()
-{
+{		
+	//for( let elem of draw_elements )
+	//	elem.m.rotate(0.01)
+	user_interaction.update()
+	user_interaction.scan_for_selection(draw_elements)
+
+
+	if( (user_interaction.something_is_selected )&&(user_interaction.isInteracting))
+	{
+		let obj = user_interaction.selection_info.obj;
+		let vOffset = user_interaction.selection_info.vOffset;
+		let pSelection_init = vOffset.getMult( obj.m )
+		let pCurrent = user_interaction.p
+		let pObj = obj.m.get_row(2)
+		let vInit = pSelection_init.getSub(pObj)
+		let vCurrent = pCurrent.getSub(pObj)
+		let angle = vInit.getRotation(vCurrent)
 		
-	for( let elem of draw_elements )
-		elem.m.rotate(0.01)
-	
-
-
-	if( user_interaction.p != null  )
-	{
-		if(( user_interaction.something_is_selected == false )&&(user_interaction.isPressed == true))
-		{
-					
-			for( let elem of draw_elements )
-				elem.isSelected = false
-				
-			for( let i = draw_elements.length -1 ; 0 <= i; i-- )
-			{
-				if( draw_elements[i].isPointInside( user_interaction.p.v.x, 
-													user_interaction.p.v.y) )
-				{
-					draw_elements[i].isSelected = true
-					user_interaction.something_is_selected = true
-					user_interaction.add_selection_info(draw_elements[i])
-					break
-				}
-			}
-		}
+		let rObj = obj.m.getRotation()
+		let rObjNew = rObj + angle
+		obj.m.setRotation(rObjNew)
+		
+		
 	}
-	
-
-	if( user_interaction.isInteracting == false )
-	{
-		user_interaction.something_is_selected = false
-		user_interaction.clear_selection_info()
-		for( let elem of draw_elements )
-			elem.isSelected = false		
-	}
-
-
 
 }	
 
@@ -628,7 +642,7 @@ function game_loop()
 
 // Attach event listeners when the document is fully loaded
 window.onload = function() {
-	user_interaction.addEventListeners(canvas)   
+	user_interaction.interactionEvent_addToListener(canvas)   
 }
 ////////////////////////////////////////////////// mouse pressed
 

@@ -549,8 +549,12 @@ Matrix.prototype = {
 
 	get_row(row){
 		if(row == 0)return new Vector(this.a,this.b)//X
-		if(row == 1)return new Vector(this.c,this.d)//Y
-		if(row == 2)return new Vector(this.e,this.f)//P
+		else if(row == 1)return new Vector(this.c,this.d)//Y
+		else if(row == 2)return new Vector(this.e,this.f)//P
+		else
+		{
+			throw Error('row must be < 3')
+		}
 	},
 
 	set_row(row,v){
