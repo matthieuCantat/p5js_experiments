@@ -215,3 +215,24 @@ game_loop();
 
 
 
+// Disable pull-to-refresh using JavaScript
+
+function disable_pull_to_refresh(event)
+{
+    const canvas = document.getElementById("three_canvas");
+    const menu = document.getElementById("debug_menu");
+    const debug_menu_is_open = menu.style.display === "block";
+    if( debug_menu_is_open)
+    {
+        //console.log('debug_menu_is_open')
+        return false
+    }
+
+    // Disable pull-to-refresh
+    //console.log('debug_menu_is_close')
+    event.preventDefault();
+    return true
+}
+document.body.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
+
+
