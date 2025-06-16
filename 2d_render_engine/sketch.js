@@ -97,7 +97,7 @@ function update()
 	// CONSTRAINT
 	let rotateConstraint_A = { objs:[ draw_elements[0], draw_elements[1]], attrs:[ 'r', 'r'], mult: 2 }
 	let rotateConstraint_B = { objs:[ draw_elements[0], draw_elements[2]], attrs:[ 'r', 'r'], mult:-3 }
-	let rotateConstraint_C = { objs:[ draw_elements[3], draw_elements[4]], attrs:[ 'ty', 'r'], mult:-0.03 }
+	let rotateConstraint_C = { objs:[ draw_elements[3], draw_elements[4]], attrs:[ 'ty', 'r'], mult:-0.01 }
 	if( (user_interaction.something_is_selected )&&(user_interaction.isInteracting))
 	{
 		if( rotateConstraint_A.objs[1] == user_interaction.selection_info.obj)
