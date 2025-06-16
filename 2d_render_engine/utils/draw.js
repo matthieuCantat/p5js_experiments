@@ -145,6 +145,7 @@ export class rectangle
 			color: "white",
 			stroke_color: "black",
 			stroke_width: 5,
+            interaction: null,
 		}
 		const args = { ...defaultOptions, ...in_options };
 
@@ -153,6 +154,7 @@ export class rectangle
 		this.stroke_color = args.stroke_color
 		this.stroke_width = args.stroke_width	
 		this.isSelected = false
+        this.interaction = args.interaction
 
 		this.stroke_color_highligth = "yellow"
 	}
