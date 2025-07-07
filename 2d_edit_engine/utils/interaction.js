@@ -10,6 +10,11 @@ export class User_interaction_info
 {
 	LOG_LISTENERS = false
 	BOT_MODE = false
+
+	PRESSED_CIRCLE_SIZE = 10
+	PRESSED_CIRCLE_SIZE_ANIM_START = 30
+
+
     constructor()
     {
 		//
@@ -202,7 +207,11 @@ export class User_interaction_info
             pCenter.y = y_delta
             obj.m.set_row(2,pCenter)
         }
-        
+        else if( obj.interaction == 'button' )
+		{
+			//obj.m.set_row(2,Vector2d())
+			console.log("do something")
+		}        
     }
 
 	update_states()
@@ -296,9 +305,13 @@ export class User_interaction_info
 		
 		if((0<this.isInteractingCount)&&(this.isInteractingCount<50)&&(this.pPressed!= null))
 		{	
-			
+			let start_size = this.PRESSED_CIRCLE_SIZE_ANIM_START + this.PRESSED_CIRCLE_SIZE
+			let end_size = this.PRESSED_CIRCLE_SIZE
+			let shrink_speed =this.isInteractingCount*5
+			let size_animated = Math.max( end_size, start_size - shrink_speed)
+
 			draw_circle( this.pPressed,
-				Math.max( 30, 70 -this.isInteractingCount*5),
+				size_animated,
 				'red',
 				'back',
 				5)
@@ -308,8 +321,13 @@ export class User_interaction_info
 		
 		if((this.isNotInteractingCount)&&(this.isNotInteractingCount<50)&&(this.pReleased!= null))
 		{
+			let start_size = this.PRESSED_CIRCLE_SIZE_ANIM_START + this.PRESSED_CIRCLE_SIZE
+			let end_size = this.PRESSED_CIRCLE_SIZE
+			let shrink_speed =this.isNotInteractingCount*5
+			let size_animated = Math.max( end_size, start_size - shrink_speed)
+						
 			draw_circle( this.pReleased,
-				Math.max( 30, 70 -this.isNotInteractingCount*5),
+				size_animated,
 				'blue',
 				'back',
 				5)		
@@ -331,27 +349,94 @@ export class User_interaction_info
 			{
 				let m = this.selection_info.obj.m
 				let v = this.selection_info.vOffset
-				let p = v.getMult(m)
-				draw_circle( p,
-					10,
-					'yellow',
-					'back',
-					5)
+				let pObjAttachInteraction = v.getMult(m)
 
-				let m_p = m.get_row(2)
-				draw_circle( m_p,
-					10,
-					'yellow',
-					'back',
-					5)				
-					
-				daw_line([p,m_p],
+				let pObjCenter = m.get_row(2)
+				
+				if(this.selection_info.obj.interaction == 'r')
+				{
+					draw_circle( pObjAttachInteraction,
+						10,
 						'yellow',
-						2,)
+						'back',
+						5)
+	
+					draw_circle( pObjCenter,
+						10,
+						'yellow',
+						'back',
+						5)				
+						
+					daw_line([pObjAttachInteraction,pObjCenter],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)			
+				}
+				else if(this.selection_info.obj.interaction == 'tx')
+				{
+			
+					draw_circle( pObjCenter,
+						10,
+						'yellow',
+						'back',
+						5)				
+						
+					let pCenter_axeX_min = pObjCenter.getAdd(1000,0)
+					let pCenter_axeX_max = pObjCenter.getAdd(-1000,0)
+					daw_line([pCenter_axeX_min, pCenter_axeX_max],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)		
+				}			
+				else if(this.selection_info.obj.interaction == 'ty')
+				{
+			
+					draw_circle( pObjCenter,
+						10,
+						'yellow',
+						'back',
+						5)				
+						
+					let pCenter_axeX_min = pObjCenter.getAdd(0,1000)
+					let pCenter_axeX_max = pObjCenter.getAdd(0,-1000)
+					daw_line([pCenter_axeX_min, pCenter_axeX_max],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)		
+				}
+				else if(this.selection_info.obj.interaction == 'button_hold')
+				{
+					let Shape = this.selection_info.obj.duplicate()
+					//Shape.color = null
+					let current_scale = Shape.m.getScale()
 
-				daw_line([p,this.p],
-						'red',
-						2,)						
+					let anim = Math.abs(Math.sin(this.isInteractingCount*0.1))
+					Shape.m.setScale(current_scale[0] + 5*anim)
+					Shape.draw()
+					
+				}					
+				else if(this.selection_info.obj.interaction == 'button_first_press')
+				{
+					let Shape = this.selection_info.obj.duplicate()
+					//Shape.color = null
+					let current_scale = Shape.m.getScale()
+
+					let duration = 100
+					let speed = 10
+					let anim = this.isInteractingCount*speed
+					Shape.m.setScale(current_scale[0] + anim)
+					if( anim < duration )
+						Shape.draw()
+				}	
 			}
 
 			// TRAIL

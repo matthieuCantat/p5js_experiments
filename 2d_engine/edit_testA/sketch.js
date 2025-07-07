@@ -1,8 +1,8 @@
 
-import Vector2d from './utils/vector2d.js';
-import Matrix2d from './utils/matrix2d.js';
-import { User_interaction_info } from './utils/interaction.js'
-import { Constraints_info } from './utils/constraint.js'
+import Vector2d from '../utils/vector2d.js';
+import Matrix2d from '../utils/matrix2d.js';
+import { User_interaction_info } from '../utils/interaction.js'
+import { Constraints_info } from '../utils/constraint.js'
 import { draw_bg, 
 	draw_grid,
 	draw_circle,
@@ -10,7 +10,8 @@ import { draw_bg,
 	rectangle,
 	COLORS,
 	canvas,
-	draw_background} from './utils/draw.js'
+	draw_background,
+	get_randow_color} from '../utils/draw.js'
 
 
 
@@ -21,53 +22,55 @@ var Constraints = new Constraints_info(User_interaction)
 
 function setup()
 {
-
+	
 	// SETUP OBJS
-	let p = new Vector2d(-100,100)
-	let p_offset = new Vector2d(100,0)
+	let p = new Vector2d(-150,200)
+	let p_offset = new Vector2d(0,-50)
+	let scale = new Vector2d(60,20)
+	let interactions = [
+		{attr:'t'},
+		{attr:'tx'},
+		{attr:'ty'},
+		{attr:'tx',limit:[-10,100]},
+		{attr:'ty',limit:[-10,100]},		
+		{attr:'r'},
+		{attr:'r',limit:[0,90]},
+		{attr:'button_hold'},
+		{attr:'button_first_press'}
+	]
 
-	let m = null
-	let color_index = null
-	for( let i = 0; i < 3; i++)
+
+	for( let i = 0; i < interactions.length; i++)
 	{
-		m = new Matrix2d()
-		m.set_row(2, p)
-		m.setRotation(Math.random()*10)
-		m.setScale( 100, 40)
+		let color_index = Math.floor(Math.random() * COLORS.length);
 
-		color_index = Math.floor(Math.random() * COLORS.length);
-		Objs.push( new rectangle( {m : m, color: COLORS[color_index], interaction:'r'})  )
+		let obj = new rectangle( 
+			{ m : new Matrix2d(p, 0, scale), 
+			  color: COLORS[color_index], 
+			  interaction :interactions[i]}) 
 
+		Objs.push( obj )
 		p.add(p_offset)
 	}
-
-	m = new Matrix2d()
-	m.set_row(2, new Vector2d(-100,-100))
-	m.setRotation(3.14/2)
-	m.setScale( 100, 40)
-	color_index = Math.floor(Math.random() * COLORS.length);
-	Objs.push( new rectangle( {m : m, color: COLORS[color_index], interaction:'ty'})  )
-
-	m = new Matrix2d()
-	m.set_row(2, new Vector2d(100,-100))
-	m.setRotation(Math.random()*10)
-	m.setScale( 100, 40)
-	color_index = Math.floor(Math.random() * COLORS.length);
-	Objs.push( new rectangle( {m : m, color: COLORS[color_index], interaction:'r'})  )
 
 	// SETUP INTERACTION
 	User_interaction.set_interaction_objs(Objs)
 
 	// SETUP CONSTRAINT
+	/*
 	let cns_data = [{ objs:[ Objs[0], Objs[1]], attrs:[ 'r' , 'r'], mult: 2    },
 					{ objs:[ Objs[0], Objs[2]], attrs:[ 'r' , 'r'], mult:-3    },
 					{ objs:[ Objs[3], Objs[4]], attrs:[ 'ty', 'r'], mult:-0.01 }	]
 	Constraints.setup( cns_data )
+	*/
+	
 
 	draw_bg('white')
 	draw_grid()
 }
 
+var created_obj = null
+var p = null
 
 function update()
 {		
@@ -75,6 +78,36 @@ function update()
 	User_interaction.update()
 	User_interaction.get_selected_obj()
 	User_interaction.handle_interaction_with_selected_obj()
+
+	let create_mode =
+    User_interaction.something_is_selected == false &&
+    User_interaction.isInteracting &&
+    created_obj === null;
+
+	let edit_scale_mode =
+    User_interaction.something_is_selected == false &&
+    User_interaction.isInteracting &&
+    created_obj !== null;
+
+	if( create_mode )
+	{
+		p = new Vector2d( User_interaction.p )
+		let m = new Matrix2d(User_interaction.p,0,10)
+		created_obj = new rectangle( {m : m, color: get_randow_color(), interaction:{attr:'r'}})
+		Objs.push( created_obj )
+	}
+	else if(edit_scale_mode)
+	{
+		let vDelta = User_interaction.p.getSub(p)
+		let sX = Math.abs(vDelta.x)+0.001
+		let sY = Math.abs(vDelta.y)+0.001
+		created_obj.m.setScale(sX,sY)
+	}
+	else
+	{
+		created_obj = null
+	}
+
 	
 	Constraints.update()
 	

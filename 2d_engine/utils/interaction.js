@@ -10,6 +10,11 @@ export class User_interaction_info
 {
 	LOG_LISTENERS = false
 	BOT_MODE = false
+
+	PRESSED_CIRCLE_SIZE = 10
+	PRESSED_CIRCLE_SIZE_ANIM_START = 30
+
+
     constructor()
     {
 		//
@@ -181,7 +186,7 @@ export class User_interaction_info
         let pSelection_init = vOffset.getMult( obj.m )
         let vCenterSelection = pSelection_init.getSub(pCenter)        
         
-        if( obj.interaction == 'r' )
+        if( obj.interaction.attr == 'r' )
         {
             let vCenterCurrent = this.p.getSub(pCenter)
             let angle_delta = vCenterSelection.getRotation(vCenterCurrent)
@@ -190,19 +195,49 @@ export class User_interaction_info
             let rObjNew = rObj + angle_delta
             obj.m.setRotation(rObjNew)
         }
-        else if( obj.interaction == 'tx' )
+        else if( obj.interaction.attr == 'tx' )
         {
             let x_delta = this.p.x - vCenterSelection.x
             pCenter.x = x_delta
-            obj.m.set_row(2,pCenter)
+
+			if( obj.interaction.limit != null )
+			{
+				let pObj_init = obj.m_init.get_row(2)
+				let x_min = pObj_init.x + obj.interaction.limit[0]
+				if ( pCenter.x < x_min)
+					pCenter.x = x_min
+				let x_max = pObj_init.x + obj.interaction.limit[1]
+				if ( x_max < pCenter.x )
+					pCenter.x = x_max
+			}
+			obj.m.set_row(2,pCenter)
         }
-        else if( obj.interaction == 'ty' )
+        else if( obj.interaction.attr == 'ty' )
         {
             let y_delta = this.p.y- vCenterSelection.y
             pCenter.y = y_delta
-            obj.m.set_row(2,pCenter)
+            
+			if( obj.interaction.limit != null )
+			{
+				let pObj_init = obj.m_init.get_row(2)
+				let y_min = pObj_init.y + obj.interaction.limit[0]
+				if ( pCenter.y < y_min)
+					pCenter.y = y_min
+				let y_max = pObj_init.y + obj.interaction.limit[1]
+				if ( y_max < pCenter.y )
+					pCenter.y = y_max
+			}	
+			obj.m.set_row(2,pCenter)		
         }
-        
+        else if( obj.interaction.attr == 't' )
+		{
+			obj.m.set_row(2,this.p)
+		}		
+        else if( obj.interaction.attr == 'button' )
+		{
+			//obj.m.set_row(2,Vector2d())
+			console.log("do something")
+		}        
     }
 
 	update_states()
@@ -296,9 +331,13 @@ export class User_interaction_info
 		
 		if((0<this.isInteractingCount)&&(this.isInteractingCount<50)&&(this.pPressed!= null))
 		{	
-			
+			let start_size = this.PRESSED_CIRCLE_SIZE_ANIM_START + this.PRESSED_CIRCLE_SIZE
+			let end_size = this.PRESSED_CIRCLE_SIZE
+			let shrink_speed =this.isInteractingCount*5
+			let size_animated = Math.max( end_size, start_size - shrink_speed)
+
 			draw_circle( this.pPressed,
-				Math.max( 30, 70 -this.isInteractingCount*5),
+				size_animated,
 				'red',
 				'back',
 				5)
@@ -308,8 +347,13 @@ export class User_interaction_info
 		
 		if((this.isNotInteractingCount)&&(this.isNotInteractingCount<50)&&(this.pReleased!= null))
 		{
+			let start_size = this.PRESSED_CIRCLE_SIZE_ANIM_START + this.PRESSED_CIRCLE_SIZE
+			let end_size = this.PRESSED_CIRCLE_SIZE
+			let shrink_speed =this.isNotInteractingCount*5
+			let size_animated = Math.max( end_size, start_size - shrink_speed)
+						
 			draw_circle( this.pReleased,
-				Math.max( 30, 70 -this.isNotInteractingCount*5),
+				size_animated,
 				'blue',
 				'back',
 				5)		
@@ -330,28 +374,154 @@ export class User_interaction_info
 			if( this.selection_info.obj != null)
 			{
 				let m = this.selection_info.obj.m
+				let m_init = this.selection_info.obj.m_init
 				let v = this.selection_info.vOffset
-				let p = v.getMult(m)
-				draw_circle( p,
-					10,
-					'yellow',
-					'back',
-					5)
+				let interaction = this.selection_info.obj.interaction
+				let pObjAttachInteraction = v.getMult(m)
 
-				let m_p = m.get_row(2)
-				draw_circle( m_p,
-					10,
-					'yellow',
-					'back',
-					5)				
-					
-				daw_line([p,m_p],
+				let pObjCenter = m.get_row(2)
+				let pObjCenterInit = m_init.get_row(2)
+				let vScale = m.getScale()
+
+				if(interaction.attr == 'r')
+				{
+					draw_circle( pObjAttachInteraction,
+						10,
 						'yellow',
-						2,)
+						'back',
+						5)
+	
+					draw_circle( pObjCenter,
+						10,
+						'yellow',
+						'back',
+						5)				
+						
+					daw_line([pObjAttachInteraction,pObjCenter],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)			
+				}
+				else if(interaction.attr == 'tx')
+				{
+			
+					draw_circle( pObjCenter,
+						10,
+						'yellow',
+						'back',
+						5)				
+							
+				
+					let pCenter_axeX_min = pObjCenterInit.getAdd(1000,0)
+					let pCenter_axeX_max = pObjCenterInit.getAdd(-1000,0)						
+					if( interaction.limit != null )
+					{
+						pCenter_axeX_min = pObjCenterInit.getAdd(interaction.limit[0],0)
+						pCenter_axeX_max = pObjCenterInit.getAdd(interaction.limit[1],0)		
+						
+						
+					
+						let col_min_top = pObjCenterInit.getAdd(interaction.limit[0]-vScale[0],1000)
+						let col_min_dwn = pObjCenterInit.getAdd(interaction.limit[0]-vScale[0],-1000)	
+						
+						daw_line([col_min_dwn, col_min_top],
+							'yellow',
+							2,)
 
-				daw_line([p,this.p],
-						'red',
-						2,)						
+						let col_max_top = pObjCenterInit.getAdd(interaction.limit[1]+vScale[0],1000)
+						let col_max_dwn = pObjCenterInit.getAdd(interaction.limit[1]+vScale[0],-1000)	
+							
+						daw_line([col_max_dwn, col_max_top],
+							'yellow',
+							2,)							
+						
+					}
+			
+
+
+
+					daw_line([pCenter_axeX_min, pCenter_axeX_max],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)		
+				}			
+				else if(interaction.attr == 'ty')
+				{
+			
+					draw_circle( pObjCenter,
+						10,
+						'yellow',
+						'back',
+						5)				
+						
+					let pCenter_axeX_min = pObjCenter.getAdd(0,1000)
+					let pCenter_axeX_max = pObjCenter.getAdd(0,-1000)
+					if( interaction.limit != null )
+					{
+						pCenter_axeX_min = pObjCenterInit.getAdd(0,interaction.limit[0])
+						pCenter_axeX_max = pObjCenterInit.getAdd(0,interaction.limit[1])		
+						
+						
+					
+						let col_min_top = pObjCenterInit.getAdd(1000,interaction.limit[0]-vScale[1])
+						let col_min_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[0]-vScale[1])	
+						
+						daw_line([col_min_dwn, col_min_top],
+							'yellow',
+							2,)
+
+						let col_max_top = pObjCenterInit.getAdd(1000,interaction.limit[1]+vScale[1])
+						let col_max_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[1]+vScale[1])	
+							
+						daw_line([col_max_dwn, col_max_top],
+							'yellow',
+							2,)							
+						
+					}					
+					daw_line([pCenter_axeX_min, pCenter_axeX_max],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)		
+				}
+				else if(interaction.attr == 'button_hold')
+				{
+					let Shape = this.selection_info.obj.duplicate()
+					//Shape.color = null
+					let current_scale = Shape.m.getScale()
+
+					let anim = Math.abs(Math.sin(this.isInteractingCount*0.1))
+					let animated_scale = [
+						current_scale[0] + 5*anim, 
+						current_scale[1] + 5*anim]
+					Shape.m.setScale(animated_scale[0], animated_scale[1] )
+					Shape.draw()
+					
+				}					
+				else if(interaction.attr == 'button_first_press')
+				{
+					let Shape = this.selection_info.obj.duplicate()
+					//Shape.color = null
+					let current_scale = Shape.m.getScale()
+
+					let duration = 100
+					let speed = 10
+					let anim = this.isInteractingCount*speed
+					let animated_scale = [
+						current_scale[0] + anim, 
+						current_scale[1] + anim]					
+					Shape.m.setScale(animated_scale[0], animated_scale[1])
+					if( anim < duration )
+						Shape.draw()
+				}	
 			}
 
 			// TRAIL

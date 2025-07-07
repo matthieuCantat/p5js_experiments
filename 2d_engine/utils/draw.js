@@ -170,6 +170,7 @@ export class rectangle
 		const args = { ...defaultOptions, ...in_options };
 
 		this.m = args.m
+		this.m_init = new Matrix2d(args.m)
 		this.color = args.color
 		this.stroke_color = args.stroke_color
 		this.stroke_width = args.stroke_width	
@@ -178,6 +179,11 @@ export class rectangle
 
 		this.stroke_color_highlight = "yellow"
         this.stroke_width_highlight = 5
+	}
+
+	duplicate()
+	{
+		return new rectangle({m : new Matrix2d(this.m), color: this.color, interaction:this.interaction})
 	}
 
 	draw()
@@ -249,4 +255,11 @@ export class rectangle
 	
 	  }
 
+}
+
+
+export function get_randow_color()
+{
+	let color_index = Math.floor(Math.random() * COLORS.length);
+	return COLORS[color_index]
 }

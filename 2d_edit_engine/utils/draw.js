@@ -180,6 +180,11 @@ export class rectangle
         this.stroke_width_highlight = 5
 	}
 
+	duplicate()
+	{
+		return new rectangle({m : new Matrix2d(this.m), color: this.color, interaction:this.interaction})
+	}
+
 	draw()
 	{
         ctx.save()
@@ -249,4 +254,11 @@ export class rectangle
 	
 	  }
 
+}
+
+
+export function get_randow_color()
+{
+	let color_index = Math.floor(Math.random() * COLORS.length);
+	return COLORS[color_index]
 }
