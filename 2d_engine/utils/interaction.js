@@ -1,7 +1,7 @@
 import { draw_circle, daw_line, cX_inv, cY_inv} from './draw.js'
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
-
+import { effects_background } from './shared.js';
 
 let draw_count = 0
 ////////////////////////////////////////////////// mouse pressed
@@ -507,19 +507,21 @@ export class User_interaction_info
 				}					
 				else if(interaction.attr == 'button_first_press')
 				{
-					let Shape = this.selection_info.obj.duplicate()
-					//Shape.color = null
-					let current_scale = Shape.m.getScale()
+					let no_effect_left = true
+					for( let i = 0; i < effects_background.length; i++ )
+					{
+						if( effects_background[i].isFinished() == false )
+						{
+							no_effect_left = false
+							break
+						}	
+					}
 
-					let duration = 100
-					let speed = 10
-					let anim = this.isInteractingCount*speed
-					let animated_scale = new Vector2d(
-						current_scale.x + anim, 
-						current_scale.y + anim)					
-					Shape.m.setScale(animated_scale)
-					if( anim < duration )
-						Shape.draw()
+					if( no_effect_left )
+					{
+						let effect_inst = new effect(this.selection_info.obj)
+						effects_background.push(effect_inst)
+					}
 				}	
 			}
 
@@ -538,5 +540,80 @@ export class User_interaction_info
 				2,
 			)
 		}
+	}
+}
+
+
+class effect
+{
+	constructor(body)
+	{
+		this.body_ref = body
+		this.objs = []
+
+		this.update_count = 0
+		this.init_scale = this.body_ref.m.getScale()
+		this.duration = 50
+		this.speed = 10
+		
+		//
+		this.counts = []
+		this.objs = []
+
+	}
+
+	isFinished()
+	{
+		if( this.duration < this.update_count )
+			return true
+		return false
+	} 
+
+	update()
+	{
+		this.update_count += 1
+		
+		if( this.isFinished() )
+			return false
+
+		let obj = this.body_ref.duplicate() 
+		obj.color = null
+		this.objs.push( obj ) 
+		this.counts.push( 0 )
+
+		for( let i = 0; i < this.objs.length; i++)
+		{
+			
+			let obj = this.objs[i]
+			let anim = this.counts[i] *this.speed
+
+			let animated_scale = new Vector2d(
+				this.init_scale.x + anim, 
+				this.init_scale.y + anim)	
+			
+			
+			this.objs[i].m.setScale(animated_scale)
+
+			this.counts[i] += 1
+		}
+	
+
+		return true
+	}
+
+	draw()
+	{
+		if( this.isFinished() )
+			return false
+
+		for( let i = 0; i < this.objs.length; i++)
+		{
+			
+			let obj = this.objs[i]
+			obj.draw()
+		}
+		
+
+		return true
 	}
 }
