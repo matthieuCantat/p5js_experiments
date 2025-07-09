@@ -182,6 +182,12 @@ export default class Vector2d
 		return this;
 	}
 
+    getRotated( angle ) {
+        const v = new Vector2d(this);
+        v.rotate(angle);
+        return v
+    }
+
 	setRotation(angle) {
         let length = this.mag()
 		this.x = Math.cos(angle) * length

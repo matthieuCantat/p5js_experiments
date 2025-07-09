@@ -25,34 +25,31 @@ function setup()
 	
 	// SETUP OBJS
 	let p = new Vector2d(-150,200)
-	let p_offset = new Vector2d(0,-50)
-	let scale = new Vector2d(60,20)
-	let interactions = [
-		{attr:'t'},
-		{attr:'tx'},
-		{attr:'ty'},
-		{attr:'tx',limit:[-10,100]},
-		{attr:'ty',limit:[-10,100]},		
-		{attr:'r'},
-		{attr:'r',limit:[0,90]},
-		{attr:'button_hold'},
-		{attr:'button_first_press'}
-	]
+	let p_offset_Y = new Vector2d(0,-140)
+	let p_offset_X = new Vector2d(140,0)
+	let scales = [ new Vector2d(65,65), new Vector2d(30,65), new Vector2d(65,30) ]
+	
+	let shape_types = [ 'rectangle', 'circle', 'triangle' , 'trapezoid' ]
 
-
-	for( let i = 0; i < interactions.length; i++)
+	for( let j = 0; j <scales.length; j++)
 	{
-		let color_index = Math.floor(Math.random() * COLORS.length);
-
-		let obj = new body( 
-			{ m : new Matrix2d(p, 0, scale), 
-			  color: COLORS[color_index], 
-			  interaction :interactions[i],
-			  shape_type:'rectangle' } ) 
-
-		Objs.push( obj )
-		p.add(p_offset)
+		let pStartCol = new Vector2d(p)
+		for( let i = 0; i < shape_types.length; i++)
+		{
+			let color_index = Math.floor(Math.random() * COLORS.length);
+	
+			let obj = new body( 
+				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
+					color: COLORS[color_index], 
+					interaction :{attr:'r'},
+					shape_type:shape_types[i] } ) 
+	
+			Objs.push( obj )
+			pStartCol.add(p_offset_Y)
+		}
+		p.add(p_offset_X)
 	}
+
 
 	// SETUP INTERACTION
 	User_interaction.set_interaction_objs(Objs)

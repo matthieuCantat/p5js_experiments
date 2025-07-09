@@ -85,7 +85,7 @@ export default function Matrix2d(a,b,c,d,e,f) {
 			if( typeof s === 'number' )
 				this.setScale( s, s)
 			else
-				this.setScale( s.x, s.y)
+				this.setScale( s)
 		}
 		else
 		{
@@ -264,7 +264,7 @@ Matrix2d.prototype = {
 		
 		let scale = this.getScale()
 		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
-		this.setScale(scale[0],scale[1])
+		this.setScale(scale)
 		return this;
 	},
 	getRotation: function( clockwise = false) {
@@ -289,7 +289,7 @@ Matrix2d.prototype = {
 		return this;
 	},
 	getScale: function() {
-		return [ this.get_row(0).mag(), this.get_row(1).mag() ]
+		return new Vector2d( this.get_row(0).mag(), this.get_row(1).mag() )
 	},
 
 	setScale: function(x,y) {
@@ -301,9 +301,19 @@ Matrix2d.prototype = {
 
 		if (arguments.length === 1)
 		{
-			let scale = x
-			vX.mult(scale)
-			vY.mult(scale)
+			if (typeof x === 'number')
+			{
+				let scale = x
+				vX.mult(scale)
+				vY.mult(scale)
+			}
+			else
+			{
+				let scale = x
+				vX.mult(scale.x)
+				vY.mult(scale.y)
+			}
+
 			this.setTransform(vX.x, vX.y, vY.x, vY.y, this.e, this.f);
 		}
 		else

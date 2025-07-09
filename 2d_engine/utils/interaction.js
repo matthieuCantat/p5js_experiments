@@ -151,8 +151,7 @@ export class User_interaction_info
 					
 				for( let i = objs.length -1 ; 0 <= i; i-- )
 				{
-					if( objs[i].isPointInside( this.p.x, 
-														this.p.y) )
+					if( objs[i].isPointInside( this.p ))
 					{
 						objs[i].isSelected = true
 						this.something_is_selected = true
@@ -424,15 +423,15 @@ export class User_interaction_info
 						
 						
 					
-						let col_min_top = pObjCenterInit.getAdd(interaction.limit[0]-vScale[0],1000)
-						let col_min_dwn = pObjCenterInit.getAdd(interaction.limit[0]-vScale[0],-1000)	
+						let col_min_top = pObjCenterInit.getAdd(interaction.limit[0]-vScale.x,1000)
+						let col_min_dwn = pObjCenterInit.getAdd(interaction.limit[0]-vScale.x,-1000)	
 						
 						daw_line([col_min_dwn, col_min_top],
 							'yellow',
 							2,)
 
-						let col_max_top = pObjCenterInit.getAdd(interaction.limit[1]+vScale[0],1000)
-						let col_max_dwn = pObjCenterInit.getAdd(interaction.limit[1]+vScale[0],-1000)	
+						let col_max_top = pObjCenterInit.getAdd(interaction.limit[1]+vScale.x,1000)
+						let col_max_dwn = pObjCenterInit.getAdd(interaction.limit[1]+vScale.x,-1000)	
 							
 						daw_line([col_max_dwn, col_max_top],
 							'yellow',
@@ -469,15 +468,15 @@ export class User_interaction_info
 						
 						
 					
-						let col_min_top = pObjCenterInit.getAdd(1000,interaction.limit[0]-vScale[1])
-						let col_min_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[0]-vScale[1])	
+						let col_min_top = pObjCenterInit.getAdd(1000,interaction.limit[0]-vScale.y)
+						let col_min_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[0]-vScale.y)	
 						
 						daw_line([col_min_dwn, col_min_top],
 							'yellow',
 							2,)
 
-						let col_max_top = pObjCenterInit.getAdd(1000,interaction.limit[1]+vScale[1])
-						let col_max_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[1]+vScale[1])	
+						let col_max_top = pObjCenterInit.getAdd(1000,interaction.limit[1]+vScale.y)
+						let col_max_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[1]+vScale.y)	
 							
 						daw_line([col_max_dwn, col_max_top],
 							'yellow',
@@ -499,10 +498,10 @@ export class User_interaction_info
 					let current_scale = Shape.m.getScale()
 
 					let anim = Math.abs(Math.sin(this.isInteractingCount*0.1))
-					let animated_scale = [
-						current_scale[0] + 5*anim, 
-						current_scale[1] + 5*anim]
-					Shape.m.setScale(animated_scale[0], animated_scale[1] )
+					let animated_scale = new Vector2d(
+						current_scale.x + 5*anim, 
+						current_scale.y + 5*anim)
+					Shape.m.setScale(animated_scale )
 					Shape.draw()
 					
 				}					
@@ -515,10 +514,10 @@ export class User_interaction_info
 					let duration = 100
 					let speed = 10
 					let anim = this.isInteractingCount*speed
-					let animated_scale = [
-						current_scale[0] + anim, 
-						current_scale[1] + anim]					
-					Shape.m.setScale(animated_scale[0], animated_scale[1])
+					let animated_scale = new Vector2d(
+						current_scale.x + anim, 
+						current_scale.y + anim)					
+					Shape.m.setScale(animated_scale)
 					if( anim < duration )
 						Shape.draw()
 				}	

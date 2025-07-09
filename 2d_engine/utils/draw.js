@@ -1,4 +1,5 @@
 
+
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
 
@@ -129,6 +130,337 @@ export function daw_line(
     
 }
 
+
+export class body
+{
+	constructor(
+		in_options,
+	)
+	{
+		const defaultOptions = {
+			m: new Matrix2d(),
+			shape_type: "rectangle",
+			color: "white",
+			stroke_color: "black",
+			stroke_width: 2,
+            interaction: null,
+		}
+		const args = { ...defaultOptions, ...in_options };
+
+		this.m = args.m
+		this.m_init = new Matrix2d(args.m)
+		this.shape_type = args.shape_type
+		this.color = args.color
+		this.stroke_color = args.stroke_color
+		this.stroke_width = args.stroke_width	
+		this.isSelected = false
+        this.interaction = args.interaction
+
+		this.stroke_color_highlight = "yellow"
+        this.stroke_width_highlight = 5
+	}
+
+	duplicate()
+	{
+		return new body(
+			{	m : new Matrix2d(this.m), 
+				shape_type: this.shape_type,
+				color: this.color, 
+				interaction:this.interaction})
+	}
+
+	draw()
+	{
+        ctx.save()
+		ctx.beginPath()
+
+		ctx.fillStyle = this.color
+		if( this.isSelected )
+        {
+            ctx.strokeStyle = this.stroke_color_highlight
+            ctx.lineWidth = this.stroke_width_highlight
+        }
+        else
+        {
+            ctx.strokeStyle = this.stroke_color
+            ctx.lineWidth = this.stroke_width
+        }
+			
+		if( this.shape_type == "rectangle" )
+			draw_rectangle(ctx,this.m)	
+		else if( this.shape_type == "circle" )
+			draw_circle_from_matrix(ctx, this.m)
+		else if( this.shape_type == "triangle" )
+			draw_triangle(ctx, this.m)
+		else if( this.shape_type == "trapezoid" )
+			draw_trapezoid(ctx, this.m)
+
+		if( this.color != null)
+			ctx.fill()
+
+		if( this.stroke_color != null)
+			ctx.stroke()
+
+		ctx.resetTransform();	
+        ctx.restore()		
+	}
+
+	isPointInside(point)
+	{
+		if( this.shape_type == "rectangle" )
+			return isPointInside_rectangle(point,this.m)
+		else if( this.shape_type == "circle" )
+			return isPointInside_circle(point,this.m)
+		else if( this.shape_type == "triangle" )
+			return isPointInside_triangle(point,this.m)
+		else if( this.shape_type == "trapezoid" )
+			return isPointInside_trapezoid(point,this.m)
+	
+		return false
+	}
+
+}
+
+function draw_rectangle(ctx, m)
+{
+	let p = m.get_row(2)
+	let orient = m.getRotation()
+	let scale = m.getScale()
+	
+	ctx.translate(cX(p), cY(p));
+	ctx.rotate(cR(orient));
+	
+	ctx.rect(
+		-scale.x, 
+		-scale.y, 
+		scale.x*2, 
+		scale.y*2);
+	
+}
+
+function draw_circle_from_matrix(ctx, m, draw_mark=true)
+{
+	let p = m.get_row(2)
+	let orient = m.getRotation()
+	let scale = m.getScale()
+	let radius = Math.max( scale.x,scale.y )
+
+	ctx.arc(  cX(p), 
+			cY(p), 
+			radius, 
+			0.0, 
+			2.0 * Math.PI); 
+	ctx.closePath();
+
+	
+	if( draw_mark)
+	{
+		let vY =m.get_row(1)
+		vY.normalize()
+		vY.mult(radius/2)
+		let p_mark = p.getAdd( vY )
+		let scale_mark = new Vector2d(1.0,radius/2)
+		let m_mark = new Matrix2d(p_mark,orient,scale_mark)
+		draw_rectangle(ctx, m_mark)
+	}		
+}
+
+
+function draw_triangle(ctx, m)
+{
+	let vA = new Vector2d(0,1)
+	let vB = vA.getRotated(3.14*2/3)
+	let vC = vA.getRotated(-3.14*2/3)
+
+	vA.normalize()
+	vB.normalize()
+	vC.normalize()
+	
+	let pA = vA.getMult(m)
+	let pB = vB.getMult(m)
+	let pC = vC.getMult(m)
+
+	//let vBCenter = pB.getSub(p)
+	//vY.normalize().mult(vBCenter.mag())
+	//let pA = p.getAdd(vY)
+
+	ctx.moveTo(cX(pA), cY(pA));            // Move to the first point (x1, y1)
+	ctx.lineTo(cX(pB), cY(pB));           // Draw line to second point (x2, y2)
+	ctx.lineTo(cX(pC), cY(pC));          // Draw line to third point (x3, y3)
+	ctx.closePath();               // Close the path (connects back to first point)
+	
+}
+
+
+function draw_trapezoid(ctx, m)
+{
+	let ANGLE = 3.14/4
+
+	let vX = m.get_row(0)
+	let vY = m.get_row(1)
+	let p = m.get_row(2)
+
+	let pC = p.getAdd(vY).getAdd(vX)
+	let pD = p.getAdd(vY).getAdd(vX.getMult(-1))
+
+	let vDC = pD.getSub(pC)
+	vDC.rotate(ANGLE)
+	let dist = Math.sin(ANGLE)*vY.mag()*2
+	vDC.normalize()
+	vDC.mult(dist)
+
+	
+	let vCD = pC.getSub(pD)
+	vCD.rotate(-ANGLE)
+	vCD.normalize()
+	vCD.mult(dist)
+
+	let pA = pD.getAdd(vCD)
+	let pB = pC.getAdd(vDC)
+
+
+
+	ctx.moveTo(cX(pA), cY(pA));            // Move to the first point (x1, y1)
+	ctx.lineTo(cX(pB), cY(pB));           // Draw line to second point (x2, y2)
+	ctx.lineTo(cX(pC), cY(pC));          // Draw line to third point (x3, y3)
+	ctx.lineTo(cX(pD), cY(pD)); 
+	ctx.closePath();               // Close the path (connects back to first point)
+	
+}
+
+
+function isPointInside_rectangle(point,m)
+{
+
+	let vX = m.get_row(0)
+	let vY = m.get_row(1)
+	let p = m.get_row(2)
+	
+	let pA = p.getSub(vX).getAdd(vY)
+	let pB = p.getAdd(vX).getAdd(vY)
+	let pC = p.getAdd(vX).getSub(vY)
+	let pD = p.getSub(vX).getSub(vY)
+	
+	let vTestA = point.getSub(pA)
+	let vBA = pB.getSub(pA)
+	let dBA = vTestA.dot(vBA)
+	
+	let vDA = pD.getSub(pA)
+	let dDA = vTestA.dot(vDA)
+	
+	let vTestC = point.getSub(pC)
+	let vBC = pB.getSub(pC)
+	let dBC = vTestC.dot(vBC)
+	
+	let vDC = pD.getSub(pC)
+	let dDC = vTestC.dot(vDC)
+	
+	return 0 < dBA && 0 < dDA && 0 < dBC && 0 < dDC
+}
+
+
+function isPointInside_trapezoid(point,m)
+{
+	let ANGLE = 3.14/4
+
+	let vX = m.get_row(0)
+	let vY = m.get_row(1)
+	let p = m.get_row(2)
+
+	let pC = p.getAdd(vY).getAdd(vX)
+	let pD = p.getAdd(vY).getAdd(vX.getMult(-1))
+
+	let vDC = pD.getSub(pC)
+	vDC.rotate(ANGLE)
+	let dist = Math.sin(ANGLE)*vY.mag()*2
+	vDC.normalize()
+	vDC.mult(dist)
+
+	
+	let vCD = pC.getSub(pD)
+	vCD.rotate(-ANGLE)
+	vCD.normalize()
+	vCD.mult(dist)
+
+	let pA = pD.getAdd(vCD)
+	let pB = pC.getAdd(vDC)
+
+	
+	let vTestA = point.getSub(pA)
+	let vBA = pB.getSub(pA)
+	let dBA = vTestA.dot(vBA)
+	
+	let vDA = pD.getSub(pA)
+	let dDA = vTestA.dot(vDA)
+	
+	let vTestC = point.getSub(pC)
+	let vBC = pB.getSub(pC)
+	let dBC = vTestC.dot(vBC)
+	
+	let _vDC = pD.getSub(pC)
+	let dDC = vTestC.dot(_vDC)
+	
+	return 0 < dBA && 0 < dDA && 0 < dBC && 0 < dDC
+}
+
+
+function isPointInside_circle(point,m)
+{
+
+	let vX = m.get_row(0)
+	let vY = m.get_row(1)
+	let p = m.get_row(2)
+	let radius = Math.max( vX.mag(), vY.mag() )
+	
+	let vDelta = point.getSub(p)
+	
+	return vDelta.mag() <= radius
+}
+
+
+function isPointInside_triangle(point,m)
+{
+	let vA = new Vector2d(0,1)
+	let vB = vA.getRotated(3.14*2/3)
+	let vC = vA.getRotated(-3.14*2/3)
+
+	vA.normalize()
+	vB.normalize()
+	vC.normalize()
+	
+	let pA = vA.getMult(m)
+	let pB = vB.getMult(m)
+	let pC = vC.getMult(m)
+
+	
+	const v0x = pC.x - pA.x;
+	const v0y = pC.y - pA.y;
+	const v1x = pB.x - pA.x;
+	const v1y = pB.y - pA.y;
+	const v2x = point.x - pA.x;
+	const v2y = point.y - pA.y;
+  
+	const dot00 = v0x * v0x + v0y * v0y;
+	const dot01 = v0x * v1x + v0y * v1y;
+	const dot02 = v0x * v2x + v0y * v2y;
+	const dot11 = v1x * v1x + v1y * v1y;
+	const dot12 = v1x * v2x + v1y * v2y;
+  
+	const invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+	const u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	const v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+  
+	return u >= 0 && v >= 0 && (u + v <= 1);
+}
+
+
+export function get_randow_color()
+{
+	let color_index = Math.floor(Math.random() * COLORS.length);
+	return COLORS[color_index]
+}
+
+
 export function draw_circle(
 	point,
 	radius,
@@ -152,114 +484,4 @@ export function draw_circle(
 	ctx.closePath();
 	ctx.fill();
 	ctx.stroke()
-}
-
-export class rectangle
-{
-	constructor(
-		in_options,
-	)
-	{
-		const defaultOptions = {
-			m: new Matrix2d(),
-			color: "white",
-			stroke_color: "black",
-			stroke_width: 2,
-            interaction: null,
-		}
-		const args = { ...defaultOptions, ...in_options };
-
-		this.m = args.m
-		this.m_init = new Matrix2d(args.m)
-		this.color = args.color
-		this.stroke_color = args.stroke_color
-		this.stroke_width = args.stroke_width	
-		this.isSelected = false
-        this.interaction = args.interaction
-
-		this.stroke_color_highlight = "yellow"
-        this.stroke_width_highlight = 5
-	}
-
-	duplicate()
-	{
-		return new rectangle({m : new Matrix2d(this.m), color: this.color, interaction:this.interaction})
-	}
-
-	draw()
-	{
-        ctx.save()
-		ctx.beginPath()
-
-		ctx.fillStyle = this.color
-		if( this.isSelected )
-        {
-            ctx.strokeStyle = this.stroke_color_highlight
-            ctx.lineWidth = this.stroke_width_highlight
-        }
-        else
-        {
-            ctx.strokeStyle = this.stroke_color
-            ctx.lineWidth = this.stroke_width
-        }
-			
-
-		
-		
-		let p = this.m.get_row(2)
-		let orient = this.m.getRotation()
-		let scale = this.m.getScale()
-		
-		ctx.translate(cX(p), cY(p));
-		ctx.rotate(cR(orient));
-		
-		ctx.rect(
-			-scale[0], 
-			-scale[1], 
-			scale[0]*2, 
-			scale[1]*2);
-		ctx.fill()
-		ctx.stroke()	
-	
-		ctx.resetTransform();	
-        ctx.restore()		
-	}
-
-	isPointInside(x, y) {
-		let pTest = new Vector2d(x, y)
-
-		let vX = this.m.get_row(0)
-		let vY = this.m.get_row(1)
-		let p = this.m.get_row(2)
-
-		let pA = p.getSub(vX).getAdd(vY)
-		let pB = p.getAdd(vX).getAdd(vY)
-		let pC = p.getAdd(vX).getSub(vY)
-		let pD = p.getSub(vX).getSub(vY)
-
-		let vTestA = pTest.getSub(pA)
-		let vBA = pB.getSub(pA)
-		let dBA = vTestA.dot(vBA)
-
-		let vDA = pD.getSub(pA)
-		let dDA = vTestA.dot(vDA)
-
-		let vTestC = pTest.getSub(pC)
-		let vBC = pB.getSub(pC)
-		let dBC = vTestC.dot(vBC)
-
-		let vDC = pD.getSub(pC)
-		let dDC = vTestC.dot(vDC)
-
-		return 0 < dBA && 0 < dDA && 0 < dBC && 0 < dDC
-	
-	  }
-
-}
-
-
-export function get_randow_color()
-{
-	let color_index = Math.floor(Math.random() * COLORS.length);
-	return COLORS[color_index]
 }
