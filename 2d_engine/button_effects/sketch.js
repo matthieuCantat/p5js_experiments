@@ -111,8 +111,14 @@ function update()
 	{
 		created_obj = null
 	}
-
 	
+
+	for (let i = body_effects.length - 1; i >= 0; i--) {
+	  if (body_effects[i].isFinished()) {
+		body_effects.splice(i, 1);
+	  }
+	}
+
 	for( let elem of body_effects )
 		elem.update()
 	

@@ -180,6 +180,8 @@ export class User_interaction_info
             return false
 
         let obj = this.selection_info.obj;
+		if( obj == null )
+			return false
         let vOffset = this.selection_info.vOffset;
 
         let pCenter = obj.m.get_row(2)
@@ -508,23 +510,13 @@ export class User_interaction_info
 				}					
 				else if(interaction.attr == 'button_first_press')
 				{
-					let no_effect_left = true
-					for( let i = 0; i < body_effects.length; i++ )
-					{
-						if( body_effects[i].isFinished() == false )
-						{
-							no_effect_left = false
-							break
-						}	
-					}
-
-					if( no_effect_left )
-					{
-						let effect_inst = new body_effect(
-							this.selection_info.obj,
-							this.selection_info.obj.effect_name,)
-						body_effects.push(effect_inst)
-					}
+				
+					let effect_inst = new body_effect(
+						this.selection_info.obj,
+						this.selection_info.obj.effect_name,)
+					body_effects.push(effect_inst)
+				
+					this.clear_selection_info()
 				}	
 			}
 
