@@ -144,6 +144,7 @@ export class body
 			stroke_color: "black",
 			stroke_width: 2,
             interaction: null,
+			effect_name: null,
 		}
 		const args = { ...defaultOptions, ...in_options };
 
@@ -158,6 +159,10 @@ export class body
 
 		this.stroke_color_highlight = "yellow"
         this.stroke_width_highlight = 5
+
+		this.visibility = true
+
+		this.effect_name = args.effect_name
 	}
 
 	duplicate()
@@ -171,6 +176,9 @@ export class body
 
 	draw()
 	{
+		if( this.visibility == false )
+			return false
+
         ctx.save()
 		ctx.beginPath()
 
@@ -206,7 +214,9 @@ export class body
 			ctx.stroke()
 
 		ctx.resetTransform();	
-        ctx.restore()		
+        ctx.restore()	
+		
+		return true
 	}
 
 	isPointInside(point)

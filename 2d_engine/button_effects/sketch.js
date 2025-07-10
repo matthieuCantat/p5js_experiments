@@ -12,7 +12,7 @@ import { draw_bg,
 	canvas,
 	draw_background,
 	get_randow_color} from '../utils/draw.js'
-import { effects_background } from '../utils/shared.js';
+import { body_effects } from '../utils/shared.js';
 
 var Objs = []
 
@@ -30,7 +30,7 @@ function setup()
 	let scales = [ new Vector2d(40,40), new Vector2d(40,40), new Vector2d(40,40) ]
 	
 	let shape_types = [ 'rectangle', 'circle', 'triangle','rectangle', 'circle' ]
-
+	let effect_names = [ 'disco_ripple', 'water_ripple', 'acid_rainbow', 'disco_ripple', 'water_ripple' ]
 	for( let j = 0; j <scales.length; j++)
 	{
 		let pStartCol = new Vector2d(p)
@@ -42,7 +42,8 @@ function setup()
 				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
 					color: COLORS[color_index], 
 					interaction :{attr:'button_first_press'},
-					shape_type:shape_types[i] } ) 
+					shape_type:shape_types[i],
+					effect_name:effect_names[i] } ) 
 	
 			Objs.push( obj )
 			pStartCol.add(p_offset_Y)
@@ -111,7 +112,7 @@ function update()
 	}
 
 	
-	for( let elem of effects_background )
+	for( let elem of body_effects )
 		elem.update()
 	
 	//for( let elem of effects_foreground )
@@ -126,14 +127,14 @@ function draw() {
 
 	draw_background()
 
-	for( let elem of effects_background )
-		elem.draw()
+	for( let elem of body_effects )
+		elem.draw_background()
 	
 	for( let elem of Objs )
 		elem.draw()
 	
-	//for( let elem of effects_foreground )
-	//	elem.draw()
+	for( let elem of body_effects )
+		elem.draw_foreground()
 
 	User_interaction.draw()
 

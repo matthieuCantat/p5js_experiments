@@ -1,7 +1,8 @@
 import { draw_circle, daw_line, cX_inv, cY_inv} from './draw.js'
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
-import { effects_background } from './shared.js';
+import { body_effects } from './shared.js';
+import { body_effect } from './effect.js';
 
 let draw_count = 0
 ////////////////////////////////////////////////// mouse pressed
@@ -508,9 +509,9 @@ export class User_interaction_info
 				else if(interaction.attr == 'button_first_press')
 				{
 					let no_effect_left = true
-					for( let i = 0; i < effects_background.length; i++ )
+					for( let i = 0; i < body_effects.length; i++ )
 					{
-						if( effects_background[i].isFinished() == false )
+						if( body_effects[i].isFinished() == false )
 						{
 							no_effect_left = false
 							break
@@ -519,8 +520,10 @@ export class User_interaction_info
 
 					if( no_effect_left )
 					{
-						let effect_inst = new effect(this.selection_info.obj)
-						effects_background.push(effect_inst)
+						let effect_inst = new body_effect(
+							this.selection_info.obj,
+							this.selection_info.obj.effect_name,)
+						body_effects.push(effect_inst)
 					}
 				}	
 			}
@@ -543,77 +546,3 @@ export class User_interaction_info
 	}
 }
 
-
-class effect
-{
-	constructor(body)
-	{
-		this.body_ref = body
-		this.objs = []
-
-		this.update_count = 0
-		this.init_scale = this.body_ref.m.getScale()
-		this.duration = 50
-		this.speed = 10
-		
-		//
-		this.counts = []
-		this.objs = []
-
-	}
-
-	isFinished()
-	{
-		if( this.duration < this.update_count )
-			return true
-		return false
-	} 
-
-	update()
-	{
-		this.update_count += 1
-		
-		if( this.isFinished() )
-			return false
-
-		let obj = this.body_ref.duplicate() 
-		obj.color = null
-		this.objs.push( obj ) 
-		this.counts.push( 0 )
-
-		for( let i = 0; i < this.objs.length; i++)
-		{
-			
-			let obj = this.objs[i]
-			let anim = this.counts[i] *this.speed
-
-			let animated_scale = new Vector2d(
-				this.init_scale.x + anim, 
-				this.init_scale.y + anim)	
-			
-			
-			this.objs[i].m.setScale(animated_scale)
-
-			this.counts[i] += 1
-		}
-	
-
-		return true
-	}
-
-	draw()
-	{
-		if( this.isFinished() )
-			return false
-
-		for( let i = 0; i < this.objs.length; i++)
-		{
-			
-			let obj = this.objs[i]
-			obj.draw()
-		}
-		
-
-		return true
-	}
-}
