@@ -27,10 +27,29 @@ function setup()
 	let p = new Vector2d(-150,200)
 	let p_offset_Y = new Vector2d(0,-140)
 	let p_offset_X = new Vector2d(140,0)
-	let scales = [ new Vector2d(40,40), new Vector2d(40,40), new Vector2d(40,40) ]
+	let scales = [ 
+		new Vector2d(40,40), 
+		new Vector2d(40,40), 
+		new Vector2d(40,40) ]
 	
-	let shape_types = [ 'rectangle', 'circle', 'triangle','rectangle', 'circle' ]
-	let effect_names = [ 'disco_ripple', 'water_ripple', 'acid_rainbow', 'disco_ripple', 'water_ripple' ]
+	let shape_types = [ 
+		'rectangle', 
+		'circle', 
+		'triangle',
+		'rectangle', 
+		'circle' ]
+
+	let effect_names = [ 
+		['body_anim_bounce','water_ripple'],
+		['body_anim_shake','disco_ripple'],
+		['body_anim_occilate','acid_rainbow'],
+		['disco_ripple'], 
+		['water_ripple'], 
+		['acid_rainbow'], 
+		['body_anim_bounce'],
+		['body_anim_shake'],
+		['body_anim_occilate'], ]
+
 	for( let j = 0; j <scales.length; j++)
 	{
 		let pStartCol = new Vector2d(p)
@@ -38,7 +57,8 @@ function setup()
 		{
 			let color_index = Math.floor(Math.random() * COLORS.length);
 	
-			let i_effect = (j+i)% effect_names.length
+			let i_effect = (j*shape_types.length+i)% effect_names.length
+
 			let obj = new body( 
 				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
 					color: COLORS[color_index], 
