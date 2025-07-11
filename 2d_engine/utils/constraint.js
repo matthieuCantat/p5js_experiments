@@ -45,13 +45,13 @@ export class Constraints_info
             {
                 let p = cns.objs[1].m.get_row(2)
                 p.x = value
-                cns.objs[1].m.set_row(2,p)
+                cns.objs[1].m.setRow(2,p)
             }	
             else if( cns.attrs[1] == 'ty')
             {
                 let p = cns.objs[1].m.get_row(2)
                 p.y = value
-                cns.objs[1].m.set_row(2,p)		
+                cns.objs[1].m.setRow(2,p)		
             }		
     
         }

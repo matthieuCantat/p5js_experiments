@@ -43,6 +43,7 @@ function setup()
 		['body_anim_bounce','water_ripple'],
 		['body_anim_shake','disco_ripple'],
 		['body_anim_occilate','acid_rainbow'],
+		['particles_escape'],
 		['disco_ripple'], 
 		['water_ripple'], 
 		['acid_rainbow'], 

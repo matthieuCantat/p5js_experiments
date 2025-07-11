@@ -212,7 +212,7 @@ export class User_interaction_info
 				if ( x_max < pCenter.x )
 					pCenter.x = x_max
 			}
-			obj.m.set_row(2,pCenter)
+			obj.m.setRow(2,pCenter)
         }
         else if( obj.interaction.attr == 'ty' )
         {
@@ -229,15 +229,15 @@ export class User_interaction_info
 				if ( y_max < pCenter.y )
 					pCenter.y = y_max
 			}	
-			obj.m.set_row(2,pCenter)		
+			obj.m.setRow(2,pCenter)		
         }
         else if( obj.interaction.attr == 't' )
 		{
-			obj.m.set_row(2,this.p)
+			obj.m.setRow(2,this.p)
 		}		
         else if( obj.interaction.attr == 'button' )
 		{
-			//obj.m.set_row(2,Vector2d())
+			//obj.m.setRow(2,Vector2d())
 			console.log("do something")
 		}        
     }

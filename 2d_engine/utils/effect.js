@@ -1,5 +1,6 @@
 import Vector2d from './vector2d.js';
-
+import Matrix2d from './matrix2d.js';
+import { body }from './draw.js'
 
 export class body_effect
 {
@@ -107,7 +108,8 @@ export class body_effect
         else if( type === 'acid_rainbow'     )this.setup_acid_rainbow() 
         else if( type === 'body_anim_bounce' )this.setup_body_anim_bounce()      
         else if( type === 'body_anim_shake' )this.setup_body_anim_shake()   
-        else if( type === 'body_anim_occilate' )this.setup_body_anim_occilate()    
+        else if( type === 'body_anim_occilate' )this.setup_body_anim_occilate()
+        else if( type === 'particles_escape' )this.setup_particles_escape()    
     }
 
 	update_effects(type)
@@ -117,7 +119,8 @@ export class body_effect
         else if( type === 'acid_rainbow'  )return this.update_acid_rainbow()
         else if( type === 'body_anim_bounce' )return this.update_body_anim_bounce()   
         else if( type === 'body_anim_shake' )return this.update_body_anim_shake()  
-        else if( type === 'body_anim_occilate' )return this.update_body_anim_occilate()      
+        else if( type === 'body_anim_occilate' )return this.update_body_anim_occilate() 
+        else if( type === 'particles_escape' )return this.update_particles_escape()      
 	}
     //__________________________________body anim bounce
     setup_body_anim_bounce()
@@ -215,7 +218,7 @@ export class body_effect
         let animX = Math.sin( this.update_count*1.9 )*2.1
         let animY = Math.sin( this.update_count*1.1 )*2.1
         let offset = new Vector2d( animX, animY )
-        this.front_body.m.set_row(2, this.init_position.getAdd(offset))
+        this.front_body.m.setRow(2, this.init_position.getAdd(offset))
 
         return true
     }
@@ -266,6 +269,82 @@ export class body_effect
             this.disco_ripple_counts[i] += 1
         }
     
+        return true
+    }
+
+    //__________________________________particles_escape
+    setup_particles_escape()
+    {
+        // settings
+        this.particles_escape_duration = 50
+		this.particles_escape_speed = 15
+        this.particles_escape_counts = []
+        
+        // memory
+        this.particles_escape_update_count = 0
+
+        // build
+
+        this.particles_escape_bodyA = new body(
+            { m : new Matrix2d(this.init_position, 0, 5.5), 
+            color: null, 
+            shape_type:'rectangle', })
+
+        this.particles_escape_bodyB = new body(
+            { m : new Matrix2d(this.init_position, 0, 5.5), 
+            color: null, 
+            shape_type:'circle', })
+
+        this.particles_escape_bodyC = new body(
+            { m : new Matrix2d(this.init_position, 0, 5.5), 
+            color: null, 
+            shape_type:'triangle', })            
+
+        // auto
+        this.particles_escape_start = this.duration
+        this.duration += this.particles_escape_duration
+        this.foreground_objs.push( this.particles_escape_bodyA )
+        this.foreground_objs.push( this.particles_escape_bodyB )
+        this.foreground_objs.push( this.particles_escape_bodyC )
+    }
+
+    update_particles_escape()
+    {
+        // INIT
+        let duration = this.particles_escape_duration
+        let start = this.particles_escape_start
+        let end  = this.particles_escape_start+duration
+
+        if(( this.update_count < start )||(end < this.update_count))
+            return false
+
+        this.particles_escape_update_count = this.update_count - start
+
+        // BEHAVIOR
+        let anim = this.particles_escape_update_count *this.particles_escape_speed * 0.1
+	
+        
+        let vA = new Vector2d(
+            this.init_scale.x*0.5 + anim, 
+            this.init_scale.y*0.5 + anim)	
+        let pA = this.init_position.getAdd(vA)
+        this.particles_escape_bodyA.m.setRow(2,pA)
+        this.particles_escape_bodyA.m.setRotation(anim*-0.1)
+
+        let vB = new Vector2d(
+            this.init_scale.x*0.5 + anim, 
+            this.init_scale.y*0.5*-1 + anim*-1)	
+        let pB = this.init_position.getAdd(vB)
+        this.particles_escape_bodyB.m.setRow(2,pB)
+        this.particles_escape_bodyB.m.setRotation(anim*-0.1)
+
+        let vC = new Vector2d(
+            this.init_scale.x*0.5*-1 + anim*-1, 
+            this.init_scale.y*0.5 + anim)	
+        let pC = this.init_position.getAdd(vC)
+        this.particles_escape_bodyC.m.setRow(2,pC)
+        this.particles_escape_bodyC.m.setRotation(anim*-0.1)        
+
         return true
     }
 

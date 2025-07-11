@@ -623,7 +623,7 @@ Matrix2d.prototype = {
 		}
 	},
 
-	set_row(row,v){
+	setRow(row,v){
 		if(row == 0)
 		{
 			this.a = v.x
@@ -660,7 +660,7 @@ Matrix2d.prototype = {
 		if( mirror_point_ref != null )
 			p_mirrored = p_mirrored.getAdd(mirror_point_ref)
 
-        m_mirrored.set_row(2,p_mirrored)
+        m_mirrored.setRow(2,p_mirrored)
 
 		//orient	
 		
@@ -689,8 +689,8 @@ Matrix2d.prototype = {
 
 			//vX_mirrored.mult(-1)
 		}
-		m_mirrored.set_row(0,vX_mirrored)
-		m_mirrored.set_row(1,vY_mirrored)
+		m_mirrored.setRow(0,vX_mirrored)
+		m_mirrored.setRow(1,vY_mirrored)
 		
 
 
