@@ -40,16 +40,18 @@ function setup()
 		'circle' ]
 
 	let effect_names = [ 
-		['body_anim_bounce','water_ripple'],
-		['body_anim_shake','disco_ripple'],
-		['body_anim_occilate','acid_rainbow'],
-		['particles_escape'],
-		['disco_ripple'], 
-		['water_ripple'], 
-		['acid_rainbow'], 
-		['body_anim_bounce'],
-		['body_anim_shake'],
-		['body_anim_occilate'], ]
+		[	{ type:'body_anim_shake'},
+			{ type:'body_anim_occilate'},
+			{ type:'acid_rainbow' },
+			{ type:'particles_escape' ,start :10 },
+			{ type:'water_ripple' ,start :30}],
+		[{ type:'particles_escape' }],
+		[{ type:'disco_ripple' }],
+		[{ type:'water_ripple' }],
+		[{ type:'acid_rainbow' }],
+		[{ type:'body_anim_bounce' }],
+		[{ type:'body_anim_shake'}],
+		[{ type:'body_anim_occilate'}], ]
 
 	for( let j = 0; j <scales.length; j++)
 	{

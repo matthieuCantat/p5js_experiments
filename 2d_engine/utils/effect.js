@@ -21,15 +21,16 @@ export class body_effect
         'explode'
     ]
 
-	constructor( body , effect_type )
+	constructor( body , effect_bricks_info )
 	{
 		this.body_ref = body
-        this.effect_type = effect_type
+        this.effect_bricks_info = effect_bricks_info
 
         //
 		this.update_count = 0
         this.duration = 0
 		//
+        this.effect_bricks = []
 		this.background_objs = []
         this.foreground_objs = []
 
@@ -46,8 +47,8 @@ export class body_effect
 
     setup()
     {
-        for( let effect_type of this.effect_type )
-            this.setup_effects(effect_type)
+        for( let effect_brick_info of this.effect_bricks_info )
+            this.setup_effects(effect_brick_info)
     }
 
 	update()
@@ -56,13 +57,14 @@ export class body_effect
 		
 		if( this.isFinished() )
         {
-            this.body_ref.visibility = true
+            //this.body_ref.visibility = true
             return false
         }
-        this.body_ref.visibility = false
+        //this.body_ref.visibility = false
+        
 			
-        for( let effect_type of this.effect_type )
-            this.update_effects(effect_type)
+        
+        this.update_effects()
 
       
 
@@ -73,9 +75,11 @@ export class body_effect
 
 	isFinished()
 	{
-		if( this.duration < this.update_count )
-			return true
-		return false
+        for( let effect_brick of this.effect_bricks )
+            if( effect_brick.isFinished() == false )
+                return false
+        
+		return true
 	} 
 
 
@@ -101,331 +105,362 @@ export class body_effect
 
     //__________________________________setup_effects
     
-    setup_effects(type)
+    setup_effects(info)
     {
-        if(      type === 'disco_ripple'     )this.setup_disco_ripple()
-        else if( type === 'water_ripple'     )this.setup_water_ripple()
-        else if( type === 'acid_rainbow'     )this.setup_acid_rainbow() 
-        else if( type === 'body_anim_bounce' )this.setup_body_anim_bounce()      
-        else if( type === 'body_anim_shake' )this.setup_body_anim_shake()   
-        else if( type === 'body_anim_occilate' )this.setup_body_anim_occilate()
-        else if( type === 'particles_escape' )this.setup_particles_escape()    
+    
+        if     ( info.type === 'body_anim_bounce' )
+            this.effect_bricks.push( new body_anim_bounce(this, info) )    
+        else if( info.type === 'body_anim_shake' )
+            this.effect_bricks.push( new body_anim_shake(this, info) )  
+        else if( info.type === 'body_anim_occilate' )
+            this.effect_bricks.push( new body_anim_occilate(this, info) )
+        else if( info.type === 'disco_ripple' )
+            this.effect_bricks.push( new disco_ripple(this, info) )
+        else if( info.type === 'water_ripple' )
+            this.effect_bricks.push( new water_ripple(this, info) )
+        else if( info.type === 'acid_rainbow' )
+            this.effect_bricks.push( new acid_rainbow(this, info) )
+        else if( info.type === 'particles_escape' )
+            this.effect_bricks.push( new particles_escape(this, info) )                                
+   
     }
 
-	update_effects(type)
+	update_effects()
 	{
-        if(      type === 'disco_ripple'   )return this.update_disco_ripple()
-        else if( type === 'water_ripple'   )return this.update_water_ripple()
-        else if( type === 'acid_rainbow'  )return this.update_acid_rainbow()
-        else if( type === 'body_anim_bounce' )return this.update_body_anim_bounce()   
-        else if( type === 'body_anim_shake' )return this.update_body_anim_shake()  
-        else if( type === 'body_anim_occilate' )return this.update_body_anim_occilate() 
-        else if( type === 'particles_escape' )return this.update_particles_escape()      
+        for( let effect_brick of this.effect_bricks )
+            effect_brick.update()
 	}
-    //__________________________________body anim bounce
-    setup_body_anim_bounce()
-    {
-        // settings
-		this.body_anim_bounce_duration = 15
-        // memory
-        this.body_anim_bounce_update_count = 0
-        // build
-        this.front_body = this.body_ref.duplicate()
-        // auto
-        this.body_anim_bounce_start = this.duration
-        this.duration += this.body_anim_bounce_duration
-        this.foreground_objs.push( this.front_body )
-    }
-    update_body_anim_bounce()
-    {
-        // INIT
-        let duration = this.body_anim_bounce_duration
-        let start = this.body_anim_bounce_start
-        let end  = this.body_anim_bounce_start+duration
+ 
+}
 
-        if(( this.update_count < start )||(end < this.update_count))
+class effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        const defaultSettings= {}
+        this.settings = { ...defaultSettings, ...settings };
+        this.Effect = effect_inst
+        this.update_count = 0
+    }
+
+    isNotStarted()
+    {
+        let update_count = this.Effect.update_count
+        // INIT
+        let start = this.settings.start
+
+        if( update_count < start )
+            return true
+
+        return false
+    }
+
+    isFinished()
+    {
+        let update_count = this.Effect.update_count
+
+        // INIT
+        let duration = this.settings.duration
+        let start = this.settings.start
+        let end  = start+duration
+
+        if(end < update_count)
+            return true
+
+        return false
+    }
+        
+    update()
+    {
+        return false
+    }    
+}
+
+
+class body_anim_bounce extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 15,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+    }
+
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.body_anim_bounce_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
-        let anim = Math.sin( this.update_count/duration*3 )*5
+        let anim = Math.sin( this.update_count/this.settings.duration*3 )*5
         let scale_offset = new Vector2d( anim, anim )
-        let scale = this.init_scale.getAdd( scale_offset )
-        this.front_body.m.setScale( scale)
+        let scale = this.Effect.init_scale .getAdd( scale_offset )
+        this.Effect.body_ref.m.setScale( scale)
 
         return true
     }
-    //__________________________________body anim occilate
-    setup_body_anim_occilate()
-    {
-        // settings
-		this.body_anim_occilate_duration = 15
-        // memory
-        this.body_anim_occilate_update_count = 0
-        // build
-        this.front_body = this.body_ref.duplicate()
-        // auto
-        this.body_anim_occilate_start = this.duration
-        this.duration += this.body_anim_occilate_duration
-        this.foreground_objs.push( this.front_body )
-    }
-    update_body_anim_occilate()
-    {
-        // INIT
-        let duration = this.body_anim_occilate_duration
-        let start = this.body_anim_occilate_start
-        let end  = this.body_anim_occilate_start+duration
+}
 
-        if(( this.update_count < start )||(end < this.update_count))
+
+class body_anim_occilate extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 15,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+    }
+
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.body_anim_occilate_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
         let anim = Math.sin( this.update_count*0.9 )*0.1
-        this.front_body.m.setRotation( this.init_rotation + anim)
+        this.Effect.body_ref.m.setRotation( this.Effect.init_rotation + anim)
+
 
         return true
     }
-    //__________________________________body anim shake
-    setup_body_anim_shake()
-    {
-        // settings
-		this.body_anim_shake_duration = 15
-        // memory
-        this.body_anim_shake_update_count = 0
-        // build
-        this.front_body = this.body_ref.duplicate()
-        // auto
-        this.body_anim_shake_start = this.duration
-        this.duration += this.body_anim_shake_duration
-        this.foreground_objs.push( this.front_body )
-    }
-    update_body_anim_shake()
-    {
-        // INIT
-        let duration = this.body_anim_shake_duration
-        let start = this.body_anim_shake_start
-        let end  = this.body_anim_shake_start+duration
+}
 
-        if(( this.update_count < start )||(end < this.update_count))
+
+class body_anim_shake extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 15,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+    }
+
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.body_anim_shake_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
         let animX = Math.sin( this.update_count*1.9 )*2.1
         let animY = Math.sin( this.update_count*1.1 )*2.1
         let offset = new Vector2d( animX, animY )
-        this.front_body.m.setRow(2, this.init_position.getAdd(offset))
+        this.Effect.body_ref.m.setRow(2, this.Effect.init_position.getAdd(offset))
 
         return true
     }
-    //__________________________________disco_ripple
-    setup_disco_ripple()
-    {
-        // settings
-        this.disco_ripple_duration = 50
-		this.disco_ripple_speed = 10
-        this.disco_ripple_counts = []
-        
-        // memory
-        this.disco_ripple_update_count = 0
+}
 
-        // auto
-        this.disco_ripple_start = this.duration
-        this.duration += this.disco_ripple_duration
+
+
+class disco_ripple extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 15,
+            speed:10,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+
+        this.ripples = []
+        this.update_counts = []
     }
 
-    update_disco_ripple()
+    update()
     {
-        // INIT
-        let duration = this.disco_ripple_duration
-        let start = this.disco_ripple_start
-        let end  = this.disco_ripple_start+duration
-
-        if(( this.update_count < start )||(end < this.update_count))
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.disco_ripple_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
-        let obj = this.body_ref.duplicate() 
+        let obj = this.Effect.body_ref.duplicate() 
         obj.color = null
-        this.background_objs.push( obj ) 
-        this.disco_ripple_counts.push( 0 )
+        this.ripples.push( obj )
+        this.Effect.background_objs.push( obj ) 
+        this.update_counts.push( 0 )
 
-        for( let i = 0; i < this.background_objs.length; i++)
+        for( let i = 0; i < this.ripples.length; i++)
         {
-            let anim = this.disco_ripple_counts[i] *this.disco_ripple_speed
+            let anim = this.update_counts[i] *this.settings.speed
             let animated_scale = new Vector2d(
-                this.init_scale.x + anim, 
-                this.init_scale.y + anim)	
+                this.Effect.init_scale.x + anim, 
+                this.Effect.init_scale.y + anim)	
             
             
-            this.background_objs[i].m.setScale(animated_scale)
+            this.ripples[i].m.setScale(animated_scale)
 
-            this.disco_ripple_counts[i] += 1
+            this.update_counts[i] += 1
         }
     
         return true
     }
+}
 
-    //__________________________________particles_escape
-    setup_particles_escape()
+
+
+class particles_escape extends effect_brick
+{
+    constructor( effect_inst, settings )
     {
-        // settings
-        this.particles_escape_duration = 50
-		this.particles_escape_speed = 15
-        this.particles_escape_counts = []
-        
-        // memory
-        this.particles_escape_update_count = 0
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 50,
+            speed:15,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+
+        this.update_counts = []
 
         // build
 
-        this.particles_escape_bodyA = new body(
-            { m : new Matrix2d(this.init_position, 0, 5.5), 
+        this.bodyA = new body(
+            { m : new Matrix2d(this.Effect.init_position, 0, 5.5), 
             color: null, 
             shape_type:'rectangle', })
 
-        this.particles_escape_bodyB = new body(
-            { m : new Matrix2d(this.init_position, 0, 5.5), 
+        this.bodyB = new body(
+            { m : new Matrix2d(this.Effect.init_position, 0, 5.5), 
             color: null, 
             shape_type:'circle', })
 
-        this.particles_escape_bodyC = new body(
-            { m : new Matrix2d(this.init_position, 0, 5.5), 
+        this.bodyC = new body(
+            { m : new Matrix2d(this.Effect.init_position, 0, 5.5), 
             color: null, 
             shape_type:'triangle', })            
 
         // auto
-        this.particles_escape_start = this.duration
-        this.duration += this.particles_escape_duration
-        this.foreground_objs.push( this.particles_escape_bodyA )
-        this.foreground_objs.push( this.particles_escape_bodyB )
-        this.foreground_objs.push( this.particles_escape_bodyC )
+        this.Effect.background_objs.push( this.bodyA )
+        this.Effect.background_objs.push( this.bodyB )
+        this.Effect.background_objs.push( this.bodyC )        
     }
 
-    update_particles_escape()
+  
+    update()
     {
-        // INIT
-        let duration = this.particles_escape_duration
-        let start = this.particles_escape_start
-        let end  = this.particles_escape_start+duration
-
-        if(( this.update_count < start )||(end < this.update_count))
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.particles_escape_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
-        let anim = this.particles_escape_update_count *this.particles_escape_speed * 0.1
+        let anim = this.update_count *this.settings.speed * 0.1
 	
-        
         let vA = new Vector2d(
-            this.init_scale.x*0.5 + anim, 
-            this.init_scale.y*0.5 + anim)	
-        let pA = this.init_position.getAdd(vA)
-        this.particles_escape_bodyA.m.setRow(2,pA)
-        this.particles_escape_bodyA.m.setRotation(anim*-0.1)
+            this.Effect.init_scale.x*0.5 + anim, 
+            this.Effect.init_scale.y*0.5 + anim)	
+        let pA = this.Effect.init_position.getAdd(vA)
+        this.bodyA.m.setRow(2,pA)
+        this.bodyA.m.setRotation(anim*-0.1)
 
         let vB = new Vector2d(
-            this.init_scale.x*0.5 + anim, 
-            this.init_scale.y*0.5*-1 + anim*-1)	
-        let pB = this.init_position.getAdd(vB)
-        this.particles_escape_bodyB.m.setRow(2,pB)
-        this.particles_escape_bodyB.m.setRotation(anim*-0.1)
+            this.Effect.init_scale.x*0.5 + anim, 
+            this.Effect.init_scale.y*0.5*-1 + anim*-1)	
+        let pB = this.Effect.init_position.getAdd(vB)
+        this.bodyB.m.setRow(2,pB)
+        this.bodyB.m.setRotation(anim*-0.1)
 
         let vC = new Vector2d(
-            this.init_scale.x*0.5*-1 + anim*-1, 
-            this.init_scale.y*0.5 + anim)	
-        let pC = this.init_position.getAdd(vC)
-        this.particles_escape_bodyC.m.setRow(2,pC)
-        this.particles_escape_bodyC.m.setRotation(anim*-0.1)        
-
+            this.Effect.init_scale.x*0.5*-1 + anim*-1, 
+            this.Effect.init_scale.y*0.5 + anim)	
+        let pC = this.Effect.init_position.getAdd(vC)
+        this.bodyC.m.setRow(2,pC)
+        this.bodyC.m.setRotation(anim*-0.1) 
+    
         return true
     }
+}
+   
 
-    //__________________________________water_ripple
 
-    setup_water_ripple()
+
+class water_ripple extends effect_brick
+{
+    constructor( effect_inst, settings )
     {
-        // settings
-		this.water_ripple_duration = 50
-		this.water_ripple_speed = 10
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 50,
+            speed:10,
+        }
+        this.settings = { ...defaultSettings, ...settings };
 
-        // memory
-        this.water_ripple_update_count = 0
-  
+        this.update_counts = []
+
         // build
-        this.back_body = this.body_ref.duplicate()
+        this.back_body = this.Effect.body_ref.duplicate()
         this.back_body.color = null
-        
-        // auto
-        this.water_ripple_start = this.duration
-        this.duration += this.water_ripple_duration
-        this.background_objs.push( this.back_body )
+        this.Effect.background_objs.push( this.back_body )       
     }
 
-    update_water_ripple()
+  
+    update()
     {
-        // INIT
-        let duration = this.water_ripple_duration
-        let start = this.water_ripple_start
-        let end  = this.water_ripple_start+duration
-
-        if(( this.update_count < start )||(end < this.update_count))
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.water_ripple_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
-        let anim = this.water_ripple_update_count *this.water_ripple_speed * 0.1
+        let anim = this.update_count *this.settings.speed * 0.1
         let animated_scale = new Vector2d(
-            this.init_scale.x + anim, 
-            this.init_scale.y + anim)	
-        
+            this.Effect.init_scale.x + anim, 
+            this.Effect.init_scale.y + anim)	
         
         this.back_body.m.setScale(animated_scale)
-
-        this.back_body.stroke_width = Math.max(0.01,10 - this.water_ripple_update_count*0.25)
+        this.back_body.stroke_width = Math.max(0.01,10 - this.update_count*0.25)
     
         return true
-    }    
-
-    //__________________________________acid_rainbow
-    setup_acid_rainbow()
-    {
-        // settings
-		this.setup_acid_duration = 50
-		this.setup_acid_speed = 10
-
-        // memory
-        this.setup_acid_update_count = 0
-  
-        // build
-        this.front_body = this.body_ref.duplicate()    
-
-        // auto
-        this.setup_acid_start = this.duration
-        this.duration += this.setup_acid_duration
-        this.foreground_objs.push( this.front_body )
-
     }
-    
-    update_acid_rainbow()
-    {
-        // INIT
-        let duration = this.update_acid_duration
-        let start = this.update_acid_start
-        let end  = this.update_acid_start+duration
+}
+   
 
-        if(( this.update_count < start )||(end < this.update_count))
+
+class acid_rainbow extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 50,
+            speed:10,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+    }
+
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
             return false
 
-        this.update_acid_update_count = this.update_count - start
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
 
@@ -437,11 +472,12 @@ export class body_effect
         let animStrokeG = (255/2)+Math.sin(this.update_count*0.3)*255/2
         let animStrokeB = (255/2)+Math.sin(this.update_count*0.2)*255/2
 
-        this.front_body.color = "rgb("+animR+", "+animG+", "+animB+")"
-        this.front_body.stroke_color = "rgb("+animStrokeR+", "+animStrokeG+", "+animStrokeB+")"
+        this.Effect.body_ref.color = "rgb("+animR+", "+animG+", "+animB+")"
+        this.Effect.body_ref.stroke_color = "rgb("+animStrokeR+", "+animStrokeG+", "+animStrokeB+")"
         
 
         return true
-    }    
-
+    }
 }
+
+    
