@@ -12,10 +12,10 @@ import { draw_bg,
 	canvas,
 	draw_background,
 	get_randow_color} from '../utils/draw.js'
-
-
+import { body_effects } from '../utils/shared.js';
 
 var Objs = []
+
 var User_interaction = new User_interaction_info();
 var Constraints = new Constraints_info(User_interaction)
 
@@ -24,22 +24,27 @@ function setup()
 {
 	
 	// SETUP OBJS
-	let unit = 40
 	let p = new Vector2d(-150,200)
-	let p_offset_Y = new Vector2d(0,-unit*2)
-	let p_offset_X = new Vector2d(unit*2,0)
-	let scales = [ new Vector2d(unit,unit), new Vector2d(unit/2,unit), new Vector2d(unit,unit/2) ]
+	let p_offset_Y = new Vector2d(0,-140)
+	let p_offset_X = new Vector2d(140,0)
+	let scales = [ 
+		new Vector2d(40,40), 
+		new Vector2d(40,40), 
+		new Vector2d(40,40) ]
 	
 	let shape_types = [ 
 		'rectangle', 
 		'circle', 
-		'circle_rot',
-		'triangle' , 
-		'cross',
-		'trapezoid',
-		'star_classic',
-		'star_ai',
-		'star_realistic'  ]
+		'triangle',
+		'rectangle', 
+		'circle' ]
+
+	let effect_names = [ 
+		[	{ type:'body_anim_shake'},
+			{ type:'body_anim_occilate'},
+			{ type:'acid_rainbow' },
+			{ type:'particles_escape' ,start :10 },
+			{ type:'water_ripple' ,start :30}], ]
 
 	for( let j = 0; j <scales.length; j++)
 	{
@@ -48,11 +53,14 @@ function setup()
 		{
 			let color_index = Math.floor(Math.random() * COLORS.length);
 	
+			let i_effect = (j*shape_types.length+i)% effect_names.length
+
 			let obj = new body( 
 				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
 					color: COLORS[color_index], 
-					interaction :{attr:'r'},
-					shape_type:shape_types[i] } ) 
+					interaction :{attr:'button_first_press'},
+					shape_type:shape_types[i],
+					effect_name:effect_names[i_effect] } ) 
 	
 			Objs.push( obj )
 			pStartCol.add(p_offset_Y)
@@ -119,8 +127,20 @@ function update()
 	{
 		created_obj = null
 	}
-
 	
+
+	for (let i = body_effects.length - 1; i >= 0; i--) {
+	  if (body_effects[i].isFinished()) {
+		body_effects.splice(i, 1);
+	  }
+	}
+
+	for( let elem of body_effects )
+		elem.update()
+	
+	//for( let elem of effects_foreground )
+	//	elem.update()	
+
 	Constraints.update()
 	
 }	
@@ -129,10 +149,16 @@ var draw_count = 0;
 function draw() {
 
 	draw_background()
+
+	for( let elem of body_effects )
+		elem.draw_background()
 	
 	for( let elem of Objs )
 		elem.draw()
 	
+	for( let elem of body_effects )
+		elem.draw_foreground()
+
 	User_interaction.draw()
 
 	draw_count += 1

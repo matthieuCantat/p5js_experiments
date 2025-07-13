@@ -40,18 +40,15 @@ function setup()
 		'circle' ]
 
 	let effect_names = [ 
-		[	{ type:'body_anim_shake'},
-			{ type:'body_anim_occilate'},
-			{ type:'acid_rainbow' },
-			{ type:'particles_escape' ,start :10 },
-			{ type:'water_ripple' ,start :30}],
+		[{ type:'body_transform_bounce' }],
+		[{ type:'body_transform_shake'}],
+		[{ type:'body_transform_occilate'}],	
+		[{ type:'body_color_acid_rainbow' }],
+		[{ type:'body_color_explosion' }],		
 		[{ type:'particles_escape' }],
 		[{ type:'disco_ripple' }],
 		[{ type:'water_ripple' }],
-		[{ type:'acid_rainbow' }],
-		[{ type:'body_anim_bounce' }],
-		[{ type:'body_anim_shake'}],
-		[{ type:'body_anim_occilate'}], ]
+	]
 
 	for( let j = 0; j <scales.length; j++)
 	{

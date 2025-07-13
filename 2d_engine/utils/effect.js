@@ -1,6 +1,8 @@
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
-import { body }from './draw.js'
+import { body, COLORS_TO_RGB }from './draw.js'
+import { interpolateColors } from './math.js';
+
 
 export class body_effect
 {
@@ -8,7 +10,7 @@ export class body_effect
     effect_types = [
         'disco_ripple',
         'water_ripple',
-        'acid_rainbow',
+        'body_color_acid_rainbow',
         'explode',
         'shiny',
         'reflective',
@@ -30,6 +32,7 @@ export class body_effect
 		this.update_count = 0
         this.duration = 0
 		//
+        this.cleanning_done = false
         this.effect_bricks = []
 		this.background_objs = []
         this.foreground_objs = []
@@ -38,6 +41,8 @@ export class body_effect
         this.init_position = this.body_ref.m.get_row(2)
         this.init_rotation = this.body_ref.m.getRotation()
         this.init_scale = this.body_ref.m.getScale()
+        this.init_color = this.body_ref.color
+        this.init_color_stroke = this.body_ref.stroke_color
 
         // SETUP
         this.setup()
@@ -57,6 +62,17 @@ export class body_effect
 		
 		if( this.isFinished() )
         {
+            if( this.cleanning_done == false)
+            {
+                this.body_ref.m.setRow(2,this.init_position)
+                this.body_ref.m.setRotation(this.init_rotation)
+                this.body_ref.m.setScale(this.init_scale)
+                this.body_ref.color = this.init_color
+                this.body_ref.stroke_color = this.init_color_stroke
+
+                this.cleanning_done = true
+
+            }            
             //this.body_ref.visibility = true
             return false
         }
@@ -101,36 +117,34 @@ export class body_effect
 			this.foreground_objs[i].draw()  
 	}
 
-
-
-    //__________________________________setup_effects
-    
-    setup_effects(info)
-    {
-    
-        if     ( info.type === 'body_anim_bounce' )
-            this.effect_bricks.push( new body_anim_bounce(this, info) )    
-        else if( info.type === 'body_anim_shake' )
-            this.effect_bricks.push( new body_anim_shake(this, info) )  
-        else if( info.type === 'body_anim_occilate' )
-            this.effect_bricks.push( new body_anim_occilate(this, info) )
-        else if( info.type === 'disco_ripple' )
-            this.effect_bricks.push( new disco_ripple(this, info) )
-        else if( info.type === 'water_ripple' )
-            this.effect_bricks.push( new water_ripple(this, info) )
-        else if( info.type === 'acid_rainbow' )
-            this.effect_bricks.push( new acid_rainbow(this, info) )
-        else if( info.type === 'particles_escape' )
-            this.effect_bricks.push( new particles_escape(this, info) )                                
-   
-    }
-
 	update_effects()
 	{
         for( let effect_brick of this.effect_bricks )
             effect_brick.update()
 	}
  
+
+
+    //__________________________________setup_effects
+    setup_effects(info)
+    {
+        const effectBrickFactory = {
+            body_transform_bounce   : body_transform_bounce,
+            body_transform_shake    : body_transform_shake,
+            body_transform_occilate :  body_transform_occilate,
+            body_color_acid_rainbow : body_color_acid_rainbow,
+            body_color_explosion    : body_color_explosion,
+            disco_ripple: disco_ripple,
+            water_ripple: water_ripple,
+            particles_escape: particles_escape,
+            //particles_stars: particles_stars,
+        };
+        
+        const EffectBrickClass = effectBrickFactory[info.type];
+        if (EffectBrickClass)
+            this.effect_bricks.push(new EffectBrickClass(this, info));
+    }
+
 }
 
 class effect_brick
@@ -177,7 +191,18 @@ class effect_brick
 }
 
 
-class body_anim_bounce extends effect_brick
+
+
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+
+
+
+class body_transform_bounce extends effect_brick
 {
     constructor( effect_inst, settings )
     {
@@ -208,7 +233,7 @@ class body_anim_bounce extends effect_brick
 }
 
 
-class body_anim_occilate extends effect_brick
+class body_transform_occilate extends effect_brick
 {
     constructor( effect_inst, settings )
     {
@@ -238,7 +263,7 @@ class body_anim_occilate extends effect_brick
 }
 
 
-class body_anim_shake extends effect_brick
+class body_transform_shake extends effect_brick
 {
     constructor( effect_inst, settings )
     {
@@ -441,7 +466,7 @@ class water_ripple extends effect_brick
    
 
 
-class acid_rainbow extends effect_brick
+class body_color_acid_rainbow extends effect_brick
 {
     constructor( effect_inst, settings )
     {
@@ -480,4 +505,54 @@ class acid_rainbow extends effect_brick
     }
 }
 
+
+
+class body_color_explosion extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 100,
+            speed:10,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+    }
+
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
+            return false
+
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
+
+        // BEHAVIOR
+        let color_base = null
+        if( this.Effect.init_color.startsWith('rgb('))
+            color_base = this.Effect.init_color.match(/\d+/g).map(Number);
+        else
+            color_base = COLORS_TO_RGB[this.Effect.init_color]
+        let color_yellow = [255, 255, 0]
+        let color_white = [255, 255, 255]
+
+        let body_color_anim = interpolateColors( 
+            this.update_count, 
+            [0,10,20,30,40], 
+            [color_base, color_yellow,color_white,color_yellow,color_base] )
+
+        this.Effect.body_ref.color = "rgb("+body_color_anim[0]+", "+body_color_anim[1]+", "+body_color_anim[2]+")"
+   
+        let stroke_color_anim = interpolateColors( 
+            this.update_count-10, 
+            [0,10,20,30,40],  
+            [[0,0,0], color_yellow,color_white,color_yellow,[0,0,0]] )
+
+        this.Effect.body_ref.stroke_color = "rgb("+stroke_color_anim[0]+", "+stroke_color_anim[1]+", "+stroke_color_anim[2]+")"
+        
+
+        return true
+    }
+}
     
