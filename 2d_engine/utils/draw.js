@@ -213,6 +213,17 @@ export function getRandomColor()
 	return COLORS[color_index];
 }
 
+export function getRGB(color)
+{
+    let rgb = null
+    if( color.startsWith('rgb('))
+        rgb = color.match(/\d+/g).map(Number);
+    else
+        rgb = COLORS_TO_RGB[color]
+
+    return rgb
+}
+
 export function draw_background()
 {
     ctx.drawImage(backgroundCanvas, 0, 0);

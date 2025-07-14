@@ -51,6 +51,7 @@ function setup()
 		[{ type:'particles_new' }],
 		[{ type:'disco_ripple' }],
 		[{ type:'water_ripple' }],
+		[{ type:'glow' }],
 	]
 
 	for( let j = 0; j <scales.length; j++)

@@ -1,6 +1,6 @@
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
-import { body, COLORS_TO_RGB,getRandomColor }from './draw.js'
+import { body, COLORS_TO_RGB, getRandomColor, getRGB }from './draw.js'
 import { interpolateColors } from './math.js';
 
 
@@ -136,6 +136,7 @@ export class body_effect
             body_color_explosion    : body_color_explosion,
             disco_ripple: disco_ripple,
             water_ripple: water_ripple,
+            glow: glow,
             particles_escape: particles_escape,
             particles_radial_strokes: particles_radial_strokes,
             particles_shiny: particles_shiny,
@@ -364,6 +365,70 @@ class disco_ripple extends effect_brick
         return true
     }
 }
+
+
+class glow extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 600,
+            speed:10,
+            size: 40,
+            body_color: false,
+            stroke_color: true,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+
+        let layer_nbr = 10
+
+        let max_size_delta = new Vector2d(this.settings.size, this.settings.size) // 10,10
+
+        this.layers = []
+        this.scales = []
+        for (let i = 0; i < layer_nbr; i++)
+        {
+            let obj = this.Effect.body_ref.duplicate() 
+            let current_delta = max_size_delta.getMult((layer_nbr-i)/layer_nbr)
+            let scale = this.Effect.init_scale.getAdd(current_delta)
+            this.scales.push(scale)
+            obj.m.setScale( scale  )
+            obj.stroke_color = null
+            this.layers.push(obj)
+            this.Effect.background_objs.push( obj ) 
+        }
+    }
+
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
+            return false
+
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
+
+        let background_color = COLORS_TO_RGB['grey']
+        let body_color = getRGB(this.Effect.body_ref.color)
+        let global_anim = Math.sin(this.update_count/this.settings.duration*3.14)
+        console.log(global_anim)
+        for( let i = 0; i < this.layers.length; i++ )
+        {
+            let color = interpolateColors(i+1,[0,15],[background_color,body_color])
+            this.layers[i].color = 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'
+        
+            let anim = Math.sin(this.update_count*0.05+i)*2
+            let scale_glow = this.scales[i].getAdd(new Vector2d( anim,anim) )
+            let scale_appears = scale_glow.getMult(global_anim).getAdd(this.Effect.init_scale.getMult(1-global_anim))
+            this.layers[i].m.setScale(scale_appears)
+        }
+        return true
+ 
+    }
+}
+
+
 
 
 
@@ -1002,11 +1067,8 @@ class body_color_explosion extends effect_brick
         this.update_count = this.Effect.update_count - this.settings.start 
 
         // BEHAVIOR
-        let color_base = null
-        if( this.Effect.init_color.startsWith('rgb('))
-            color_base = this.Effect.init_color.match(/\d+/g).map(Number);
-        else
-            color_base = COLORS_TO_RGB[this.Effect.init_color]
+        let color_base = getRGB(this.Effect.init_color)
+     
         let color_yellow = [255, 255, 0]
         let color_white = [255, 255, 255]
 
