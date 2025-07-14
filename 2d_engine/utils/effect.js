@@ -352,34 +352,77 @@ class particles_escape extends effect_brick
         super(effect_inst, settings)
         const defaultSettings= {
             start:0,
-            duration: 50,
-            speed:15,
+            duration: 100,
         }
         this.settings = { ...defaultSettings, ...settings };
 
         this.update_counts = []
 
+        let particles_nbr = 20
+        let possible_bodies_types = [  
+            'rectangle', 
+            'circle', 
+            'triangle',
+            'cross', 
+            'star_classic' 
+        ]
+        
+        let size_limits = [ 2.5 , 10.5 ]
+        let t_speed_limits = [ 1.0 , 5. ]
+        let r_speed_limits = [ 0.01 , 0.2 ]
+        let angle_offset = [0.01,1]
+        let life_time = [this.settings.duration*0.7, this.settings.duration]
         // build
+ 
+        this.bodies_types = []
+        for( let i = 0; i < particles_nbr; i++ )
+        {
+            let i_random = Math.floor( Math.random()* possible_bodies_types.length )
+            this.bodies_types.push( possible_bodies_types[i_random] )
+        }
+    
+        this.particles_settings = []
+        for( let type of this.bodies_types )
+        {
+            let setting = {
+                size: Math.random()*(size_limits[1]-size_limits[0]) + size_limits[0],
+                t_speed : Math.random()*(t_speed_limits[1]-t_speed_limits[0]) + t_speed_limits[0],
+                r_speed : Math.random()*(r_speed_limits[1]-r_speed_limits[0]) + r_speed_limits[0],
+                angle_offset : Math.random()*(angle_offset[1]-angle_offset[0]) + angle_offset[0],
+                life_time : Math.floor(Math.random()*(life_time[1]-life_time[0]) + life_time[0]),
+            }
+            this.particles_settings.push( setting )
+        }   
+        
 
-        this.bodyA = new body(
-            { m : new Matrix2d(this.Effect.init_position, 0, 5.5), 
-            color: null, 
-            shape_type:'rectangle', })
+        this.bodies = []
+        for( let i = 0; i < this.bodies_types.length; i++ )
+        {
+            let type = this.bodies_types[i]
+            let size_random = this.particles_settings[i].size
+            let b = new body(
+                { m : new Matrix2d(this.Effect.init_position, 0, size_random), 
+                    color: null, 
+                    shape_type:type, })
+            this.bodies.push( b )
+            this.Effect.background_objs.push( b )
+        }
 
-        this.bodyB = new body(
-            { m : new Matrix2d(this.Effect.init_position, 0, 5.5), 
-            color: null, 
-            shape_type:'circle', })
-
-        this.bodyC = new body(
-            { m : new Matrix2d(this.Effect.init_position, 0, 5.5), 
-            color: null, 
-            shape_type:'triangle', })            
-
-        // auto
-        this.Effect.background_objs.push( this.bodyA )
-        this.Effect.background_objs.push( this.bodyB )
-        this.Effect.background_objs.push( this.bodyC )        
+        let vUp = new Vector2d(0,1)
+        let angle_incr = 3.14*2 / this.bodies.length
+        this.dirVectors = []
+        this.start_positions = []
+        for( let i = 0; i < this.bodies.length; i++ )
+        {
+            let angle = angle_incr*i + this.particles_settings[i].angle_offset
+            let vDir = vUp.getRotated(angle)
+            vDir.normalize()
+            let p = vDir.getMult(this.Effect.body_ref.m)
+            let v = p.getSub(this.Effect.init_position)
+            v.normalize()
+            this.dirVectors.push( v )
+            this.start_positions.push(p)
+        }
     }
 
   
@@ -391,30 +434,29 @@ class particles_escape extends effect_brick
         // TIME
         this.update_count = this.Effect.update_count - this.settings.start 
 
+        let decrease = Math.max(0,this.settings.duration - this.update_count )/ this.settings.duration
+        console.log(decrease)
         // BEHAVIOR
-        let anim = this.update_count *this.settings.speed * 0.1
+        for( let i = 0; i < this.bodies.length; i++ )
+        {
+            if( this.particles_settings[i].life_time< this.update_count )
+            {
+                this.bodies[i].visibility = false
+                continue
+            }
+
+            let p = this.start_positions[i]
+            let v = this.dirVectors[i]
+            ////
+            
+            let t_anim = this.update_count *this.particles_settings[i].t_speed
+            let r_anim = this.update_count *this.particles_settings[i].r_speed
+            let pOut = p.getAdd(v.getMult(t_anim))
+            this.bodies[i].m.setRow(2,pOut)
+            this.bodies[i].m.setRotation(r_anim)
+        }
+        
 	
-        let vA = new Vector2d(
-            this.Effect.init_scale.x*0.5 + anim, 
-            this.Effect.init_scale.y*0.5 + anim)	
-        let pA = this.Effect.init_position.getAdd(vA)
-        this.bodyA.m.setRow(2,pA)
-        this.bodyA.m.setRotation(anim*-0.1)
-
-        let vB = new Vector2d(
-            this.Effect.init_scale.x*0.5 + anim, 
-            this.Effect.init_scale.y*0.5*-1 + anim*-1)	
-        let pB = this.Effect.init_position.getAdd(vB)
-        this.bodyB.m.setRow(2,pB)
-        this.bodyB.m.setRotation(anim*-0.1)
-
-        let vC = new Vector2d(
-            this.Effect.init_scale.x*0.5*-1 + anim*-1, 
-            this.Effect.init_scale.y*0.5 + anim)	
-        let pC = this.Effect.init_position.getAdd(vC)
-        this.bodyC.m.setRow(2,pC)
-        this.bodyC.m.setRotation(anim*-0.1) 
-    
         return true
     }
 }

@@ -484,11 +484,11 @@ function draw_star(ctx,
 
 	
 	let vUp = new Vector2d(0,1)
-
+	let angle_unit = 3.14*2/(nbr_branches*2)
 	let local_vectors = []
 	for( let i = 0; i < nbr_branches*2; i++ )
 	{
-		let angle_unit = 3.14*2/(nbr_branches*2)
+		
 		let v = vUp.getRotated(angle_unit*i)
 		v.normalize()
 		if(i%2 !== 0)	
