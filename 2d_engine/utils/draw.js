@@ -207,6 +207,12 @@ export function cY_inv(pos) { return  0.4 * canvas.height - pos.y ; }
 export function cR_inv(rotation){ return rotation*-1 ; }
 
 
+export function getRandomColor()
+{
+	let color_index = Math.floor(Math.random() * COLORS.length);
+	return COLORS[color_index];
+}
+
 export function draw_background()
 {
     ctx.drawImage(backgroundCanvas, 0, 0);

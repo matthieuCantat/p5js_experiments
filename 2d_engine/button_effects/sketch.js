@@ -8,7 +8,7 @@ import { draw_bg,
 	draw_circle,
 	daw_line, 
 	body,
-	COLORS,
+	getRandomColor,
 	canvas,
 	draw_background,
 	get_randow_color} from '../utils/draw.js'
@@ -55,13 +55,12 @@ function setup()
 		let pStartCol = new Vector2d(p)
 		for( let i = 0; i < shape_types.length; i++)
 		{
-			let color_index = Math.floor(Math.random() * COLORS.length);
 	
 			let i_effect = (j*shape_types.length+i)% effect_names.length
 
 			let obj = new body( 
 				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
-					color: COLORS[color_index], 
+					color: getRandomColor(), 
 					interaction :{attr:'button_first_press'},
 					shape_type:shape_types[i],
 					effect_name:effect_names[i_effect] } ) 

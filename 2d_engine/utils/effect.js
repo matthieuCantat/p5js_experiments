@@ -1,6 +1,6 @@
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
-import { body, COLORS_TO_RGB }from './draw.js'
+import { body, COLORS_TO_RGB,getRandomColor }from './draw.js'
 import { interpolateColors } from './math.js';
 
 
@@ -302,10 +302,14 @@ class disco_ripple extends effect_brick
         super(effect_inst, settings)
         const defaultSettings= {
             start:0,
-            duration: 15,
+            duration: 140,
             speed:10,
+            body_color: false,
+            stroke_color: true,
         }
         this.settings = { ...defaultSettings, ...settings };
+
+
 
         this.ripples = []
         this.update_counts = []
@@ -321,13 +325,29 @@ class disco_ripple extends effect_brick
 
         // BEHAVIOR
         let obj = this.Effect.body_ref.duplicate() 
-        obj.color = null
-        this.ripples.push( obj )
-        this.Effect.background_objs.push( obj ) 
-        this.update_counts.push( 0 )
+
+        if( this.settings.body_color === true )
+            obj.color = getRandomColor()
+        else
+            obj.color = null
+        if( this.settings.stroke_color === true )
+        {
+            obj.stroke_color = getRandomColor()
+            obj.stroke_width = 10.5
+        }
+            
+        
+
+        if( this.update_count < this.settings.duration/2 )
+        {
+            this.ripples.push( obj )
+            this.Effect.background_objs.push( obj ) 
+            this.update_counts.push( 0 )
+        } 
 
         for( let i = 0; i < this.ripples.length; i++)
         {
+
             let anim = this.update_counts[i] *this.settings.speed
             let animated_scale = new Vector2d(
                 this.Effect.init_scale.x + anim, 
