@@ -46,12 +46,14 @@ function setup()
 		[{ type:'body_color_acid_rainbow' }],
 		[{ type:'body_color_explosion' }],		
 		[{ type:'particles_escape' }],
+		[{ type:'particles_effervescent' }],
 		[{ type:'particles_radial_strokes' }],
 		[{ type:'particles_shiny' }],
 		[{ type:'particles_new' }],
 		[{ type:'disco_ripple' }],
 		[{ type:'water_ripple' }],
-		[{ type:'glow' }],
+		[{ type:'glow'}],
+		[{ type:'rays'}],
 	]
 
 	for( let j = 0; j <scales.length; j++)

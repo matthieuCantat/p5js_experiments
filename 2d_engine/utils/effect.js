@@ -1,7 +1,7 @@
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
 import { body, COLORS_TO_RGB, getRandomColor, getRGB }from './draw.js'
-import { interpolateColors } from './math.js';
+import { interpolateColors, smoothstep, easeOut } from './math.js';
 
 
 export class body_effect
@@ -137,7 +137,9 @@ export class body_effect
             disco_ripple: disco_ripple,
             water_ripple: water_ripple,
             glow: glow,
+            rays: rays,
             particles_escape: particles_escape,
+            particles_effervescent:particles_effervescent,
             particles_radial_strokes: particles_radial_strokes,
             particles_shiny: particles_shiny,
             particles_new: particles_new,
@@ -376,8 +378,9 @@ class glow extends effect_brick
             start:0,
             duration: 600,
             speed:10,
-            size: 40,
-            body_color: false,
+            size: 20,
+            grow_speed:20,
+            color: null,
             stroke_color: true,
         }
         this.settings = { ...defaultSettings, ...settings };
@@ -410,9 +413,20 @@ class glow extends effect_brick
         this.update_count = this.Effect.update_count - this.settings.start 
 
         let background_color = COLORS_TO_RGB['grey']
-        let body_color = getRGB(this.Effect.body_ref.color)
-        let global_anim = Math.sin(this.update_count/this.settings.duration*3.14)
-        console.log(global_anim)
+
+        let body_color = null
+        if( this.settings.color === null )
+            body_color = getRGB(this.Effect.init_color)
+        else
+            body_color = getRGB(this.settings.color)
+        
+        
+        
+        let speed_transition = this.settings.grow_speed
+        let global_anim_start = smoothstep( 0, speed_transition,this.update_count)
+        let global_anim_end = 1 - smoothstep(this.settings.duration-speed_transition,this.settings.duration,this.update_count)
+        let global_anim = global_anim_start * global_anim_end
+        
         for( let i = 0; i < this.layers.length; i++ )
         {
             let color = interpolateColors(i+1,[0,15],[background_color,body_color])
@@ -420,7 +434,9 @@ class glow extends effect_brick
         
             let anim = Math.sin(this.update_count*0.05+i)*2
             let scale_glow = this.scales[i].getAdd(new Vector2d( anim,anim) )
-            let scale_appears = scale_glow.getMult(global_anim).getAdd(this.Effect.init_scale.getMult(1-global_anim))
+            let scale_init = this.Effect.init_scale.getMult(1-global_anim)
+            let scale_target = scale_glow.getMult(global_anim)
+            let scale_appears = scale_target.getAdd(scale_init)
             this.layers[i].m.setScale(scale_appears)
         }
         return true
@@ -430,6 +446,130 @@ class glow extends effect_brick
 
 
 
+
+class rays extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 100,
+            body_color: true,
+            stroke_color: false,
+            nbr: 20,
+        }
+        this.settings = { ...defaultSettings, ...settings };
+
+        this.update_counts = []
+
+        let particles_nbr = this.settings.nbr
+       
+        let size_limits = [ 2.5 , 10.5 ]
+        let t_speed_limits = [ .02 , 0.1 ]
+
+        let offset_start = [0,60]
+        let life_time = [this.settings.duration-20, this.settings.duration]
+        // build
+ 
+        this.bodies_types = []
+        for( let i = 0; i < particles_nbr; i++ )
+            this.bodies_types.push( "triangle" )
+    
+        this.particles_settings = []
+        for( let type of this.bodies_types )
+        {
+            let setting = {
+                //size: Math.random()*(size_limits[1]-size_limits[0]) + size_limits[0],
+                t_speed : Math.random()*(t_speed_limits[1]-t_speed_limits[0]) + t_speed_limits[0],
+                //r_speed : Math.random()*(r_speed_limits[1]-r_speed_limits[0]) + r_speed_limits[0],
+                offset_start : Math.floor(Math.random()*(offset_start[1]-offset_start[0]) + offset_start[0]),
+                life_time : Math.floor(Math.random()*(life_time[1]-life_time[0]) + life_time[0]),
+                body_color: getRandomColor(),
+            }
+            this.particles_settings.push( setting )
+        }   
+        
+
+        this.bodies = []
+        for( let i = 0; i < this.bodies_types.length; i++ )
+        {
+            let type = this.bodies_types[i]
+            let size_random = 20                        
+            let color = null
+            if( this.settings.body_color === true )
+                color = this.particles_settings[i].body_color
+            let stroke_color = null
+            if( this.settings.stroke_color === true )
+                stroke_color = this.particles_settings[i].body_color
+
+            
+            let b = new body(
+                { m : new Matrix2d(this.Effect.init_position, 0, size_random), 
+                    color: color, 
+                    stroke_color:stroke_color,
+                    shape_type:type, })
+            this.bodies.push( b )
+            this.Effect.background_objs.push( b )
+        }
+
+        let vUp = new Vector2d(0,1)
+        let angle_incr = 3.14*2 / this.bodies.length
+        this.dirVectors = []
+
+        let SCREEN_SIZE_OFFSET = 350
+        this.scale_target = new Vector2d(SCREEN_SIZE_OFFSET*6/particles_nbr,SCREEN_SIZE_OFFSET)
+
+        for( let i = 0; i < this.bodies.length; i++ )
+        {
+            let angle = angle_incr*i 
+            let vDir = vUp.getRotated(angle)
+            vDir.normalize()
+            vDir.mult(SCREEN_SIZE_OFFSET)
+            this.dirVectors.push( vDir )
+            
+            this.bodies[i].m.setRotation(angle+Math.PI)
+
+            this.bodies[i].m.setRow(2,vDir.getAdd(this.Effect.init_position) )
+            this.bodies[i].m.setScale( this.scale_target )
+        }
+    }
+
+  
+    update()
+    {
+        
+        if((this.isNotStarted())||(this.isFinished()))
+            return false
+
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
+        
+        // BEHAVIOR
+        for( let i = 0; i < this.bodies.length; i++ )
+        {
+            if( this.particles_settings[i].life_time< this.update_count )
+            {
+                this.bodies[i].visibility = false
+                continue
+            }
+            let grow_speed = this.particles_settings[i].t_speed
+            let offset_start = this.particles_settings[i].offset_start
+
+            let update_count_offseted = Math.max( 0.01, this.update_count - offset_start )
+            
+            let anim = update_count_offseted *grow_speed 
+
+            let vDir = this.dirVectors[i].getMult( anim )
+            let vScale = this.scale_target.getMult( anim )
+            this.bodies[i].m.setRow(2,vDir.getAdd(this.Effect.init_position) )
+            this.bodies[i].m.setScale( vScale )
+        }
+        
+	
+        return true
+    }
+}
 
 
 class particles_escape extends effect_brick
@@ -553,6 +693,127 @@ class particles_escape extends effect_brick
             let pOut = p.getAdd(v.getMult(t_anim))
             this.bodies[i].m.setRow(2,pOut)
             this.bodies[i].m.setRotation(r_anim)
+        }
+        
+	
+        return true
+    }
+}
+  
+
+
+class particles_effervescent extends effect_brick
+{
+    constructor( effect_inst, settings )
+    {
+        super(effect_inst, settings)
+        const defaultSettings= {
+            start:0,
+            duration: 500,
+            body_color: false,
+            stroke_color: true,
+            nbr:1
+        }
+        this.settings = { ...defaultSettings, ...settings };
+
+        this.update_counts = []
+
+        this.possible_bodies_types = [  
+            'rectangle', 
+            'circle', 
+            'triangle',
+            'cross', 
+            'star_classic' 
+        ]
+        
+        this.size_limits = [ 2.5 , 10.5 ]
+        this.t_speed_limits = [ .01 , 5. ]
+        this.r_speed_limits = [ 0.01 , 30.2 ]
+        this.angle_offset = [0.01,10.1]
+        this.life_time = [this.settings.duration*0.01, this.settings.duration*0.1]
+        // build
+ 
+
+        this.vUp = new Vector2d(0,1)
+        
+        this.bodies = []
+        this.dirVectors = []
+        this.start_positions = []  
+        this.particles_settings = []
+        this.update_counts = []
+
+        this.angle = 0
+    }
+
+  
+    update()
+    {
+        if((this.isNotStarted())||(this.isFinished()))
+            return false
+
+        // TIME
+        this.update_count = this.Effect.update_count - this.settings.start 
+
+
+        let angle_incr = 3.14*2 / this.bodies.length
+      
+        for( let i = 0; i < this.settings.nbr; i++ )
+        {
+            let i_random = Math.floor( Math.random()* this.possible_bodies_types.length )
+            let type = this.possible_bodies_types[i_random]
+
+            let rand = {
+                size: Math.random()*(this.size_limits[1]-this.size_limits[0]) + this.size_limits[0],
+                t_speed : Math.random()*(this.t_speed_limits[1]-this.t_speed_limits[0]) + this.t_speed_limits[0],
+                r_speed : Math.random()*(this.r_speed_limits[1]-this.r_speed_limits[0]) + this.r_speed_limits[0],
+                angle_offset : Math.random()*(this.angle_offset[1]-this.angle_offset[0]) + this.angle_offset[0],
+                life_time : Math.floor(Math.random()*(this.life_time[1]-this.life_time[0]) + this.life_time[0]),
+                body_color: getRandomColor(),
+            }
+
+            
+            let b = new body(
+                { m : new Matrix2d(this.Effect.init_position, 0, rand.size), 
+                    color: 'white', 
+                    stroke_color:null,
+                    shape_type:type, })
+
+            this.bodies.push( b )
+            this.Effect.background_objs.push( b ) 
+            this.particles_settings.push( rand )           
+
+            //
+            this.angle += 0.01 + rand.angle_offset
+            let vDir = this.vUp.getRotated(this.angle)
+            vDir.normalize()
+            let p = vDir.getMult(this.Effect.body_ref.m)
+            let v = p.getSub(this.Effect.init_position)
+            v.normalize()
+            this.dirVectors.push( v )
+            this.start_positions.push(p)
+            this.update_counts.push(0)
+        }
+
+        // BEHAVIOR
+        for( let i = 0; i < this.bodies.length; i++ )
+        {
+            if( this.particles_settings[i].life_time< this.update_counts[i] )
+            {
+                this.bodies[i].visibility = false
+                continue
+            }
+
+            let p = this.start_positions[i]
+            let v = this.dirVectors[i]
+            ////
+            
+            let t_anim = easeOut(0,100,this.update_counts[i]*this.particles_settings[i].t_speed,2)*this.particles_settings[i].r_speed
+            //let r_anim = this.update_count *this.particles_settings[i].r_speed
+            let pOut = p.getAdd(v.getMult(t_anim))
+            this.bodies[i].m.setRow(2,pOut)
+            //this.bodies[i].m.setRotation(r_anim)
+
+            this.update_counts[i] += 1
         }
         
 	
