@@ -2,6 +2,8 @@
 
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
+import { body_effects } from './shared.js';
+import { body_effect } from './effect.js';
 
 export var COLORS = [
 	"aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque",
@@ -339,6 +341,7 @@ export class body
 			stroke_width: 2,
             interaction: null,
 			effect_name: null,
+			event_effects: {},
 		}
 		const args = { ...defaultOptions, ...in_options };
 
@@ -357,6 +360,48 @@ export class body
 		this.visibility = true
 
 		this.effect_name = args.effect_name
+
+		this.event_effects = args.event_effects
+		this.events = {
+			'touchstart': { status: false, effect_inst: null },
+			'touchend': { status: false, effect_inst: null },
+			'touchmove': { status: false, effect_inst: null },
+			'touchidle': { status: false, effect_inst: null },
+			'idle': { status: false, effect_inst: null },
+			'selectedidle': { status: false, effect_inst: null },
+			'collision': { status: false, effect_inst: null },			
+		}
+		
+	}
+
+	update_event_effects()
+	{
+		// clean
+		for( const key in this.events)
+		{
+			let effect_inst = this.events[key].effect_inst
+			if( ( effect_inst != null)&&( effect_inst.isFinished() ) )
+				this.events[key].effect_inst = null
+		}
+		// Check if any event is triggered and create the effect instance if needed	
+		for( const key in this.events)
+		{
+			let eventMustTriggerAnEffect = ( this.event_effects[key] != null )
+			let isTriggered = (this.events[key].status == true)
+			let effect_not_running = (this.events[key].effect_inst == null)
+			//console.log('event',key, eventMustTriggerAnEffect, isTriggered, effect_not_running)
+			if( (eventMustTriggerAnEffect)&&(isTriggered)&&(effect_not_running))
+			{
+				console.log(this.event_effects[key])
+				let effect_inst = new body_effect(
+					this,
+					this.event_effects[key])
+
+				this.events[key].effect_inst = effect_inst	
+				body_effects.push(effect_inst)	
+			}
+		}					
+
 	}
 
 	duplicate()
@@ -372,6 +417,8 @@ export class body
 	{
 		if( this.visibility == false )
 			return false
+
+		this.update_event_effects()
 
         ctx.save()
 		ctx.beginPath()
@@ -394,7 +441,6 @@ export class body
 		
 
 		const drawFunction = this.drawFactory[this.shape_type];
-		
 		drawFunction(ctx,this.m);
        
 
@@ -416,6 +462,7 @@ export class body
 	}
 
 }
+
 
 function draw_rectangle(ctx, m)
 {

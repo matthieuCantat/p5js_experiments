@@ -125,6 +125,9 @@ export class User_interaction_info
 	{
 		this.selection_info.obj = obj
 		this.selection_info.vOffset = this.pPressed.getMult( obj.m.getInverse())
+		this.selection_info.obj.events.touchstart.status = true
+		
+		
 	}
 
 	clear_selection_info()

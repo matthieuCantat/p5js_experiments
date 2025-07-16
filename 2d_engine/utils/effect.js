@@ -420,6 +420,13 @@ class glow extends effect_brick
         else
             body_color = getRGB(this.settings.color)
         
+        let body_color_darker = [body_color[0]*0.8,body_color[1]*0.8,body_color[2]*0.8]
+        let stroke_color = getRGB(this.Effect.init_color_stroke)
+        let stroke_color_new = interpolateColors(this.update_count,
+            [0,50],
+            [stroke_color,body_color_darker])
+        
+        this.Effect.body_ref.stroke_color = 'rgb(' + stroke_color_new[0] + ',' + stroke_color_new[1] + ',' + stroke_color_new[2] + ')'
         
         
         let speed_transition = this.settings.grow_speed
@@ -637,7 +644,7 @@ class particles_escape extends effect_brick
             if( this.settings.stroke_color === true )
                 stroke_color = this.particles_settings[i].body_color
 
-            console.log( i, color )
+            
             let b = new body(
                 { m : new Matrix2d(this.Effect.init_position, 0, size_random), 
                     color: color, 
