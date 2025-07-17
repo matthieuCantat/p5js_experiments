@@ -364,14 +364,15 @@ export class body
 
 		this.event_effects = args.event_effects
 		this.events = {
-			'touchstart': { status: false, effect_insts: [] },
-			'touchend': { status: false, effect_insts: [] },
-			'touchmove': { status: false, effect_insts: [] },
-			'touchidle': { status: false, effect_insts: [] },
-			'idle': { status: false, effect_insts: [] },
-			'selectedidle': { status: false, effect_insts: [] },
-			'collision': { status: false, effect_insts: [] },			
+			'isPressed': { status: false, count:0, effect_insts: [] },
+			'isReleased': { status: false, count:0, effect_insts: [] },
+			'touchmove': { status: false, count:0, effect_insts: [] },
+			'touchidle': { status: false, count:0, effect_insts: [] },
+			'idle': { status: false, count:0, effect_insts: [] },
+			'selectedidle': { status: false, count:0, effect_insts: [] },
+			'collision': { status: false, count:0, effect_insts: [] },			
 		}
+		
 		
 	}
 

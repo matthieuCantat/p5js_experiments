@@ -34,8 +34,8 @@ function setup()
 
 
 	let event_effect = {
-		'touchstart': [{ type:'particles_escape' }],
-		'touchend': [{ type:'water_ripple' }],
+		'isPressed': [{ type:'particles_escape' }],
+		'isReleased': [{ type:'water_ripple' }],
 		'touchmove': [{ type:'body_color_acid_rainbow' }],
 		'touchidle': [{ type:'particles_effervescent' }],
 		'idle': [{ type:'particles_new' }],
@@ -109,12 +109,9 @@ function update_events_info( Inter, Objs )
 	{
 		if(Inter.selection_info.obj == obj)
 		{
-			obj.events.touchstart.status = false
-			if( Inter.isPressed )
-				obj.events.touchstart.status = true
-			
-			if( Inter.isReleased )
-				obj.events.touchend.status = true
+			obj.events.isPressed.status = Inter.isPressed
+			obj.events.isReleased.status = Inter.isReleased
+
 			if( Inter.isInteracting )
 			{
 				if (obj.isMoving())
@@ -126,8 +123,8 @@ function update_events_info( Inter, Objs )
 		}
 		else
 		{
-			obj.events.touchstart.status = false
-			obj.events.touchend.status = false
+			obj.events.isPressed.status = false
+			obj.events.isReleased.status = false
 			obj.events.touchmove.status = false
 			obj.events.touchidle.status = false
 			obj.events.idle.status = false

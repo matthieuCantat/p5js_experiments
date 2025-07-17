@@ -28,6 +28,7 @@ export class User_interaction_info
 		this.touch_down_last = false
 		// INTERACTION
 		this.isInteracting = false
+		this.isInteractingExtend = false
 		this.isPressed = false
 		this.isReleased = false
 		this.interactionChanged = false
@@ -50,6 +51,7 @@ export class User_interaction_info
         this.interaction_objs = []
 
 		this._touch_down_last = false
+		this._isInteracting_last = false
 		
     }
 
@@ -162,7 +164,7 @@ export class User_interaction_info
 	{
         let objs = this.interaction_objs
 
-		if( this.isInteracting )
+		if( this.isInteractingExtend)
 		{
 			if(( this.something_is_selected == false )&&(this.isPressed == true))
 			{
@@ -287,15 +289,29 @@ export class User_interaction_info
 		else
 			this.isInteracting = false
 
+		
+		// isReleased - must be one frame long
+		if (this.isInteracting == false)
+		{
+			if(this._isInteracting_last == true)
+				this.isReleased = true
+			else
+				this.isReleased = false
+		}
+		else
+			this.isReleased = false
+		//console.log('isInteracting',this.isInteracting,'isReleased',this.isReleased)
+		
+		this.isInteractingExtend = false
+		if((this.isInteracting)||(this.isReleased))
+			this.isInteractingExtend = true
+		
 		// others
 		this.interactionChanged = false
 		
-		this.isReleased = false
 		if( this.isInteracting != this._isInteracting_last)
 		{
 			this.interactionChanged = true
-			if(this.isInteracting == false)
-				this.isReleased = true
 		}
      
 		// for next eval
