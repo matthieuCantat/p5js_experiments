@@ -64,9 +64,6 @@ export class body_effect
         {
             if( this.cleanning_done == false)
             {
-                this.body_ref.m.setRow(2,this.init_position)
-                this.body_ref.m.setRotation(this.init_rotation)
-                this.body_ref.m.setScale(this.init_scale)
                 this.body_ref.color = this.init_color
                 this.body_ref.stroke_color = this.init_color_stroke
 
@@ -174,7 +171,7 @@ class effect_brick
         return false
     }
 
-    isFinished()
+    isFinished(offset=0)
     {
         let update_count = this.Effect.update_count
 
@@ -183,7 +180,7 @@ class effect_brick
         let start = this.settings.start
         let end  = start+duration
 
-        if(end < update_count)
+        if(end+offset < update_count)
             return true
 
         return false
@@ -217,10 +214,20 @@ class body_transform_bounce extends effect_brick
             duration: 15,
         }
         this.settings = { ...defaultSettings, ...settings };
+        this.cleanning_done = false
     }
 
     update()
     {
+        if(( this.isFinished(-1) )&&(this.cleanning_done == false))
+        {
+            this.Effect.body_ref.m.setRow(2,this.Effect.init_position)
+            this.Effect.body_ref.m.setRotation(this.Effect.init_rotation)
+            this.Effect.body_ref.m.setScale(this.Effect.init_scale)
+            this.cleanning_done = true
+            return false
+        }   
+
         if((this.isNotStarted())||(this.isFinished()))
             return false
 
@@ -248,10 +255,20 @@ class body_transform_occilate extends effect_brick
             duration: 15,
         }
         this.settings = { ...defaultSettings, ...settings };
+        this.cleanning_done = false
     }
 
     update()
     {
+        if(( this.isFinished(-1) )&&(this.cleanning_done == false))
+        {
+            this.Effect.body_ref.m.setRow(2,this.Effect.init_position)
+            this.Effect.body_ref.m.setRotation(this.Effect.init_rotation)
+            this.Effect.body_ref.m.setScale(this.Effect.init_scale)
+            this.cleanning_done = true
+            return false
+        }   
+
         if((this.isNotStarted())||(this.isFinished()))
             return false
 
@@ -278,10 +295,20 @@ class body_transform_shake extends effect_brick
             duration: 15,
         }
         this.settings = { ...defaultSettings, ...settings };
+        this.cleanning_done = false
     }
 
     update()
     {
+        if(( this.isFinished(-1) )&&(this.cleanning_done == false))
+        {
+            this.Effect.body_ref.m.setRow(2,this.Effect.init_position)
+            this.Effect.body_ref.m.setRotation(this.Effect.init_rotation)
+            this.Effect.body_ref.m.setScale(this.Effect.init_scale)
+            this.cleanning_done = true
+            return false
+        }   
+        
         if((this.isNotStarted())||(this.isFinished()))
             return false
 

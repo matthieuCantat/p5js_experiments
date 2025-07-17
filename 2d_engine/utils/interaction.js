@@ -125,9 +125,6 @@ export class User_interaction_info
 	{
 		this.selection_info.obj = obj
 		this.selection_info.vOffset = this.pPressed.getMult( obj.m.getInverse())
-		this.selection_info.obj.events.touchstart.status = true
-		
-		
 	}
 
 	clear_selection_info()
@@ -172,6 +169,32 @@ export class User_interaction_info
 			for( let obj of objs )
 				obj.isSelected = false		
 		}		
+	}
+
+	update_selected_obj_events_info()
+	{
+		if(this.selection_info.obj == null)
+			return false
+
+		this.selection_info.obj.events.touchstart.status = false
+		this.selection_info.obj.events.touchend.status = false
+		this.selection_info.obj.events.touchmove.status = false
+		this.selection_info.obj.events.touchidle.status = false
+		this.selection_info.obj.events.idle.status = false
+		this.selection_info.obj.events.selectedidle.status = false
+		this.selection_info.obj.events.collision.status = false
+
+		if( this.isPressed )
+			this.selection_info.obj.events.touchstart.status = true
+		if( this.isReleased )
+			this.selection_info.obj.events.touchend.status = true
+		if( ( this.isInteracting )&&(this.selection_info.obj.isMoving()))
+		{
+			this.selection_info.obj.events.touchmove.status = true
+		}
+			
+
+		return true
 	}
 
     handle_interaction_with_selected_obj()
@@ -313,7 +336,10 @@ export class User_interaction_info
 			this.override_pos()
 		this.update_states()
 		this.update_counters()
-		this.update_coords()		
+		this.update_coords()
+		this.get_selected_obj()
+		this.update_selected_obj_events_info()
+		this.handle_interaction_with_selected_obj()				
         draw_count += 1
 	}
 

@@ -84,8 +84,6 @@ function update()
 {		
 	//	INTERACTION
 	User_interaction.update()
-	User_interaction.get_selected_obj()
-	User_interaction.handle_interaction_with_selected_obj()
 
 	let create_mode =
     User_interaction.something_is_selected == false &&

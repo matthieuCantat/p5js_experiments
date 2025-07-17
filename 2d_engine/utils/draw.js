@@ -346,6 +346,7 @@ export class body
 		const args = { ...defaultOptions, ...in_options };
 
 		this.m = args.m
+		this.last_m = new Matrix2d(args.m) // to keep track of the last position
 		this.m_init = new Matrix2d(args.m)
 		this.shape_type = args.shape_type
 		this.color = args.color
@@ -413,12 +414,25 @@ export class body
 				interaction:this.interaction})
 	}
 
-	draw()
+	isMoving()
+	{
+
+		let vDelta = this.m.get_row(2).getSub(this.last_m.get_row(2))
+		return vDelta.mag() > 0.01
+	}
+
+	update()
 	{
 		if( this.visibility == false )
 			return false
 
 		this.update_event_effects()
+
+		this.last_m = new Matrix2d(this.m) // to keep track of the last position
+	}
+
+	draw()
+	{
 
         ctx.save()
 		ctx.beginPath()
