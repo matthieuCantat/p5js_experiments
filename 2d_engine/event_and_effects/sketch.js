@@ -72,7 +72,7 @@ function setup()
 	*/
 	
 
-	draw_bg('white')
+	draw_bg('grey')
 	draw_grid()
 }
 
