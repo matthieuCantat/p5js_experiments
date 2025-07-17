@@ -364,13 +364,13 @@ export class body
 
 		this.event_effects = args.event_effects
 		this.events = {
-			'touchstart': { status: false, effect_inst: null },
-			'touchend': { status: false, effect_inst: null },
-			'touchmove': { status: false, effect_inst: null },
-			'touchidle': { status: false, effect_inst: null },
-			'idle': { status: false, effect_inst: null },
-			'selectedidle': { status: false, effect_inst: null },
-			'collision': { status: false, effect_inst: null },			
+			'touchstart': { status: false, effect_insts: [] },
+			'touchend': { status: false, effect_insts: [] },
+			'touchmove': { status: false, effect_insts: [] },
+			'touchidle': { status: false, effect_insts: [] },
+			'idle': { status: false, effect_insts: [] },
+			'selectedidle': { status: false, effect_insts: [] },
+			'collision': { status: false, effect_insts: [] },			
 		}
 		
 	}
@@ -380,9 +380,14 @@ export class body
 		// clean
 		for( const key in this.events)
 		{
-			let effect_inst = this.events[key].effect_inst
-			if( ( effect_inst != null)&&( effect_inst.isFinished() ) )
-				this.events[key].effect_inst = null
+			let effect_insts = this.events[key].effect_insts
+
+			let effect_inst_cleaned = []
+			for( let i = 0; i < effect_insts.length; i++ )
+				 if ( effect_insts[i].isFinished() == false ) 
+					effect_inst_cleaned.push(effect_insts[i])
+			
+			this.events[key].effect_insts = effect_inst_cleaned
 		}
 		// Check if any event is triggered and create the effect instance if needed	
 		for( const key in this.events)
@@ -390,15 +395,15 @@ export class body
 			let eventMustTriggerAnEffect = ( this.event_effects[key] != null )
 			let isTriggered = (this.events[key].status == true)
 			let effect_not_running = (this.events[key].effect_inst == null)
-			//console.log('event',key, eventMustTriggerAnEffect, isTriggered, effect_not_running)
-			if( (eventMustTriggerAnEffect)&&(isTriggered)&&(effect_not_running))
+			
+			if( (eventMustTriggerAnEffect)&&(isTriggered) )
 			{
-				console.log(this.event_effects[key])
+				
 				let effect_inst = new body_effect(
 					this,
 					this.event_effects[key])
 
-				this.events[key].effect_inst = effect_inst	
+				this.events[key].effect_insts.push( effect_inst	)
 				body_effects.push(effect_inst)	
 			}
 		}					
@@ -421,13 +426,18 @@ export class body
 		return vDelta.mag() > 0.0001
 	}
 
+	save_last_m()
+	{
+		this.last_m = new Matrix2d(this.m) // to keep track of the last position
+	}
+
 	update()
 	{
 		if( this.visibility == false )
 			return false
 
 		this.update_event_effects()
-
+		
 		
 	}
 

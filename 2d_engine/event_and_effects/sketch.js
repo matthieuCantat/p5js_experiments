@@ -84,40 +84,7 @@ function update()
 	//	INTERACTION
 	User_interaction.update()
 
-	let create_mode =
-    User_interaction.something_is_selected == false &&
-    User_interaction.isInteracting &&
-    created_obj === null;
-
-	let edit_scale_mode =
-    User_interaction.something_is_selected == false &&
-    User_interaction.isInteracting &&
-    created_obj !== null;
-
-	if( create_mode )
-	{
-		p = new Vector2d( User_interaction.p )
-		let m = new Matrix2d(User_interaction.p,0,10)
-		created_obj = new body( 
-			{ m : m, 
-			  color: get_randow_color(), 
-			  interaction:{attr:'r'},
-			  shape_type:'rectangle' } )
-		Objs.push( created_obj )
-	}
-	else if(edit_scale_mode)
-	{
-		let vDelta = User_interaction.p.getSub(p)
-		let sX = Math.abs(vDelta.x)+0.001
-		let sY = Math.abs(vDelta.y)+0.001
-		created_obj.m.setScale(sX,sY)
-	}
-	else
-	{
-		created_obj = null
-	}
-
-
+	update_events_info( User_interaction, Objs )
 
 	for( let elem of Objs )
 		elem.update()
@@ -128,6 +95,49 @@ function update()
 	Constraints.update()
 	
 }	
+
+
+function update_events_info( Inter, Objs )
+{
+	//console.log('dowm',Inter.touch_down, 'move',Inter.touch_move, 'up',Inter.touch_up)
+	//if( Inter.isPressed )
+	//	console.log('isPressed')
+	//else
+	//	console.log('nothing pressed')
+	//console.log('isPressed',Inter.isPressed, 'isInteracting',Inter.isInteracting)
+	for( let obj of Objs )
+	{
+		if(Inter.selection_info.obj == obj)
+		{
+			obj.events.touchstart.status = false
+			if( Inter.isPressed )
+				obj.events.touchstart.status = true
+			
+			if( Inter.isReleased )
+				obj.events.touchend.status = true
+			if( Inter.isInteracting )
+			{
+				if (obj.isMoving())
+					obj.events.touchmove.status = true	
+				else
+					obj.events.touchmove.status = false	
+			}
+
+		}
+		else
+		{
+			obj.events.touchstart.status = false
+			obj.events.touchend.status = false
+			obj.events.touchmove.status = false
+			obj.events.touchidle.status = false
+			obj.events.idle.status = false
+			obj.events.selectedidle.status = false
+			obj.events.collision.status = false
+		}
+
+	}
+	return true
+}
 
 var draw_count = 0;
 function draw() {

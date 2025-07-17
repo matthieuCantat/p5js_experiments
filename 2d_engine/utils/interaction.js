@@ -21,6 +21,11 @@ export class User_interaction_info
 		//
         this._isInteracting_last = null
 
+		this.touch_down = false
+		this.touch_move = false
+		this.touch_up = false
+
+		this.touch_down_last = false
 		// INTERACTION
 		this.isInteracting = false
 		this.isPressed = false
@@ -43,25 +48,40 @@ export class User_interaction_info
 		this.something_is_selected = false
 		this.selection_info = { obj : null , vOffset : null }
         this.interaction_objs = []
+
+		this._touch_down_last = false
 		
     }
 
 	interactionEvent_getPos(event, interaction_type, action )
 	{
-        if(this.LOG_LISTENERS)
-			console.log('interactionEvent_hande', interaction_type, action)
-
-		if( ( interaction_type == 'mouse')&&( action == 'move')&&(this.p == null))
+		// skip on computer if mouse move without interaction
+		let mouse_move = (( interaction_type == 'mouse')&&( action == 'move'))
+		let mouse_move_across_screen_without_interaction = (( mouse_move)&&(this.p == null))
+		if( mouse_move_across_screen_without_interaction )
 			return
-
+			
+		// get event 
 		let e = event
 		if( interaction_type == 'touch')
 			e = event.touches[0] || event.changedTouches[0]
 		
+		// store position
 		if( ( action == 'down')||( action == 'move') )
 			this.p = this.get_input_coords_as_vector( e.clientX, e.clientY)
 		else if( action == 'up')
 			this.p = null	
+
+		// get event
+		this.touch_down = false
+		this.touch_move = false
+		this.touch_up = false
+		if( action == 'down')
+			this.touch_down	= true
+		if( action == 'move')
+			this.touch_move	= true	
+		if( action == 'up')
+			this.touch_up	= true			
     }
     
 	// LISTENERS
@@ -171,31 +191,6 @@ export class User_interaction_info
 		}		
 	}
 
-	update_selected_obj_events_info()
-	{
-		if(this.selection_info.obj == null)
-			return false
-
-		this.selection_info.obj.events.touchstart.status = false
-		this.selection_info.obj.events.touchend.status = false
-		this.selection_info.obj.events.touchmove.status = false
-		this.selection_info.obj.events.touchidle.status = false
-		this.selection_info.obj.events.idle.status = false
-		this.selection_info.obj.events.selectedidle.status = false
-		this.selection_info.obj.events.collision.status = false
-
-		if( this.isPressed )
-			this.selection_info.obj.events.touchstart.status = true
-		if( this.isReleased )
-			this.selection_info.obj.events.touchend.status = true
-		if( ( this.isInteracting )&&(this.selection_info.obj.isMoving()))
-		{
-			this.selection_info.obj.events.touchmove.status = true
-		}
-			
-
-		return true
-	}
 
     handle_interaction_with_selected_obj()
     {
@@ -210,7 +205,7 @@ export class User_interaction_info
 		if( obj == null )
 			return false
 
-		this.selection_info.obj.last_m = new Matrix2d(this.selection_info.obj.m) // to keep track of the last position
+		this.selection_info.obj.save_last_m()
 
 
         let vOffset = this.selection_info.vOffset;
@@ -275,27 +270,37 @@ export class User_interaction_info
 
 	update_states()
 	{
+		// isPressed - must be one frame long
+		if (this.touch_down == true)
+		{
+			if(this._touch_down_last == false)
+				this.isPressed = true
+			else
+				this.isPressed = false
+		}
+		else
+			this.isPressed = false
+
 		// is interacting
-		if( this.p != null)
+		if( ( this.touch_down)||( this.touch_move))
 			this.isInteracting = true
 		else
 			this.isInteracting = false
 
 		// others
 		this.interactionChanged = false
-		this.isPressed = false
+		
 		this.isReleased = false
 		if( this.isInteracting != this._isInteracting_last)
 		{
 			this.interactionChanged = true
-			if(this.isInteracting == true)
-				this.isPressed = true
-			else
+			if(this.isInteracting == false)
 				this.isReleased = true
 		}
      
 		// for next eval
 		this._isInteracting_last = this.isInteracting
+		this._touch_down_last = this.touch_down
 	}
 
 	update_counters()
@@ -343,7 +348,6 @@ export class User_interaction_info
 		this.update_counters()
 		this.update_coords()
 		this.get_selected_obj()
-		this.update_selected_obj_events_info()
 		this.handle_interaction_with_selected_obj()				
         draw_count += 1
 	}
