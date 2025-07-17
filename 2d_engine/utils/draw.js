@@ -418,7 +418,7 @@ export class body
 	{
 
 		let vDelta = this.m.get_row(2).getSub(this.last_m.get_row(2))
-		return vDelta.mag() > 0.01
+		return vDelta.mag() > 0.0001
 	}
 
 	update()
@@ -428,7 +428,7 @@ export class body
 
 		this.update_event_effects()
 
-		this.last_m = new Matrix2d(this.m) // to keep track of the last position
+		
 	}
 
 	draw()

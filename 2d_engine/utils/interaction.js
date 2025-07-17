@@ -199,6 +199,7 @@ export class User_interaction_info
 
     handle_interaction_with_selected_obj()
     {
+		
 
         let do_handle_interaction = ( ( this.something_is_selected )&&( this.isInteracting ))
 
@@ -208,6 +209,10 @@ export class User_interaction_info
         let obj = this.selection_info.obj;
 		if( obj == null )
 			return false
+
+		this.selection_info.obj.last_m = new Matrix2d(this.selection_info.obj.m) // to keep track of the last position
+
+
         let vOffset = this.selection_info.vOffset;
 
         let pCenter = obj.m.get_row(2)
