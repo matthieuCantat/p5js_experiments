@@ -9,23 +9,36 @@ let draw_count = 0
 // Declare the boolean value as a global variable
 export class User_interaction_info
 {
-	LOG_LISTENERS = false
+	DEBUG = false
 	BOT_MODE = false
 
 	PRESSED_CIRCLE_SIZE = 10
 	PRESSED_CIRCLE_SIZE_ANIM_START = 30
 
+	EVENT_HISTORY_SIZE = 40
+	POINT_HISTORY_SIZE = 40
+
+	FIX_TOUCHUP_FRAME_NBR_THRESHOLD = 30
+
+	EVENT_TAP_FRAME_NBR_THRESHOLD = 30
+	EVENT_HOLD_FRAME_NBR_THRESHOLD = 4
+	EVENT_HOLD_DISTANCE_THRESHOLD = 0.1
+	EVENT_DRAG_FRAME_NBR_THRESHOLD = 4
+	EVENT_DRAG_DISTANCE_THRESHOLD = 0.1
+
+	
 
     constructor()
     {
 		//
         this._isInteracting_last = null
 
+
+
 		this.touch_down = false
 		this.touch_move = false
 		this.touch_up = false
 
-		this.touch_down_last = false
 		// INTERACTION
 		this.isInteracting = false
 		this.isInteractingExtend = false
@@ -50,6 +63,29 @@ export class User_interaction_info
 		this.selection_info = { obj : null , vOffset : null }
         this.interaction_objs = []
 
+		this.events = {
+			'touchDown':{status:false,count:0}, 
+			'touchUp':{status:false,count:0},  
+			'tap':{status:false,count:0}, 
+			'doubleTap':{status:false,count:0}, 
+			'fingerOnScreen':{status:false,count:0},
+			'hold':{status:false,count:0}, 
+			'drag':{status:false,count:0}, 
+			'swipe':{status:false,count:0}, 
+			'swipeLeft':{status:false,count:0}, 
+			'swipeRight':{status:false,count:0}, 
+			'swipeUp':{status:false,count:0}, 
+			'swipeDown':{status:false,count:0}, 
+			'flick':{status:false,count:0}, 
+		}
+
+		
+		this.events_history = {}
+		for( let event in this.events )
+			this.events_history[event] = []
+		this.p_history = []
+
+		// UTILS
 		this._touch_down_last = false
 		this._isInteracting_last = false
 		
@@ -283,6 +319,7 @@ export class User_interaction_info
 		else
 			this.isPressed = false
 
+
 		// is interacting
 		if( ( this.touch_down)||( this.touch_move))
 			this.isInteracting = true
@@ -354,7 +391,167 @@ export class User_interaction_info
 		}
 			
 		this.p_last = this.p
+		this.p_history.unshift(this.p)
+		if ( this.POINT_HISTORY_SIZE < this.p_history.length)
+			this.p_history.pop(); // Remove the oldest if over size		
 	}
+	
+	update_events()
+	{
+		this.events.touchDown.status = this.isPressed
+		this.events.touchUp.status = this.isReleased
+		this.events.fingerOnScreen.status = this.isInteracting
+		
+		//fix touchUp
+		if( this.events.touchDown.status === true )
+		{
+			let history_is_valid_size = (this.FIX_TOUCHUP_FRAME_NBR_THRESHOLD <= this.events_history.touchDown.length )
+			if(history_is_valid_size === true)
+			{
+				for( let i = 0 ; i < this.FIX_TOUCHUP_FRAME_NBR_THRESHOLD ; i++)
+				{
+
+					if( this.events_history.touchUp[i] == true )
+						break
+					if( this.events_history.touchDown[i] == true )
+						this.events.touchUp.status = true
+				}
+			}
+		}
+
+		//Tap
+		this.events.tap.status = false	
+		if( this.events.touchUp.status === true )
+		{
+			let history_is_valid_size = (this.EVENT_TAP_FRAME_NBR_THRESHOLD <= this.events_history.touchDown.length )
+			if(history_is_valid_size === true)
+			{
+				for( let i = 0 ; i < this.EVENT_TAP_FRAME_NBR_THRESHOLD ; i++)
+				{
+					if( this.events_history.touchDown[i] === true )
+					{
+						this.events.tap.status = true
+						break
+					}
+				}
+			}
+		}
+		// doubleTap
+		this.events.doubleTap.status = false	
+		if( this.events.tap.status === true )
+		{
+			let history_is_valid_size = (this.EVENT_TAP_FRAME_NBR_THRESHOLD <= this.events_history.tap.length )
+			if(history_is_valid_size === true)
+			{
+				for( let i = 0 ; i < this.EVENT_TAP_FRAME_NBR_THRESHOLD ; i++)
+				{
+					if( this.events_history.tap[i] === true )
+					{
+						this.events.doubleTap.status = true
+						break
+					}
+				}
+			}
+		}
+			
+		
+
+		//hold
+		this.events.hold.status = false
+		if( this.isInteracting )
+		{
+			let history_is_valid_size = ( this.EVENT_HOLD_FRAME_NBR_THRESHOLD <= this.p_history.length )
+			
+			let history_contain_only_points = true
+			if(history_is_valid_size === true)
+			{
+				for( let i = 0; i < this.EVENT_HOLD_FRAME_NBR_THRESHOLD; i++)
+				{
+					if( this.p_history[i] == null)
+					{
+						history_contain_only_points = false
+						break
+					}
+				}
+			}
+
+			let each_points_delta_respect_threshold = true
+			if( (history_is_valid_size === true) && (history_contain_only_points === true) )
+			{
+				for( let i = 1; i < this.EVENT_HOLD_FRAME_NBR_THRESHOLD; i++)
+				{
+					let distance = this.p_history[i].getSub(this.p_history[i-1]).mag()
+					if(  this.EVENT_HOLD_DISTANCE_THRESHOLD < distance)
+					{
+						each_points_delta_respect_threshold = false
+						break
+					}
+				}
+			}
+
+			if( (history_is_valid_size === true) 
+				&& (history_contain_only_points === true) 
+				&& (each_points_delta_respect_threshold === true) )
+				this.events.hold.status = true
+		}
+
+		
+		//drag
+		this.events.drag.status = false
+		if( this.isInteracting )
+		{
+			let history_is_valid_size = ( this.EVENT_DRAG_FRAME_NBR_THRESHOLD <= this.p_history.length )
+			
+			let history_contain_only_points = true
+			if(history_is_valid_size === true)
+			{
+				for( let i = 0; i < this.EVENT_DRAG_FRAME_NBR_THRESHOLD; i++)
+				{
+					if( this.p_history[i] === null)
+					{
+						history_contain_only_points = false
+						break
+					}
+				}
+			}
+
+			let each_points_delta_respect_threshold = true
+			if( (history_is_valid_size === true) && (history_contain_only_points === true) )
+			{
+				for( let i = 1; i < this.EVENT_DRAG_FRAME_NBR_THRESHOLD; i++)
+				{
+					let distance = this.p_history[i].getSub(this.p_history[i-1]).mag()
+					if( distance < this.EVENT_DRAG_DISTANCE_THRESHOLD)
+					{
+						each_points_delta_respect_threshold = false
+						break
+					}
+				}
+			}
+
+			if( (history_is_valid_size === true) 
+				&& (history_contain_only_points === true) 
+				&& (each_points_delta_respect_threshold === true) )
+				this.events.drag.status = true
+		}
+	
+		//
+		this.events.swipe.status = false
+		this.events.swipeLeft.status = false
+		this.events.swipeRight.status = false
+		this.events.swipeUp.status = false
+		this.events.swipeDown.status = false
+		this.events.flick.status = false
+
+
+		for( let eventType in this.events)
+		{
+			this.events_history[eventType].unshift(this.events[eventType].status)
+			if ( this.EVENT_HISTORY_SIZE < this.events_history[eventType].length)
+				this.events_history[eventType].pop(); // Remove the oldest if over size
+		}
+	}
+
 
 	update()
 	{
@@ -363,10 +560,21 @@ export class User_interaction_info
 		this.update_states()
 		this.update_counters()
 		this.update_coords()
+		this.update_events()
+
 		this.get_selected_obj()
 		this.handle_interaction_with_selected_obj()				
         draw_count += 1
-	}
+
+		//console.log('----',draw_count)
+		//console.log('----',this.events_history.touchDown)//draw_count)
+		if(this.DEBUG === true)
+			for( let n in this.events )
+				if(this.events[n].status)
+					console.log(draw_count,n)
+		
+	}	
+		
 
 	draw()
 	{

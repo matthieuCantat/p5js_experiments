@@ -919,7 +919,7 @@ class particles_radial_strokes extends effect_brick
             if( this.settings.stroke_color === true )
                 stroke_color = this.particles_settings[i].body_color
 
-            console.log( i, color )
+            
             let b = new body(
                 { m : new Matrix2d(this.Effect.init_position, 0, size_random), 
                     color: color, 

@@ -34,15 +34,18 @@ function setup()
 
 
 	let event_effect = {
-		'isPressed': [{ type:'particles_escape' }],
-		'isReleased': [{ type:'water_ripple' }],
-		'touchmove': [{ type:'body_color_acid_rainbow' }],
-		'touchidle': [{ type:'particles_effervescent' }],
-		'idle': [{ type:'particles_new' }],
-		'selectedidle': [{ type:'glow'}],
-		'collision': [{ type:'particles_radial_strokes' }],
+		'touchDown': { effects:[{ type:'particles_radial_strokes' }], isRepeatable:true},
+		'touchUp': { effects:[{ type:'water_ripple'}], isRepeatable:true},
+		'tap': { effects:[{ type:'particles_escape'}], isRepeatable:true},
+		'doubleTap': { effects:[{ type:'disco_ripple'}], isRepeatable:true},
+		'fingerOnScreen': null,
+		'hold': { effects:[ { type:'particles_effervescent' }], isRepeatable:false},
+		'drag': { effects:[{ type:'body_color_acid_rainbow'}], isRepeatable:false},
+		//'idle': [{ type:'particles_new' }],
+		//'selectedidle': [{ type:'glow'}],
+		//'collision': [{ type:'particles_radial_strokes' }],
 	}
-
+	
 
 
 	for( let i = 0; i < interactions.length; i++)
@@ -109,7 +112,9 @@ function update_events_info( Inter, Objs )
 	{
 		if(Inter.selection_info.obj == obj)
 		{
-			obj.events.isPressed.status = Inter.isPressed
+			for(let event in obj.events)
+				obj.events[event].status = Inter.events[event].status
+			/*
 			obj.events.isReleased.status = Inter.isReleased
 
 			if( Inter.isInteracting )
@@ -119,17 +124,13 @@ function update_events_info( Inter, Objs )
 				else
 					obj.events.touchmove.status = false	
 			}
+					*/
 
 		}
 		else
 		{
-			obj.events.isPressed.status = false
-			obj.events.isReleased.status = false
-			obj.events.touchmove.status = false
-			obj.events.touchidle.status = false
-			obj.events.idle.status = false
-			obj.events.selectedidle.status = false
-			obj.events.collision.status = false
+			for(let event in obj.events)
+				obj.events[event].status = false
 		}
 
 	}

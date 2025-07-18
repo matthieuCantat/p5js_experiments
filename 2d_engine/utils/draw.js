@@ -363,8 +363,10 @@ export class body
 		this.effect_name = args.effect_name
 
 		this.event_effects = args.event_effects
+		/*
 		this.events = {
 			'isPressed': { status: false, count:0, effect_insts: [] },
+			'isPressedHold': { status: false, count:0, effect_insts: [] },
 			'isReleased': { status: false, count:0, effect_insts: [] },
 			'touchmove': { status: false, count:0, effect_insts: [] },
 			'touchidle': { status: false, count:0, effect_insts: [] },
@@ -372,6 +374,17 @@ export class body
 			'selectedidle': { status: false, count:0, effect_insts: [] },
 			'collision': { status: false, count:0, effect_insts: [] },			
 		}
+		*/
+		this.events = {
+			'touchDown': { status: false, count:0, effect_insts: [] },
+			'touchUp': { status: false, count:0, effect_insts: [] },
+			'tap': { status: false, count:0, effect_insts: [] },
+			'doubleTap': { status: false, count:0, effect_insts: [] },
+			'fingerOnScreen': { status: false, count:0, effect_insts: [] },
+			'hold': { status: false, count:0, effect_insts: [] },
+			'drag': { status: false, count:0, effect_insts: [] },
+		}
+
 		
 		
 	}
@@ -393,20 +406,27 @@ export class body
 		// Check if any event is triggered and create the effect instance if needed	
 		for( const key in this.events)
 		{
-			let eventMustTriggerAnEffect = ( this.event_effects[key] != null )
-			let isTriggered = (this.events[key].status == true)
-			let effect_not_running = (this.events[key].effect_inst == null)
 			
-			if( (eventMustTriggerAnEffect)&&(isTriggered) )
-			{
-				
-				let effect_inst = new body_effect(
-					this,
-					this.event_effects[key])
+			let no_effects_linked = ( this.event_effects[key] === null )
+			if( no_effects_linked )
+				continue
+			let isTriggered = (this.events[key].status == true)
+			let effect_already_running = (0 < this.events[key].effect_insts.length )
+			let isNotRepeatable = this.event_effects[key].isRepeatable == false
 
-				this.events[key].effect_insts.push( effect_inst	)
-				body_effects.push(effect_inst)	
-			}
+			
+			if( isTriggered == false ) 
+				continue
+			if((isNotRepeatable)&&(effect_already_running))
+				continue
+
+			let effect_inst = new body_effect(
+				this,
+				this.event_effects[key].effects)
+
+			this.events[key].effect_insts.push( effect_inst	)
+			body_effects.push(effect_inst)	
+		
 		}					
 
 	}
