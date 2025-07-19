@@ -376,14 +376,48 @@ export class body
 		}
 		*/
 		this.events = {
-			'touchDown': { status: false, count:0, effect_insts: [] },
-			'touchUp': { status: false, count:0, effect_insts: [] },
-			'tap': { status: false, count:0, effect_insts: [] },
-			'doubleTap': { status: false, count:0, effect_insts: [] },
-			'fingerOnScreen': { status: false, count:0, effect_insts: [] },
-			'hold': { status: false, count:0, effect_insts: [] },
-			'drag': { status: false, count:0, effect_insts: [] },
+			'touchDown': { name:'touchDown', status: false, count:0, effect_insts: [] },
+			'touchUp': { name:'touchUp', status: false, count:0, effect_insts: [] },
+			'tap': { name:'tap', status: false, count:0, effect_insts: [] },
+			'doubleTap': { name:'doubleTap', status: false, count:0, effect_insts: [] },
+			'fingerOnScreen': { name:'fingerOnScreen', status: false, count:0, effect_insts: [] },
+			'hold': { name:'hold', status: false, count:0, effect_insts: [] },
+			'drag': { name:'drag', status: false, count:0, effect_insts: [] },
 		}
+		
+		
+		// update effect duration with event ref
+		for( let event in this.event_effects)
+		{
+			if(this.event_effects[event] == null)
+				continue
+			
+			for(let i=0; i < this.event_effects[event].effects.length; i++)
+			{
+				let effect_info = this.event_effects[event].effects[i]
+				if( 'duration' in effect_info == false)
+					continue
+
+				let duration = effect_info.duration
+				if(typeof duration === 'string' )
+				{
+					let event_target_name = duration
+					//REPLACE
+					//console.log(this.event_effects[event].effects[i].duration)
+					//console.log(event,i,event_target_name)
+					this.event_effects[event].effects[i].duration = this.events[event_target_name]
+					//console.log('A',this.event_effects[event].effects[i].duration === this.events[event_target_name])
+					//console.log(this.event_effects[event].effects[i].duration)
+					//this.events[event_target_name].status = true
+					//console.log()
+				}
+
+			}
+			
+		}
+
+		//if(this.event_effects['hold'] != null)
+		//    console.log('B',this.event_effects['hold'].effects[0].duration === this.events['hold'])
 
 		
 		
@@ -395,14 +429,31 @@ export class body
 		for( const key in this.events)
 		{
 			let effect_insts = this.events[key].effect_insts
+			if( effect_insts.length == 0 )
+				continue
 
 			let effect_inst_cleaned = []
 			for( let i = 0; i < effect_insts.length; i++ )
-				 if ( effect_insts[i].isFinished() == false ) 
+			{
+				if ( effect_insts[i].isFinished() == true )
+				{
+					effect_insts[i].clean()
+				}
+				else
+				{
 					effect_inst_cleaned.push(effect_insts[i])
+				}
+					
+			}
+
+			
+			if((key == 'hold')&&( effect_inst_cleaned.length == 0))
+				console.log('clean', key)
 			
 			this.events[key].effect_insts = effect_inst_cleaned
 		}
+
+
 		// Check if any event is triggered and create the effect instance if needed	
 		for( const key in this.events)
 		{
@@ -410,14 +461,16 @@ export class body
 			let no_effects_linked = ( this.event_effects[key] === null )
 			if( no_effects_linked )
 				continue
-			let isTriggered = (this.events[key].status == true)
-			let effect_already_running = (0 < this.events[key].effect_insts.length )
-			let isNotRepeatable = this.event_effects[key].isRepeatable == false
 
-			
+			let isTriggered = (this.events[key].status == true)
 			if( isTriggered == false ) 
 				continue
-			if((isNotRepeatable)&&(effect_already_running))
+
+			let effect_already_running = (0 < this.events[key].effect_insts.length )
+			let isNotRepeatable = this.event_effects[key].isRepeatable == false
+			let oneEffectAtTheTime = ((isNotRepeatable)&&(effect_already_running))
+		
+			if(oneEffectAtTheTime)
 				continue
 
 			let effect_inst = new body_effect(
@@ -454,6 +507,15 @@ export class body
 
 	update()
 	{
+		
+		//if(this.events['hold'].status)
+		//{
+		//	console.log('-----')
+		//	console.log(this.events['hold'])
+		//	console.log(this.event_effects['hold'].effects[0].duration)
+		//	console.log('C',this.event_effects['hold'].effects[0].duration === this.events['hold'])
+		//}
+
 		if( this.visibility == false )
 			return false
 
@@ -464,6 +526,8 @@ export class body
 
 	draw()
 	{
+		if(this.visibility == false)
+			return false
 
         ctx.save()
 		ctx.beginPath()

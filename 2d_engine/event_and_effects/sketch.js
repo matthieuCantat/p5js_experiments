@@ -39,8 +39,8 @@ function setup()
 		'tap': { effects:[{ type:'particles_escape'}], isRepeatable:true},
 		'doubleTap': { effects:[{ type:'disco_ripple'}], isRepeatable:true},
 		'fingerOnScreen': null,
-		'hold': { effects:[ { type:'particles_effervescent' }], isRepeatable:false},
-		'drag': { effects:[{ type:'body_color_acid_rainbow'}], isRepeatable:false},
+		'hold': { effects:[{ type:'particles_effervescent', duration:'hold' }], isRepeatable:false},
+		'drag': { effects:[{ type:'body_color_acid_rainbow', duration:'drag'}], isRepeatable:false},
 		//'idle': [{ type:'particles_new' }],
 		//'selectedidle': [{ type:'glow'}],
 		//'collision': [{ type:'particles_radial_strokes' }],
@@ -57,7 +57,7 @@ function setup()
 			  color: COLORS[color_index], 
 			  interaction :interactions[i],
 			  shape_type:'rectangle',
-			  event_effects : event_effect } ) 
+			  event_effects : structuredClone(event_effect) } ) 
 
 		Objs.push( obj )
 		p.add(p_offset)
@@ -97,6 +97,16 @@ function update()
 	
 	Constraints.update()
 	
+	/*
+	let value = {tata:10}
+
+	let obj = { toto:{other_value:10}}
+	value.tata = obj.toto
+	obj.toto.other_value = 5
+	console.log(value.tata.other_value)
+	*/
+	
+
 }	
 
 

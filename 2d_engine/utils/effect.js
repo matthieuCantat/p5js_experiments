@@ -95,6 +95,11 @@ export class body_effect
 		return true
 	} 
 
+    clean()
+    {
+        this.effect_bricks = []// have to override this for delete
+    }
+
 
 
 	draw_background()
@@ -159,6 +164,7 @@ class effect_brick
         this.update_count = 0
     }
 
+
     isNotStarted()
     {
         let update_count = this.Effect.update_count
@@ -177,6 +183,16 @@ class effect_brick
 
         // INIT
         let duration = this.settings.duration
+        if( duration == null)
+            return false
+        if(typeof duration !== 'number' )
+        {
+            let event_info = duration
+            //if( event_info.name == 'hold' )
+            //    console.log(event_info.name, event_info.status,this)
+            return ( event_info.status == false )
+        }
+      
         let start = this.settings.start
         let end  = start+duration
 
@@ -764,7 +780,7 @@ class particles_effervescent extends effect_brick
         this.t_speed_limits = [ .01 , 5. ]
         this.r_speed_limits = [ 0.01 , 30.2 ]
         this.angle_offset = [0.01,10.1]
-        this.life_time = [this.settings.duration*0.01, this.settings.duration*0.1]
+        this.life_time = [5, 50]
         // build
  
 
@@ -812,6 +828,7 @@ class particles_effervescent extends effect_brick
                     stroke_color:null,
                     shape_type:type, })
 
+          
             this.bodies.push( b )
             this.Effect.background_objs.push( b ) 
             this.particles_settings.push( rand )           
