@@ -12,44 +12,25 @@ import { body_effects } from '../utils/shared.js';
 import { body } from '../utils/body.js'
 
 
-
-
 function setup_objs()
 {
-	
-	// SETUP OBJS
-	let p = new Vector2d(0,200)
-	let p_offset = new Vector2d(0,-100)
-	let scale = new Vector2d(60,20)
-	let interactions = [
-		{attr:'tx',limit:[-100,100]},
-		{attr:'ty',limit:[-400,0]},		
-	]
 
-	let event_effect = {
-		'touchDown': { effects:[{ type:'particles_radial_strokes' }], isRepeatable:true},
-		'touchUp': { effects:[{ type:'water_ripple'}], isRepeatable:true},
-		'tap': { effects:[{ type:'particles_escape'}], isRepeatable:true},
-		'doubleTap': { effects:[{ type:'disco_ripple'}], isRepeatable:true},
-		'fingerOnScreen': null,
-		'hold': { effects:[{ type:'particles_effervescent', duration:'hold' }], isRepeatable:false},
-		'drag': { effects:[{ type:'body_color_acid_rainbow', duration:'drag'}], isRepeatable:false},
-		//'idle': [{ type:'particles_new' }],
-		//'selectedidle': [{ type:'glow'}],
-		//'collision': [{ type:'particles_radial_strokes' }],
-	}
-	
+	// SETUP OBJS
+	let p = new Vector2d(-150,200)
+	let p_offset = new Vector2d(0,-50)
+	let scale = new Vector2d(60,20)
+
+
 	let objs = []
-	for( let i = 0; i < interactions.length; i++)
+	for( let i = 0; i < 10; i++)
 	{
 		let color_index = Math.floor(Math.random() * COLORS.length);
 
 		let obj = new body( 
 			{ m : new Matrix2d(p, 0, scale), 
 			  color: COLORS[color_index], 
-			  interaction :interactions[i],
-			  shape_type:'rectangle',
-			  event_effects : structuredClone(event_effect) } ) 
+			  interaction :{attr:'tx',limit:[0,250]},
+			  shape_type:'rectangle' } ) 
 
 		objs.push( obj )
 		p.add(p_offset)
@@ -57,6 +38,8 @@ function setup_objs()
 
 	return objs
 }
+
+
 
 
 ///////////////////////////////////////////////////

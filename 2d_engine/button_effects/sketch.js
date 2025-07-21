@@ -7,12 +7,12 @@ import { draw_bg,
 	draw_grid,
 	draw_circle,
 	daw_line, 
-	body,
 	getRandomColor,
 	canvas,
 	draw_background,
 	get_randow_color} from '../utils/draw.js'
 import { body_effects } from '../utils/shared.js';
+import { body } from '../utils/body.js'
 
 var Objs = []
 

@@ -12,7 +12,8 @@ import { draw_bg,
 	canvas,
 	draw_background,
 	get_randow_color} from '../utils/draw.js'
-
+import { body } from '../utils/body.js'
+	
 
 
 var Objs = []

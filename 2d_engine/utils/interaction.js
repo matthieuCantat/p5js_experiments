@@ -552,6 +552,24 @@ export class User_interaction_info
 		}
 	}
 
+		
+	update_objs_events_info( Objs )
+	{
+		for( let obj of Objs )
+		{
+			if(this.selection_info.obj == obj)
+			{
+				for(let event in obj.events)
+					obj.events[event].status = this.events[event].status
+			}
+			else
+			{
+				for(let event in obj.events)
+					obj.events[event].status = false
+			}
+		}
+		return true
+	}
 
 	update()
 	{

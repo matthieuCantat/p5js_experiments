@@ -7,15 +7,53 @@ import { draw_bg,
 	draw_grid,
 	draw_circle,
 	daw_line, 
-	body,
 	COLORS,
 	canvas,
 	draw_background,
 	get_randow_color} from '../utils/draw.js'
+import { body } from '../utils/body.js'
+
+
+function setup_objs()
+{
+
+	// SETUP OBJS
+	let p = new Vector2d(-150,200)
+	let p_offset = new Vector2d(0,-50)
+	let scale = new Vector2d(60,20)
+	let interactions = [
+		{attr:'t'},
+		{attr:'tx'},
+		{attr:'ty'},
+		{attr:'tx',limit:[-10,100]},
+		{attr:'ty',limit:[-10,100]},		
+		{attr:'r'},
+		{attr:'r',limit:[0,90]},
+		{attr:'button_hold'},
+		{attr:'button_first_press'}
+	]
+
+	let objs = []
+	for( let i = 0; i < interactions.length; i++)
+	{
+		let color_index = Math.floor(Math.random() * COLORS.length);
+
+		let obj = new body( 
+			{ m : new Matrix2d(p, 0, scale), 
+			  color: COLORS[color_index], 
+			  interaction :interactions[i],
+			  shape_type:'rectangle' } ) 
+
+		objs.push( obj )
+		p.add(p_offset)
+	}
+
+	return objs
+}
 
 
 
-var Objs = []
+var Objs = setup_objs()
 var User_interaction = new User_interaction_info();
 var Constraints = new Constraints_info(User_interaction)
 
