@@ -16,7 +16,7 @@ function setup_objs()
 {
 
 	// SETUP OBJS
-	let p = new Vector2d(-50,200)
+	let p = new Vector2d(-100,200)
 	let p_offset = new Vector2d(0,-50)
 	let scale = new Vector2d(60,20)
 
