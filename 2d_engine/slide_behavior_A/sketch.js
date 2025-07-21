@@ -16,7 +16,7 @@ function setup_objs()
 {
 
 	// SETUP OBJS
-	let p = new Vector2d(-150,200)
+	let p = new Vector2d(-50,200)
 	let p_offset = new Vector2d(0,-50)
 	let scale = new Vector2d(60,20)
 
@@ -29,7 +29,7 @@ function setup_objs()
 		let obj = new body( 
 			{ m : new Matrix2d(p, 0, scale), 
 			  color: COLORS[color_index], 
-			  interaction :{attr:'tx',limit:[0,250]},
+			  interaction :{attr:'tx',limit:[0,200]},
 			  shape_type:'rectangle' } ) 
 
 		objs.push( obj )
