@@ -280,11 +280,11 @@ export function draw_phone_dims()
 	
 	let lineWidth = 2
 	
-	daw_line([{x:-1000,y:-350},{x:1000,y:-350}],'red',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:200},{x:1000,y:200}],'red',lineWidth/2, bgCtx)
+	daw_line([{x:-1000,y:-420},{x:1000,y:-420}],'red',lineWidth/2, bgCtx)
+	daw_line([{x:-1000,y:280},{x:1000,y:280}],'red',lineWidth/2, bgCtx)
 	
-	daw_line([{x:-160,y:-1000},{x:-160,y:1000}],'red',lineWidth/2, bgCtx)
-	daw_line([{x:200,y:-1000},{x:200,y:1000}],'red',lineWidth/2, bgCtx)
+	daw_line([{x:-180,y:-1000},{x:-180,y:1000}],'red',lineWidth/2, bgCtx)
+	daw_line([{x:170,y:-1000},{x:170,y:1000}],'red',lineWidth/2, bgCtx)
 	
 }
 
