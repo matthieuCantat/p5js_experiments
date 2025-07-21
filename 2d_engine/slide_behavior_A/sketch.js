@@ -5,6 +5,7 @@ import { User_interaction_info } from '../utils/interaction.js'
 import { Constraints_info } from '../utils/constraint.js'
 import { draw_bg, 
 	draw_grid,
+	draw_phone_dims,
 	COLORS,
 	canvas,
 	draw_background} from '../utils/draw.js'
@@ -58,6 +59,9 @@ function setup()
 	// DRAW BG
 	draw_bg('grey')
 	draw_grid()
+	draw_phone_dims()
+
+
 }
 
 function update()
