@@ -23,14 +23,14 @@ function setup_objs()
 
 
 	let objs = []
-	for( let i = 0; i < 10; i++)
+	for( let i = 0; i < 12; i++)
 	{
 		let color_index = Math.floor(Math.random() * COLORS.length);
 
 		let obj = new body( 
 			{ m : new Matrix2d(p, 0, scale), 
 			  color: COLORS[color_index], 
-			  interaction :{attr:'tx',limit:[0,200]},
+			  interaction :{attr:'tx',limit:[0,180]},
 			  shape_type:'rectangle' } ) 
 
 		objs.push( obj )
