@@ -115,8 +115,13 @@ export class body_effect
 	
 	draw_foreground()
 	{
+        if( this.isFinished() )
+			return false
+
 		for( let i = 0; i < this.foreground_objs.length; i++)
 			this.foreground_objs[i].draw()  
+
+        return true
 	}
 
 	update_effects()
@@ -1140,7 +1145,9 @@ class particles_shiny extends effect_brick
 
 
 class particles_new extends effect_brick
-{
+{   
+    MIN_SIZE = 0.1
+
     constructor( effect_inst, settings )
     {
         super(effect_inst, settings)
@@ -1167,7 +1174,7 @@ class particles_new extends effect_brick
         let t_speed_limits = [ .05 , 0.1 ]
         let r_speed_limits = [ 0.01 , 0.1 ]
         let angle_offset = [-0.5,0.5]
-        let life_time = [this.settings.duration*0.7, this.settings.duration]
+        let life_time = [5000, 5000]
         // build
  
         this.bodies_types = []
@@ -1201,7 +1208,7 @@ class particles_new extends effect_brick
             if( this.settings.stroke_color === true )
                 stroke_color = this.particles_settings[i].body_color
 
-            console.log( i, color )
+            
             let b = new body(
                 { m : new Matrix2d(this.Effect.init_position, 0, size_random), 
                     color: color, 
@@ -1235,6 +1242,7 @@ class particles_new extends effect_brick
         if((this.isNotStarted())||(this.isFinished()))
             return false
 
+        
         // TIME
         this.update_count = this.Effect.update_count - this.settings.start 
 
@@ -1258,8 +1266,13 @@ class particles_new extends effect_brick
             let pOut = p//.getAdd(v.getMult(t_anim))
             this.bodies[i].m.setRow(2,pOut)
             //this.bodies[i].m.setRotation(r_anim)
-            let s_anim = Math.max(0,Math.sin(this.update_count*this.particles_settings[i].t_speed)*0.5)
+            let s_anim = Math.max(this.MIN_SIZE,Math.sin(this.update_count*this.particles_settings[i].t_speed)*0.5)
             this.bodies[i].m.setScale(this.Effect.init_scale.getMult(s_anim))
+
+            if( s_anim <= this.MIN_SIZE )
+                this.bodies[i].visibility = false
+            else
+                this.bodies[i].visibility = true
 
         }
         

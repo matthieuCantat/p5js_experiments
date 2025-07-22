@@ -104,6 +104,7 @@ export class body
 			'fingerOnScreen': { name:'fingerOnScreen', status: false, count:0, effect_insts: [] },
 			'hold': { name:'hold', status: false, count:0, effect_insts: [] },
 			'drag': { name:'drag', status: false, count:0, effect_insts: [] },
+			'idle': { name:'idle', status: false, count:0, effect_insts: [] },
 		}
 		
 		
@@ -167,9 +168,6 @@ export class body
 					
 			}
 
-			
-			if((key == 'hold')&&( effect_inst_cleaned.length == 0))
-				console.log('clean', key)
 			
 			this.events[key].effect_insts = effect_inst_cleaned
 		}

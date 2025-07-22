@@ -5,6 +5,7 @@ import { User_interaction_info } from '../utils/interaction.js'
 import { Constraints_info } from '../utils/constraint.js'
 import { draw_bg, 
 	draw_grid,
+	draw_phone_dims,
 	COLORS,
 	canvas,
 	draw_background} from '../utils/draw.js'
@@ -12,33 +13,15 @@ import { body_effects } from '../utils/shared.js';
 import { body } from '../utils/body.js'
 
 
-
-
 function setup_objs()
 {
-	
+
 	// SETUP OBJS
 	let p = new Vector2d(0,200)
-	let p_offset = new Vector2d(0,-100)
-	let scale = new Vector2d(60,20)
-	let interactions = [
-		{attr:'tx',limit:[-100,100]},
-		{attr:'ty',limit:[-400,0]},		
-	]
+	let p_offset = new Vector2d(0,-50)
+	let scale = new Vector2d(100,20)
 
-	let event_effect = {
-		'touchDown': { effects:[{ type:'particles_radial_strokes' }], isRepeatable:true},
-		'touchUp': { effects:[{ type:'water_ripple'}], isRepeatable:true},
-		'tap': { effects:[{ type:'particles_escape'}], isRepeatable:true},
-		'doubleTap': { effects:[{ type:'disco_ripple'}], isRepeatable:true},
-		'fingerOnScreen': null,
-		'hold': { effects:[{ type:'particles_effervescent', duration:'hold' }], isRepeatable:false},
-		'drag': { effects:[{ type:'body_color_acid_rainbow', duration:'drag'}], isRepeatable:false},
-		'idle': { effects:[{ type:'particles_new', duration:'idle'}], isRepeatable:false},
-		//'selectedidle': [{ type:'glow'}],
-		//'collision': [{ type:'particles_radial_strokes' }],
-	}
-	
+	let interactions = [{attr:'tr'}]
 	let objs = []
 	for( let i = 0; i < interactions.length; i++)
 	{
@@ -48,8 +31,7 @@ function setup_objs()
 			{ m : new Matrix2d(p, 0, scale), 
 			  color: COLORS[color_index], 
 			  interaction :interactions[i],
-			  shape_type:'rectangle',
-			  event_effects : structuredClone(event_effect) } ) 
+			  shape_type:'rectangle' } ) 
 
 		objs.push( obj )
 		p.add(p_offset)
@@ -57,6 +39,8 @@ function setup_objs()
 
 	return objs
 }
+
+
 
 
 ///////////////////////////////////////////////////
@@ -75,6 +59,9 @@ function setup()
 	// DRAW BG
 	draw_bg('grey')
 	draw_grid()
+	draw_phone_dims()
+
+
 }
 
 function update()

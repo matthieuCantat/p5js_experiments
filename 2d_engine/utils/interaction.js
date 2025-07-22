@@ -26,6 +26,7 @@ export class User_interaction_info
 	EVENT_DRAG_FRAME_NBR_THRESHOLD = 4
 	EVENT_DRAG_DISTANCE_THRESHOLD = 0.01
 
+	EVENT_IDLE_FRAME_NBR_THRESHOLD = 300
 	
 
     constructor()
@@ -77,6 +78,7 @@ export class User_interaction_info
 			'swipeUp':{status:false,count:0}, 
 			'swipeDown':{status:false,count:0}, 
 			'flick':{status:false,count:0}, 
+			'idle':{status:false,count:0}, 
 		}
 
 		
@@ -233,73 +235,89 @@ export class User_interaction_info
     handle_interaction_with_selected_obj()
     {
 		
-
         let do_handle_interaction = ( ( this.something_is_selected )&&( this.isInteracting ))
-
         if( do_handle_interaction == false) 
             return false
 
-        let obj = this.selection_info.obj;
-		if( obj == null )
+		let selected_obj = this.selection_info.obj
+		let selected_v_local = this.selection_info.vOffset
+		if( selected_obj == null )
 			return false
 
-		this.selection_info.obj.save_last_m()
+		let inter = selected_obj.interaction.attr
+		let pMouse = this.p
+		selected_obj.save_last_m()
 
-
-        let vOffset = this.selection_info.vOffset;
-
-        let pCenter = obj.m.get_row(2)
-        let pSelection_init = vOffset.getMult( obj.m )
-        let vCenterSelection = pSelection_init.getSub(pCenter)        
+        let pCenter = selected_obj.m.get_row(2)
+        let pSelectionAttach = selected_v_local.getMult( selected_obj.m )
+        let selected_v = pSelectionAttach.getSub(pCenter)        
         
-        if( obj.interaction.attr == 'r' )
+        if( inter == 'r' )
         {
-            let vCenterCurrent = this.p.getSub(pCenter)
-            let angle_delta = vCenterSelection.getRotation(vCenterCurrent)
-            
-            let rObj = obj.m.getRotation()
-            let rObjNew = rObj + angle_delta
-            obj.m.setRotation(rObjNew)
+            let vToMouse = pMouse.getSub(pCenter)
+			let angle_delta = selected_v.getRotation(vToMouse)
+            selected_obj.m.rotate(angle_delta)
         }
-        else if( obj.interaction.attr == 'tx' )
+        else if( inter == 't' )
+		{
+			selected_obj.m.setRow(2,pMouse)
+		}			
+        else if( inter == 'tx' )
         {
-            let x_delta = this.p.x - vCenterSelection.x
+            let x_delta = pMouse.x - selected_v.x
             pCenter.x = x_delta
 
-			if( obj.interaction.limit != null )
+			if( selected_obj.interaction.limit != null )
 			{
-				let pObj_init = obj.m_init.get_row(2)
-				let x_min = pObj_init.x + obj.interaction.limit[0]
-				if ( pCenter.x < x_min)
-					pCenter.x = x_min
-				let x_max = pObj_init.x + obj.interaction.limit[1]
-				if ( x_max < pCenter.x )
-					pCenter.x = x_max
+				let _pInit = selected_obj.m_init.get_row(2)
+				let x_min = _pInit.x + selected_obj.interaction.limit[0]
+				let x_max = _pInit.x + selected_obj.interaction.limit[1]
+				pCenter.x = Math.min( x_max, Math.max( x_min, pCenter.x))
 			}
-			obj.m.setRow(2,pCenter)
+			selected_obj.m.setRow(2,pCenter)
         }
-        else if( obj.interaction.attr == 'ty' )
+        else if( inter == 'ty' )
         {
-            let y_delta = this.p.y- vCenterSelection.y
+            let y_delta = pMouse.y- selected_v.y
             pCenter.y = y_delta
             
-			if( obj.interaction.limit != null )
+			if( selected_obj.interaction.limit != null )
 			{
-				let pObj_init = obj.m_init.get_row(2)
-				let y_min = pObj_init.y + obj.interaction.limit[0]
-				if ( pCenter.y < y_min)
-					pCenter.y = y_min
-				let y_max = pObj_init.y + obj.interaction.limit[1]
-				if ( y_max < pCenter.y )
-					pCenter.y = y_max
+				let pObj_init = selected_obj.m_init.get_row(2)
+				let y_min = pObj_init.y + selected_obj.interaction.limit[0]
+				let y_max = pObj_init.y + selected_obj.interaction.limit[1]
+				pCenter.y = Math.min( y_max, Math.max( y_min, pCenter.y))
 			}	
-			obj.m.setRow(2,pCenter)		
+			selected_obj.m.setRow(2,pCenter)		
         }
-        else if( obj.interaction.attr == 't' )
+		else if( inter == 'tr' )
 		{
-			obj.m.setRow(2,this.p)
-		}		
-        else if( obj.interaction.attr == 'button' )
+			let rotate_coef =1.
+			let translate_coef = 0.5
+
+			// solve angle
+			let vToMouse = pMouse.getSub(pCenter)
+			let angle_delta = selected_v.getRotation(vToMouse)
+            selected_obj.m.rotate(angle_delta*rotate_coef)
+			// solve translate
+			let pSelectionAttach_afterRotate = selected_v_local.getMult( selected_obj.m )
+			let vDelta = pMouse.getSub(pSelectionAttach_afterRotate)
+			let pCenter_afterRotate = selected_obj.m.get_row(2)
+			let pCenter_afterTranslate = pCenter_afterRotate.getAdd(vDelta)
+			
+			let _pInit = selected_obj.m_init.get_row(2)
+			pCenter_afterTranslate.x = _pInit.x
+		
+			let y_min = _pInit.y - 300
+			let y_max = _pInit.y + 400
+			pCenter_afterTranslate.y = Math.min( y_max, Math.max( y_min, pCenter_afterTranslate.y))
+		
+
+			//pCenter
+			selected_obj.m.setRow(2,pCenter_afterTranslate)
+
+		}	
+        else if( inter == 'button' )
 		{
 			//obj.m.setRow(2,Vector2d())
 			console.log("do something")
@@ -550,6 +568,26 @@ export class User_interaction_info
 			if ( this.EVENT_HISTORY_SIZE < this.events_history[eventType].length)
 				this.events_history[eventType].pop(); // Remove the oldest if over size
 		}
+
+
+		// idle handle
+		for( let event in this.events )
+		{
+			if( event == 'idle')
+				continue
+			if( this.events[event].status == true)
+			{
+				this.events.idle.count = 0
+				this.events.idle.status = false
+				break
+			}
+		}
+
+		if( this.EVENT_IDLE_FRAME_NBR_THRESHOLD < this.events.idle.count )
+			this.events.idle.status = true
+
+		this.events.idle.count += 1
+		
 	}
 
 		
@@ -567,6 +605,8 @@ export class User_interaction_info
 				for(let event in obj.events)
 					obj.events[event].status = false
 			}
+
+			obj.events['idle'].status = this.events['idle'].status
 		}
 		return true
 	}
