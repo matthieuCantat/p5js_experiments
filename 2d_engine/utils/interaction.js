@@ -208,7 +208,11 @@ export class User_interaction_info
 			{
 						
 				for( let obj of objs )
+				{
+					obj.interaction_info = null
 					obj.isSelected = false
+				}
+					
 					
 				for( let i = objs.length -1 ; 0 <= i; i-- )
 				{
@@ -224,10 +228,15 @@ export class User_interaction_info
 		}
 		else
 		{
+			
 			this.something_is_selected = false
 			this.clear_selection_info()
 			for( let obj of objs )
-				obj.isSelected = false		
+			{
+				obj.interaction_info = null
+				obj.isSelected = false	
+			}
+					
 		}		
 	}
 
@@ -251,6 +260,8 @@ export class User_interaction_info
         let pSelectionAttach = selected_v_local.getMult( selected_obj.m )
         let selected_v = pSelectionAttach.getSub(pCenter)        
         
+
+		
         if( inter == 'r' )
         {
             let vToMouse = pMouse.getSub(pCenter)
@@ -291,23 +302,12 @@ export class User_interaction_info
         }
 		else if( inter == 'tr' )
 		{
-			let ROTATE_COEF =0.9
-	
-
-			// solve angle
-			let vToMouse = pMouse.getSub(pCenter)
-			let angle_delta = selected_v.getRotation(vToMouse)
-            selected_obj.m.rotate(angle_delta*ROTATE_COEF)
-
-			// solve translate
-			let pSelectionAttach_afterRotate = selected_v_local.getMult( selected_obj.m )
-			let vDelta = pMouse.getSub(pSelectionAttach_afterRotate)
-			let pCenter_afterRotate = selected_obj.m.get_row(2)
-			let pCenter_afterTranslate = pCenter_afterRotate.getAdd(vDelta)
 			
-
-			//pCenter
-			selected_obj.m.setRow(2,pCenter_afterTranslate)
+			selected_obj.interaction_info = {
+				pUser : pMouse,
+				vAttach : selected_v_local,
+			}
+		
 
 		}	
         else if( inter == 'button' )

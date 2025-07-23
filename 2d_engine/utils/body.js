@@ -111,6 +111,7 @@ export class body
 			'idle': { name:'idle', status: false, count:0, effect_insts: [] },
 		}
 		
+		this.interaction_info = null
 		
 		// update effect duration with event ref
 		for( let event in this.event_effects)
@@ -231,8 +232,9 @@ export class body
 		if( 3.14 < angular_momentum )
 			angular_momentum -= 2*3.14
 		if( angular_momentum < -3.14 )
-			angular_momentum += 2*3.14		
-		this.angular_momentum = Math.max(-0.1,Math.min( 0.1, angular_momentum))
+			angular_momentum += 2*3.14	
+		this.angular_momentum = angular_momentum	
+		//this.angular_momentum = Math.max(-0.1,Math.min( 0.1, angular_momentum))
 		this.last_m = new Matrix2d(this.m) // to keep track of the last position
 	}
 
@@ -254,56 +256,105 @@ export class body
 		
 		if( this.DYN )
 		{
+			let m = this.m
 			//ADD DYN
 			let FRICTION_TRANSLATE = 0.01
 			let FRICTION_ROTATE = 0.01
-			let pNext = this.m.get_row(2).getAdd(this.momentum.getMult((1-FRICTION_TRANSLATE)))
+			let pNext = m.get_row(2).getAdd(this.momentum.getMult((1-FRICTION_TRANSLATE)))
 			let aNext = this.angular_momentum*(1-FRICTION_ROTATE)
 
-			// add axe constraint
-			let pCurrent = pNext
+			m.setRow(2,pNext)
+			m.rotate(aNext)
 
-			let vAxeCns = new Vector2d(1,1)
-			vAxeCns.normalize()
-			let pAxeCns = new Vector2d(0,0)
-
-			let _v = pCurrent.getSub(pAxeCns)
-
-			let _v_n = _v.getNormalized()
-			let vAxeCn_n = vAxeCns.getNormalized()
-			let dot = _v_n.dot(vAxeCn_n)
-
-			let pProj = vAxeCns.getMult(_v.mag()*dot).getAdd(pAxeCns)
-			
-			pCurrent = pProj
-			
-			// add axe limit
-			let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
-			let _dot = vAxeCenterToCurrent.dot(vAxeCns)
-
-			let LENGTH_MAX = 200
-			let LENGTH_MIN = 50
-			if( 0 < _dot )
+			// add interaction
+			if(this.interaction_info != null )
 			{
-				let current_length = vAxeCenterToCurrent.mag()
 				
-				if( LENGTH_MAX < current_length )
+				let DYN_COEF = 0.9
+				let ROTATE_COEF =0.9
+	
+				let pCenter = m.get_row(2)
+				let pAttach_world = this.interaction_info.vAttach.getMult( m )
+				let vAttach_world = pAttach_world.getSub(pCenter)
+				let _mCurrent = new Matrix2d(m)
+				
+				// solve angle
+				let vToMouse = this.interaction_info.pUser.getSub(pCenter)
+				vToMouse.normalize()
+				vAttach_world.normalize()
+				let aDelta = vAttach_world.getRotation(vToMouse,false)
+				_mCurrent.rotate(aDelta*ROTATE_COEF)
+	
+				// solve translate
+				let pSelectionAttach_afterRotate = this.interaction_info.vAttach.getMult( _mCurrent )
+				let vDelta = this.interaction_info.pUser.getSub(pSelectionAttach_afterRotate)
+				
+				// get force
+				let aMouseAttract = aDelta*ROTATE_COEF*DYN_COEF
+				let vMouseAttract = vDelta.getMult(DYN_COEF)
+	
+				//add to matrix
+				let pCurrent = m.get_row(2)
+				m.setRow(2,pCurrent.getAdd(vMouseAttract))
+				m.rotate(aMouseAttract)
+			}
+			
+			let DO_AXE_CNS = false
+			let DO_AXE_CNS_LIMIT = false
+
+			if(DO_AXE_CNS)
+			{
+
+				let vAxeCns = new Vector2d(1,1)
+				vAxeCns.normalize()
+				let pAxeCns = new Vector2d(0,0)				
+				// add axe constraint
+				let pCurrent = m.get_row(2)
+
+				let _v = pCurrent.getSub(pAxeCns)
+
+				let _v_n = _v.getNormalized()
+				let vAxeCn_n = vAxeCns.getNormalized()
+				let dot = _v_n.dot(vAxeCn_n)
+
+				let pProj = vAxeCns.getMult(_v.mag()*dot).getAdd(pAxeCns)
+				
+				m.setRow(2,pProj)
+
+				if(DO_AXE_CNS_LIMIT)
 				{
-					let _v = vAxeCenterToCurrent.getNormalized().mult(LENGTH_MAX)
-					pCurrent = pAxeCns.getAdd(_v)
+					// add axe limit
+					let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
+					let _dot = vAxeCenterToCurrent.dot(vAxeCns)
+
+					let LENGTH_MAX = 200
+					let LENGTH_MIN = 50
+					if( 0 < _dot )
+					{
+						let current_length = vAxeCenterToCurrent.mag()
+						
+						if( LENGTH_MAX < current_length )
+						{
+							let _v = vAxeCenterToCurrent.getNormalized().mult(LENGTH_MAX)
+							pCurrent = pAxeCns.getAdd(_v)
+						}
+					}
+					else
+					{
+						let current_length = vAxeCenterToCurrent.mag()
+						if( LENGTH_MIN < current_length )
+						{
+							let _v = vAxeCenterToCurrent.getNormalized().mult(LENGTH_MIN)
+							pCurrent = pAxeCns.getAdd(_v)
+						}				
+					}
+					
+					m.setRow(2,pCurrent)
 				}
 			}
-			else
-			{
-				let current_length = vAxeCenterToCurrent.mag()
-				if( LENGTH_MIN < current_length )
-				{
-					let _v = vAxeCenterToCurrent.getNormalized().mult(LENGTH_MIN)
-					pCurrent = pAxeCns.getAdd(_v)
-				}				
-			}
-			this.m.setRow(2,pCurrent)
-			this.m.rotate(aNext)
+
+			this.m = m
+			
 		}
 
 
