@@ -246,7 +246,6 @@ export class User_interaction_info
 
 		let inter = selected_obj.interaction.attr
 		let pMouse = this.p
-		selected_obj.save_last_m()
 
         let pCenter = selected_obj.m.get_row(2)
         let pSelectionAttach = selected_v_local.getMult( selected_obj.m )
@@ -292,26 +291,20 @@ export class User_interaction_info
         }
 		else if( inter == 'tr' )
 		{
-			let rotate_coef =1.
-			let translate_coef = 0.5
+			let ROTATE_COEF =0.9
+	
 
 			// solve angle
 			let vToMouse = pMouse.getSub(pCenter)
 			let angle_delta = selected_v.getRotation(vToMouse)
-            selected_obj.m.rotate(angle_delta*rotate_coef)
+            selected_obj.m.rotate(angle_delta*ROTATE_COEF)
+
 			// solve translate
 			let pSelectionAttach_afterRotate = selected_v_local.getMult( selected_obj.m )
 			let vDelta = pMouse.getSub(pSelectionAttach_afterRotate)
 			let pCenter_afterRotate = selected_obj.m.get_row(2)
 			let pCenter_afterTranslate = pCenter_afterRotate.getAdd(vDelta)
 			
-			let _pInit = selected_obj.m_init.get_row(2)
-			pCenter_afterTranslate.x = _pInit.x
-		
-			let y_min = _pInit.y - 300
-			let y_max = _pInit.y + 400
-			pCenter_afterTranslate.y = Math.min( y_max, Math.max( y_min, pCenter_afterTranslate.y))
-		
 
 			//pCenter
 			selected_obj.m.setRow(2,pCenter_afterTranslate)
@@ -321,7 +314,10 @@ export class User_interaction_info
 		{
 			//obj.m.setRow(2,Vector2d())
 			console.log("do something")
-		}        
+		} 
+		
+		
+		
     }
 
 	update_states()

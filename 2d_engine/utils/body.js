@@ -16,6 +16,7 @@ isPointInside_triangle,
 import Matrix2d from './matrix2d.js';
 import { body_effects } from './shared.js';
 import { body_effect } from './effect.js';
+import Vector2d from './vector2d.js';
 
 
 
@@ -69,6 +70,8 @@ export class body
 		this.m = args.m
 		this.last_m = new Matrix2d(args.m) // to keep track of the last position
 		this.m_init = new Matrix2d(args.m)
+		this.momentum = new Vector2d()
+		this.angular_momentum = 0
 		this.shape_type = args.shape_type
 		this.color = args.color
 		this.stroke_color = args.stroke_color
@@ -221,6 +224,14 @@ export class body
 
 	save_last_m()
 	{
+		this.momentum = this.m.get_row(2).getSub(this.last_m.get_row(2))
+		let angular_momentum = this.m.getRotation() - this.last_m.getRotation()
+		//console.log(angular_momentum)
+		if( 3.14 < angular_momentum )
+			angular_momentum -= 2*3.14
+		if( angular_momentum < -3.14 )
+			angular_momentum += 2*3.14		
+		this.angular_momentum = Math.max(-0.1,Math.min( 0.1, angular_momentum))
 		this.last_m = new Matrix2d(this.m) // to keep track of the last position
 	}
 
@@ -241,6 +252,59 @@ export class body
 		this.update_event_effects()
 		
 		
+		//ADD DYN
+		let FRICTION_TRANSLATE = 0.01
+		let FRICTION_ROTATE = 0.01
+		let pNext = this.m.get_row(2).getAdd(this.momentum.getMult((1-FRICTION_TRANSLATE)))
+		let aNext = this.angular_momentum*(1-FRICTION_ROTATE)
+
+		// add axe constraint
+		let pCurrent = pNext
+
+		let vAxeCns = new Vector2d(1,1)
+		vAxeCns.normalize()
+		let pAxeCns = new Vector2d(0,0)
+
+		let _v = pCurrent.getSub(pAxeCns)
+
+		let _v_n = _v.getNormalized()
+		let vAxeCn_n = vAxeCns.getNormalized()
+		let dot = _v_n.dot(vAxeCn_n)
+
+		let pProj = vAxeCns.getMult(_v.mag()*dot).getAdd(pAxeCns)
+		
+		pCurrent = pProj
+		
+		// add axe limit
+		let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
+		let _dot = vAxeCenterToCurrent.dot(vAxeCns)
+
+		let LENGTH_MAX = 200
+		let LENGTH_MIN = 50
+		if( 0 < _dot )
+		{
+			let current_length = vAxeCenterToCurrent.mag()
+			
+			if( LENGTH_MAX < current_length )
+			{
+				let _v = vAxeCenterToCurrent.getNormalized().mult(LENGTH_MAX)
+				pCurrent = pAxeCns.getAdd(_v)
+			}
+		}
+		else
+		{
+			let current_length = vAxeCenterToCurrent.mag()
+			if( LENGTH_MIN < current_length )
+			{
+				let _v = vAxeCenterToCurrent.getNormalized().mult(LENGTH_MIN)
+				pCurrent = pAxeCns.getAdd(_v)
+			}				
+		}
+		this.m.setRow(2,pCurrent)
+		this.m.rotate(aNext)
+
+		this.save_last_m()
+			
 	}
 
 	draw()
