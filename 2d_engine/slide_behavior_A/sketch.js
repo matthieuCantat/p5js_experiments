@@ -33,6 +33,7 @@ function setup_objs()
 			  interaction :{attr:'tx',limit:[0,180]},
 			  shape_type:'rectangle' } ) 
 
+		
 		objs.push( obj )
 		p.add(p_offset)
 	}

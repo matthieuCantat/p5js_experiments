@@ -33,6 +33,7 @@ function setup_objs()
 			  interaction :interactions[i],
 			  shape_type:'rectangle' } ) 
 
+		obj.DYN = true
 		objs.push( obj )
 		p.add(p_offset)
 	}
