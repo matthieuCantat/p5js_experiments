@@ -267,7 +267,7 @@ export class body
 		let DO_AXE_CNS = false
 		let DO_AXE_CNS_LIMIT = false
 
-		let BORDER_COLLISION = false
+		let BORDER_COLLISION = true
 
 		if( this.DYN )
 		{
@@ -373,16 +373,16 @@ export class body
 			let vX = this.m.get_row(0)
 			let vY = this.m.get_row(1)
 			let min_radius = Math.min(vX.mag(),vY.mag())
+
 			
-			
-			// first resolve translation
-			for( let i = 0 ; i < 1 ;i++)
+			// first resolve center core
+			for( let i = 0 ; i < 4 ;i++)
 			{
 				let v = pCenter.getSub(this.BORDERS_CENTER_POINTS[i])
 				let vBorder = this.BORDERS_NORMALS[i].getNormal()
 				vBorder.normalize()
-				let dot = v.dot(vBorder)
-				let pProj = vBorder.mult(dot).getAdd(pCenter)
+				let dot_proj = v.dot(vBorder)
+				let pProj = vBorder.mult(dot_proj).getAdd(this.BORDERS_CENTER_POINTS[i])
 				let v_proj_to_center = pCenter.getSub(pProj)
 				
 				let side_dot = v_proj_to_center.dot(this.BORDERS_NORMALS[i])
@@ -405,9 +405,61 @@ export class body
 					pCenter.add(vPush)
 				}
 			}
-
 			this.m.setRow(2,pCenter)
-	
+
+			// solve
+		
+			/*
+
+			for( let i = 0 ; i < 4 ;i++)
+			{
+				pCenter = this.m.get_row(2)
+
+				vX = this.m.get_row(0)
+				vY = this.m.get_row(1)					
+				let points = [
+					pCenter.getAdd(vX.getMult(-1)).getAdd(vY),
+					pCenter.getAdd(vX).getAdd(vY),
+					pCenter.getAdd(vX).getAdd(vY.getMult(-1)),
+					pCenter.getAdd(vX.getMult(-1)).getAdd(vY.getMult(-1)),
+				]
+
+				for( let j = 0 ; j < 4 ;j++)
+				{
+
+
+					let v = points[j].getSub(this.BORDERS_CENTER_POINTS[i])
+					let vBorder = this.BORDERS_NORMALS[i].getNormal()
+					vBorder.normalize()
+					let dot_proj = v.dot(vBorder)
+					let pProj = vBorder.mult(dot_proj).getAdd(this.BORDERS_CENTER_POINTS[i])
+					let v_proj_to_center = pCenter.getSub(pProj).normalize()
+					let v_proj_to_point = points[j].getSub(pProj)
+
+					let side_dot = v_proj_to_point.dot(this.BORDERS_NORMALS[i])
+					let isOnScreenSide = 0 < side_dot
+					if ( isOnScreenSide == false )
+					{
+						let push_mag = v_proj_to_point.mag()
+						
+						let vPushToCenter_mag = v_proj_to_point.dot(v_proj_to_center)
+						let vPushToCenter = v_proj_to_center.getMult(vPushToCenter_mag)
+
+						let vPushRot = v_proj_to_point.getSub(vPushToCenter)
+						let _p = points[i].getAdd(vPushRot)
+						let vA = points[i].getSub(pCenter)
+						let vB = _p.getSub(pCenter)
+						let rot = vA.getRotation(vB)
+
+						this.m.setRow(2,this.m.get_row(2).add(vPushToCenter))
+						this.m.rotate(rot)
+						
+
+					}
+				}
+			}
+			this.m.setRow(2,pCenter)			
+			*/
 
 		}
 
