@@ -243,15 +243,17 @@ export class User_interaction_info
 
     handle_interaction_with_selected_obj()
     {
-		
-        let do_handle_interaction = ( ( this.something_is_selected )&&( this.isInteracting ))
-        if( do_handle_interaction == false) 
-            return false
+		if(this.something_is_selected == false)
+			return
 
 		let selected_obj = this.selection_info.obj
 		let selected_v_local = this.selection_info.vOffset
 		if( selected_obj == null )
 			return false
+
+        selected_obj.interaction_info = null
+        if( this.isInteracting == false) 
+            return false
 
 		let inter = selected_obj.interaction.attr
 		let pMouse = this.p

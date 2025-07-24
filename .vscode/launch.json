@@ -9,7 +9,7 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "file": "${workspaceFolder}/2d_engine/event_and_effects/index.html"
+            "file": "${workspaceFolder}/2d_engine/object_manipulation_A/index.html"
         },
         {
             "name": "Launch localhost",
