@@ -22,16 +22,59 @@ function setup_objs()
 	let scale = new Vector2d(60,20)
 
 
+	let dyn_settings_list = [
+		{
+		'enable':false,
+	  },
+	  {
+		'enable':true,
+	  },	  
+	  {
+		'enable':true,
+		'mass':1,
+		'friction_translate':0.001,
+		'friction_rotate':1.0,
+		'speed_limit_translate': 30,
+		'speed_limit_rotate':0.3,
+	  },	  
+	  {
+		'enable':true,
+		'mass':1,
+		'friction_translate':0.01,
+		'friction_rotate':1.0,
+		'speed_limit_translate': 30,
+		'speed_limit_rotate':0.3,
+	  },
+	  {
+		'enable':true,
+		'mass':1,
+		'friction_translate':0.1,
+		'friction_rotate':1.0,
+		'speed_limit_translate': 30,
+		'speed_limit_rotate':0.3,
+	  },	  	  
+	]
+
+
 	let objs = []
-	for( let i = 0; i < 12; i++)
+	for( let i = 0; i < dyn_settings_list.length; i++)
 	{
 		let color_index = Math.floor(Math.random() * COLORS.length);
 
 		let obj = new body( 
 			{ m : new Matrix2d(p, 0, scale), 
 			  color: COLORS[color_index], 
-			  interaction :{attr:'tx',limit:[0,180]},
-			  shape_type:'rectangle' } ) 
+			  shape_type:'rectangle',
+			  axe_cns_settings: {
+				m_driver: new Matrix2d(p,0),
+				v_axe: new Vector2d(1,0),
+				enable:true,
+				enable_limits:true,
+				limit_max:200,
+				limit_min:0,
+		  		},
+			  dyn_settings: dyn_settings_list[i],
+			} ) 
 
 		
 		objs.push( obj )

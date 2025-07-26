@@ -255,7 +255,7 @@ export class User_interaction_info
         if( this.isInteracting == false) 
             return false
 
-		let inter = selected_obj.interaction.attr
+		let inter = selected_obj.interaction_settings.attr
 		let pMouse = this.p
 
         let pCenter = selected_obj.m.get_row(2)
@@ -696,6 +696,7 @@ export class User_interaction_info
 				let m = this.selection_info.obj.m
 				let m_init = this.selection_info.obj.m_init
 				let v = this.selection_info.vOffset
+				let interaction_type =  this.selection_info.obj.interaction_settings.attr
 				let interaction = this.selection_info.obj.interaction
 				let pObjAttachInteraction = v.getMult(m)
 
@@ -703,7 +704,7 @@ export class User_interaction_info
 				let pObjCenterInit = m_init.get_row(2)
 				let vScale = m.getScale()
 
-				if(interaction.attr == 'r')
+				if(interaction_type == 'r')
 				{
 					draw_circle( pObjAttachInteraction,
 						10,
@@ -725,7 +726,7 @@ export class User_interaction_info
 							'red',
 							2,)			
 				}
-				else if(interaction.attr == 'tx')
+				else if(interaction_type == 'tx')
 				{
 			
 					draw_circle( pObjCenter,
@@ -771,7 +772,7 @@ export class User_interaction_info
 							'red',
 							2,)		
 				}			
-				else if(interaction.attr == 'ty')
+				else if(interaction_type == 'ty')
 				{
 			
 					draw_circle( pObjCenter,
@@ -812,7 +813,7 @@ export class User_interaction_info
 							'red',
 							2,)		
 				}
-				else if(interaction.attr == 'button_hold')
+				else if(interaction_type == 'button_hold')
 				{
 					let Shape = this.selection_info.obj.duplicate()
 					//Shape.color = null
@@ -826,7 +827,7 @@ export class User_interaction_info
 					Shape.draw()
 					
 				}					
-				else if(interaction.attr == 'button_first_press')
+				else if(interaction_type == 'button_first_press')
 				{
 				
 					let effect_inst = new body_effect(

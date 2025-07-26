@@ -12,7 +12,6 @@ import { draw_bg,
 import { body_effects } from '../utils/shared.js';
 import { body } from '../utils/body.js'
 
-
 function setup_objs()
 {
 
@@ -21,19 +20,36 @@ function setup_objs()
 	let p_offset = new Vector2d(0,-50)
 	let scale = new Vector2d(100,20)
 
-	let interactions = [{attr:'tr'}]
+
 	let objs = []
-	for( let i = 0; i < interactions.length; i++)
+	for( let i = 0; i < 1; i++)
 	{
 		let color_index = Math.floor(Math.random() * COLORS.length);
 
 		let obj = new body( 
 			{ m : new Matrix2d(p, 0, scale), 
 			  color: COLORS[color_index], 
-			  interaction :interactions[i],
-			  shape_type:'rectangle' } ) 
+			  shape_type:'rectangle',
 
-		obj.DYN = true
+			  dyn_settings:{
+				enable:true,
+				enable_gravity:true,
+				mass:0.3,
+			  },
+
+			  do_border_collision:true,
+
+			  axe_cns_settings:{
+					m_driver: new Matrix2d(p,-45),
+					enable:false,
+					enable_limits:true,
+					limit_max:300,
+					limit_min:0,
+			  },
+
+			} ) 
+
+		
 		objs.push( obj )
 		p.add(p_offset)
 	}
