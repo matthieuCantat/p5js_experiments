@@ -813,6 +813,28 @@ export class User_interaction_info
 							'red',
 							2,)		
 				}
+				else if(interaction_type == 'tr')
+				{
+					draw_circle( pObjAttachInteraction,
+						5,
+						'yellow',
+						'back',
+						5)
+	
+					draw_circle( pObjCenter,
+						5,
+						'yellow',
+						'back',
+						5)				
+						
+					daw_line([pObjAttachInteraction,pObjCenter],
+							'yellow',
+							2,)
+	
+					daw_line([pObjAttachInteraction,this.p],
+							'red',
+							2,)		
+				}				
 				else if(interaction_type == 'button_hold')
 				{
 					let Shape = this.selection_info.obj.duplicate()

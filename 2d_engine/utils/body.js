@@ -105,6 +105,7 @@ export class body
 			'enable':true,
 			'coef':1.0,
 			'rotate_resolution_priority':1.0,
+			'do_translation':true,
 			'attr':'tr',
 			'radius_threshold':0,
 		}
@@ -487,7 +488,8 @@ export class body
 	
 			
 			//add to matrix
-			this.m.setRow(2,this.m.get_row(2).getAdd(vMouseAttract))
+			if( this.interaction_settings.do_translation == true)
+				this.m.setRow(2,this.m.get_row(2).getAdd(vMouseAttract))
 			this.m.rotate(aMouseAttract)			
 		}
 		else if ( mode == 'split_force' )
