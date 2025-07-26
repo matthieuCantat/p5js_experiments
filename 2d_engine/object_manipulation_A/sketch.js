@@ -31,6 +31,13 @@ function setup_objs()
 			  color: COLORS[color_index], 
 			  shape_type:'rectangle',
 
+			  interaction_settings:{
+				'enable':true,
+				'coef':0.01,
+				'rotate_resolution_priority':1.0,
+				'radius_threshold':100,
+			},
+
 			  dyn_settings:{
 				enable:true,
 				enable_gravity:true,

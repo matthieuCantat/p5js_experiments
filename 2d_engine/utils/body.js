@@ -101,12 +101,15 @@ export class body
 		this.visibility = true
 		
 		// INTERACTION
-		this.interaction_settings = {
+		let interaction_settings_default = {
 			'enable':true,
 			'coef':1.0,
 			'rotate_resolution_priority':1.0,
 			'attr':'tr',
+			'radius_threshold':0,
 		}
+
+		this.interaction_settings = {...interaction_settings_default, ...in_options.interaction_settings}
 
 		// DYN
 		let dyn_settings_default = {
@@ -445,30 +448,53 @@ export class body
 		if(this.interaction_info == null )
 			return false
 
-		let pCenter = this.m.get_row(2)
-		let pAttach_world = this.interaction_info.vAttach.getMult( this.m )
-		let vAttach_world = pAttach_world.getSub(pCenter)
-		let _mCurrent = new Matrix2d(this.m)
-		
-		// solve angle
-		let vToMouse = this.interaction_info.pUser.getSub(pCenter)
-		vToMouse.normalize()
-		vAttach_world.normalize()
-		let aDelta = vAttach_world.getRotation(vToMouse,false)
-		_mCurrent.rotate(aDelta*this.interaction_settings.rotate_resolution_priority)
+		let mode = 'rotate_priority'
 
-		// solve translate
-		let pSelectionAttach_afterRotate = this.interaction_info.vAttach.getMult( _mCurrent )
-		let vDelta = this.interaction_info.pUser.getSub(pSelectionAttach_afterRotate)
-		
-		// get force
-		let aMouseAttract = aDelta*this.interaction_settings.rotate_resolution_priority*this.interaction_settings.coef
-		let vMouseAttract = vDelta.getMult(this.interaction_settings.coef)
+		if( mode = 'rotate_priority' )
+		{
+			let pCenter = this.m.get_row(2)
+			let pAttach = this.interaction_info.vAttach.getMult( this.m )
+			let pMouse = this.interaction_info.pUser
 
-		
-		//add to matrix
-		this.m.setRow(2,this.m.get_row(2).getAdd(vMouseAttract))
-		this.m.rotate(aMouseAttract)
+			// pATTACH
+			let vMouseToAttach = pAttach.getSub(pMouse)
+			let vMouseToAttach_mag = Math.min( vMouseToAttach.mag(),
+				this.interaction_settings.radius_threshold)
+			
+			vMouseToAttach.normalize()
+			vMouseToAttach.mult(vMouseToAttach_mag)
+			let pTarget = pMouse.getAdd(vMouseToAttach)
+			
+
+			let vAttach_world = pAttach.getSub(pCenter)
+			let _mCurrent = new Matrix2d(this.m)
+			
+			
+			// solve angle
+			let vCenterToMouse = pTarget.getSub(pCenter)
+			vCenterToMouse.normalize()
+			vAttach_world.normalize()
+			let aDelta = vAttach_world.getRotation(vCenterToMouse,false)
+			_mCurrent.rotate(aDelta*this.interaction_settings.rotate_resolution_priority)
+	
+			// solve translate
+			let pSelectionAttach_afterRotate = this.interaction_info.vAttach.getMult( _mCurrent )
+			let vDelta = pTarget.getSub(pSelectionAttach_afterRotate)
+			
+			// get force
+			let aMouseAttract = aDelta*this.interaction_settings.rotate_resolution_priority*this.interaction_settings.coef
+			let vMouseAttract = vDelta.getMult(this.interaction_settings.coef)
+	
+			
+			//add to matrix
+			this.m.setRow(2,this.m.get_row(2).getAdd(vMouseAttract))
+			this.m.rotate(aMouseAttract)			
+		}
+		else if ( mode == 'split_force' )
+		{
+	
+		}
+
 
 		return true
 	}
