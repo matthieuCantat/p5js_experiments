@@ -8,137 +8,188 @@ import { draw_bg,
 	draw_phone_dims,
 	COLORS,
 	canvas,
-	draw_background} from '../utils/draw.js'
+	draw_background,
+	draw_background_text
+} from '../utils/draw.js'
 import { body_effects } from '../utils/shared.js';
 import { body } from '../utils/body.js'
+
+
+
+let p_start = new Vector2d(-170,200)
+let p_offset = new Vector2d(0,-50)
+
+let settings_list = [
+	{
+		'title':'rigid short grab - no dyn',
+		'inter':{
+			'enable':true,
+			'coef':1.0,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':false,
+		},
+	},
+	{
+		'title':'rigid long grab - no dyn',
+		'inter':{
+			'enable':true,
+			'coef':1.0,
+			'rotate_resolution_priority':0.0,
+			'radius_threshold':100,
+		},
+		'dyn':{
+			'enable':false,
+		},
+	},		
+	{
+		'title':'elastic short grab - no dyn',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':false,
+		},
+	},
+	{
+		'title':'elastic long grab - no dyn',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+			'radius_threshold':100,
+		},
+		'dyn':{
+			'enable':false,
+		},
+	},		
+	{		
+		'title':'rigid short grab - dyn',
+		'inter':{
+			'enable':true,
+			'coef':1.0,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.0001,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,				
+		},
+	},
+	{
+		'title':'rigid long grab - dyn',
+		'inter':{
+			'enable':true,
+			'coef':1.0,
+			'rotate_resolution_priority':0.0,
+			'radius_threshold':100,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.0001,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+		},
+	},		
+	{
+		'title':'elastic short grab - dyn',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.0001,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+		},
+	},
+	{
+		'title':'elastic long grab - dyn',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+			'radius_threshold':100,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.0001,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+		},
+	},		
+	{
+		'title':'elastic short grab - dyn attract start',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.1,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+			'custom_forces':[
+				{
+					'p': p_start.getAdd(p_offset.getMult(8)),
+					'strength': -0.03,
+					'influence_radius':-1,
+				}
+			]
+			
+		},
+	},	
+	{
+		'title':'elastic short grab - dyn glue start',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.1,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+			'custom_forces':[
+				{
+					'p': p_start.getAdd(p_offset.getMult(8)),
+					'strength': -0.1,
+					'influence_radius':100,
+				}
+			]
+			
+		},
+	},								
+]
 
 
 function setup_objs()
 {
 
 	// SETUP OBJS
-	let p = new Vector2d(-170,200)
-	let p_offset = new Vector2d(0,-50)
+
+	let p = new Vector2d(p_start)
 	let scale = new Vector2d(60,20)
-
-
-	let settings_list = [
-		{
-			'title':'rigid short grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},
-		{
-			'title':'rigid long grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},		
-		{
-			'title':'elastic short grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},
-		{
-			'title':'elastic long grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},		
-		{		
-			'title':'rigid short grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,				
-			},
-		},
-		{
-			'title':'rigid long grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,
-			},
-		},		
-		{
-			'title':'elastic short grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,
-			},
-		},
-		{
-			'title':'elastic long grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,
-			},
-		},		
-						  	  
-	]
-
-
 	let objs = []
 	for( let i = 0; i < settings_list.length; i++)
 	{
@@ -193,6 +244,14 @@ function setup()
 	draw_bg('grey')
 	draw_grid()
 	draw_phone_dims()
+
+	
+	let p = p_start.getAdd(new Vector2d(70,0))
+	for( let i = 0; i < settings_list.length; i++)
+	{
+		draw_background_text(settings_list[i]['title'],p,'black',20)
+		p.add(p_offset)
+	}
 
 
 }

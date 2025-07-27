@@ -289,6 +289,16 @@ export function draw_phone_dims()
 }
 
 
+export function draw_background_text(txt,p,color,size)
+{
+	
+	bgCtx.fillStyle = color
+	bgCtx.font = size + "px arial";
+	bgCtx.fillText(txt, cX(p), cY(p));
+	
+	
+}
+
 export function daw_line(
 	points,
 	color,

@@ -121,6 +121,7 @@ export class body
 			'friction_rotate':0.01,
 			'speed_limit_translate': 30,
 			'speed_limit_rotate':0.3,
+			'custom_forces':[],
 		}
 		this.dyn_settings = { ...dyn_settings_default, ...in_options.dyn_settings };
 
@@ -312,6 +313,31 @@ export class body
 			if(this.dyn_settings.enable_gravity)
 			{
 				pNext.add(this.GRAVITY_VECTOR.getMult(this.dyn_settings.mass))
+			}
+
+			for(let i = 0; i < this.dyn_settings.custom_forces.length; i++)
+			{
+				let force_info = this.dyn_settings.custom_forces[i]
+				let v = pNext.getSub(force_info.p)
+				
+				if(0 < force_info.influence_radius)
+				{
+					
+					if(v.mag() < force_info.influence_radius)
+					{
+						
+						let vForce =  v.getMult(force_info.strength)
+						pNext.add(vForce)
+					}
+				}
+				else
+				{
+					let vForce = v.getMult(force_info.strength)
+					pNext.add(vForce)
+				}
+				
+				
+				
 			}
 
 			this.m.setRow(2,pNext)
@@ -532,6 +558,7 @@ export class body
 		if(this.axe_cns_settings.enable_limits)
 		{
 			pCurrent = this.m.get_row(2)
+
 			// add axe limit
 			let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
 			let _dot = vAxeCenterToCurrent.dot(vAxeCns)
@@ -543,14 +570,14 @@ export class body
 			let l_max = this.axe_cns_settings.limit_max
 			if((l_max!= null)&&( l_max < current_length ))
 			{
-				let _v = vAxeCenterToCurrent.getNormalized().mult(l_max)
+				let _v = vAxeCns.getMult(l_max)
 				pCurrent = pAxeCns.getAdd(_v)
 			}
 	
 			let l_min = this.axe_cns_settings.limit_min
 			if((l_min != null)&&( current_length < l_min ))
 			{
-				let _v = vAxeCenterToCurrent.getNormalized().mult(Math.abs(l_min))
+				let _v = vAxeCns.getMult(l_min)
 				pCurrent = pAxeCns.getAdd(_v)
 			}				
 		
