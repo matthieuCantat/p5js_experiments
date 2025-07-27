@@ -19,136 +19,20 @@ function setup_objs()
 	// SETUP OBJS
 	let p = new Vector2d(-170,200)
 	let p_offset = new Vector2d(0,-50)
-	let scale = new Vector2d(20,20)
+	let scale = new Vector2d(70,20)
 
-
-	let settings_list = [
-		{
-			'title':'rigid short grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},
-		{
-			'title':'rigid long grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},		
-		{
-			'title':'elastic short grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},
-		{
-			'title':'elastic long grab - no dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':false,
-			},
-		},		
-		{		
-			'title':'rigid short grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,				
-			},
-		},
-		{
-			'title':'rigid long grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':1.0,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,
-			},
-		},		
-		{
-			'title':'elastic short grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,
-			},
-		},
-		{
-			'title':'elastic long grab - dyn',
-			'inter':{
-				'enable':true,
-				'coef':0.05,
-				'rotate_resolution_priority':0.0,
-				'radius_threshold':100,
-			},
-			'dyn':{
-				'enable':true,
-				'mass':1,
-				'friction_translate':0.0001,
-				'friction_rotate':1.0,
-				'speed_limit_translate': 30,
-				'speed_limit_rotate':0.3,
-			},
-		},		
-						  	  
-	]
 
 	
 	let objs = []	
 
 	let obj_rotate = new body( 
 		{ m : new Matrix2d(new Vector2d(), 0, 150), 
-		  color: 'red', 
+		  color: 'blue', 
 		  shape_type:'circle_rot',
 
 		  interaction_settings: {
 			'enable':true,
-			'coef':1,
+			'coef':0.01,
 			'rotate_resolution_priority':1.0,
 			'radius_threshold':0,
 			'do_translation':false,
@@ -157,7 +41,7 @@ function setup_objs()
 			'enable':true,
 			'mass':1,
 			'friction_translate':0.0001,
-			'friction_rotate':0.01,
+			'friction_rotate':0.001,
 			'speed_limit_translate': 30,
 			'speed_limit_rotate':0.3,
 		  }
@@ -167,9 +51,9 @@ function setup_objs()
 	objs.push( obj_rotate )
 
 	let nbr = 10
-	let aIncr = 3.14*2/10
+	let aIncr = 3.14*2/nbr
 	let aCurrent = 0
-	for( let i = 0; i < settings_list.length; i++)
+	for( let i = 0; i < nbr; i++)
 	{
 		let color_index = Math.floor(Math.random() * COLORS.length);
 
@@ -183,7 +67,8 @@ function setup_objs()
 				enable:true,
 				enable_limits:true,
 				limit_max:300,
-				limit_min:0,
+				limit_min:100,
+				rotation_constraint_coef:1.0,
 			}
 
 		let obj = new body( 

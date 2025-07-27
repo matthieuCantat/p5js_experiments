@@ -67,7 +67,7 @@ function setup()
 			let obj = new body( 
 				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
 					color: getRandomColor(), 
-					interaction :{attr:'button_first_press'},
+					interaction_settings :{attr:'button_first_press'},
 					shape_type:shape_types[i],
 					effect_name:effect_names[i_effect] } ) 
 	

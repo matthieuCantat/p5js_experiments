@@ -7,7 +7,6 @@ import { draw_bg,
 	draw_grid,
 	draw_circle,
 	daw_line, 
-	body,
 	COLORS,
 	canvas,
 	draw_background,
@@ -52,7 +51,7 @@ function setup()
 			let obj = new body( 
 				{ m : new Matrix2d(pStartCol, 0, scales[j]), 
 					color: COLORS[color_index], 
-					interaction :{attr:'r'},
+					interaction_settings :{attr:'r'},
 					shape_type:shape_types[i] } ) 
 	
 			Objs.push( obj )
@@ -103,7 +102,7 @@ function update()
 		created_obj = new body( 
 			{ m : m, 
 			  color: get_randow_color(), 
-			  interaction:{attr:'r'},
+			  interaction_settings:{attr:'r'},
 			  shape_type:'rectangle' } )
 		Objs.push( created_obj )
 	}

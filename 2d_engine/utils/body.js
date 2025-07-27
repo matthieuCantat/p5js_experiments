@@ -132,6 +132,8 @@ export class body
 			'enable_limits':false,
 			'limit_min':null,
 			'limit_max':null,
+			'rotation_constraint_coef':0.0,
+			'rotation_constraint_axe':0,
 		}
 		this.axe_cns_settings = { ...axe_cns_settings_default, ...in_options.axe_cns_settings };
 	
@@ -503,6 +505,7 @@ export class body
 
 	update_matrix_axe_cns()
 	{
+		
 		let m_driver = this.axe_cns_settings.m_driver
 		let v_axe = this.axe_cns_settings.v_axe
 
@@ -533,29 +536,33 @@ export class body
 			let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
 			let _dot = vAxeCenterToCurrent.dot(vAxeCns)
 
-			if( 0 < _dot )
+			let current_length = vAxeCenterToCurrent.mag()
+			if( _dot < 0 )
+				current_length *= -1
+
+			let l_max = this.axe_cns_settings.limit_max
+			if((l_max!= null)&&( l_max < current_length ))
 			{
-				let current_length = vAxeCenterToCurrent.mag()
-				
-				let l_max = this.axe_cns_settings.limit_max
-				if((l_max!= null)&&( l_max < current_length ))
-				{
-					let _v = vAxeCenterToCurrent.getNormalized().mult(l_max)
-					pCurrent = pAxeCns.getAdd(_v)
-				}
+				let _v = vAxeCenterToCurrent.getNormalized().mult(l_max)
+				pCurrent = pAxeCns.getAdd(_v)
 			}
-			else
+	
+			let l_min = this.axe_cns_settings.limit_min
+			if((l_min != null)&&( current_length < l_min ))
 			{
-				let current_length = vAxeCenterToCurrent.mag()
-				let l_min = this.axe_cns_settings.limit_min
-				if((l_min != null)&&(l_min < current_length ))
-				{
-					let _v = vAxeCenterToCurrent.getNormalized().mult(l_min)
-					pCurrent = pAxeCns.getAdd(_v)
-				}				
-			}
+				let _v = vAxeCenterToCurrent.getNormalized().mult(Math.abs(l_min))
+				pCurrent = pAxeCns.getAdd(_v)
+			}				
+		
 			
 			this.m.setRow(2,pCurrent)
+		}
+
+		if( 0 < this.axe_cns_settings.rotation_constraint_coef )
+		{
+			let vX = this.m.get_row(this.axe_cns_settings.rotation_constraint_axe)
+			let aDelta = vX.getRotation(vAxeCns)
+			this.m.rotate(aDelta*this.axe_cns_settings.rotation_constraint_coef)
 		}
 			
 	}

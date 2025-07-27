@@ -21,9 +21,9 @@ function setup_objs()
 	let p = new Vector2d(0,200)
 	let p_offset = new Vector2d(0,-100)
 	let scale = new Vector2d(60,20)
-	let interactions = [
-		{attr:'tx',limit:[-100,100]},
-		{attr:'ty',limit:[-400,0]},		
+	let settings = [
+		{v_axe:new Vector2d(1,0),min:-150,max:150,rotation_constraint_axe:0},
+		{v_axe:new Vector2d(0,1),min:-400,max:0,rotation_constraint_axe:1},
 	]
 
 	let event_effect = {
@@ -40,16 +40,36 @@ function setup_objs()
 	}
 	
 	let objs = []
-	for( let i = 0; i < interactions.length; i++)
+	for( let i = 0; i < settings.length; i++)
 	{
 		let color_index = Math.floor(Math.random() * COLORS.length);
+		let m = new Matrix2d(p, 0, scale)
+		let obj = new body( { 
+			m : m, 
+			color: COLORS[color_index], 
+			shape_type:'rectangle',
 
-		let obj = new body( 
-			{ m : new Matrix2d(p, 0, scale), 
-			  color: COLORS[color_index], 
-			  interaction :interactions[i],
-			  shape_type:'rectangle',
-			  event_effects : structuredClone(event_effect) } ) 
+			interaction_settings: {
+				'enable':true,
+				'coef':1.,
+				'rotate_resolution_priority':0.0,
+				'radius_threshold':0,
+				'do_translation':true,
+			},
+
+			axe_cns_settings : {
+				m_driver: new Matrix2d(m),
+				v_axe: settings[i]['v_axe'],
+				enable:true,
+				enable_limits:true,
+				limit_max: settings[i]['max'],
+				limit_min: settings[i]['min'],
+				rotation_constraint_coef:1.0,
+				rotation_constraint_axe: settings[i]['rotation_constraint_axe'],
+			},
+
+			event_effects : structuredClone(event_effect) 
+			} ) 
 
 		objs.push( obj )
 		p.add(p_offset)
