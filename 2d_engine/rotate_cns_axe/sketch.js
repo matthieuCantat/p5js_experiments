@@ -69,6 +69,7 @@ function setup_objs()
 				limit_max:300,
 				limit_min:100,
 				rotation_constraint_coef:1.0,
+				dyn_bounce_coef:0.5,
 			}
 
 		let obj = new body( 

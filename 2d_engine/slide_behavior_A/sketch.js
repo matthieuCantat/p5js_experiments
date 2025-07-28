@@ -177,9 +177,64 @@ let settings_list = [
 					'influence_radius':100,
 				}
 			]
-			
+		},		
+	},	
+	{
+		'title':'elastic short grab - dyn repulse middle',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
 		},
-	},								
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.01,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+			'custom_forces':[
+				{
+					'p': p_start.getAdd(p_offset.getMult(9)).add(new Vector2d(170,0)),
+					'strength': 0.1,
+					'influence_radius':100,
+				}
+			]
+		},		
+	},	
+	{
+		'title':'elastic short grab - dyn multi attract',
+		'inter':{
+			'enable':true,
+			'coef':0.05,
+			'rotate_resolution_priority':0.0,
+		},
+		'dyn':{
+			'enable':true,
+			'mass':1,
+			'friction_translate':0.001,
+			'friction_rotate':1.0,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+			'custom_forces':[
+				{
+					'p': p_start.getAdd(p_offset.getMult(11)),
+					'strength': -0.1,
+					'influence_radius':50,
+				},
+				{
+					'p': p_start.getAdd(p_offset.getMult(11)).add(new Vector2d(100,0)),
+					'strength': -0.1,
+					'influence_radius':50,
+				},		
+				{
+					'p': p_start.getAdd(p_offset.getMult(11)).add(new Vector2d(200,0)),
+					'strength': -0.1,
+					'influence_radius':50,
+				},								
+			]
+		},		
+	},									
 ]
 
 
@@ -202,6 +257,7 @@ function setup_objs()
 				enable_limits:true,
 				limit_max:350,
 				limit_min:0,
+				dyn_bounce_coef:0.5,
 			}
 
 

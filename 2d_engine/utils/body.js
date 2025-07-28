@@ -135,6 +135,7 @@ export class body
 			'limit_max':null,
 			'rotation_constraint_coef':0.0,
 			'rotation_constraint_axe':0,
+			'dyn_bounce_coef':0,
 		}
 		this.axe_cns_settings = { ...axe_cns_settings_default, ...in_options.axe_cns_settings };
 	
@@ -348,8 +349,9 @@ export class body
 		if(this.interaction_settings.enable)
 			this.update_matrix_with_user_interaction()
 	
+		let axe_cns_info = { vCollisionLimit : null}
 		if(this.axe_cns_settings.enable)
-			this.update_matrix_axe_cns()
+			axe_cns_info = this.update_matrix_axe_cns()
 	
 
 		if( this.do_border_collision )
@@ -450,6 +452,15 @@ export class body
 
 		// FOR NEXT EVAL
 		let momentum = this.m.get_row(2).getSub(this.last_m.get_row(2))
+		if( ( 0 < this.axe_cns_settings.dyn_bounce_coef)&&(axe_cns_info.vCollisionLimit!=null))
+		{
+			let vCollisionAdjust = axe_cns_info.vCollisionLimit
+			let momentum_inv = momentum.getMult(-1)
+
+			let new_momentum = vCollisionAdjust.getAdd(momentum_inv)
+			momentum = new_momentum.getMult(this.axe_cns_settings.dyn_bounce_coef)
+		}
+
 		let momentum_mag = Math.max(-this.dyn_settings.speed_limit_translate,
 			Math.min( this.dyn_settings.speed_limit_translate, momentum.mag()))
 		momentum.normalize()
@@ -531,7 +542,10 @@ export class body
 
 	update_matrix_axe_cns()
 	{
-		
+		let out_info = {
+			'vCollisionLimit':null
+		}
+
 		let m_driver = this.axe_cns_settings.m_driver
 		let v_axe = this.axe_cns_settings.v_axe
 
@@ -571,16 +585,19 @@ export class body
 			if((l_max!= null)&&( l_max < current_length ))
 			{
 				let _v = vAxeCns.getMult(l_max)
-				pCurrent = pAxeCns.getAdd(_v)
+				let pLimit = pAxeCns.getAdd(_v)
+				out_info.vCollisionLimit = pLimit.getSub(pCurrent)
+				pCurrent = pLimit
 			}
 	
 			let l_min = this.axe_cns_settings.limit_min
 			if((l_min != null)&&( current_length < l_min ))
 			{
 				let _v = vAxeCns.getMult(l_min)
-				pCurrent = pAxeCns.getAdd(_v)
+				let pLimit = pAxeCns.getAdd(_v)
+				out_info.vCollisionLimit = pLimit.getSub(pCurrent)
+				pCurrent = pLimit
 			}				
-		
 			
 			this.m.setRow(2,pCurrent)
 		}
@@ -591,8 +608,12 @@ export class body
 			let aDelta = vX.getRotation(vAxeCns)
 			this.m.rotate(aDelta*this.axe_cns_settings.rotation_constraint_coef)
 		}
+
+		return out_info
 			
 	}
+
+
 
 	draw()
 	{
