@@ -45,7 +45,7 @@ function setup_objs()
 		  },
 		  dyn_settings: {
 			'enable':true,
-			'mass':1,
+			'mass':0,
 			'friction_translate':0.0001,
 			'friction_rotate':0.001,
 			'speed_limit_translate': 30,
@@ -60,7 +60,7 @@ function setup_objs()
 			enable_limits:true,
 			limit_max:600,
 			limit_min:-600,
-			//dyn_bounce_coef:0.05,
+			dyn_bounce_coef:0.05,
 		}		  
 
 		} ) 
@@ -75,14 +75,14 @@ function setup_objs()
 
 		  interaction_settings: {
 			'enable':true,
-			'coef':0.1,
+			'coef':0.2,
 			'rotate_resolution_priority':0.0,
 			'radius_threshold':0,
 			'do_translation':true,
 		  },
 		  dyn_settings: {
 			'enable':true,
-			'mass':1,
+			'mass':0,
 			'friction_translate':0.0001,
 			'friction_rotate':0.001,
 			'speed_limit_translate': 30,
@@ -97,7 +97,7 @@ function setup_objs()
 			enable_limits:true,
 			limit_max:300,
 			limit_min:-400,
-			//dyn_bounce_coef:0.05,
+			dyn_bounce_coef:0.5,
 		}			  
 
 		} ) 
@@ -113,13 +113,13 @@ function setup_objs()
 		  interaction_settings: {
 			'enable':true,
 			'coef':0.01,
-			'rotate_resolution_priority':0.0,
+			'rotate_resolution_priority':1.0,
 			'radius_threshold':0,
 			'do_translation':true,
 		  },
 		  dyn_settings: {
 			'enable':true,
-			'mass':1,
+			'mass':0,
 			'friction_translate':0.0001,
 			'friction_rotate':0.001,
 			'speed_limit_translate': 30,
@@ -129,7 +129,7 @@ function setup_objs()
 			m_driver: new Matrix2d(m_wheelA),
 			v_axe: new Vector2d(0,1),
 			rotation_constraint_axe:1,
-			rotation_constraint_coef:1.0,
+			rotation_constraint_coef:0.0,
 			enable:true,
 			enable_limits:true,
 			limit_max:300,
@@ -151,13 +151,13 @@ function setup_objs()
 		  interaction_settings: {
 			'enable':true,
 			'coef':0.01,
-			'rotate_resolution_priority':0.0,
+			'rotate_resolution_priority':1.0,
 			'radius_threshold':0,
 			'do_translation':true,
 		  },
 		  dyn_settings: {
 			'enable':true,
-			'mass':1,
+			'mass':0,
 			'friction_translate':0.0001,
 			'friction_rotate':0.001,
 			'speed_limit_translate': 30,
@@ -167,7 +167,7 @@ function setup_objs()
 			m_driver: new Matrix2d(m_wheelB),
 			v_axe: new Vector2d(0,1),
 			rotation_constraint_axe:1,
-			rotation_constraint_coef:1.0,
+			rotation_constraint_coef:0.0,
 			enable:true,
 			enable_limits:true,
 			limit_max:300,
@@ -180,11 +180,48 @@ function setup_objs()
 	objs.push( obj_wheelB )
 	
 
+	let m_gear_pedals = new Matrix2d(new Vector2d(-50,10), 0, 20)
+	let obj_gear_pedals= new body( 
+		{ m : m_gear_pedals, 
+		  color: 'red', 
+		  shape_type:'circle_rot',
+
+		  interaction_settings: {
+			'enable':true,
+			'coef':0.01,
+			'rotate_resolution_priority':1.0,
+			'radius_threshold':0,
+			'do_translation':true,
+		  },
+		  dyn_settings: {
+			'enable':true,
+			'mass':0,
+			'friction_translate':0.0001,
+			'friction_rotate':0.001,
+			'speed_limit_translate': 30,
+			'speed_limit_rotate':0.3,
+		  },
+		  axe_cns_settings :{
+			m_driver: new Matrix2d(m_gear_pedals),
+			v_axe: new Vector2d(0,1),
+			rotation_constraint_axe:1,
+			rotation_constraint_coef:0.0,
+			enable:true,
+			enable_limits:true,
+			limit_max:300,
+			limit_min:-400,
+			//dyn_bounce_coef:0.05,
+		}			  
+
+		} ) 
+
+	objs.push( obj_gear_pedals )
 	// SETUP CONSTRAINT
 	
 	let cns_data = [
-		{ objs:[ obj_bicycle, obj_wheelA], attrs:[ 'ty' , 'ty'], mult: 1    },
-		{ objs:[ obj_bicycle, obj_wheelB], attrs:[ 'ty' , 'ty'], mult: 1    },
+		{ objs:[ obj_bicycle, obj_wheelA, obj_wheelB,obj_gear_pedals], attrs:[ 'ty' , 'ty', 'ty','ty'], mult: 1    },
+		{ objs:[ obj_bicycle, obj_wheelA, obj_wheelB], attrs:[ 'ty' , 'r', 'r'], mult: -0.02    },
+		{ objs:[ obj_bicycle, obj_gear_pedals], attrs:[ 'ty', 'r'], mult: -0.01    },
 	]
 	Constraints.setup( cns_data )
 		

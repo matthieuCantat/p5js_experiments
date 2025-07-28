@@ -15,21 +15,17 @@ export class Constraints_info
         // store offset
         for( let cns of this.data )
         {
-            if(      cns.attrs[0] == 'r' )
+            cns.value_base = []
+            for( let i = 0 ; i < cns.objs.length; i++)
             {
-                let mOffset = cns.objs[1].m.getMult( cns.objs[0].m.getInverse())
-                cns.offset = mOffset.getRotation()
+                if(  cns.attrs[i] == 'r' )
+                    cns.value_base.push(cns.objs[i].m.getRotation())
+                else if( cns.attrs[i] == 'tx')
+                    cns.value_base.push(cns.objs[i].m.get_row(2).x)
+                else if( cns.attrs[i] == 'ty')
+                    cns.value_base.push(cns.objs[i].m.get_row(2).y)
             }
-            else if( cns.attrs[0] == 'tx')
-            {
-                let vOffset = cns.objs[1].m.get_row(2).getSub( cns.objs[0].m.get_row(2))
-                cns.offset = vOffset.x
-            }
-            else if( cns.attrs[0] == 'ty')
-            {
-                let vOffset = cns.objs[1].m.get_row(2).getSub( cns.objs[0].m.get_row(2))
-                cns.offset = vOffset.y                
-            }
+
         }
     }
 
@@ -39,42 +35,54 @@ export class Constraints_info
     {
         for( let cns of this.data )
         {
-            // SWITCH INTERACTION WITH SELECTION
+            // GET INDEX OF SELECTED OBJ
+            let iMaster = -1
             if( (this.User_interaction.something_is_selected )&&(this.User_interaction.isInteracting))
             {
-                if( cns.objs[1] == this.User_interaction.selection_info.obj)
+                for( let i = 0; i < cns.objs.length; i++)
                 {
-                    cns.objs = [ cns.objs[1], cns.objs[0]]
-                    cns.mult = 1/cns.mult
-                    cns.attrs = [ cns.attrs[1], cns.attrs[0]]
-                    cns.offset *= -1
+                    if( cns.objs[i] == this.User_interaction.selection_info.obj)
+                    {
+                        iMaster = i
+                        break
+                    }
+                }
+            }
+
+            if( iMaster == -1)
+                iMaster = 0
+
+            // GET DRIVER VALUE
+            let driver_value = 0
+            
+            if(      cns.attrs[iMaster] == 'r' )driver_value = cns.objs[iMaster].m.getRotation()
+            else if( cns.attrs[iMaster] == 'tx')driver_value = cns.objs[iMaster].m.get_row(2).x
+            else if( cns.attrs[iMaster] == 'ty')driver_value = cns.objs[iMaster].m.get_row(2).y
+            driver_value -= cns.value_base[iMaster]
+            driver_value *= cns.mult
+
+            // SET DRIVER VALUE
+            for( let i = 0; i < cns.objs.length; i++)
+            {
+                if( i == iMaster)
+                    continue
+
+                if( cns.attrs[i] == 'r')
+                    cns.objs[i].m.setRotation(cns.value_base[i]+driver_value)
+                else if( cns.attrs[i] == 'tx')
+                {
+                    let p = cns.objs[i].m.get_row(2)
+                    p.x = cns.value_base[i]+driver_value
+                    cns.objs[i].m.setRow(2,p)
+                }	
+                else if( cns.attrs[i] == 'ty')
+                {
+                    let p = cns.objs[i].m.get_row(2)
+                    p.y  = cns.value_base[i]+driver_value
+                    cns.objs[i].m.setRow(2,p)		
                 }	
             }
-    
-            // MOVE TRANSFORM
-            let value = 0
-            
-            if(      cns.attrs[0] == 'r' )value = cns.objs[0].m.getRotation()
-            else if( cns.attrs[0] == 'tx')value = cns.objs[0].m.get_row(2).x
-            else if( cns.attrs[0] == 'ty')value = cns.objs[0].m.get_row(2).y
-            value *= cns.mult
 
-            value+=cns.offset
-        
-            if( cns.attrs[1] == 'r')
-                cns.objs[1].m.setRotation(value)
-            else if( cns.attrs[1] == 'tx')
-            {
-                let p = cns.objs[1].m.get_row(2)
-                p.x = value
-                cns.objs[1].m.setRow(2,p)
-            }	
-            else if( cns.attrs[1] == 'ty')
-            {
-                let p = cns.objs[1].m.get_row(2)
-                p.y = value
-                cns.objs[1].m.setRow(2,p)		
-            }	
     
         }
     }
