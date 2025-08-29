@@ -83,7 +83,15 @@ export class body
 		}
 		const args = { ...defaultOptions, ...in_options };
 
-		this.m = args.m
+		this.m = null
+		if( args.m instanceof Matrix2d)
+			this.m = args.m
+		else
+			this.m = new Matrix2d(args.m) // if not a matrix, convert it to one
+		
+		
+
+
 		this.last_m = new Matrix2d(args.m) // to keep track of the last position
 		this.m_init = new Matrix2d(args.m)
 		this.momentum = new Vector2d()
@@ -126,6 +134,7 @@ export class body
 		this.dyn_settings = { ...dyn_settings_default, ...in_options.dyn_settings };
 
 		// AXE_CNS
+		/*
 		let axe_cns_settings_default = {
 			'enable':false,
 			'm_driver':new Matrix2d(),
@@ -138,7 +147,7 @@ export class body
 			'dyn_bounce_coef':0,
 		}
 		this.axe_cns_settings = { ...axe_cns_settings_default, ...in_options.axe_cns_settings };
-	
+		*/
 		
 		this.do_border_collision = args.do_border_collision
 
@@ -349,9 +358,11 @@ export class body
 		if(this.interaction_settings.enable)
 			this.update_matrix_with_user_interaction()
 	
+		/*
 		let axe_cns_info = { vCollisionLimit : null}
 		if(this.axe_cns_settings.enable)
 			axe_cns_info = this.update_matrix_axe_cns()
+		*/
 	
 
 		if( this.do_border_collision )
@@ -452,6 +463,7 @@ export class body
 
 		// FOR NEXT EVAL
 		let momentum = this.m.get_row(2).getSub(this.last_m.get_row(2))
+		/*
 		if( ( 0 < this.axe_cns_settings.dyn_bounce_coef)&&(axe_cns_info.vCollisionLimit!=null))
 		{
 			let vCollisionAdjust = axe_cns_info.vCollisionLimit
@@ -460,6 +472,7 @@ export class body
 			let new_momentum = vCollisionAdjust.getAdd(momentum_inv)
 			momentum = new_momentum.getMult(this.axe_cns_settings.dyn_bounce_coef)
 		}
+			*/
 
 		let momentum_mag = Math.max(-this.dyn_settings.speed_limit_translate,
 			Math.min( this.dyn_settings.speed_limit_translate, momentum.mag()))
@@ -539,15 +552,26 @@ export class body
 
 		return true
 	}
-
+/*
 	update_matrix_axe_cns()
 	{
 		let out_info = {
 			'vCollisionLimit':null
 		}
 
-		let m_driver = this.axe_cns_settings.m_driver
-		let v_axe = this.axe_cns_settings.v_axe
+		let m_driver = null
+		if( this.axe_cns_settings.m_driver instanceof Matrix2d)
+			m_driver = this.axe_cns_settings.m_driver
+		else
+			m_driver = new Matrix2d(this.axe_cns_settings.m_driver) // if not a matrix, convert it to one
+
+		let v_axe = null
+		if( this.axe_cns_settings.v_axe instanceof Vector2d)
+			v_axe = this.axe_cns_settings.v_axe
+		else
+			v_axe = new Vector2d(this.axe_cns_settings.v_axe) // if not a vector, convert it to one
+
+
 
 		let p_driver = m_driver.get_row(2)
 		let pAxeWorld = v_axe.getMult(m_driver)
@@ -612,7 +636,7 @@ export class body
 		return out_info
 			
 	}
-
+*/
 
 
 	draw()

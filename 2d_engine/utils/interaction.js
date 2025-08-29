@@ -62,7 +62,7 @@ export class User_interaction_info
 		// OBJ TO INTERACT
 		this.something_is_selected = false
 		this.selection_info = { obj : null , vOffset : null }
-        this.interaction_objs = []
+        this.interaction_objs = {}
 
 		this.events = {
 			'touchDown':{status:false,count:0}, 
@@ -200,27 +200,29 @@ export class User_interaction_info
 
 	get_selected_obj()
 	{
-        let objs = this.interaction_objs
+        let Objs = this.interaction_objs
 
 		if( this.isInteractingExtend)
 		{
 			if(( this.something_is_selected == false )&&(this.isPressed == true))
 			{
-						
-				for( let obj of objs )
+				let objs_names = []
+				for( let n in Objs )
 				{
-					obj.interaction_info = null
-					obj.isSelected = false
+					Objs[n].interaction_info = null
+					Objs[n].isSelected = false
+					objs_names.push(n)
 				}
 					
 					
-				for( let i = objs.length -1 ; 0 <= i; i-- )
+				for( let i = objs_names.length -1 ; 0 <= i; i-- )
 				{
-					if( objs[i].isPointInside( this.p ))
+					let n = objs_names[i]
+					if( Objs[n].isPointInside( this.p ))
 					{
-						objs[i].isSelected = true
+						Objs[n].isSelected = true
 						this.something_is_selected = true
-						this.add_selection_info(objs[i])
+						this.add_selection_info(Objs[n])
 						break
 					}
 				}
@@ -231,10 +233,10 @@ export class User_interaction_info
 			
 			this.something_is_selected = false
 			this.clear_selection_info()
-			for( let obj of objs )
+			for( let n in Objs )
 			{
-				obj.interaction_info = null
-				obj.isSelected = false	
+				Objs[n].interaction_info = null
+				Objs[n].isSelected = false	
 			}
 					
 		}		
@@ -591,20 +593,20 @@ export class User_interaction_info
 		
 	update_objs_events_info( Objs )
 	{
-		for( let obj of Objs )
+		for( let n in Objs )
 		{
-			if(this.selection_info.obj == obj)
+			if(this.selection_info.obj == Objs[n])
 			{
-				for(let event in obj.events)
-					obj.events[event].status = this.events[event].status
+				for(let event in Objs[n].events)
+					Objs[n].events[event].status = this.events[event].status
 			}
 			else
 			{
-				for(let event in obj.events)
-					obj.events[event].status = false
+				for(let event in Objs[n].events)
+					Objs[n].events[event].status = false
 			}
 
-			obj.events['idle'].status = this.events['idle'].status
+			Objs[n].events['idle'].status = this.events['idle'].status
 		}
 		return true
 	}

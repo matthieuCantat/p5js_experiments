@@ -1,20 +1,12 @@
-
-/*
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
-import { User_interaction_info } from '../utils/interaction.js'
-import { Constraints_info } from '../utils/constraint.js'
-import { draw_bg, 
-	draw_grid,
-	draw_phone_dims,
-	COLORS,
-	canvas,
-	draw_background,
-	draw_background_text
-} from '../utils/draw.js'
-import { body_effects } from '../utils/shared.js';
-import { body } from '../utils/body.js'
+import { COLORS } from '../utils/draw.js'
 
+
+export var scene_info = {
+    "objs":{},
+    "cns":[],
+}
 
 
 let p_start = new Vector2d(-170,200)
@@ -239,157 +231,34 @@ let settings_list = [
 ]
 
 
-function setup_objs()
+let p = new Vector2d(p_start)
+let scale = new Vector2d(60,20)
+for( let i = 0; i < settings_list.length; i++)
 {
+    let color_index = Math.floor(Math.random() * COLORS.length);
 
-	// SETUP OBJS
+    scene_info.objs["slide"+i] = {
+            m : new Matrix2d(p, 0, scale), 
+            color: COLORS[color_index], 
+            shape_type:'rectangle',
 
-	let p = new Vector2d(p_start)
-	let scale = new Vector2d(60,20)
-	let objs = []
-	for( let i = 0; i < settings_list.length; i++)
-	{
-		let color_index = Math.floor(Math.random() * COLORS.length);
+            interaction_settings: settings_list[i].inter,
+            dyn_settings: settings_list[i].dyn,
+        } 
 
-		let axe_cns_settings = {
-				m_driver: new Matrix2d(p,0),
-				v_axe: new Vector2d(1,0),
-				enable:true,
-				enable_limits:true,
-				limit_max:350,
-				limit_min:0,
-				dyn_bounce_coef:0.5,
-			}
+    scene_info.cns.push(
+        {
+            mode: 'axe',
+            driver_obj: new Matrix2d(p,0),
+            driven_obj: "slide"+i,
+            v_axe: new Vector2d(1,0),
+            enable:true,
+            enable_limits:true,
+            limit_max:350,
+            limit_min:0,
+            dyn_bounce_coef:0.5,
+        }
+    )
 
-
-		let obj = new body( 
-			{ m : new Matrix2d(p, 0, scale), 
-			  color: COLORS[color_index], 
-			  shape_type:'rectangle',
-
-			  interaction_settings: settings_list[i].inter,
-			  dyn_settings: settings_list[i].dyn,
-
-			  axe_cns_settings: axe_cns_settings
-			} ) 
-
-		
-		objs.push( obj )
-		p.add(p_offset)
-	}
-
-	return objs
+    p.add(p_offset)
 }
-
-
-
-
-///////////////////////////////////////////////////
-/////////////////////////////////////////////////// STRUCTURE
-///////////////////////////////////////////////////
-
-
-var Objs = setup_objs()
-var User_interaction = new User_interaction_info();
-var Constraints = new Constraints_info(User_interaction)
-
-function setup()
-{
-	// SETUP INTERACTION
-	User_interaction.set_interaction_objs(Objs)
-	// DRAW BG
-	draw_bg('grey')
-	draw_grid()
-	draw_phone_dims()
-
-	
-	let p = p_start.getAdd(new Vector2d(70,0))
-	for( let i = 0; i < settings_list.length; i++)
-	{
-		draw_background_text(settings_list[i]['title'],p,'black',20)
-		p.add(p_offset)
-	}
-
-
-}
-
-function update()
-{		
-	//	INTERACTION
-	User_interaction.update()
-	User_interaction.update_objs_events_info( Objs )
-
-	for( let elem of Objs )
-		elem.update()
-	
-	for( let elem of body_effects )
-		elem.update()
-	
-	Constraints.update()
-	
-}	
-
-function draw() {
-
-	draw_background()
-
-	for( let elem of body_effects )
-		elem.draw_background()
-	
-	for( let elem of Objs )
-		elem.draw()
-	
-	for( let elem of body_effects )
-		elem.draw_foreground()
-
-	User_interaction.draw()
-}
-
-function game_loop()
-{
-	update()
-	draw()
-	requestAnimationFrame(game_loop);
-}
-
-
-///////////////////////////////////////////////////
-/////////////////////////////////////////////////// EXEC
-///////////////////////////////////////////////////
-
-
-// Attach event listeners when the document is fully loaded
-window.onload = function() {
-	User_interaction.interactionEvent_addToListener(canvas)   
-}
-////////////////////////////////////////////////// mouse pressed
-
-setup();
-game_loop();	
-
-
-// Disable pull-to-refresh using JavaScript
-function disable_pull_to_refresh(event)
-{
-    event.preventDefault();
-    return true
-}
-canvas.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
-
-*/
-
-import { gameEngine } from '../utils/gameEngine.js';
-import { scene_info } from './scene_info.js';
-
-var GameEngine = new gameEngine();
-GameEngine.load_scene(scene_info);
-GameEngine.setup();
-
-window.onload = function() {GameEngine.setup_listeners();}
-
-function game_loop(){
-	GameEngine.game_tick();
-	requestAnimationFrame(game_loop);
-}
-
-game_loop()

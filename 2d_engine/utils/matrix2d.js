@@ -51,16 +51,36 @@ export default function Matrix2d(a,b,c,d,e,f) {
 	}
 	if (arguments.length === 1)
 	{
-		// init from matrix
-		let m = a
-		this.a = m.a
-		this.b = m.b
-		this.c = m.c
-		this.d = m.d
-		this.e = m.e
-		this.f = m.f
+		if (a instanceof Matrix2d)
+		{
+			// init from matrix
+			let m = a
+			this.a = m.a
+			this.b = m.b
+			this.c = m.c
+			this.d = m.d
+			this.e = m.e
+			this.f = m.f
+		}
+
+		if (a instanceof Array)
+		{
+			// Init from position rotation scale
+			let p = a
+			let r = a[2]
+			let s = c
+
+			this.e = a[0]
+			this.f = a[1]
+			this.setRotation(r)
+			if( a.length === 5 )
+				this.setScale( a[3], a[4])
+			else
+				this.setScale( a[3] )
+		}
 	}
-	else if (arguments.length === 2)
+
+	if (arguments.length === 2)
 	{
 		// Init from position rotation
 		let p = a

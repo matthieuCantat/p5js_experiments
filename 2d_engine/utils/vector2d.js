@@ -10,9 +10,17 @@ export default class Vector2d
         this.y = 0
         if (arguments.length === 1)
         {
-            let v = x
-            this.x = v.x
-            this.y = v.y
+            if (x instanceof Vector2d)
+            {
+                this.x = x.x
+                this.y = x.y
+            }
+            else if (x instanceof Array)
+            {
+                this.x = x[0]
+                this.y = x[1]
+            }
+          
         }
         else if (arguments.length === 2)
         {

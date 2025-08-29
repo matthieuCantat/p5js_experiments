@@ -1,4 +1,6 @@
 
+
+/*
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
 import { User_interaction_info } from '../utils/interaction.js'
@@ -65,13 +67,7 @@ function setup()
 	User_interaction.set_interaction_objs(Objs)
 
 	// SETUP CONSTRAINT
-	/*
-	let cns_data = [{ objs:[ Objs[0], Objs[1]], attrs:[ 'r' , 'r'], mult: 2    },
-					{ objs:[ Objs[0], Objs[2]], attrs:[ 'r' , 'r'], mult:-3    },
-					{ objs:[ Objs[3], Objs[4]], attrs:[ 'ty', 'r'], mult:-0.01 }	]
-	Constraints.setup( cns_data )
-	*/
-	
+
 
 	draw_bg('white')
 	draw_grid()
@@ -182,3 +178,21 @@ function disable_pull_to_refresh(event)
 canvas.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
 
 
+*/
+
+
+import { gameEngine } from '../utils/gameEngine.js';
+import { scene_info } from './scene_info.js';
+
+var GameEngine = new gameEngine();
+GameEngine.load_scene(scene_info);
+GameEngine.setup();
+
+window.onload = function() {GameEngine.setup_listeners();}
+
+function game_loop(){
+	GameEngine.game_tick();
+	requestAnimationFrame(game_loop);
+}
+
+game_loop()
