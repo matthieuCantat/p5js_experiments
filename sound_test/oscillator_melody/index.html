@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <button onclick="playMelody()">Play Melody</button>
+
+    <script>
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Note frequencies (Hz)
+      const notes = {
+        C4: 261.63,
+        D4: 293.66,
+        E4: 329.63,
+        F4: 349.23,
+        G4: 392.00,
+        A4: 440.00,
+        B4: 493.88,
+      };
+
+      // Melody: [note, duration in seconds]
+      const melody = [
+        ["E4", 0.5],
+        ["D4", 0.5],
+        ["C4", 0.5],
+        ["D4", 0.5],
+        ["E4", 0.5],
+        ["E4", 0.5],
+        ["E4", 1],
+        ["D4", 0.5],
+        ["D4", 0.5],
+        ["D4", 1],
+        ["E4", 0.5],
+        ["G4", 0.5],
+        ["G4", 1],
+      ]; // "Mary Had a Little Lamb" (simplified)
+
+      function playNote(freq, startTime, duration) {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.type = "sine"; // "sine", "square", "sawtooth", "triangle"
+        osc.frequency.value = freq;
+
+        gainNode.gain.setValueAtTime(0.1, startTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      }
+
+      function playMelody() {
+        let currentTime = audioCtx.currentTime;
+
+        for (const [note, duration] of melody) {
+          if (note !== "rest") {
+            playNote(notes[note], currentTime, duration);
+          }
+          currentTime += duration; // move forward in time
+        }
+      }
+    </script>
+  </body>
+</html>

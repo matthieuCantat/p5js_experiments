@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <button onclick="playSample()">Play Sample</button>
+
+    <script>
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      let sampleBuffer = null;
+
+      // Load an audio file (e.g., a .wav or .mp3 in the same folder)
+      async function loadSample(url) {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        sampleBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      }
+
+      function playSample() {
+        if (!sampleBuffer) {
+          console.log("Sample not loaded yet!");
+          return;
+        }
+
+        const source = audioCtx.createBufferSource();
+        source.buffer = sampleBuffer;
+        source.connect(audioCtx.destination);
+        source.start();
+      }
+
+      // Load sample at startup
+      loadSample("sfx_wii_bell_long_01.mp3");
+    </script>
+  </body>
+</html>

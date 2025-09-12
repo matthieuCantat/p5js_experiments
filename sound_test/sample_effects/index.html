@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+  <body>
+    <button onclick="playSample()">Play With Effects</button>
+
+    <script>
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      let sampleBuffer = null;
+
+      // Load an audio file
+      async function loadSample(url) {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        sampleBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      }
+
+      // Create effects rack
+      function createEffectsChain(source) {
+        // 1. Low-pass filter
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 1500;
+
+        // 2. Delay
+        const delay = audioCtx.createDelay();
+        delay.delayTime.value = 0.25; // 250 ms echo
+
+        // 3. Reverb (Convolver) – needs an impulse response
+        const convolver = audioCtx.createConvolver();
+
+        // Make a quick fake impulse response for demo
+        const impulse = audioCtx.createBuffer(2, audioCtx.sampleRate * 3, audioCtx.sampleRate);
+        for (let channel = 0; channel < impulse.numberOfChannels; channel++) {
+          let channelData = impulse.getChannelData(channel);
+          for (let i = 0; i < channelData.length; i++) {
+            channelData[i] = (Math.random() * 2 - 1) * (1 - i / channelData.length);
+          }
+        }
+        convolver.buffer = impulse;
+
+        // 4. Gain (volume control)
+        const gain = audioCtx.createGain();
+        gain.gain.value = 0.7;
+
+        // Connect: source → filter → delay → reverb → gain → speakers
+        source.connect(filter);
+        filter.connect(delay);
+        delay.connect(convolver);
+        convolver.connect(gain);
+        gain.connect(audioCtx.destination);
+      }
+
+      function playSample() {
+        if (!sampleBuffer) {
+          console.log("Sample not loaded yet!");
+          return;
+        }
+
+        const source = audioCtx.createBufferSource();
+        source.buffer = sampleBuffer;
+
+        // Build effects chain
+        createEffectsChain(source);
+
+        // Start playback
+        source.start();
+      }
+
+      // Load your sample (replace with a real .wav/.mp3)
+      loadSample("sfx_wii_bell_long_01.mp3");
+    </script>
+  </body>
+</html>
