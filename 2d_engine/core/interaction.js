@@ -1,6 +1,6 @@
-import { draw_circle, daw_line, cX_inv, cY_inv} from './draw.js'
-import Vector2d from './vector2d.js';
-import Matrix2d from './matrix2d.js';
+import { draw_circle, daw_line, cX_inv, cY_inv} from '../utils/draw.js'
+import Vector2d from '../utils/vector2d.js';
+import Matrix2d from '../utils/matrix2d.js';
 import { body_effects } from './shared.js';
 import { body_effect } from './effect.js';
 

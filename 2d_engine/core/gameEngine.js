@@ -1,16 +1,16 @@
 
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
-import { User_interaction_info } from '../utils/interaction.js'
-import { Constraints_info } from '../utils/constraint.js'
+import { User_interaction_info } from './interaction.js'
+import { Constraints_info } from './constraint.js'
 import { draw_bg, 
 	draw_grid,
 	draw_phone_dims,
 	COLORS,
 	canvas,
 	draw_background} from '../utils/draw.js'
-import { body_effects } from '../utils/shared.js';
-import { body } from '../utils/body.js'
+import { body_effects } from './shared.js';
+import { body } from './body.js'
 
 
 export class gameEngine {

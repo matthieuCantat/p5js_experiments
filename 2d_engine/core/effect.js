@@ -1,8 +1,8 @@
-import Vector2d from './vector2d.js';
-import Matrix2d from './matrix2d.js';
-import { COLORS_TO_RGB, getRandomColor, getRGB }from './draw.js'
-import { interpolateColors, smoothstep, easeOut } from './math.js';
-import { body } from '../utils/body.js'
+import Vector2d from '../utils/vector2d.js';
+import Matrix2d from '../utils/matrix2d.js';
+import { COLORS_TO_RGB, getRandomColor, getRGB }from '../utils/draw.js'
+import { interpolateColors, smoothstep, easeOut } from '../utils/math.js';
+import { body } from './body.js'
 
 export class body_effect
 {

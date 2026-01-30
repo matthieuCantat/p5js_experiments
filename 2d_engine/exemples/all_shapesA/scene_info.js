@@ -1,6 +1,6 @@
-import Vector2d from '../utils/vector2d.js';
-import Matrix2d from '../utils/matrix2d.js';
-import {COLORS} from '../utils/draw.js'
+import Vector2d from '../../utils/vector2d.js';
+import Matrix2d from '../../utils/matrix2d.js';
+import {COLORS} from '../../utils/draw.js'
 
 
 export var scene_info = {

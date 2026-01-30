@@ -1,4 +1,4 @@
-import { gameEngine } from '../utils/gameEngine.js';
+import { gameEngine } from '../../core/gameEngine.js';
 import { scene_info } from './scene_info.js';
 
 var GameEngine = new gameEngine();

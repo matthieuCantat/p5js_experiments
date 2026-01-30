@@ -13,11 +13,11 @@ draw_cross,
 isPointInside_rectangle,
 isPointInside_circle,
 isPointInside_triangle,
-} from './draw.js';
-import Matrix2d from './matrix2d.js';
+} from '../utils/draw.js';
+import Matrix2d from '../utils/matrix2d.js';
 import { body_effects } from './shared.js';
 import { body_effect } from './effect.js';
-import Vector2d from './vector2d.js';
+import Vector2d from '../utils/vector2d.js';
 
 
 

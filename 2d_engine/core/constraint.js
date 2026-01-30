@@ -1,6 +1,6 @@
-import Vector2d from './vector2d.js';
-import Matrix2d from './matrix2d.js';
-import { project_point_on_line, multiply_vector_with_matrix } from './math.js';
+import Vector2d from '../utils/vector2d.js';
+import Matrix2d from '../utils/matrix2d.js';
+import { project_point_on_line, multiply_vector_with_matrix } from '../utils/math.js';
 
 export class Constraints_info
 {
