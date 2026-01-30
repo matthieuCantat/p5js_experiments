@@ -84,3 +84,32 @@ export function easeOut2(edge0, edge1, x) {
   // Map back to original range
   return  (1 - t);
 }
+
+
+export function project_point_on_line( p, vLine, pLine )
+{
+  let vLine_normalized = vLine.getNormalized()
+
+  let v_p_to_pLine = p.getSub(pLine)
+  let l_p_to_pLine = v_p_to_pLine.mag()
+  let v_p_to_pLine_normalized = v_p_to_pLine.getNormalized()
+
+  let dot = v_p_to_pLine_normalized.dot(vLine_normalized)
+  let vLine_projected = vLine.getMult(l_p_to_pLine*dot)
+  let p_projected = vLine_projected.getAdd(pLine)
+
+  return p_projected
+}
+
+export function multiply_vector_with_matrix( v, m, normalize=false )
+{
+  let p_vectorTip = v.getMult(m)
+
+  let p_matrix = m.get_row(2)
+  let v_out = p_vectorTip.getSub(p_matrix)
+
+  if( normalize )
+      v_out.normalize()
+
+  return v_out
+}

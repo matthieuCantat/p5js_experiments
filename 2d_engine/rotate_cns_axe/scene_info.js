@@ -56,7 +56,7 @@ for( let i = 0; i < nbr; i++)
     var axe_cns = {
         "mode": "axe",
         "driver_obj": "rotate",
-        "driven_obj":'slide'+i,
+        "driven_objs":['slide'+i],
         "v_axe": p,
         "enable":true,
         "enable_limits":true,

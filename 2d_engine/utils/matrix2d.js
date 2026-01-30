@@ -1,5 +1,5 @@
 import Vector2d from './vector2d.js';
-
+var PI = Math.PI;
 
 /*!
  * Transformation Matrix2d JS v1.5 (c) Epistemex 2014
@@ -72,7 +72,7 @@ export default function Matrix2d(a,b,c,d,e,f) {
 
 			this.e = a[0]
 			this.f = a[1]
-			this.setRotation(r)
+			this.setRotationDeg(r)
 			if( a.length === 5 )
 				this.setScale( a[3], a[4])
 			else
@@ -88,7 +88,7 @@ export default function Matrix2d(a,b,c,d,e,f) {
 
 		this.e = p.x
 		this.f = p.y
-		this.setRotation(r)
+		this.setRotationDeg(r)
 	}	
 	else if (arguments.length === 3)
 	{
@@ -101,7 +101,7 @@ export default function Matrix2d(a,b,c,d,e,f) {
 
 			this.e = p.x
 			this.f = p.y
-			this.setRotation(r)
+			this.setRotationDeg(r)
 			if( typeof s === 'number' )
 				this.setScale( s, s)
 			else
@@ -278,16 +278,21 @@ Matrix2d.prototype = {
 		return this;
 	},
 	///////////////////////////////////////////////////////////////////////////////////////////new
-	setRotation: function(angle) {
-		var cos = Math.cos(angle),
-			sin = Math.sin(angle);
+	setRotation: function(angle, clockwise = true ) {
+		
+		let _angle = angle;
+		if( clockwise === true )
+			_angle = angle * -1;
+		
+		var cos = Math.cos(_angle),
+			sin = Math.sin(_angle);
 		
 		let scale = this.getScale()
 		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
 		this.setScale(scale)
 		return this;
 	},
-	getRotation: function( clockwise = false) {
+	getRotation: function( clockwise = true) {
 		let vX = new Vector2d(1,0)
 		return vX.getRotation( this.get_row(0), clockwise );
 	},	

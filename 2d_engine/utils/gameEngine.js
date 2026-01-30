@@ -14,23 +14,27 @@ import { body } from '../utils/body.js'
 
 
 export class gameEngine {
+    
     constructor() {
         this.Canvas = canvas;
         this.User_interaction = new User_interaction_info();
-        this.Constraints = new Constraints_info(this.User_interaction);
+        this.Constraints = new Constraints_info(this.User_interaction,this);
         this.Objs = {};
+        this.update_nbr = 0;
+        this.game_time = 0;
     }
 
     load_scene( scene_info )
     {
+        // LOAD OBJS
         this.Objs = {}
         for( let obj in scene_info.objs )
             this.Objs[obj] = new body( scene_info.objs[obj] )
         
+        // LOAD CONSTRAINTS
         let cns_args = []
         for( let cns_arg of scene_info.cns )
         {
-            
             // Convert to obj 
             if(cns_arg.mode === 'instance')
             {
@@ -43,8 +47,9 @@ export class gameEngine {
                     cns_arg.driver_obj = this.Objs[cns_arg.driver_obj]
                 }
                 
-                if( typeof cns_arg.driven_obj === 'string' )
-                    cns_arg.driven_obj = this.Objs[cns_arg.driven_obj]
+                for ( let i = 0 ; i < cns_arg.driven_objs.length; i++ )
+                    if( typeof cns_arg.driven_objs[i] === 'string' )
+                        cns_arg.driven_objs[i] = this.Objs[cns_arg.driven_objs[i]]
             }
             
             cns_args.push( cns_arg )
@@ -58,13 +63,15 @@ export class gameEngine {
         this.User_interaction.set_interaction_objs(this.Objs)
         // SETUP WEB PAGE BEHAVIOR
         this.Canvas.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
-                    
-          
+        // DRAW BG   
+        this.draw_init()
+    }
 
-        // DRAW BG
-        draw_bg('grey')
-        draw_grid()
-        draw_phone_dims()
+    draw_init()
+    {
+       draw_bg('grey')
+       draw_grid()
+       draw_phone_dims()
     }
 
     setup_listeners()
@@ -84,6 +91,8 @@ export class gameEngine {
             elem.update()
         
         this.Constraints.update()
+
+        this.update_nbr += 1
     }
 
     draw() {
@@ -103,11 +112,6 @@ export class gameEngine {
     }
 
 
-    game_tick()
-    {
-        this.update()
-        this.draw()
-    }
     
 }
 

@@ -9,7 +9,7 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "file": "${workspaceFolder}/2d_engine/cns_bicycle/index.html"
+            "file": "${workspaceFolder}/2d_engine/play_anim/index.html"
         },
         {
             "name": "Launch localhost",

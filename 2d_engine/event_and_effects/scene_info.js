@@ -62,7 +62,7 @@ export var scene_info = {
         {
             mode: 'axe',
             driver_obj: [0,200, 0 , 60,20],
-            driven_obj: 'A',
+            driven_objs: ['A'],
             v_axe: [1,0],
             enable:true,
             enable_limits:true,
@@ -74,7 +74,7 @@ export var scene_info = {
         {
             mode: 'axe',
             driver_obj: [0,100, 0 , 60,20],
-            driven_obj: 'B',
+            driven_objs: ['B'],
             v_axe: [0,1],
             enable:true,
             enable_limits:true,

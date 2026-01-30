@@ -1,6 +1,7 @@
 
 import { 
 draw_rectangle,
+draw_text,
 draw_circle_simple,
 draw_circle_from_matrix,
 draw_triangle,
@@ -37,6 +38,7 @@ export class body
 		star_ai    : draw_star_ai,
 		star_realistic    : draw_star_realistic,
 		cross : draw_cross,
+		text : draw_text,
 	}
 	isPointInsideFactory = {
 		rectangle   : isPointInside_rectangle,
@@ -48,6 +50,7 @@ export class body
 		star_ai    : isPointInside_circle,		
 		star_realistic    : isPointInside_circle,		
 		cross: isPointInside_rectangle,
+		text: isPointInside_rectangle,
 	}
 
 	BORDERS_CENTER_POINTS = [
@@ -78,8 +81,10 @@ export class body
             interaction: null,
 			effect_name: null,
 			event_effects: {},
+			event_cmds: {},
 			dyn_settings: {},
 			do_border_collision:false,
+			txt : '',
 		}
 		const args = { ...defaultOptions, ...in_options };
 
@@ -102,6 +107,7 @@ export class body
 		this.stroke_width = args.stroke_width	
 		this.isSelected = false
         this.interaction = args.interaction
+		this.txt = args.txt
 
 		this.stroke_color_highlight = "yellow"
         this.stroke_width_highlight = 5
@@ -110,12 +116,13 @@ export class body
 		
 		// INTERACTION
 		let interaction_settings_default = {
-			'enable':true,
+			'enable':false,
 			'coef':1.0,
 			'rotate_resolution_priority':1.0,
 			'do_translation':true,
 			'attr':'tr',
 			'radius_threshold':0,
+			'scale_selection_shape' : 1.0,
 		}
 
 		this.interaction_settings = {...interaction_settings_default, ...in_options.interaction_settings}
@@ -156,6 +163,7 @@ export class body
 		this.effect_name = args.effect_name
 
 		this.event_effects = args.event_effects
+		this.event_cmds = args.event_cmds
 		/*
 		this.events = {
 			'isPressed': { status: false, count:0, effect_insts: [] },
@@ -346,8 +354,6 @@ export class body
 					pNext.add(vForce)
 				}
 				
-				
-				
 			}
 
 			this.m.setRow(2,pNext)
@@ -493,7 +499,6 @@ export class body
 		
 		this.last_m = new Matrix2d(this.m) // to keep track of the last position
 	
-		
 	}
 
 	update_matrix_with_user_interaction()
@@ -542,7 +547,9 @@ export class body
 			//add to matrix
 			if( this.interaction_settings.do_translation == true)
 				this.m.setRow(2,this.m.get_row(2).getAdd(vMouseAttract))
-			this.m.rotate(aMouseAttract)			
+
+			this.m.rotate(aMouseAttract)	
+
 		}
 		else if ( mode == 'split_force' )
 		{
@@ -552,91 +559,7 @@ export class body
 
 		return true
 	}
-/*
-	update_matrix_axe_cns()
-	{
-		let out_info = {
-			'vCollisionLimit':null
-		}
 
-		let m_driver = null
-		if( this.axe_cns_settings.m_driver instanceof Matrix2d)
-			m_driver = this.axe_cns_settings.m_driver
-		else
-			m_driver = new Matrix2d(this.axe_cns_settings.m_driver) // if not a matrix, convert it to one
-
-		let v_axe = null
-		if( this.axe_cns_settings.v_axe instanceof Vector2d)
-			v_axe = this.axe_cns_settings.v_axe
-		else
-			v_axe = new Vector2d(this.axe_cns_settings.v_axe) // if not a vector, convert it to one
-
-
-
-		let p_driver = m_driver.get_row(2)
-		let pAxeWorld = v_axe.getMult(m_driver)
-		let vAxeWorld = pAxeWorld.getSub(p_driver)
-
-		let vAxeCns = vAxeWorld
-		vAxeCns.normalize()
-		let pAxeCns = p_driver			
-		// add axe constraint
-		let pCurrent = this.m.get_row(2)
-
-		let _v = pCurrent.getSub(pAxeCns)
-
-		let _v_n = _v.getNormalized()
-		let vAxeCn_n = vAxeCns.getNormalized()
-		let dot = _v_n.dot(vAxeCn_n)
-
-		let pProj = vAxeCns.getMult(_v.mag()*dot).getAdd(pAxeCns)
-		
-		this.m.setRow(2,pProj)
-
-		if(this.axe_cns_settings.enable_limits)
-		{
-			pCurrent = this.m.get_row(2)
-
-			// add axe limit
-			let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
-			let _dot = vAxeCenterToCurrent.dot(vAxeCns)
-
-			let current_length = vAxeCenterToCurrent.mag()
-			if( _dot < 0 )
-				current_length *= -1
-
-			let l_max = this.axe_cns_settings.limit_max
-			if((l_max!= null)&&( l_max < current_length ))
-			{
-				let _v = vAxeCns.getMult(l_max)
-				let pLimit = pAxeCns.getAdd(_v)
-				out_info.vCollisionLimit = pLimit.getSub(pCurrent)
-				pCurrent = pLimit
-			}
-	
-			let l_min = this.axe_cns_settings.limit_min
-			if((l_min != null)&&( current_length < l_min ))
-			{
-				let _v = vAxeCns.getMult(l_min)
-				let pLimit = pAxeCns.getAdd(_v)
-				out_info.vCollisionLimit = pLimit.getSub(pCurrent)
-				pCurrent = pLimit
-			}				
-			
-			this.m.setRow(2,pCurrent)
-		}
-
-		if( 0 < this.axe_cns_settings.rotation_constraint_coef )
-		{
-			let vX = this.m.get_row(this.axe_cns_settings.rotation_constraint_axe)
-			let aDelta = vX.getRotation(vAxeCns)
-			this.m.rotate(aDelta*this.axe_cns_settings.rotation_constraint_coef)
-		}
-
-		return out_info
-			
-	}
-*/
 
 
 	draw()
@@ -665,7 +588,7 @@ export class body
 		
 
 		const drawFunction = this.drawFactory[this.shape_type];
-		drawFunction(ctx,this.m);
+		drawFunction(ctx,this.m,this.txt);
        
 
 		if( this.color != null)
@@ -682,7 +605,11 @@ export class body
 
 	isPointInside(point)
 	{
-		return this.isPointInsideFactory[this.shape_type](point, this.m);
+		let mShape = new Matrix2d(this.m);
+		let s = this.interaction_settings.scale_selection_shape;
+		mShape = mShape.scale(s,s);
+		
+		return this.isPointInsideFactory[this.shape_type](point, mShape);
 	}
 
 }

@@ -250,7 +250,7 @@ for( let i = 0; i < settings_list.length; i++)
         {
             mode: 'axe',
             driver_obj: new Matrix2d(p,0),
-            driven_obj: "slide"+i,
+            driven_objs: ["slide"+i],
             v_axe: new Vector2d(1,0),
             enable:true,
             enable_limits:true,

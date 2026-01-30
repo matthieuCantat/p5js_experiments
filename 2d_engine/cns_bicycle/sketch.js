@@ -1,4 +1,3 @@
-
 import { gameEngine } from '../utils/gameEngine.js';
 import { scene_info } from './scene_info.js';
 
@@ -9,7 +8,9 @@ GameEngine.setup();
 window.onload = function() {GameEngine.setup_listeners();}
 
 function game_loop(){
-	GameEngine.game_tick();
+	
+	GameEngine.update();
+	GameEngine.draw();
 	requestAnimationFrame(game_loop);
 }
 

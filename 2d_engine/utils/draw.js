@@ -345,6 +345,20 @@ export function draw_rectangle(ctx, m)
 	
 }
 
+
+
+export function draw_text(ctx, m, txt)
+{
+	let p = m.get_row(2)
+	let orient = m.getRotation()
+	let scale = m.getScale()
+	
+
+	ctx.font =''+Math.ceil(scale.x)*7+'px serif';
+	ctx.fillText(txt, cX(p), cY(p));
+	
+}
+
 export function draw_circle_simple(ctx, m)
 {
 	draw_circle_from_matrix(ctx, m, false)

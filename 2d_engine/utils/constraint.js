@@ -1,12 +1,14 @@
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
+import { project_point_on_line, multiply_vector_with_matrix } from './math.js';
 
 export class Constraints_info
 {
-    constructor(User_interaction)
+    constructor(User_interaction, Game_engine)
     {
         this.data = []
         this.User_interaction = User_interaction
+        this.Game_engine = Game_engine
         /*
         let axe_cns_settings_default = {
 			'enable':false,
@@ -18,8 +20,11 @@ export class Constraints_info
 			'rotation_constraint_coef':0.0,
 			'rotation_constraint_axe':0,
 			'dyn_bounce_coef':0,
+            step_incr: null,
 		}
             */
+
+        
     }
 
     setup(data)
@@ -48,6 +53,7 @@ export class Constraints_info
 	// CONSTRAINT
 	update()
     {
+        
         for( let cns of this.data )
         {
             if( cns.mode === 'instance' )
@@ -58,7 +64,7 @@ export class Constraints_info
                 {
                     for( let i = 0; i < cns.objs.length; i++)
                     {
-                        if( cns.objs[i] == this.User_interaction.selection_info.obj)
+                        if( this.User_interaction.selection_info.obj == cns.objs[i])
                         {
                             iMaster = i
                             break
@@ -85,7 +91,9 @@ export class Constraints_info
                         continue
 
                     if( cns.attrs[i] == 'r')
-                        cns.objs[i].m.setRotation(cns.value_base[i]+driver_value)
+                    {
+                        cns.objs[i].m.setRotation(cns.value_base[i]+driver_value);
+                    }
                     else if( cns.attrs[i] == 'tx')
                     {
                         let p = cns.objs[i].m.get_row(2)
@@ -102,6 +110,7 @@ export class Constraints_info
 
             }
 
+
             if( cns.mode === 'axe' )
             {
 
@@ -117,41 +126,27 @@ export class Constraints_info
                 else
                     m_driver = new Matrix2d(cns.driver_obj) // if not a matrix, convert it to one
         
-                let v_axe = null
-                if( cns.v_axe instanceof Vector2d)
-                    v_axe = cns.v_axe
+                let v_axe_local = null
+                if( cns.v_axe instanceof Vector2d )
+                    v_axe_local = cns.v_axe
                 else
-                    v_axe = new Vector2d(cns.v_axe) // if not a vector, convert it to one
+                    v_axe_local = new Vector2d(cns.v_axe) // if not a vector, convert it to one
         
-        
-        
-                let p_driver = m_driver.get_row(2)
-                let pAxeWorld = v_axe.getMult(m_driver)
-                let vAxeWorld = pAxeWorld.getSub(p_driver)
-        
-                let vAxeCns = vAxeWorld
-                vAxeCns.normalize()
-                let pAxeCns = p_driver			
-                // add axe constraint
-                let pCurrent = cns.driven_obj.m.get_row(2)
-        
-                let _v = pCurrent.getSub(pAxeCns)
-        
-                let _v_n = _v.getNormalized()
-                let vAxeCn_n = vAxeCns.getNormalized()
-                let dot = _v_n.dot(vAxeCn_n)
-        
-                let pProj = vAxeCns.getMult(_v.mag()*dot).getAdd(pAxeCns)
+                let vAxe = multiply_vector_with_matrix( v_axe_local, m_driver, true )
+                let pAxe = m_driver.get_row(2)		
                 
-                cns.driven_obj.m.setRow(2,pProj)
-        
+                // add axe constraint
+                let pDriven = cns.driven_objs[0].m.get_row(2)
+                let pDriven_on_axe = project_point_on_line( pDriven, vAxe, pAxe )
+                
+                cns.driven_objs[0].m.setRow(2,pDriven_on_axe)
+
                 if(cns.enable_limits)
                 {
-                    pCurrent = cns.driven_obj.m.get_row(2)
-        
+                    
                     // add axe limit
-                    let vAxeCenterToCurrent = pCurrent.getSub(pAxeCns)
-                    let _dot = vAxeCenterToCurrent.dot(vAxeCns)
+                    let vAxeCenterToCurrent = pDriven_on_axe.getSub(pAxe)
+                    let _dot = vAxeCenterToCurrent.dot(vAxe)
         
                     let current_length = vAxeCenterToCurrent.mag()
                     if( _dot < 0 )
@@ -160,30 +155,91 @@ export class Constraints_info
                     let l_max = cns.limit_max
                     if((l_max!= null)&&( l_max < current_length ))
                     {
-                        let _v = vAxeCns.getMult(l_max)
-                        let pLimit = pAxeCns.getAdd(_v)
-                        out_info.vCollisionLimit = pLimit.getSub(pCurrent)
-                        pCurrent = pLimit
+                        let v_to_limit = vAxe.getMult(l_max)
+                        let pLimit = v_to_limit.getAdd(_v)
+
+                        out_info.vCollisionLimit = pLimit.getSub(pDriven_on_axe)
+                        pDriven_on_axe = pLimit
                     }
             
                     let l_min = cns.limit_min
                     if((l_min != null)&&( current_length < l_min ))
                     {
-                        let _v = vAxeCns.getMult(l_min)
-                        let pLimit = pAxeCns.getAdd(_v)
-                        out_info.vCollisionLimit = pLimit.getSub(pCurrent)
-                        pCurrent = pLimit
+                        let v_to_limit = vAxe.getMult(l_min)
+                        let pLimit = pAxe.getAdd(v_to_limit)
+
+                        out_info.vCollisionLimit = pLimit.getSub(pDriven_on_axe)
+                        pDriven_on_axe = pLimit
                     }				
                     
-                    cns.driven_obj.m.setRow(2,pCurrent)
+                    cns.driven_objs[0].m.setRow(2,pDriven_on_axe)    
                 }
-        
+
+                
+
+
                 if( 0 < cns.rotation_constraint_coef )
                 {
-                    let vX = cns.driven_obj.m.get_row(cns.rotation_constraint_axe)
-                    let aDelta = vX.getRotation(vAxeCns)
-                    cns.driven_obj.m.rotate(aDelta*cns.rotation_constraint_coef)
+                    let vX = cns.driven_objs[0].m.get_row(cns.rotation_constraint_axe)
+                    let aDelta = vX.getRotation(vAxe)
+                    cns.driven_objs[0].m.rotate(aDelta*cns.rotation_constraint_coef)
                 }
+
+                let user_is_modifying_driven = false;
+                if( (this.User_interaction.something_is_selected )&&(this.User_interaction.isInteracting))
+                    if( this.User_interaction.selection_info.obj == cns.driven_objs[0])
+                        user_is_modifying_driven = true;
+
+
+                
+                if( cns.hasOwnProperty('step_incr') )
+                {
+                    // CTRL
+                    let anim_speed = 0.05;
+
+
+                    // PREPARE
+
+                    let step_incr = cns.step_incr;
+                    let l_min = cns.limit_min
+                    let l_max = cns.limit_max
+                    let l_range = l_max - l_min ;
+
+                    let p_min = pAxe.getAdd(vAxe.getMult(l_min))
+
+                    //>>>>>> pCurrent
+                    let vAxeCenterToCurrent = pDriven.getSub(p_min)
+                    let l_current = vAxeCenterToCurrent.mag();
+                    
+                    
+                    // ADD SPEED 
+                    if( 1 <= Math.abs(anim_speed) )
+                        l_current += anim_speed*step_incr;
+                    else if( Math.abs(anim_speed) < 1 )
+                        if( this.Game_engine.update_nbr % (1/Math.abs(anim_speed)) == 0 )
+                            l_current += step_incr * Math.sign(anim_speed);
+                    
+                    // LOOP IT
+                    if ( l_current < 0 ) 
+                        l_current += l_range;
+                    l_current = l_current % l_range;
+
+                    // SNAP
+                    l_current = Math.floor(l_current/step_incr) * step_incr;
+
+                    // UDPATE
+                    if( user_is_modifying_driven == false)
+                        vAxeCenterToCurrent.x = l_current
+                        pDriven = vAxeCenterToCurrent.getAdd(p_min); // UPDATE
+                        //<<<<<< pCurrent
+
+
+                    cns.driven_objs[0].m.setRow(2,pDriven);
+
+                    this.Game_engine.game_time = l_current/step_incr;
+                    
+                }
+                
         
                 //return out_info
                     

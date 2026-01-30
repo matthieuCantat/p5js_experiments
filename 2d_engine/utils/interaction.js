@@ -62,7 +62,8 @@ export class User_interaction_info
 		// OBJ TO INTERACT
 		this.something_is_selected = false
 		this.selection_info = { obj : null , vOffset : null }
-        this.interaction_objs = {}
+        this.Objs = {}
+		this.interaction_objs_names = []
 
 		this.events = {
 			'touchDown':{status:false,count:0}, 
@@ -195,22 +196,29 @@ export class User_interaction_info
 
     set_interaction_objs(objs)
     {
-        this.interaction_objs = objs
+        this.Objs = objs
+
+		this.interaction_objs_names = []
+		for( let n in this.Objs )
+		{
+			if(this.Objs[n].interaction_settings.enable == true)
+				this.interaction_objs_names.push(n)
+		}
+
     }
 
 	get_selected_obj()
 	{
-        let Objs = this.interaction_objs
 
 		if( this.isInteractingExtend)
 		{
 			if(( this.something_is_selected == false )&&(this.isPressed == true))
 			{
 				let objs_names = []
-				for( let n in Objs )
+				for( let n of this.interaction_objs_names )
 				{
-					Objs[n].interaction_info = null
-					Objs[n].isSelected = false
+					this.Objs[n].interaction_info = null
+					this.Objs[n].isSelected = false
 					objs_names.push(n)
 				}
 					
@@ -218,11 +226,11 @@ export class User_interaction_info
 				for( let i = objs_names.length -1 ; 0 <= i; i-- )
 				{
 					let n = objs_names[i]
-					if( Objs[n].isPointInside( this.p ))
+					if( this.Objs[n].isPointInside( this.p ))
 					{
-						Objs[n].isSelected = true
+						this.Objs[n].isSelected = true
 						this.something_is_selected = true
-						this.add_selection_info(Objs[n])
+						this.add_selection_info(this.Objs[n])
 						break
 					}
 				}
@@ -233,10 +241,10 @@ export class User_interaction_info
 			
 			this.something_is_selected = false
 			this.clear_selection_info()
-			for( let n in Objs )
+			for( let n in this.Objs )
 			{
-				Objs[n].interaction_info = null
-				Objs[n].isSelected = false	
+				this.Objs[n].interaction_info = null
+				this.Objs[n].isSelected = false	
 			}
 					
 		}		
