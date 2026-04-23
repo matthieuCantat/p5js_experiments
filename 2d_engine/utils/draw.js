@@ -371,6 +371,7 @@ export function draw_circle_from_matrix(ctx, m, draw_mark=true)
 	let scale = m.getScale()
 	let radius = Math.max( scale.x,scale.y )
 
+	ctx.beginPath();
 	ctx.arc(  cX(p), 
 			cY(p), 
 			radius, 
@@ -410,6 +411,7 @@ export function draw_triangle(ctx, m)
 	//vY.normalize().mult(vBCenter.mag())
 	//let pA = p.getAdd(vY)
 
+	ctx.beginPath();
 	ctx.moveTo(cX(pA), cY(pA));            // Move to the first point (x1, y1)
 	ctx.lineTo(cX(pB), cY(pB));           // Draw line to second point (x2, y2)
 	ctx.lineTo(cX(pC), cY(pC));          // Draw line to third point (x3, y3)
@@ -439,6 +441,7 @@ export function draw_star(ctx,
 		local_vectors.push(v)
 	}
 
+	ctx.beginPath();
 	for( let i = 0; i < local_vectors.length; i++ )
 	{
 		let p = local_vectors[i].getMult(m)
@@ -482,6 +485,7 @@ export function draw_cross(ctx,
 		local_vectors.push((vY_rotated_min.getMult(0.5)).getAdd(vX_rotated_min.getMult(-0.5)))
 	}
 
+	ctx.beginPath();
 	for( let i = 0; i < local_vectors.length; i++ )
 	{
 		let p = local_vectors[i].getMult(m)
@@ -549,7 +553,7 @@ export function draw_trapezoid(ctx, m)
 	let pB = pC.getAdd(vDC)
 
 
-
+	ctx.beginPath();
 	ctx.moveTo(cX(pA), cY(pA));            // Move to the first point (x1, y1)
 	ctx.lineTo(cX(pB), cY(pB));           // Draw line to second point (x2, y2)
 	ctx.lineTo(cX(pC), cY(pC));          // Draw line to third point (x3, y3)

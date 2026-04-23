@@ -1,7 +1,8 @@
 
-import Vector2d from '../utils/vector2d.js';
-import Matrix2d from '../utils/matrix2d.js';
-import { User_interaction_info } from './interaction.js'
+
+
+import { Time } from './time.js'
+import { User } from './user.js'
 import { Constraints_info } from './constraint.js'
 import { draw_bg, 
 	draw_grid,
@@ -9,27 +10,37 @@ import { draw_bg,
 	COLORS,
 	canvas,
 	draw_background} from '../utils/draw.js'
-import { body_effects } from './shared.js';
 import { body } from './body.js'
+import { Logger } from './logger.js';
 
+
+
+const logger = new Logger("gameEngine");
 
 export class gameEngine {
     
     constructor() {
+        logger.info("constructor")
+        
         this.Canvas = canvas;
-        this.User_interaction = new User_interaction_info();
-        this.Constraints = new Constraints_info(this.User_interaction,this);
+
+        this.Time = new Time();
+        this.User = new User( this, this.Time );
+        this.Constraints = new Constraints_info( this.User, this, this.Time );
         this.Objs = {};
-        this.update_nbr = 0;
-        this.game_time = 0;
+        this.body_effects = [];
+        this.render_queue = [];
+
     }
 
     load_scene( scene_info )
     {
+        logger.info("load_scene")
+
         // LOAD OBJS
         this.Objs = {}
         for( let obj in scene_info.objs )
-            this.Objs[obj] = new body( scene_info.objs[obj] )
+            this.Objs[obj] = new body( { ...scene_info.objs[obj], Game_engine:this, Time: this.Time } )
         
         // LOAD CONSTRAINTS
         let cns_args = []
@@ -59,56 +70,55 @@ export class gameEngine {
     }
 
     setup() {
-        // SETUP INTERACTION
-        this.User_interaction.set_interaction_objs(this.Objs)
-        // SETUP WEB PAGE BEHAVIOR
-        this.Canvas.addEventListener('touchmove', disable_pull_to_refresh, { passive: false } );
+        logger.info("setup")
+
+        this.User.setup()
         // DRAW BG   
-        this.draw_init()
+        draw_bg('grey')
+        draw_grid()
+        draw_phone_dims()
     }
 
-    draw_init()
-    {
-       draw_bg('grey')
-       draw_grid()
-       draw_phone_dims()
-    }
-
-    setup_listeners()
-    {
-        this.User_interaction.interactionEvent_addToListener(this.Canvas)  
-    }
 
     update() {
+  
+        if( this.Time.one_update_debug_time_passed )
+            logger.info("update");   
+
         //	INTERACTION
-        this.User_interaction.update()
-        this.User_interaction.update_objs_events_info( this.Objs )
+        this.User.update()
+        this.User.objs_update_events_info( this.Objs )
 
         for( let elem in this.Objs )
             this.Objs[elem].update()
         
-        for( let elem of body_effects )
+        for( let elem of this.body_effects )
             elem.update()
         
         this.Constraints.update()
 
-        this.update_nbr += 1
+        this.Time.update()
     }
 
     draw() {
+        if( this.Time.one_update_debug_time_passed )
+            logger.info("draw");   
+
 
         draw_background()
 
-        for( let elem of body_effects )
+        this.render_queue = []
+
+        for( let elem of this.body_effects )
             elem.draw_background()
         
         for( let elem in this.Objs )
             this.Objs[elem].draw()
         
-        for( let elem of body_effects )
+        for( let elem of this.body_effects )
             elem.draw_foreground()
     
-        this.User_interaction.draw()        
+        this.User.draw()        
     }
 
 
@@ -116,10 +126,3 @@ export class gameEngine {
 }
 
 
-
-// Disable pull-to-refresh using JavaScript
-function disable_pull_to_refresh(event)
-{
-    event.preventDefault();
-    return true
-}

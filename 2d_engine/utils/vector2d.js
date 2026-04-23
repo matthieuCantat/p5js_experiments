@@ -48,6 +48,21 @@ export default class Vector2d
 		return this;
 	}
 
+    set_random_continuous(param, min_x, max_x, min_y, max_y)
+    {
+        //let sinA_0 = Math.sin(param*0.01)
+		let sinA_1 = Math.sin(param*0.01+1)
+		//let sinB_0 = Math.sin(param*0.02)
+		let sinB_1 = Math.sin(param*0.02+1)
+		let sinC_0 = Math.sin(param*0.03)
+		//let sinC_1 = Math.sin(param*0.03+1)
+		//let sinD_0 = Math.sin(param*0.04)
+		let sinD_1 = Math.sin(param*0.04+1)
+
+        this.x = min_x + sinA_1*sinB_1*( max_x - min_x )
+        this.y = min_y + sinC_0*sinD_1*( max_y - min_y )
+    }
+
     ///////////////////////////
     normalize()
     {

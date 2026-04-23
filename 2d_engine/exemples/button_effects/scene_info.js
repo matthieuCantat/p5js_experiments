@@ -23,21 +23,22 @@ let shape_types = [
     'circle' ]
 
 let effect_names = [ 
-    [{ type:'body_transform_bounce' }],
-    [{ type:'body_transform_shake'}],
-    [{ type:'body_transform_occilate'}],	
-    [{ type:'body_color_acid_rainbow' }],
-    [{ type:'body_color_explosion' }],		
-    [{ type:'particles_escape' }],
-    [{ type:'particles_effervescent' }],
-    [{ type:'particles_radial_strokes' }],
-    [{ type:'particles_shiny' }],
-    [{ type:'particles_new' }],
-    [{ type:'disco_ripple' }],
-    [{ type:'water_ripple' }],
-    [{ type:'glow'}],
-    [{ type:'rays'}],
+    'body_transform_bounce' ,
+    'body_transform_shake',
+    'body_transform_occilate',	
+    'body_color_acid_rainbow' ,
+    'body_color_explosion' ,		
+    'particles_escape' ,
+    'particles_effervescent' ,
+    'particles_radial_strokes' ,
+    'particles_shiny' ,
+    'particles_new' ,
+    'disco_ripple' ,
+    'water_ripple' ,
+    'glow',
+    'rays',
 ]
+
 
 for( let j = 0; j <3; j++)
 {
@@ -47,15 +48,35 @@ for( let j = 0; j <3; j++)
 
         let i_effect = (j*shape_types.length+i)% effect_names.length
 
-        scene_info['objs']['button_effect_'+j+'_'+i] ={
+        scene_info['objs']['button_effect_'+j+'_'+i] = {
             m : [pStartCol.x, pStartCol.y, 0, 40,40], 
-            color: getRandomColor(), 
-            interaction_settings :{attr:'button_first_press'},
-            shape_type:shape_types[i],
-            effect_name:effect_names[i_effect] 
+            color : getRandomColor(), 
+            interaction_settings : {attr:'button_first_press'},
+            shape_type : shape_types[i],
+            event_effects : {'touchDown': { effects:[{ type:effect_names[i_effect] }], isRepeatable:true},},          
         }
 
         pStartCol.add(p_offset_Y)
     }
     p.add(p_offset_X)
 }
+
+//event_effects : {'touchDown': { effects:[{ type:effect_names[i_effect] }], isRepeatable:true},},
+/*
+
+    event_effects : {
+        'touchDown': { effects:[{ type:'particles_radial_strokes' }], isRepeatable:true},
+        'hold'     : { effects:[{ type:'particles_effervescent', duration:'hold' } ], isRepeatable:false},
+        'drag'     : { effects:[{ type:'body_color_acid_rainbow', duration:'drag'}], isRepeatable:false},
+        'idle'     : { effects:[{ type:'particles_new', duration:'idle'}], isRepeatable:false},
+    }
+ 
+
+    effects : [
+        { event:'touchDown', isRepeatable:true , type:'particles_radial_strokes' },
+        { event:'hold'     , isRepeatable:false, type:'particles_effervescent'  , duration:'hold' },
+        { event:'drag'     , isRepeatable:false, type:'body_color_acid_rainbow' , duration:'drag'},
+        { event:'idle'     , isRepeatable:false, type:'particles_new'           , duration:'idle'},
+    ]
+
+*/

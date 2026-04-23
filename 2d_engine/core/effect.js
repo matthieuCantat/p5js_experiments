@@ -3,31 +3,22 @@ import Matrix2d from '../utils/matrix2d.js';
 import { COLORS_TO_RGB, getRandomColor, getRGB }from '../utils/draw.js'
 import { interpolateColors, smoothstep, easeOut } from '../utils/math.js';
 import { body } from './body.js'
+import { Logger } from './logger.js';
+
+
+
+const logger = new Logger("effect");
 
 export class body_effect
 {
 
-    effect_types = [
-        'disco_ripple',
-        'water_ripple',
-        'body_color_acid_rainbow',
-        'explode',
-        'shiny',
-        'reflective',
-        'shinning_stars',
-        'explulse_objects',
-        'collision_top',
-        'collision_bottom',
-        'collision_left',
-        'collision_right',
-        'explode'
-    ]
-
-	constructor( body , effect_bricks_info )
+	constructor( body , effect_bricks_info, Time )
 	{
+        logger.info("constructor")
 		this.body_ref = body
         this.effect_bricks_info = effect_bricks_info
-
+        this.Time = Time
+        
         //
 		this.update_count = 0
         this.duration = 0
@@ -46,14 +37,14 @@ export class body_effect
 
         // SETUP
         this.setup()
-
-
 	}
 
     setup()
     {
-        for( let effect_brick_info of this.effect_bricks_info )
-            this.setup_effects(effect_brick_info)
+        logger.info("setup")
+
+        for( let info of this.effect_bricks_info )
+            this.add_effect_brick( info )
     }
 
 	update()
@@ -132,8 +123,8 @@ export class body_effect
  
 
 
-    //__________________________________setup_effects
-    setup_effects(info)
+    
+    add_effect_brick(info)
     {
         const effectBrickFactory = {
             body_transform_bounce   : body_transform_bounce,
@@ -158,6 +149,11 @@ export class body_effect
     }
 
 }
+
+
+
+
+
 
 class effect_brick
 {

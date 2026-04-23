@@ -15,10 +15,11 @@ isPointInside_circle,
 isPointInside_triangle,
 } from '../utils/draw.js';
 import Matrix2d from '../utils/matrix2d.js';
-import { body_effects } from './shared.js';
 import { body_effect } from './effect.js';
 import Vector2d from '../utils/vector2d.js';
+import { Logger } from './logger.js';
 
+const logger = new Logger("body");
 
 
 
@@ -69,9 +70,11 @@ export class body
 	GRAVITY_VECTOR = new Vector2d(0,-0.981)
 
 	constructor(
-		in_options,
+		in_options
 	)
 	{
+		logger.info("constructor",in_options.name)
+
 		const defaultOptions = {
 			m: new Matrix2d(),
 			shape_type: "rectangle",
@@ -85,8 +88,13 @@ export class body
 			dyn_settings: {},
 			do_border_collision:false,
 			txt : '',
+			Game_engine: null,
+			Time: null,
 		}
 		const args = { ...defaultOptions, ...in_options };
+
+		this.Game_engine = args.Game_engine
+		this.Time = args.Time
 
 		this.m = null
 		if( args.m instanceof Matrix2d)
@@ -158,38 +166,29 @@ export class body
 		
 		this.do_border_collision = args.do_border_collision
 
-		//DYN
+		/////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////// EFFECTS
+		/////////////////////////////////////////////////////////
 
 		this.effect_name = args.effect_name
-
-		this.event_effects = args.event_effects
+		
 		this.event_cmds = args.event_cmds
-		/*
+	
 		this.events = {
-			'isPressed': { status: false, count:0, effect_insts: [] },
-			'isPressedHold': { status: false, count:0, effect_insts: [] },
-			'isReleased': { status: false, count:0, effect_insts: [] },
-			'touchmove': { status: false, count:0, effect_insts: [] },
-			'touchidle': { status: false, count:0, effect_insts: [] },
-			'idle': { status: false, count:0, effect_insts: [] },
-			'selectedidle': { status: false, count:0, effect_insts: [] },
-			'collision': { status: false, count:0, effect_insts: [] },			
-		}
-		*/
-		this.events = {
-			'touchDown': { name:'touchDown', status: false, count:0, effect_insts: [] },
-			'touchUp': { name:'touchUp', status: false, count:0, effect_insts: [] },
-			'tap': { name:'tap', status: false, count:0, effect_insts: [] },
-			'doubleTap': { name:'doubleTap', status: false, count:0, effect_insts: [] },
+			'touchDown':      { name:'touchDown'     , status: false, count:0, effect_insts: [] },
+			'touchUp':        { name:'touchUp'       , status: false, count:0, effect_insts: [] },
+			'tap':            { name:'tap'           , status: false, count:0, effect_insts: [] },
+			'doubleTap':      { name:'doubleTap'     , status: false, count:0, effect_insts: [] },
 			'fingerOnScreen': { name:'fingerOnScreen', status: false, count:0, effect_insts: [] },
-			'hold': { name:'hold', status: false, count:0, effect_insts: [] },
-			'drag': { name:'drag', status: false, count:0, effect_insts: [] },
-			'idle': { name:'idle', status: false, count:0, effect_insts: [] },
+			'hold':           { name:'hold'          , status: false, count:0, effect_insts: [] },
+			'drag':           { name:'drag'          , status: false, count:0, effect_insts: [] },
+			'idle':           { name:'idle'          , status: false, count:0, effect_insts: [] },
 		}
 		
 		this.interaction_info = null
 		
 		// update effect duration with event ref
+		this.event_effects = args.event_effects
 		for( let event in this.event_effects)
 		{
 			if(this.event_effects[event] == null)
@@ -206,25 +205,13 @@ export class body
 				{
 					let event_target_name = duration
 					//REPLACE
-					//console.log(this.event_effects[event].effects[i].duration)
-					//console.log(event,i,event_target_name)
-					this.event_effects[event].effects[i].duration = this.events[event_target_name]
-					//console.log('A',this.event_effects[event].effects[i].duration === this.events[event_target_name])
-					//console.log(this.event_effects[event].effects[i].duration)
-					//this.events[event_target_name].status = true
-					//console.log()
-				}
-
+					this.event_effects[event].effects[i].duration = this.events[event_target_name]	
+				}	
 			}
-			
 		}
-
-		//if(this.event_effects['hold'] != null)
-		//    console.log('B',this.event_effects['hold'].effects[0].duration === this.events['hold'])
-
-		
-		
 	}
+
+
 
 	update_event_effects()
 	{
@@ -275,10 +262,11 @@ export class body
 
 			let effect_inst = new body_effect(
 				this,
-				this.event_effects[key].effects)
+				this.event_effects[key].effects,
+				this.Time,)
 
 			this.events[key].effect_insts.push( effect_inst	)
-			body_effects.push(effect_inst)	
+			this.Game_engine.body_effects.push(effect_inst)	
 		
 		}					
 
@@ -290,7 +278,10 @@ export class body
 			{	m : new Matrix2d(this.m), 
 				shape_type: this.shape_type,
 				color: this.color, 
-				interaction:this.interaction})
+				interaction:this.interaction,
+				Game_engine:this.Game_engine,
+				Time:this.Time,}
+			)
 	}
 
 	isMoving()
@@ -303,14 +294,8 @@ export class body
 
 	update()
 	{
-		
-		//if(this.events['hold'].status)
-		//{
-		//	console.log('-----')
-		//	console.log(this.events['hold'])
-		//	console.log(this.event_effects['hold'].effects[0].duration)
-		//	console.log('C',this.event_effects['hold'].effects[0].duration === this.events['hold'])
-		//}
+        if( this.Time.one_update_debug_time_passed )
+            logger.info("update");
 
 		if( this.visibility == false )
 			return false
@@ -564,13 +549,43 @@ export class body
 
 	draw()
 	{
+        if( this.Time.one_update_debug_time_passed )
+            logger.info("draw");
+
 		if(this.visibility == false)
 			return false
 
-        ctx.save()
-		ctx.beginPath()
+        ctx.save()// save current drawing style
 
+		// STYLE
+		this.drawApplyStyle(ctx)
+
+		// DRAW SHAPE
+		const drawFunction = this.drawFactory[this.shape_type];
+		if (!drawFunction) {
+			console.warn("Unknown shape:", this.shape_type);
+			ctx.restore();
+			return false
+		}		
+		drawFunction( ctx, this.m, this.txt);
+       
+		// RENDER
+		if( this.color != null)
+			ctx.fill()
+
+		if( this.stroke_color != null)
+			ctx.stroke()
+
+		//ctx.resetTransform();	
+        ctx.restore();// restore drawing style
 		
+		return true
+	}
+
+
+	drawApplyStyle(ctx)
+	{
+
 
 		if( this.color != null)
 			ctx.fillStyle = this.color
@@ -585,22 +600,7 @@ export class body
             ctx.strokeStyle = this.stroke_color
             ctx.lineWidth = this.stroke_width
         }
-		
-
-		const drawFunction = this.drawFactory[this.shape_type];
-		drawFunction(ctx,this.m,this.txt);
-       
-
-		if( this.color != null)
-			ctx.fill()
-
-		if( this.stroke_color != null)
-			ctx.stroke()
-
-		ctx.resetTransform();	
-        ctx.restore()	
-		
-		return true
+				
 	}
 
 	isPointInside(point)
@@ -613,3 +613,31 @@ export class body
 	}
 
 }
+
+/*
+
+class Effect
+{
+	constructor( args )
+	{
+		for( let event in args)
+		{
+			
+			for(let i=0; i < args[event].effects.length; i++)
+			{
+				let effect_info = args[event].effects[i]
+				if( 'duration' in effect_info == false)
+					continue
+
+				let duration = effect_info.duration
+				if(typeof duration === 'string' )
+				{
+					let event_target_name = duration
+					//REPLACE
+					this[event].effects[i].duration = this.events[event_target_name]	
+				}	
+			}
+		}
+	}
+}
+*/

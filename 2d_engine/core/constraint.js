@@ -1,14 +1,20 @@
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
 import { project_point_on_line, multiply_vector_with_matrix } from '../utils/math.js';
+import { Logger } from './logger.js';
+
+const logger = new Logger("constraints Manager");
 
 export class Constraints_info
 {
-    constructor(User_interaction, Game_engine)
+    constructor(User, Game_engine, Time)
     {
+        logger.info("constructor")
+
         this.data = []
-        this.User_interaction = User_interaction
+        this.User = User
         this.Game_engine = Game_engine
+        this.Time = Time
         /*
         let axe_cns_settings_default = {
 			'enable':false,
@@ -29,6 +35,8 @@ export class Constraints_info
 
     setup(data)
     {
+        logger.info("setup")
+
         this.data = data   
         // store offset
         for( let cns of this.data )
@@ -53,6 +61,9 @@ export class Constraints_info
 	// CONSTRAINT
 	update()
     {
+        if( this.Time.one_update_debug_time_passed )
+            logger.info("update");  
+
         
         for( let cns of this.data )
         {
@@ -60,11 +71,11 @@ export class Constraints_info
             {
                 // GET INDEX OF SELECTED OBJ
                 let iMaster = -1
-                if( (this.User_interaction.something_is_selected )&&(this.User_interaction.isInteracting))
+                if( (this.User.Selection.active )&&(this.User.State.isInteracting))
                 {
                     for( let i = 0; i < cns.objs.length; i++)
                     {
-                        if( this.User_interaction.selection_info.obj == cns.objs[i])
+                        if( this.User.selection_info.obj == cns.objs[i])
                         {
                             iMaster = i
                             break
@@ -186,8 +197,8 @@ export class Constraints_info
                 }
 
                 let user_is_modifying_driven = false;
-                if( (this.User_interaction.something_is_selected )&&(this.User_interaction.isInteracting))
-                    if( this.User_interaction.selection_info.obj == cns.driven_objs[0])
+                if( (this.User.Selection.active )&&(this.User.isInteracting))
+                    if( this.User.Selection.obj == cns.driven_objs[0])
                         user_is_modifying_driven = true;
 
 
