@@ -21,7 +21,6 @@ let scales = [ new Vector2d(unit,unit), new Vector2d(unit/2,unit), new Vector2d(
 let shape_types = [ 
     'rectangle', 
     'circle', 
-    'circle_rot',
     'triangle' , 
     'cross',
     'trapezoid',

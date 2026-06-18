@@ -137,14 +137,22 @@ export class Constraints_info
                 else
                     m_driver = new Matrix2d(cns.driver_obj) // if not a matrix, convert it to one
         
+
+                let vOffsetPos_local = null
+                if( cns.v_axe instanceof Vector2d )
+                    vOffsetPos_local = cns.p_axe
+                else
+                    vOffsetPos_local = new Vector2d(cns.p_axe) // if not a vector, convert it to one
+
                 let v_axe_local = null
                 if( cns.v_axe instanceof Vector2d )
                     v_axe_local = cns.v_axe
                 else
                     v_axe_local = new Vector2d(cns.v_axe) // if not a vector, convert it to one
         
-                let vAxe = multiply_vector_with_matrix( v_axe_local, m_driver, true )
-                let pAxe = m_driver.get_row(2)		
+                let vAxe = v_axe_local.getMult( m_driver, true )
+                let vOffset = vOffsetPos_local.getMult( m_driver, true )
+                let pAxe = vOffset.getAdd( m_driver.get_row(2) )		
                 
                 // add axe constraint
                 let pDriven = cns.driven_objs[0].m.get_row(2)
@@ -167,7 +175,7 @@ export class Constraints_info
                     if((l_max!= null)&&( l_max < current_length ))
                     {
                         let v_to_limit = vAxe.getMult(l_max)
-                        let pLimit = v_to_limit.getAdd(_v)
+                        let pLimit = v_to_limit.getAdd(pAxe)
 
                         out_info.vCollisionLimit = pLimit.getSub(pDriven_on_axe)
                         pDriven_on_axe = pLimit

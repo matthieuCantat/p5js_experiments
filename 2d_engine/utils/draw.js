@@ -1,5 +1,6 @@
 
 
+import{ radian }from './math.js';
 import Vector2d from './vector2d.js';
 import Matrix2d from './matrix2d.js';
 
@@ -192,13 +193,6 @@ canvas.width = window.innerWidth - 20;
 canvas.height = window.innerHeight - 20;
 
 
-// Create an offscreen canvas
-export const backgroundCanvas = document.getElementById("backgroundCanvas");
-console.log('backgroundCanvas',backgroundCanvas)
-const bgCtx = backgroundCanvas.getContext("2d");
-backgroundCanvas.width = canvas.width;
-backgroundCanvas.height = canvas.height;
-
 export function cX(pos) { return canvas.width / 2 + pos.x ; }
 export function cY(pos) { return 0.4 * canvas.height - pos.y ; }
 export function cR(rotation){ return rotation*-1 ; }
@@ -225,68 +219,16 @@ export function getRGB(color)
     return rgb
 }
 
-export function draw_background()
-{
-    ctx.drawImage(backgroundCanvas, 0, 0);
-}
 
-export function draw_bg(
-	color,
+export function draw_uniform_background( 
+	ctx, 
+	{ }
 )
 {
-	bgCtx.fillStyle = color
-	bgCtx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-export function draw_grid()
-{
-	
-	let lineWidth = 2
-	
-	daw_line([{x:-1000,y:100},{x:1000,y:100}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:200},{x:1000,y:200}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:300},{x:1000,y:300}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:400},{x:1000,y:400}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:500},{x:1000,y:500}],'black',lineWidth/2, bgCtx)
-	
-	daw_line([{x:-1000,y:-100},{x:1000,y:-100}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:-200},{x:1000,y:-200}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:-300},{x:1000,y:-300}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:-400},{x:1000,y:-400}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:-500},{x:1000,y:-500}],'black',lineWidth/2, bgCtx)
-	
-	daw_line([{x:-1000,y:0},{x:1000,y:0}],'black',lineWidth, bgCtx)
-
-	daw_line([{x:500,y:-1000},{x:500,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:400,y:-1000},{x:400,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:300,y:-1000},{x:300,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:200,y:-1000},{x:200,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:100,y:-1000},{x:100,y:1000}],'black',lineWidth/2, bgCtx)
-	
-	daw_line([{x:-100,y:-1000},{x:-100,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-200,y:-1000},{x:-200,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-300,y:-1000},{x:-300,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-400,y:-1000},{x:-400,y:1000}],'black',lineWidth/2, bgCtx)
-	daw_line([{x:-500,y:-1000},{x:-500,y:1000}],'black',lineWidth/2, bgCtx)
-
-	daw_line([{x:0,y:-1000},{x:0,y:1000}],'black',lineWidth, bgCtx)
-
-
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 
-export function draw_phone_dims()
-{
-	
-	let lineWidth = 2
-	
-	daw_line([{x:-1000,y:-420},{x:1000,y:-420}],'red',lineWidth/2, bgCtx)
-	daw_line([{x:-1000,y:280},{x:1000,y:280}],'red',lineWidth/2, bgCtx)
-	
-	daw_line([{x:-180,y:-1000},{x:-180,y:1000}],'red',lineWidth/2, bgCtx)
-	daw_line([{x:170,y:-1000},{x:170,y:1000}],'red',lineWidth/2, bgCtx)
-	
-}
 
 
 export function draw_background_text(txt,p,color,size)
@@ -299,55 +241,60 @@ export function draw_background_text(txt,p,color,size)
 	
 }
 
-export function daw_line(
-	points,
-	color,
-	lineWidth,
-    c,
+export function draw_line( 
+	ctx, 
+	{ points = [] , stroke_color = 'red', lineWidth = 5 }
+
 )
 {
-    if( c == null )
-        c = ctx
-    c.save()
-	c.beginPath()
-    c.strokeStyle = color
-	c.fillStyle = color
-	c.lineWidth = lineWidth;
+	
+    //ctx.save()
+	ctx.beginPath()
+	//ctx.color = [1,0,0]
+    //ctx.strokeStyle = stroke_color
+	//ctx.fillStyle = color
+	//ctx.lineWidth = lineWidth;
 
 	if ( points.length == 0)
 		return 
 
-	c.moveTo( cX(points[0]), cY(points[0]) );
+	ctx.moveTo( cX(points[0]), cY(points[0]) );
 	for( let i = 1; i < points.length; i++)
-		c.lineTo( cX(points[i]), cY(points[i]) )
+		ctx.lineTo( cX(points[i]), cY(points[i]) )
 
-	c.stroke();
-    c.restore()
+	//ctx.stroke();
+    //ctx.restore()
     
 }
 
 
 
-export function draw_rectangle(ctx, m)
+export function draw_rectangle(ctx, { m = null, sub_draw = false } )
 {
+	
 	let p = m.get_row(2)
-	let orient = m.getRotation()
+	let orient = m.getRotationRad()
 	let scale = m.getScale()
 	
 	ctx.translate(cX(p), cY(p));
-	ctx.rotate(cR(orient));
+	ctx.rotate(orient);
 	
+	if( sub_draw == false )
+		ctx.beginPath();
 	ctx.rect(
 		-scale.x, 
 		-scale.y, 
 		scale.x*2, 
 		scale.y*2);
+
+	if( sub_draw == false )
+		ctx.closePath();
 	
 }
 
 
 
-export function draw_text(ctx, m, txt)
+export function draw_text(ctx, { m = null , txt = '' })
 {
 	let p = m.get_row(2)
 	let orient = m.getRotation()
@@ -359,41 +306,47 @@ export function draw_text(ctx, m, txt)
 	
 }
 
-export function draw_circle_simple(ctx, m)
+export function draw_circle_simple(ctx, { m = null } )
 {
-	draw_circle_from_matrix(ctx, m, false)
+	draw_circle_from_matrix(ctx, { m : m, draw_mark : false } )
 }
 
-export function draw_circle_from_matrix(ctx, m, draw_mark=true)
+export function draw_circle_from_matrix(ctx, { m = null, draw_mark=true })
 {
+	
 	let p = m.get_row(2)
-	let orient = m.getRotation()
+	let orient = m.getRotationDeg()
 	let scale = m.getScale()
+	
+	
 	let radius = Math.max( scale.x,scale.y )
 
 	ctx.beginPath();
-	ctx.arc(  cX(p), 
+	ctx.arc( cX(p), 
 			cY(p), 
 			radius, 
 			0.0, 
 			2.0 * Math.PI); 
 	ctx.closePath();
-
 	
 	if( draw_mark)
 	{
-		let vY =m.get_row(1)
+		let vY = m.get_row(1)
 		vY.normalize()
 		vY.mult(radius/2)
 		let p_mark = p.getAdd( vY )
 		let scale_mark = new Vector2d(1.0,radius/2)
-		let m_mark = new Matrix2d(p_mark,orient,scale_mark)
-		draw_rectangle(ctx, m_mark)
-	}		
+		
+		let m_mark = new Matrix2d( p_mark, orient, scale_mark)
+		
+		draw_rectangle(ctx, { m : m_mark, sub_draw : true } )
+	}	
+	
+	
 }
 
 
-export function draw_triangle(ctx, m)
+export function draw_triangle(ctx, { m = null } )
 {
 	let vA = new Vector2d(0,1)
 	let vB = vA.getRotated(3.14*2/3)
@@ -421,9 +374,9 @@ export function draw_triangle(ctx, m)
 
 
 export function draw_star(ctx, 
-	m, 
+	{ m = null,
 	nbr_branches=5, 
-	radius_hole_from_radius=0.4)
+	radius_hole_from_radius=0.4 })
 {
 
 	
@@ -457,8 +410,7 @@ export function draw_star(ctx,
 
 
 export function draw_cross(ctx, 
-	m, 
-	thickness=0.4)
+	{ m = null, thickness=0.4 },)
 {
 
 	let vX = new Vector2d(1,0)
@@ -526,39 +478,50 @@ export function draw_star_realistic(ctx,m)
 }
 
 
-export function draw_trapezoid(ctx, m)
-{
-	let ANGLE = 3.14/4
 
+
+export function draw_trapezoid(ctx, { m = null, sub_draw = false })
+{
+	let ANGLE = 45
+
+	let p = m.get_row(2)
 	let vX = m.get_row(0)
 	let vY = m.get_row(1)
-	let p = m.get_row(2)
-
-	let pC = p.getAdd(vY).getAdd(vX)
-	let pD = p.getAdd(vY).getAdd(vX.getMult(-1))
-
-	let vDC = pD.getSub(pC)
-	vDC.rotate(ANGLE)
-	let dist = Math.sin(ANGLE)*vY.mag()*2
-	vDC.normalize()
-	vDC.mult(dist)
-
 	
-	let vCD = pC.getSub(pD)
-	vCD.rotate(-ANGLE)
-	vCD.normalize()
-	vCD.mult(dist)
 
-	let pA = pD.getAdd(vCD)
-	let pB = pC.getAdd(vDC)
+	let pA = p.getAdd(vX.getMult(-1)).getAdd(vY)
+	let pB = p.getAdd(vX).getAdd(vY)
+	let pC = p.getAdd(vX).getAdd(vY.getMult(-1))
+	let pD = p.getAdd(vX.getMult(-1)).getAdd(vY.getMult(-1))
 
 
-	ctx.beginPath();
+	let dist_axeY = vY.mag()*2
+
+	let vAD = pD.getSub(pA)
+	vAD.rotate(ANGLE)
+	vAD.normalize()
+	let dist_AD = dist_axeY / Math.cos(radian(ANGLE))
+	vAD.mult(dist_AD)
+	let pD_trap = pA.getAdd(vAD)
+
+	let vBC = pC.getSub(pB)
+	vBC.rotate(-ANGLE)
+	vBC.normalize()
+	let dist_BC = dist_axeY / Math.cos(radian(-ANGLE))
+	vBC.mult(dist_BC)
+	let pC_trap = pB.getAdd(vBC)
+
+
+	if( sub_draw == false )
+		ctx.beginPath();
 	ctx.moveTo(cX(pA), cY(pA));            // Move to the first point (x1, y1)
 	ctx.lineTo(cX(pB), cY(pB));           // Draw line to second point (x2, y2)
-	ctx.lineTo(cX(pC), cY(pC));          // Draw line to third point (x3, y3)
-	ctx.lineTo(cX(pD), cY(pD)); 
-	ctx.closePath();               // Close the path (connects back to first point)
+	ctx.lineTo(cX(pC_trap), cY(pC_trap));          // Draw line to third point (x3, y3)
+	ctx.lineTo(cX(pD_trap), cY(pD_trap)); 
+	if( sub_draw == false )
+		ctx.closePath();
+
+	
 	
 }
 
@@ -606,7 +569,7 @@ export function isPointInside_trapezoid(point,m)
 
 	let vDC = pD.getSub(pC)
 	vDC.rotate(ANGLE)
-	let dist = Math.sin(ANGLE)*vY.mag()*2
+	let dist = Math.sin(radian(ANGLE))*vY.mag()*2
 	vDC.normalize()
 	vDC.mult(dist)
 

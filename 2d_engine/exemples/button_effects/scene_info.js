@@ -51,7 +51,7 @@ for( let j = 0; j <3; j++)
         scene_info['objs']['button_effect_'+j+'_'+i] = {
             m : [pStartCol.x, pStartCol.y, 0, 40,40], 
             color : getRandomColor(), 
-            interaction_settings : {attr:'button_first_press'},
+            interaction_settings : { enable:true, attr:'button_first_press'},
             shape_type : shape_types[i],
             event_effects : {'touchDown': { effects:[{ type:effect_names[i_effect] }], isRepeatable:true},},          
         }
@@ -60,6 +60,8 @@ for( let j = 0; j <3; j++)
     }
     p.add(p_offset_X)
 }
+
+
 
 //event_effects : {'touchDown': { effects:[{ type:effect_names[i_effect] }], isRepeatable:true},},
 /*

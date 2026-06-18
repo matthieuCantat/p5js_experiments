@@ -4,7 +4,7 @@
 
 export class Logger {
 
-    CURRENT_LEVEL = ["debug","info","warn","error"][1];
+    CURRENT_LEVEL = ["debug","info","warn","error"][2];
 
     constructor(scope = "MAIN") {
       this.levels = { debug: 0, info: 1, warn: 2, error: 3 };

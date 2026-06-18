@@ -43,6 +43,7 @@ export class body_effect
     {
         logger.info("setup")
 
+    
         for( let info of this.effect_bricks_info )
             this.add_effect_brick( info )
     }
@@ -65,12 +66,8 @@ export class body_effect
             return false
         }
         //this.body_ref.visibility = false
-        
-			
-        
+                
         this.update_effects()
-
-      
 
 		return true
 	}
@@ -707,7 +704,7 @@ class particles_escape extends effect_brick
             let angle = angle_incr*i + this.particles_settings[i].angle_offset
             let vDir = vUp.getRotated(angle)
             vDir.normalize()
-            let p = vDir.getMult(this.Effect.body_ref.m)
+            let p = vDir.getMult(this.Effect.body_ref.m, false )
             let v = p.getSub(this.Effect.init_position)
             v.normalize()
             this.dirVectors.push( v )

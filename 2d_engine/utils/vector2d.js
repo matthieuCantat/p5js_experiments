@@ -2,6 +2,24 @@
 class Matrix2d
 {};
 
+
+
+function rad(value)
+{
+  return value*Math.PI/180
+}
+function deg(value)
+{
+  return value/Math.PI*180
+}
+
+
+function round( value, decimals )
+{
+  let factor = Math.pow(10, decimals);
+  return Math.round(value * factor) / factor;
+}
+
 export default class Vector2d
 { 
     constructor(x,y)
@@ -29,6 +47,8 @@ export default class Vector2d
         }
     }
 
+
+    ______TRANSLATE = null
 	set(x,y) {
 
         this.x = 0
@@ -63,6 +83,120 @@ export default class Vector2d
         this.y = min_y + sinC_0*sinD_1*( max_y - min_y )
     }
 
+
+	///////////////////////////////////////////////////////////////////////////////////////////new
+    ______ROTATE = null
+
+    getRotationRad(vOther, clockwise = true)
+    {
+        //https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
+        let dot = this.x*vOther.x + this.y*vOther.y      // Dot product between [x1, y1] and [x2, y2]
+        let det = this.x*vOther.y - this.y*vOther.x      // Determinant
+        let angle = Math.atan2(det, dot)  // atan2(y, x) or atan2(sin, cos) 
+      
+        if(clockwise)
+        {
+            let v_ortho = this.getOrtho()
+            if(0 < v_ortho.dot(vOther) )
+                angle = 2*Math.PI+angle
+            angle = angle *-1
+        }
+        
+        return angle
+    }    	
+    getRotationDeg(vOther, clockwise = true)
+    {
+        return deg( this.getRotationRad(vOther, clockwise))
+    }
+		
+    getRotation(vOther, clockwise = true)
+    {
+        return this.getRotationDeg(vOther, clockwise)
+    }
+
+	setRotationRad(angle) {
+        let length = this.mag()
+		this.x = Math.cos(angle) * length
+		this.y =  Math.sin(angle) * length
+		return this;
+	}
+	setRotationDeg(angle) {
+		this.setRotationRad(rad(angle))
+		return this;
+	}
+	setRotation(angle) {
+		this.setRotationDeg(angle)
+		return this;
+	}
+
+    rotateRad(angle) {
+        //this.v.rotate(angle) 
+
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        
+        let x = this.x * cos - this.y * sin
+        let y = this.x * sin + this.y * cos
+
+        this.x = x
+        this.y = y
+
+		return this;
+	}
+
+    rotateDeg(angle) {
+        this.rotateRad(rad(angle))
+		return this;
+	}
+    
+    rotate(angle) {
+        this.rotateDeg(angle)
+		return this;
+	}
+
+
+
+    getRotatedRad( angle ) {
+        const v = new Vector2d(this);
+        v.rotateRad(angle);
+        return v
+    }    
+    getRotatedDeg( angle ) {
+        const v = new Vector2d(this);
+        v.rotateDeg(angle);
+        return v
+    }    
+    getRotated( angle ) {
+        return this.getRotatedDeg(angle)
+    }
+
+    ______SCALE = null
+
+	setScale(s) {
+		this.normalize()
+        this.mult(s)
+		return this;
+	}
+
+    
+    ______VALUE = null
+	///////////////////////////////////////////////////////////////////////////////////////////new end
+    //x(){return this.x}
+    //y(){ return this.y}
+    get_value(){return {x: this.x , y: this.y }}
+    dot(v)
+    {
+        return  this.x * v.x + this.y * v.y;
+    }
+    mag()
+    {
+        return Math.hypot(this.x, this.y)
+    }
+
+
+    ______VECTOR = null
+
+
     ///////////////////////////
     normalize()
     {
@@ -82,7 +216,7 @@ export default class Vector2d
     }    
 
     ///////////////////////////
-    mult(v) {
+    mult(v,isVector) {
         if( v instanceof Vector2d)
         {
             this.x = this.x *v.x
@@ -96,26 +230,38 @@ export default class Vector2d
         else
         {
             let m = v
-            // position
-            let p  = m.get_row(2)
+            
             let vX = m.get_row(0)
             let vY = m.get_row(1)
             vX.mult(this.x)
             vY.mult(this.y)
+
+            let p = new Vector2d()
             p.add( vX )
             p.add( vY )
+            /*
+            if(arguments.length == 1)
+                p.add( m.get_row(2) )
+            else{
+                if (isVector === false)
+                    p.add( m.get_row(2) )
+            }
+                */
+                
             this.x = p.x
             this.y = p.y
         }
         return this
     }
 
-	getMult(v)
+	getMult(v,isVector)
     {
         let new_v = new Vector2d(this)      
-        new_v.mult(v)
-        return new_v
+        new_v.mult(v,isVector)
+        
+        return new_v 
 	}
+
     ///////////////////////////
     add(x,y) {
 
@@ -172,75 +318,6 @@ export default class Vector2d
         return new Vector2d(this.y,this.x*-1)
     }
 
-	///////////////////////////////////////////////////////////////////////////////////////////new
-	getRotation(vOther, clockwise = true)
-    {
-        //https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
-        let dot = this.x*vOther.x + this.y*vOther.y      // Dot product between [x1, y1] and [x2, y2]
-        let det = this.x*vOther.y - this.y*vOther.x      // Determinant
-        let angle = Math.atan2(det, dot)  // atan2(y, x) or atan2(sin, cos) 
-      
-        if(clockwise)
-        {
-            let v_ortho = this.getOrtho()
-            if(0 < v_ortho.dot(vOther) )
-                angle = 2*Math.PI+angle
-            angle = angle *-1
-        }
-        
-
-        return angle
-    }
-    
-    rotate(angle) {
-        //this.v.rotate(angle) 
-
-        const cos = Math.cos(angle);
-        const sin = Math.sin(angle);
-        
-        let x = this.x * cos - this.y * sin
-        let y = this.x * sin + this.y * cos
-
-        this.x = x
-        this.y = y
-
-		return this;
-	}
-
-    getRotated( angle ) {
-        const v = new Vector2d(this);
-        v.rotate(angle);
-        return v
-    }
-
-	setRotation(angle) {
-        let length = this.mag()
-		this.x = Math.cos(angle) * length
-		this.y =  Math.sin(angle) * length
-		return this;
-	}
-	setRotationDeg(angle) {
-		this.setRotation(angle/180*Math.PI)
-		return this;
-	}	
-	setScale(s) {
-		this.normalize()
-        this.mult(s)
-		return this;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////new end
-    //x(){return this.x}
-    //y(){ return this.y}
-    get_value(){return {x: this.x , y: this.y }}
-    dot(v)
-    {
-        return  this.x * v.x + this.y * v.y;
-    }
-    mag()
-    {
-        return Math.hypot(this.x, this.y)
-    }
 	getNormal(other_side = false) {
         let v = new Vector2d()
         if(other_side)
@@ -256,16 +333,7 @@ export default class Vector2d
         return v
 	}
 
-    log(title=null){
-        if(title != null)
-        {
-            console.log( title, Math.round(this.x,2),Math.round(this.y,2))            
-        }
-        else{
-            console.log( Math.round(this.x,2),Math.round(this.y,2))
-        }
-
-    }
+    ______INFO = null
     
     is_equal_to(v)
     {
@@ -275,6 +343,18 @@ export default class Vector2d
         return false
     }
 	
+    ______DEBUG = null
+    log(title=null){
+        if(title != null)
+        {
+            console.log( title, round(this.x,2),'||',round(this.y,2))            
+        }
+        else{
+            console.log( round(this.x,2),'||',round(this.y,2))
+        }
+
+    }
+
     /*
 	draw(p5,p=null,c=[255,0,0]) {
         let _w = 5

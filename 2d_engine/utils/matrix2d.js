@@ -101,6 +101,7 @@ export default function Matrix2d(a,b,c,d,e,f) {
 
 			this.e = p.x
 			this.f = p.y
+			
 			this.setRotationDeg(r)
 			if( typeof s === 'number' )
 				this.setScale( s, s)
@@ -134,48 +135,103 @@ export default function Matrix2d(a,b,c,d,e,f) {
 
 Matrix2d.prototype = {
 
+	
+
+	______TRANSLATE: null,
+
+
+	setTranslation: function(x,y) {
+		if (arguments.length === 1)
+		{
+			let p = x
+			this.setTransform(this.a, this.b, this.c, this.d, p.x, p.y);
+		}
+		else
+		{
+			this.setTransform(this.a, this.b, this.c, this.d, x, y);
+		}
+
+		return this;
+	},
+
+	
 	/**
-	 * Flips the horizontal values.
+	 * Translate current matrix accumulative.
+	 * @param {number} tx - translation for x
+	 * @param {number} ty - translation for y
 	 */
-	flipX: function() {
-		this.transform(-1, 0, 0, 1, 0, 0);
+	translate: function(tx, ty) {
+		this.transform(1, 0, 0, 1, tx, ty);
 		return this;
 	},
 
 	/**
-	 * Flips the vertical values.
+	 * Translate current matrix on x axis accumulative.
+	 * @param {number} tx - translation for x
 	 */
-	flipY: function() {
-		this.transform(1, 0, 0, -1, 0, 0);
+	translateX: function(tx) {
+		this.transform(1, 0, 0, 1, tx, 0);
 		return this;
 	},
 
 	/**
-	 * Short-hand to reset current matrix to an identity matrix.
+	 * Translate current matrix on y axis accumulative.
+	 * @param {number} ty - translation for y
 	 */
-	reset: function() {
-		this.a = this.d = 1;
-		this.b = this.c = this.e = this.f = 0;
-		this._setCtx();
+	translateY: function(ty) {
+		this.transform(1, 0, 0, 1, 0, ty);
 		return this;
 	},
+
+	///////////////////////////////////////////////////////////////////////////////////////////new
+	______ROTATE : null,
+
+	getRotationRad: function( clockwise = true) {
+		let vX = new Vector2d(1,0)		
+		return vX.getRotationRad( this.get_row(0), clockwise );
+	},			
+	getRotationDeg: function( clockwise = true) {
+		let vX = new Vector2d(1,0)
+		return vX.getRotationDeg( this.get_row(0), clockwise );
+	},		
+	getRotation: function( clockwise = true) {
+		return this.getRotationDeg( clockwise );
+	},	
+
+	setRotationRad: function(angle, clockwise = true ) {
+		
+		let _angle = angle;
+		if( clockwise === true )
+			_angle = angle * -1;
+		
+		var cos = Math.cos(_angle),
+			sin = Math.sin(_angle);
+		
+		
+		let scale = this.getScale()
+		//console.log(cos, '||', sin, '||', -sin, '||', cos)
+		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
+		this.setScale(scale)
+
+		return this;
+	},		
+	setRotationDeg: function(angle) {
+		this.setRotationRad(rad( angle ))
+		return this;
+	},	
+	setRotation: function(angle) {
+		this.setRotationDeg(angle)
+		return this;
+	},		
 
 	/**
 	 * Rotates current matrix accumulative by angle.
 	 * @param {number} angle - angle in radians
 	 */
-	rotate: function(angle) {
+	rotateRad: function(angle) {
 
-		var current_angle = this.getRotation()
-		this.setRotation(current_angle+angle)
-		/*
-		var cos = Math.cos(rad(current_angle)),
-			sin = Math.sin(rad(current_angle));
-		
-		let scale = this.getScale()
-		this.transform(cos, sin, -sin, cos, 0, 0);
-		//this.setScale(scale[0],scale[1])
-		*/
+		var current_angle = this.getRotationRad()
+		this.setRotationRad(current_angle+angle)
 		return this;
 	},
 
@@ -184,10 +240,62 @@ Matrix2d.prototype = {
 	 * @param {number} angle - angle in degrees
 	 */
 	rotateDeg: function(angle) {
-		this.rotate(angle * 0.017453292519943295);
+		this.rotateRad( rad( angle ));
 		return this;
 	},
 
+	/**
+	 * Rotates current matrix accumulative by angle.
+	 * @param {number} angle - angle in radians
+	 */
+	rotate: function(angle) {
+		this.rotateDeg(angle)
+		return this;
+	},	
+	
+	______SCALE: null,
+
+	getScale: function() {
+		return new Vector2d( this.get_row(0).mag(), this.get_row(1).mag() )
+	},
+
+	setScale: function(x,y) {
+
+		let vX = this.get_row(0)
+		let vY = this.get_row(1)
+		vX.normalize()
+		vY.normalize()
+
+		if (arguments.length === 1)
+		{
+			if (typeof x === 'number')
+			{
+				let scale = x
+				vX.mult(scale)
+				vY.mult(scale)
+			}
+			else
+			{
+				let scale = x
+				vX.mult(scale.x)
+				vY.mult(scale.y)
+			}
+
+			this.setTransform(vX.x, vX.y, vY.x, vY.y, this.e, this.f);
+		}
+		else
+		{
+			vX.mult(x)
+			vY.mult(y)
+			this.setTransform(vX.x, vX.y, vY.x, vY.y, this.e, this.f);
+		}
+
+
+		return this;
+	},
+
+
+	
 	/**
 	 * Scales current matrix accumulative.
 	 * @param {number} sx - scale factor x (1 does nothing)
@@ -244,131 +352,88 @@ Matrix2d.prototype = {
 		return this;
 	},
 
-	/**
-	 * Set current matrix to new absolute matrix.
-	 * @param {number} a - scale x
-	 * @param {number} b - skew y
-	 * @param {number} c - skew x
-	 * @param {number} d - scale y
-	 * @param {number} e - translate x
-	 * @param {number} f - translate y
-	 */
-	setTransform: function(a, b, c, d, e, f) {
-		if (arguments.length === 1)
-		{
-			let m = a
-			this.a = m.a;
-			this.b = m.b;
-			this.c = m.c;
-			this.d = m.d;
-			this.e = m.e;
-			this.f = m.f;
-			this._setCtx();
-		}
-		else{
-			this.a = a;
-			this.b = b;
-			this.c = c;
-			this.d = d;
-			this.e = e;
-			this.f = f;
-			this._setCtx();			
-		}
+	______VECTOR: null,
 
-		return this;
-	},
-	///////////////////////////////////////////////////////////////////////////////////////////new
-	setRotation: function(angle, clockwise = true ) {
-		
-		let _angle = angle;
-		if( clockwise === true )
-			_angle = angle * -1;
-		
-		var cos = Math.cos(_angle),
-			sin = Math.sin(_angle);
-		
-		let scale = this.getScale()
-		this.setTransform(cos, sin, -sin, cos, this.e, this.f);
-		this.setScale(scale)
-		return this;
-	},
-	getRotation: function( clockwise = true) {
-		let vX = new Vector2d(1,0)
-		return vX.getRotation( this.get_row(0), clockwise );
-	},	
-	setRotationDeg: function(angle) {
-		this.setRotation(angle/180*PI)
-		return this;
-	},	
-	setTranslation: function(x,y) {
-		if (arguments.length === 1)
-		{
-			let p = x
-			this.setTransform(this.a, this.b, this.c, this.d, p.x, p.y);
-		}
+	
+	get_row(row){
+		if(row == 0)return new Vector2d(this.a,this.b)//X
+		else if(row == 1)return new Vector2d(this.c,this.d)//Y
+		else if(row == 2)return new Vector2d(this.e,this.f)//P
 		else
 		{
-			this.setTransform(this.a, this.b, this.c, this.d, x, y);
+			throw Error('row must be < 3')
 		}
-
-		return this;
-	},
-	getScale: function() {
-		return new Vector2d( this.get_row(0).mag(), this.get_row(1).mag() )
 	},
 
-	setScale: function(x,y) {
-
-		let vX = this.get_row(0)
-		let vY = this.get_row(1)
-		vX.normalize()
-		vY.normalize()
-
-		if (arguments.length === 1)
+	setRow(row,v){
+		if(row == 0)
 		{
-			if (typeof x === 'number')
-			{
-				let scale = x
-				vX.mult(scale)
-				vY.mult(scale)
-			}
-			else
-			{
-				let scale = x
-				vX.mult(scale.x)
-				vY.mult(scale.y)
-			}
-
-			this.setTransform(vX.x, vX.y, vY.x, vY.y, this.e, this.f);
+			this.a = v.x
+			this.b = v.y
 		}
-		else
+		if(row == 1)
 		{
-			vX.mult(x)
-			vY.mult(y)
-			this.setTransform(vX.x, vX.y, vY.x, vY.y, this.e, this.f);
+			this.c = v.x
+			this.d = v.y
 		}
-
-
-		return this;
+		if(row == 2)
+		{
+			this.e = v.x
+			this.f = v.y
+		}
 	},
+
+
+
+	______MATRIX: null,
+
+
 
 	getMult: function(m) {
 
 		var new_m = new Matrix2d()
+		/*
 		new_m.setTransform(this)
 		// position
 		let local = new_m.get_row(2)
 		local.mult(m)
-
 		new_m.setTranslation(local)
 		// other
 		new_m.transform(m.a, m.b, m.c, m.d, 0, 0) 
+		*/
 		
+		new_m.a = m.a * this.a + m.c * this.b;
+		new_m.b = m.b * this.a + m.d * this.b;
+	
+		new_m.c = m.a * this.c + m.c * this.d;
+		new_m.d = m.b * this.c + m.d * this.d;
+	
+		new_m.e = m.a * this.e + m.c * this.f + m.e;
+		new_m.f = m.b * this.e + m.d * this.f + m.f;		
 		
 
 		return new_m;
 	},
 
+	
+	normalize: function() {
+		let vX = this.get_row(0)
+		let vY = this.get_row(1)
+		vX.normalize()
+		vY.normalize()
+		this.setRow(0,vX)
+		this.setRow(1,vY)
+
+		return this
+	},
+
+	getNormalized: function() {
+		
+		var new_m = new Matrix2d()
+		new_m.setTransform(this)
+
+		return new_m.normalize();
+	},
 
 	extractPositionMatrix: function(m) {
 
@@ -381,72 +446,9 @@ Matrix2d.prototype = {
 		new_m.transform(this.a, this.b, this.c, this.d, 0, 0) 
 		return new_m;
 	},	
+	
 	///////////////////////////////////////////////////////////////////////////////////////////new end
 	
-
-	/**
-	 * Translate current matrix accumulative.
-	 * @param {number} tx - translation for x
-	 * @param {number} ty - translation for y
-	 */
-	translate: function(tx, ty) {
-		this.transform(1, 0, 0, 1, tx, ty);
-		return this;
-	},
-
-	/**
-	 * Translate current matrix on x axis accumulative.
-	 * @param {number} tx - translation for x
-	 */
-	translateX: function(tx) {
-		this.transform(1, 0, 0, 1, tx, 0);
-		return this;
-	},
-
-	/**
-	 * Translate current matrix on y axis accumulative.
-	 * @param {number} ty - translation for y
-	 */
-	translateY: function(ty) {
-		this.transform(1, 0, 0, 1, 0, ty);
-		return this;
-	},
-
-	/**
-	 * Multiplies current matrix with new matrix values.
-	 * @param {number} a2 - scale x
-	 * @param {number} b2 - skew y
-	 * @param {number} c2 - skew x
-	 * @param {number} d2 - scale y
-	 * @param {number} e2 - translate x
-	 * @param {number} f2 - translate y
-	 */
-	transform: function(a2, b2, c2, d2, e2, f2) {
-
-		var a1 = this.a,
-			b1 = this.b,
-			c1 = this.c,
-			d1 = this.d,
-			e1 = this.e,
-			f1 = this.f;
-
-		/* matrix order (canvas compatible):
-		* ace
-		* bdf
-		* 001
-		*/
-		this.a = a1 * a2 + c1 * b2;
-		this.b = b1 * a2 + d1 * b2;
-		this.c = a1 * c2 + c1 * d2;
-		this.d = b1 * c2 + d1 * d2;
-		this.e = a1 * e2 + c1 * f2 + e1;
-		this.f = b1 * e2 + d1 * f2 + f1;
-
-		this._setCtx();
-
-		return this;
-	},
-
 	/**
 	 * Get an inverse matrix of current matrix. The method returns a new
 	 * matrix with values you need to use to get to an identity matrix.
@@ -498,6 +500,175 @@ Matrix2d.prototype = {
 
 		return m;
 	},
+
+	______TRANSFORM: null,
+
+	
+	/**
+	 * Set current matrix to new absolute matrix.
+	 * @param {number} a - scale x
+	 * @param {number} b - skew y
+	 * @param {number} c - skew x
+	 * @param {number} d - scale y
+	 * @param {number} e - translate x
+	 * @param {number} f - translate y
+	 */
+	setTransform: function(a, b, c, d, e, f) {
+		if (arguments.length === 1)
+		{
+			let m = a
+			this.a = m.a;
+			this.b = m.b;
+			this.c = m.c;
+			this.d = m.d;
+			this.e = m.e;
+			this.f = m.f;
+			this._setCtx();
+		}
+		else{
+			this.a = a;
+			this.b = b;
+			this.c = c;
+			this.d = d;
+			this.e = e;
+			this.f = f;
+			this._setCtx();			
+		}
+
+		return this;
+	},
+
+
+	/**
+	 * Flips the horizontal values.
+	 */
+	flipX: function() {
+		this.transform(-1, 0, 0, 1, 0, 0);
+		return this;
+	},
+
+	/**
+	 * Flips the vertical values.
+	 */
+	flipY: function() {
+		this.transform(1, 0, 0, -1, 0, 0);
+		return this;
+	},
+
+
+
+	/**
+	 * Multiplies current matrix with new matrix values.
+	 * @param {number} a2 - scale x
+	 * @param {number} b2 - skew y
+	 * @param {number} c2 - skew x
+	 * @param {number} d2 - scale y
+	 * @param {number} e2 - translate x
+	 * @param {number} f2 - translate y
+	 */
+	transform: function(a2, b2, c2, d2, e2, f2) {
+
+		var a1 = this.a,
+			b1 = this.b,
+			c1 = this.c,
+			d1 = this.d,
+			e1 = this.e,
+			f1 = this.f;
+
+		/* matrix order (canvas compatible):
+		* ace
+		* bdf
+		* 001
+		*/
+		this.a = a1 * a2 + c1 * b2;
+		this.b = b1 * a2 + d1 * b2;
+		this.c = a1 * c2 + c1 * d2;
+		this.d = b1 * c2 + d1 * d2;
+		this.e = a1 * e2 + c1 * f2 + e1;
+		this.f = b1 * e2 + d1 * f2 + f1;
+
+		this._setCtx();
+
+		return this;
+	},
+
+
+
+
+	get_mirror(axe_x = false, axe_y = true, mirror_point_ref = null ){
+		let m_mirrored = new Matrix2d(this)
+
+		// point
+        let p = this.get_row(2)
+		if( mirror_point_ref != null )
+			p = p.getSub(mirror_point_ref)
+
+        let p_mirrored = null
+		if( (axe_x == false)&&(axe_y == true))
+			p_mirrored = new Vector2d(p.x*-1,p.y)
+		else if( (axe_x == true)&&(axe_y == false))
+			p_mirrored = new Vector2d(p.x,p.y*-1)
+		else if( (axe_x == true)&&(axe_y == true))
+			p_mirrored = new Vector2d(p.x*-1,p.y*-1)
+
+		if( mirror_point_ref != null )
+			p_mirrored = p_mirrored.getAdd(mirror_point_ref)
+
+        m_mirrored.setRow(2,p_mirrored)
+
+		//orient	
+		
+		let vX = this.get_row(0)
+		let vY = this.get_row(1)
+		let vX_mirrored = null
+		let vY_mirrored = null		
+		if( (axe_x == false)&&(axe_y == true))
+		{
+			vX_mirrored = new Vector2d(vX.x*-1,vX.y)
+			vY_mirrored = new Vector2d(vY.x*-1,vY.y)
+
+			vY_mirrored.mult(-1)
+		}
+		else if( (axe_x == true)&&(axe_y == false))
+		{
+			vX_mirrored = new Vector2d(vX.x,vX.y*-1)
+			vY_mirrored = new Vector2d(vY.x,vY.y*-1)
+
+			vY_mirrored.mult(-1)
+		}
+		else if( (axe_x == true)&&(axe_y == true))
+		{
+			vX_mirrored = new Vector2d(vX.x*-1,vX.y*-1)
+			vY_mirrored = new Vector2d(vY.x*-1,vY.y*-1)
+
+			//vX_mirrored.mult(-1)
+		}
+		m_mirrored.setRow(0,vX_mirrored)
+		m_mirrored.setRow(1,vY_mirrored)
+		
+
+
+		return m_mirrored
+
+	},
+
+
+
+
+
+	______OTHER: null,
+
+
+	/**
+	 * Short-hand to reset current matrix to an identity matrix.
+	 */
+	reset: function() {
+		this.a = this.d = 1;
+		this.b = this.c = this.e = this.f = 0;
+		this._setCtx();
+		return this;
+	},
+
 
 	/**
 	 * Apply current matrix to x and y point.
@@ -591,6 +762,20 @@ Matrix2d.prototype = {
 	},
 
 	/**
+	 * Apply current absolute matrix to context if defined, to sync it.
+	 * @private
+	 */
+	_setCtx: function() {
+		if (this.context)
+			this.context.setTransform(this.a, this.b, this.c, this.d, this.e, this.f);
+	},
+
+
+
+
+	______INFO: null,
+
+	/**
 	 * Returns true if matrix is an identity matrix (no transforms applied).
 	 * @returns {boolean} True if identity (not transformed)
 	 */
@@ -629,122 +814,37 @@ Matrix2d.prototype = {
 		return Math.abs(f1 - f2) < 1e-14;
 	},
 
-	/**
-	 * Apply current absolute matrix to context if defined, to sync it.
-	 * @private
-	 */
-	_setCtx: function() {
-		if (this.context)
-			this.context.setTransform(this.a, this.b, this.c, this.d, this.e, this.f);
-	},
 
-	get_row(row){
-		if(row == 0)return new Vector2d(this.a,this.b)//X
-		else if(row == 1)return new Vector2d(this.c,this.d)//Y
-		else if(row == 2)return new Vector2d(this.e,this.f)//P
-		else
-		{
-			throw Error('row must be < 3')
-		}
-	},
-
-	setRow(row,v){
-		if(row == 0)
-		{
-			this.a = v.x
-			this.b = v.y
-		}
-		if(row == 1)
-		{
-			this.c = v.x
-			this.d = v.y
-		}
-		if(row == 2)
-		{
-			this.e = v.x
-			this.f = v.y
-		}
-	},
-
-	get_mirror(axe_x = false, axe_y = true, mirror_point_ref = null ){
-		let m_mirrored = new Matrix2d(this)
-
-		// point
-        let p = this.get_row(2)
-		if( mirror_point_ref != null )
-			p = p.getSub(mirror_point_ref)
-
-        let p_mirrored = null
-		if( (axe_x == false)&&(axe_y == true))
-			p_mirrored = new Vector2d(p.x*-1,p.y)
-		else if( (axe_x == true)&&(axe_y == false))
-			p_mirrored = new Vector2d(p.x,p.y*-1)
-		else if( (axe_x == true)&&(axe_y == true))
-			p_mirrored = new Vector2d(p.x*-1,p.y*-1)
-
-		if( mirror_point_ref != null )
-			p_mirrored = p_mirrored.getAdd(mirror_point_ref)
-
-        m_mirrored.setRow(2,p_mirrored)
-
-		//orient	
-		
-		let vX = this.get_row(0)
-		let vY = this.get_row(1)
-		let vX_mirrored = null
-		let vY_mirrored = null		
-		if( (axe_x == false)&&(axe_y == true))
-		{
-			vX_mirrored = new Vector2d(vX.x*-1,vX.y)
-			vY_mirrored = new Vector2d(vY.x*-1,vY.y)
-
-			vY_mirrored.mult(-1)
-		}
-		else if( (axe_x == true)&&(axe_y == false))
-		{
-			vX_mirrored = new Vector2d(vX.x,vX.y*-1)
-			vY_mirrored = new Vector2d(vY.x,vY.y*-1)
-
-			vY_mirrored.mult(-1)
-		}
-		else if( (axe_x == true)&&(axe_y == true))
-		{
-			vX_mirrored = new Vector2d(vX.x*-1,vX.y*-1)
-			vY_mirrored = new Vector2d(vY.x*-1,vY.y*-1)
-
-			//vX_mirrored.mult(-1)
-		}
-		m_mirrored.setRow(0,vX_mirrored)
-		m_mirrored.setRow(1,vY_mirrored)
-		
-
-
-		return m_mirrored
-
-	},
+	______DEBUG: null,
 
 	log: function(title=null) {
 
 		if(title!=null)
 		{
 			console.log(title,
+			'vX :',
 			Math.round(this.a*100,2)/100,
 			Math.round(this.b*100,2)/100,
+			' | vY :',
 			Math.round(this.c*100,2)/100,
 			Math.round(this.d*100,2)/100,
+			' | p :',
 			Math.round(this.e*100,2)/100,
 			Math.round(this.f*100,2)/100,
-			'rotation deg : '+ Math.round(deg(this.getRotation(true))*100,2)/100)
+			'rotation deg : '+ Math.round(this.getRotation(true)*100,2)/100)
 		}
 		else
 		{
-			console.log(Math.round(this.a*100,2)/100,
+			console.log(
+			Math.round(this.a*100,2)/100,
 			Math.round(this.b*100,2)/100,
+			' | ',
 			Math.round(this.c*100,2)/100,
 			Math.round(this.d*100,2)/100,
+			' | ',
 			Math.round(this.e*100,2)/100,
 			Math.round(this.f*100,2)/100,
-			'rotation deg: '+ Math.round(deg(this.getRotation(true))*100,2)/100)
+			'rotation deg: '+ Math.round(this.getRotation(true)*100,2)/100)
 		
 		}
 

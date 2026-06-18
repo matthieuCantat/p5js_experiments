@@ -113,3 +113,17 @@ export function multiply_vector_with_matrix( v, m, normalize=false )
 
   return v_out
 }
+
+
+export function round( value, decimals )
+{
+  let factor = Math.pow(10, decimals);
+  return Math.round(value * factor) / factor;
+}
+
+export function degree(value) {
+  return value/Math.PI/180
+}
+export function radian(value) {
+  return value/180*Math.PI
+}

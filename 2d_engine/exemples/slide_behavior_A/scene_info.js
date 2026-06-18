@@ -9,7 +9,7 @@ export var scene_info = {
 }
 
 
-let p_start = new Vector2d(-170,200)
+let p_start = new Vector2d(-150,200)
 let p_offset = new Vector2d(0,-50)
 
 let settings_list = [
@@ -231,6 +231,8 @@ let settings_list = [
 ]
 
 
+scene_info.objs["root"] = {}
+
 let p = new Vector2d(p_start)
 let scale = new Vector2d(60,20)
 for( let i = 0; i < settings_list.length; i++)
@@ -245,20 +247,22 @@ for( let i = 0; i < settings_list.length; i++)
             interaction_settings: settings_list[i].inter,
             dyn_settings: settings_list[i].dyn,
         } 
-
+	
     scene_info.cns.push(
         {
-            mode: 'axe',
-            driver_obj: new Matrix2d(p,0),
-            driven_objs: ["slide"+i],
-            v_axe: new Vector2d(1,0),
-            enable:true,
-            enable_limits:true,
-            limit_max:350,
-            limit_min:0,
-            dyn_bounce_coef:0.5,
+			"mode": "axe",
+			"driver_obj": "root",
+			"driven_objs":['slide'+i],
+			"p_axe": new Vector2d( p ),
+			"v_axe": new Vector2d(1,0),
+			"enable":true,
+			"enable_limits":true,
+			"limit_max":350,
+			"limit_min":0,
+			"dyn_bounce_coef":0.5,			
         }
     )
-
+	
+	
     p.add(p_offset)
 }

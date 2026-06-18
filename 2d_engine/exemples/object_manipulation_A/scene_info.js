@@ -10,8 +10,8 @@ export var scene_info = {
 
             interaction_settings:{
               'enable':true,
-              'coef':0.01,
-              'rotate_resolution_priority':1.0,
+              'coef':0.5,
+              'rotate_resolution_priority':0.9,
               'radius_threshold':100,
             },
 

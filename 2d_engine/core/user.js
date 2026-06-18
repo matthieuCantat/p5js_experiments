@@ -1,4 +1,4 @@
-import { draw_circle, daw_line, cX_inv, cY_inv} from '../utils/draw.js'
+import { draw_circle, draw_line, cX_inv, cY_inv} from '../utils/draw.js'
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
 import { body_effect } from './effect.js';
@@ -59,7 +59,7 @@ export class User
 		this.Event.update(this.State, this.Coords)
 		this.Selection.update(this.State, this.Coords, this.Game_engine)
 		
-		user_move_selection( this.Selection, this.State, this.Coords )
+		//user_move_selection( this.Selection, this.State, this.Coords )
 				
         draw_count += 1
 	}	
@@ -67,54 +67,68 @@ export class User
 		
 	draw()
 	{
+
+		let draw_queue = []
+
         if( this.Time.one_update_debug_time_passed )
             logger.info("draw");		
 		
 		let HELPER_START_POINT_LIFTIME = 50
 		
 		
-		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&(this.Coords.pPressed!= null)
-		if(draw_press_position)
+		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.State.isInteracting )
+		if( draw_press_position )
 		{	
 			let start_size = User.DRAW_DEFAULT.circle_size_anim_start + User.DRAW_DEFAULT.circle_size
 			let end_size = User.DRAW_DEFAULT.circle_size
 			let shrink_speed = this.Counter.isInteracting*5
 			let size_animated = Math.max( end_size, start_size - shrink_speed)
 
-			draw_circle( this.Coords.pPressed,
-				size_animated,
-				'red',
-				'back',
-				5)
+			draw_queue.push({
+				shape_type : 'circle',  
+				m : new Matrix2d().setTranslation(this.Coords.pPressed).setScale(size_animated), 
+				color : 'red',
+				stroke_color : 'black', 
+				strokes_width : 5,            
+			})
+
 
 
 		}
 
-		let draw_release_position = ( 0 < this.Counter.isNotInteracting < HELPER_START_POINT_LIFTIME )&&(this.Coords.pReleased!= null)
+		let draw_release_position = ( 0 < this.Counter.isNotInteracting < HELPER_START_POINT_LIFTIME )&&( this.State.isInteracting )
 		if( draw_release_position )
 		{
 			let start_size = User.DRAW_DEFAULT.circle_size_anim_start + User.DRAW_DEFAULT.circle_size
 			let end_size = User.DRAW_DEFAULT.circle_size
 			let shrink_speed =this.Counter.isNotInteracting*5
 			let size_animated = Math.max( end_size, start_size - shrink_speed)
-						
-			draw_circle( this.Coords.pReleased,
-				size_animated,
-				'blue',
-				'back',
-				5)		
+			
+			draw_queue.push({
+				shape_type : 'circle',  
+                m : new Matrix2d().setTranslation(this.Coords.pPressed).setScale(size_animated), 
+                color : 'blue',
+                stroke_color : 'black', 
+				strokes_width : 5,            
+            } )
+			
 
 		}
 		
 		if( this.State.isInteracting )
 		{
 			// CURRENT MOUSE PRESSED
-			draw_circle( this.Coords.p,
-						10,
-						'red',
-						'back',
-						5)
+						
+			draw_queue.push({
+				shape_type : 'circle',  
+                m : new Matrix2d().setTranslation(this.Coords.p).setScale(10), 
+                color : 'red',
+                stroke_color : 'black', 
+				strokes_width : 5,            
+            } )
 
+			
+		
 			
 			// SELECTED OBJ SELECTION
 			if( this.Selection.obj != null)
@@ -122,7 +136,7 @@ export class User
 				let m = this.Selection.obj.m
 				let m_init = this.Selection.obj.m_init
 				let v = this.Selection.vOffset
-				let interaction_type =  this.Selection.obj.interaction_settings.attr
+				let interaction_type = this.Selection.obj.interaction_settings.attr
 				let interaction = this.Selection.obj.interaction
 				let pObjAttachInteraction = v.getMult(m)
 
@@ -130,38 +144,54 @@ export class User
 				let pObjCenterInit = m_init.get_row(2)
 				let vScale = m.getScale()
 
+				
+
+
 				if(interaction_type == 'r')
 				{
-					draw_circle( pObjAttachInteraction,
-						10,
-						'yellow',
-						'back',
-						5)
-	
-					draw_circle( pObjCenter,
-						10,
-						'yellow',
-						'back',
-						5)				
-						
-					daw_line([pObjAttachInteraction,pObjCenter],
-							'yellow',
-							2,)
-	
-					daw_line([pObjAttachInteraction,this.Coords.p],
-							'red',
-							2,)			
+		
+					draw_queue.push({
+						shape_type : 'circle',  
+						m : new Matrix2d().setTranslation(pObjAttachInteraction).setScale(10), 
+						color : 'yellow',
+						stroke_color : 'black', 
+						strokes_width : 5,            
+					} )
+									
+					draw_queue.push({
+						shape_type : 'circle',  
+						m : new Matrix2d().setTranslation(pObjCenter).setScale(10), 
+						color : 'yellow',
+						stroke_color : 'black', 
+						strokes_width : 5,            
+					} )
+
+
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pObjAttachInteraction,pObjCenter] , 
+						stroke_color : 'yellow', 
+						lineWidth : 2 })
+									
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pObjAttachInteraction,this.Coords.p] , 
+						stroke_color : 'red', 
+						lineWidth : 2 })						
+			
 				}
 				else if(interaction_type == 'tx')
 				{
 			
-					draw_circle( pObjCenter,
-						10,
-						'yellow',
-						'back',
-						5)				
-							
-				
+					
+					draw_queue.push({
+						shape_type : 'circle',  
+						m : new Matrix2d().setTranslation(pObjCenter).setScale(10), 
+						color : 'yellow',
+						stroke_color : 'black', 
+						strokes_width : 5,            
+					} )
+
 					let pCenter_axeX_min = pObjCenterInit.getAdd(1000,0)
 					let pCenter_axeX_max = pObjCenterInit.getAdd(-1000,0)						
 					if( interaction.limit != null )
@@ -174,38 +204,52 @@ export class User
 						let col_min_top = pObjCenterInit.getAdd(interaction.limit[0]-vScale.x,1000)
 						let col_min_dwn = pObjCenterInit.getAdd(interaction.limit[0]-vScale.x,-1000)	
 						
-						daw_line([col_min_dwn, col_min_top],
-							'yellow',
-							2,)
+
+						draw_queue.push({
+							shape_type : 'line',
+							points : [col_min_dwn, col_min_top] , 
+							stroke_color : 'yellow', 
+							lineWidth : 2 })
+
 
 						let col_max_top = pObjCenterInit.getAdd(interaction.limit[1]+vScale.x,1000)
 						let col_max_dwn = pObjCenterInit.getAdd(interaction.limit[1]+vScale.x,-1000)	
-							
-						daw_line([col_max_dwn, col_max_top],
-							'yellow',
-							2,)							
+						
+						draw_queue.push({
+							shape_type : 'line',
+							points : [col_max_dwn, col_max_top] , 
+							stroke_color : 'yellow', 
+							lineWidth : 2 })
+
 						
 					}
 			
 
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pCenter_axeX_min, pCenter_axeX_max] , 
+						stroke_color : 'yellow', 
+						lineWidth : 2 })
 
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pObjAttachInteraction, this.Coords.p] , 
+						stroke_color : 'red', 
+						lineWidth : 2 })
 
-					daw_line([pCenter_axeX_min, pCenter_axeX_max],
-							'yellow',
-							2,)
 	
-					daw_line([pObjAttachInteraction,this.Coords.p],
-							'red',
-							2,)		
 				}			
 				else if(interaction_type == 'ty')
 				{
-			
-					draw_circle( pObjCenter,
-						10,
-						'yellow',
-						'back',
-						5)				
+
+					draw_queue.push({
+						shape_type : 'circle',  
+						m : new Matrix2d().setTranslation(pObjCenter).setScale(10), 
+						color : 'yellow',
+						stroke_color : 'black', 
+						strokes_width : 5,            
+					} )
+		
 						
 					let pCenter_axeX_min = pObjCenter.getAdd(0,1000)
 					let pCenter_axeX_max = pObjCenter.getAdd(0,-1000)
@@ -219,47 +263,72 @@ export class User
 						let col_min_top = pObjCenterInit.getAdd(1000,interaction.limit[0]-vScale.y)
 						let col_min_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[0]-vScale.y)	
 						
-						daw_line([col_min_dwn, col_min_top],
-							'yellow',
-							2,)
+						draw_queue.push({
+							shape_type : 'line',
+							points : [col_min_dwn, col_min_top] , 
+							stroke_color : 'yellow', 
+							lineWidth : 2 })
+	
 
 						let col_max_top = pObjCenterInit.getAdd(1000,interaction.limit[1]+vScale.y)
 						let col_max_dwn = pObjCenterInit.getAdd(-1000,interaction.limit[1]+vScale.y)	
+
+						draw_queue.push({
+							shape_type : 'line',
+							points : [col_max_dwn, col_max_top] , 
+							stroke_color : 'yellow', 
+							lineWidth : 2 })
 							
-						daw_line([col_max_dwn, col_max_top],
-							'yellow',
-							2,)							
 						
-					}					
-					daw_line([pCenter_axeX_min, pCenter_axeX_max],
-							'yellow',
-							2,)
-	
-					daw_line([pObjAttachInteraction,this.Coords.p],
-							'red',
-							2,)		
+					}		
+					
+
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pCenter_axeX_min, pCenter_axeX_max] , 
+						stroke_color : 'yellow', 
+						lineWidth : 2 })
+
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pObjAttachInteraction, this.Coords.p] , 
+						stroke_color : 'red', 
+						lineWidth : 2 })
+
+						
 				}
 				else if(interaction_type == 'tr')
 				{
-					draw_circle( pObjAttachInteraction,
-						5,
-						'yellow',
-						'back',
-						5)
-	
-					draw_circle( pObjCenter,
-						5,
-						'yellow',
-						'back',
-						5)				
-						
-					daw_line([pObjAttachInteraction,pObjCenter],
-							'yellow',
-							2,)
-	
-					daw_line([pObjAttachInteraction,this.Coords.p],
-							'red',
-							2,)		
+
+					/*
+					draw_queue.push({
+						shape_type : 'circle',  
+						m : new Matrix2d().setTranslation(pObjAttachInteraction).setScale(5), 
+						color : 'yellow',
+						stroke_color : 'black', 
+						strokes_width : 5,            
+					} )
+
+					draw_queue.push({
+						shape_type : 'circle',  
+						m : new Matrix2d().setTranslation(pObjCenter).setScale(5), 
+						color : 'yellow',
+						stroke_color : 'black', 
+						strokes_width : 5,            
+					} )
+		
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pObjAttachInteraction, pObjCenter] , 
+						stroke_color : 'yellow', 
+						lineWidth : 2 })
+
+					draw_queue.push({
+						shape_type : 'line',
+						points : [pObjAttachInteraction, this.Coords.p] , 
+						stroke_color : 'red', 
+						lineWidth : 2 })
+						*/
 				}				
 				else if(interaction_type == 'button_hold')
 				{
@@ -277,10 +346,11 @@ export class User
 				}					
 				else if(interaction_type == 'button_first_press')
 				{
-				
+					console.log("button_first_press", this.Selection.obj)
+					
 					let effect_inst = new body_effect(
 						this.Selection.obj,
-						this.Selection.obj.effect_name,
+						this.Selection.obj.effects,
 						this.Time)
 					this.Game_engine.body_effects.push(effect_inst)
 				
@@ -289,12 +359,19 @@ export class User
 			}
 
 			// TRAIL
-			daw_line(
-				this.Coords.Trail.get(),
-				'purple',
-				2,
-			)
+			
+			draw_queue.push({
+				shape_type : 'line',  
+                points : this.Coords.Trail.get(),
+                stroke_color : 'purple',
+				line_width : 5,            
+            })
+		
+			
+
 		}
+
+		return draw_queue
 	}
 
 
@@ -329,10 +406,11 @@ class Observer{
 	{
 		logger.info("Observer constructor")
 
-		this.p = null
+		this.p = new Vector2d()
+		//this.touching = false
 		this.touch_down = false
 		this.touch_move = false	
-		//this.touch_up = false
+		
 			
 	}
 
@@ -369,20 +447,25 @@ class Observer{
 		
 		// store position
 		if( ( action == 'down')||( action == 'move') )
+		{
 			this.p = get_user_coords_from_event( e )
+			//this.touching = true
+		}
 		else if( action == 'up')
-			this.p = null	
+		{
+			//this.touching = false	
+		}
+			
 
 		// get event
 		this.touch_down = false
-		this.touch_move = false
-		//this.touch_up = false
 		if( action == 'down')
 			this.touch_down	= true
+
+		this.touch_move = false
 		if( action == 'move')
 			this.touch_move	= true	
-		//if( action == 'up')
-		//	this.touch_up	= true			
+					
     }	
 }
 
@@ -478,37 +561,39 @@ class Coords{
 
 	constructor()
 	{
-		this.p = null
-		this.pPressed = null
-		this.pReleased = null
-		this.p_last = null
-		this.pPressed_last = null
-		this.pReleased_last = null
+		this.p = new Vector2d()
+		this.pPressed = new Vector2d()
+		this.pReleased = new Vector2d()
+		this.p_last = new Vector2d()
+		this.pPressed_last = new Vector2d()
+		this.pReleased_last = new Vector2d()
 		this.Trail = new trail_points( 200 )
 		this.p_history = []
 	}
 	update(p, State)
-	{
-		this.p = p
+	{	
+		if( State.isInteracting)
+			this.p.set( p )
+		
 		if( State.isPressed)
-			this.pPressed = this.p
+			this.pPressed.set( this.p )
 
 		if(State.isReleased)
-			this.pReleased = this.p_last
+			this.pReleased.set( this.p_last )
 			
 
 		if(State.isInteracting)
 		{
 			this.Trail.add(this.p)
-			this.pReleased = null
+			//this.pReleased = null
 		}
 		else
 		{
 			this.Trail.clear()
-			this.pPressed = null
+			//this.pPressed = null
 		}
 			
-		this.p_last = this.p
+		this.p_last.set( this.p )
 
 
 		this.p_history.unshift(this.p)
@@ -745,135 +830,120 @@ class Selection
 {
 	constructor()
 	{
-		this.obj = null
-		this.vOffset = null
-		this.active = false
+	}
+
+	get_selectable_objs_names( Game_engine )
+	{
+		let selectable_objs_names = []
+		for( let n in Game_engine.Objs )
+		{
+			if(Game_engine.Objs[n].interaction.settings.enable == false)
+				continue
+			selectable_objs_names.push(n)
+		}
+		return selectable_objs_names
 	}
 
 
 	update( State, Coords, Game_engine )
 	{
-
-		if( State.isInteractingExtend)
+		let selectable_objs_names = this.get_selectable_objs_names(Game_engine)		
+		
+		if( State.isInteracting == false )
+		{			
+			for( let n in Game_engine.Objs )
+				Game_engine.Objs[n].interaction.vCenter_to_userFirstGrab_mLocal = null
+			return false
+		}
+		
+		if(State.isPressed)
 		{
-			if(( this.active == false )&&(State.isPressed == true))
+			for( let n of selectable_objs_names )
+				Game_engine.Objs[n].cleanUserInteractionInfo()
+				
+			for( let n of selectable_objs_names.reverse() )
 			{
-				let objs_names = []
-				for( let n in Game_engine.Objs )
-				{
-					if(Game_engine.Objs[n].interaction_settings.enable == false)
-						continue
-					Game_engine.Objs[n].interaction_info = null
-					Game_engine.Objs[n].isSelected = false
-					objs_names.push(n)
-				}
-					
-					
-				for( let i = objs_names.length -1 ; 0 <= i; i-- )
-				{
-					let n = objs_names[i]
-					if( Game_engine.Objs[n].isPointInside( Coords.p ))
-					{
-						Game_engine.Objs[n].isSelected = true
-						this.active = true
-
-						//add_selection_info
-						this.obj = Game_engine.Objs[n]
-						this.vOffset = Coords.pPressed.getMult( Game_engine.Objs[n].m.getInverse())						
-						break
-					}
-				}
+				let isInteracting = Game_engine.Objs[n].setUserFirstInteractionInfo( Coords.p, Coords.pPressed )
+				if( isInteracting )
+					break	
 			}
 		}
-		else
-		{
-			this.active = false
-			this.clear()
-			for( let n in Game_engine.Objs )
-			{
-				Game_engine.Objs[n].interaction_info = null
-				Game_engine.Objs[n].isSelected = false	
-			}	
-		}		
 
+		return true
+	
 	}	
 
 
-	clear()
-	{
-		this.obj = null
-		this.vOffset = null
-	}
 
 }
 
+/*
 
 function user_move_selection( Selection, State, Coords )
 {
-	if( Selection.active == false)
-		return
+	
+	let obj = Selection.obj
+	let vOffset = Selection.vOffset
 
-	let selected_obj = Selection.obj
-	let selected_v_local = Selection.vOffset
-	if( selected_obj == null )
+	let something_is_selected = ( (Selection.active )&&(obj !== null))
+	if( something_is_selected == false )
 		return false
 
-	selected_obj.interaction_info = null
-	if( State.isInteracting == false) 
+	obj.interaction.vCenter_to_userFirstGrab_mLocal = null
+
+	let user_is_interacting = State.isInteracting
+	if( user_is_interacting == false ) 
 		return false
 
-	let inter = selected_obj.interaction_settings.attr
+	let inter = obj.interaction.settings.attr
 	let pMouse = Coords.p
 
-	let pCenter = selected_obj.m.get_row(2)
-	let pSelectionAttach = selected_v_local.getMult( selected_obj.m )
-	let selected_v = pSelectionAttach.getSub(pCenter)        
+	let pCenter = obj.m.get_row(2)
+	let vCenter_to_userGrab = vOffset.getMult( obj.m, true )
+	let pUserGrab = pCenter.getAdd( vCenter_to_userGrab )	
 	
-
 	if( inter == 'r' )
 	{
-		let vToMouse = pMouse.getSub(pCenter)
-		let angle_delta = selected_v.getRotation(vToMouse)
-		selected_obj.m.rotate(angle_delta)
+		let vCenter_to_user = pMouse.getSub(pCenter)
+		let angle_delta = vCenter_to_userGrab.getRotation(vCenter_to_user)
+		obj.m.rotate(angle_delta)
 	}
 	else if( inter == 't' )
 	{
-		selected_obj.m.setRow(2,pMouse)
+		obj.m.setRow(2,pMouse)
 	}			
 	else if( inter == 'tx' )
 	{
 		let x_delta = pMouse.x - selected_v.x
 		pCenter.x = x_delta
 
-		if( selected_obj.interaction.limit != null )
+		if( obj.interaction.limit != null )
 		{
-			let _pInit = selected_obj.m_init.get_row(2)
-			let x_min = _pInit.x + selected_obj.interaction.limit[0]
-			let x_max = _pInit.x + selected_obj.interaction.limit[1]
+			let _pInit = obj.m_init.get_row(2)
+			let x_min = _pInit.x + obj.interaction.limit[0]
+			let x_max = _pInit.x + obj.interaction.limit[1]
 			pCenter.x = Math.min( x_max, Math.max( x_min, pCenter.x))
 		}
-		selected_obj.m.setRow(2,pCenter)
+		obj.m.setRow(2,pCenter)
 	}
 	else if( inter == 'ty' )
 	{
 		let y_delta = pMouse.y- selected_v.y
 		pCenter.y = y_delta
 		
-		if( selected_obj.interaction.limit != null )
+		if( obj.interaction.settings.limit != null )
 		{
-			let pObj_init = selected_obj.m_init.get_row(2)
-			let y_min = pObj_init.y + selected_obj.interaction.limit[0]
-			let y_max = pObj_init.y + selected_obj.interaction.limit[1]
+			let pObj_init = obj.m_init.get_row(2)
+			let y_min = pObj_init.y + obj.interaction.settings.limit[0]
+			let y_max = pObj_init.y + obj.interaction.settings.limit[1]
 			pCenter.y = Math.min( y_max, Math.max( y_min, pCenter.y))
 		}	
-		selected_obj.m.setRow(2,pCenter)		
+		obj.m.setRow(2,pCenter)		
 	}
 	else if( inter == 'tr' )
 	{
-		selected_obj.interaction_info = {
-			pUser : pMouse,
-			vAttach : selected_v_local,
-		}
+		obj.interaction.pUser = pMouse 
+		obj.interaction.vAttach = vOffset 
 	}	
 	else if( inter == 'button' )
 	{
@@ -882,7 +952,7 @@ function user_move_selection( Selection, State, Coords )
 	} 	
 	
 }
-
+*/
 
 // Disable pull-to-refresh using JavaScript
 function disable_pull_to_refresh(event)
@@ -919,9 +989,8 @@ class trail_points
 
 	clear()
 	{
-		this.points = []
 		for( let i = 0; i < this.points.length; i++)
-			this.points.push(null)
+			this.points[i] = null
 	}	
 	
 	add( p )

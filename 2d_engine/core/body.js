@@ -1,18 +1,9 @@
 
 import { 
-draw_rectangle,
-draw_text,
-draw_circle_simple,
-draw_circle_from_matrix,
-draw_triangle,
-draw_trapezoid,
-draw_star_classic,
-draw_star_ai,
-draw_star_realistic,
-draw_cross,
 isPointInside_rectangle,
 isPointInside_circle,
 isPointInside_triangle,
+COLORS_TO_RGB,
 } from '../utils/draw.js';
 import Matrix2d from '../utils/matrix2d.js';
 import { body_effect } from './effect.js';
@@ -23,28 +14,14 @@ const logger = new Logger("body");
 
 
 
-var canvas = document.getElementById("myCanvas");
-var ctx = canvas.getContext("2d");
-
 
 export class body
 {
-	drawFactory = {
-		rectangle   : draw_rectangle,
-		circle    : draw_circle_simple,
-		circle_rot    : draw_circle_from_matrix,
-		triangle :  draw_triangle,
-		trapezoid : draw_trapezoid,
-		star_classic    : draw_star_classic,
-		star_ai    : draw_star_ai,
-		star_realistic    : draw_star_realistic,
-		cross : draw_cross,
-		text : draw_text,
-	}
+	
 	isPointInsideFactory = {
 		rectangle   : isPointInside_rectangle,
 		circle    : isPointInside_circle,
-		circle_rot    : isPointInside_circle,
+		//circle_rot    : isPointInside_circle,
 		triangle :  isPointInside_triangle,
 		trapezoid : isPointInside_rectangle,
 		star_classic    : isPointInside_circle,	
@@ -67,8 +44,9 @@ export class body
 		new Vector2d(1,0)
 	]	
 
-	GRAVITY_VECTOR = new Vector2d(0,-0.981)
-
+	HIGHLIGHT_STROKE_COLOR = "yellow"
+	HIGHLIGHT_STROKE_WIDTH = 5
+	
 	constructor(
 		in_options
 	)
@@ -76,9 +54,16 @@ export class body
 		logger.info("constructor",in_options.name)
 
 		const defaultOptions = {
+			name : '',
+			parent : null,
 			m: new Matrix2d(),
+			m_shape: null,
+			visibility : true,
+			shape_visibility : true,
+			m_interaction: null,
 			shape_type: "rectangle",
 			color: "white",
+			color_brignthess: 0.7,
 			stroke_color: "black",
 			stroke_width: 2,
             interaction: null,
@@ -91,49 +76,84 @@ export class body
 			Game_engine: null,
 			Time: null,
 		}
-		const args = { ...defaultOptions, ...in_options };
+		this.args = { ...defaultOptions, ...in_options };
 
-		this.Game_engine = args.Game_engine
-		this.Time = args.Time
+		this.Game_engine = this.args.Game_engine
+		this.Time = this.args.Time
 
-		this.m = null
-		if( args.m instanceof Matrix2d)
-			this.m = args.m
-		else
-			this.m = new Matrix2d(args.m) // if not a matrix, convert it to one
+
+		this.name = this.args.name
+		// POSITION AND MOVEMENT
+		//let mShape = null
+		//if( this.args.m instanceof Matrix2d)
+		//	mShape = this.args.m
+		//else
+		//	mShape = new Matrix2d(this.args.m) // if not a matrix, convert it to one
+		//
+		//this.m = new Matrix2d(mShape)
+		//this.m.normalize()
+//
+		//this.m_shape = mShape.getMult(this.m.getInverse()) // to keep track of the shape matrix without the position and rotation
+		//
+//
+		//this.m_init = new Matrix2d(this.args.m)
 		
+		let parent_obj = null
+		if( this.args.parent != null )
+			parent_obj = this.Game_engine.Objs[this.args.parent]
+		this.trsf = new Transform(  this.args.m, 
+									this.args.m_shape,
+									this.args.m_interaction,
+									parent_obj )
 		
+		// FOR DYN
+		//this.last_m = new Matrix2d(this.args.m) // to keep track of the last position
+		//this.momentum = new Vector2d()
+		//this.angular_momentum = 0
 
+		// ASPECT
+		this.shape_type = this.args.shape_type
+		this.color = this.args.color
+		if( this.args.color_brignthess != 1.0 )
+		{
+			let new_color = [ 
+			Math.floor(COLORS_TO_RGB[this.color][0] * this.args.color_brignthess),
+			Math.floor(COLORS_TO_RGB[this.color][1] * this.args.color_brignthess),
+				Math.floor(COLORS_TO_RGB[this.color][2] * this.args.color_brignthess)]
+			this.color = 'rgb('+new_color[0]+','+new_color[1]+','+new_color[2]+')'
+		}
 
-		this.last_m = new Matrix2d(args.m) // to keep track of the last position
-		this.m_init = new Matrix2d(args.m)
-		this.momentum = new Vector2d()
-		this.angular_momentum = 0
-		this.shape_type = args.shape_type
-		this.color = args.color
-		this.stroke_color = args.stroke_color
-		this.stroke_width = args.stroke_width	
-		this.isSelected = false
-        this.interaction = args.interaction
-		this.txt = args.txt
-
-		this.stroke_color_highlight = "yellow"
-        this.stroke_width_highlight = 5
-
-		this.visibility = true
+		this.stroke_color = this.args.stroke_color
+		this.stroke_width = this.args.stroke_width
 		
+		// OTHER
+        this.interaction = this.args.interaction
+		this.txt = this.args.txt
+
+
+		this.visibility = this.args.visibility
+		this.shape_visibility = this.args.shape_visibility
+		// TRANSFORM
+
+		let transform_settings_default = {
+			parent_limit_space : false,
+			translate_limits: null,
+			rotate_limits: null,
+		}
+		this.transform_settings = {...transform_settings_default, ...in_options.transform_settings}
+
 		// INTERACTION
 		let interaction_settings_default = {
 			'enable':false,
+			'type':['move','button','switch'][0],
 			'coef':1.0,
 			'rotate_resolution_priority':1.0,
 			'do_translation':true,
-			'attr':'tr',
 			'radius_threshold':0,
 			'scale_selection_shape' : 1.0,
 		}
 
-		this.interaction_settings = {...interaction_settings_default, ...in_options.interaction_settings}
+		let _interaction_settings = {...interaction_settings_default, ...in_options.interaction_settings}
 
 		// DYN
 		let dyn_settings_default = {
@@ -164,15 +184,15 @@ export class body
 		this.axe_cns_settings = { ...axe_cns_settings_default, ...in_options.axe_cns_settings };
 		*/
 		
-		this.do_border_collision = args.do_border_collision
+		this.do_border_collision = this.args.do_border_collision
 
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// EFFECTS
 		/////////////////////////////////////////////////////////
 
-		this.effect_name = args.effect_name
+		this.effect_name = this.args.effect_name
 		
-		this.event_cmds = args.event_cmds
+		this.event_cmds = this.args.event_cmds
 	
 		this.events = {
 			'touchDown':      { name:'touchDown'     , status: false, count:0, effect_insts: [] },
@@ -185,10 +205,15 @@ export class body
 			'idle':           { name:'idle'          , status: false, count:0, effect_insts: [] },
 		}
 		
-		this.interaction_info = null
+		this.interaction = {
+			settings : _interaction_settings,
+			vCenter_to_userFirstGrab_mLocal : null,
+			pUser : this.Game_engine.User.Coords.p,
+			vOffset : null,	
+		}
 		
 		// update effect duration with event ref
-		this.event_effects = args.event_effects
+		this.event_effects = this.args.event_effects
 		for( let event in this.event_effects)
 		{
 			if(this.event_effects[event] == null)
@@ -209,12 +234,20 @@ export class body
 				}	
 			}
 		}
+
+
+		// PARENT
+	
+		
+
+
 	}
 
 
 
 	update_event_effects()
 	{
+		
 		// clean
 		for( const key in this.events)
 		{
@@ -260,13 +293,15 @@ export class body
 			if(oneEffectAtTheTime)
 				continue
 
+			
 			let effect_inst = new body_effect(
 				this,
 				this.event_effects[key].effects,
 				this.Time,)
 
 			this.events[key].effect_insts.push( effect_inst	)
-			this.Game_engine.body_effects.push(effect_inst)	
+			this.Game_engine.body_effects.push( effect_inst )	
+		
 		
 		}					
 
@@ -275,7 +310,7 @@ export class body
 	duplicate()
 	{
 		return new body(
-			{	m : new Matrix2d(this.m), 
+			{	m : new Matrix2d(this.trsf.get_shape()), 
 				shape_type: this.shape_type,
 				color: this.color, 
 				interaction:this.interaction,
@@ -300,60 +335,20 @@ export class body
 		if( this.visibility == false )
 			return false
 
+		
+
 		this.update_event_effects()
 		
-		
+		this.trsf.update(
+			this.transform_settings,
+			this.interaction,
+			this.dyn_settings
+		)
 	
-		if( this.dyn_settings.enable )
-		{
-			//ADD DYN
-			let p = this.m.get_row(2)
-			let vMomentum = this.momentum.getMult(1-this.dyn_settings.friction_translate)
+		//let axe_cns_info = { vCollisionLimit : null}
+		//if(this.axe_cns_settings.enable)
+		//	axe_cns_info = this.update_matrix_axe_cns()
 		
-			let pNext = p.getAdd(vMomentum)
-			let aNext = this.angular_momentum*(1-this.dyn_settings.friction_rotate)
-		
-			if(this.dyn_settings.enable_gravity)
-			{
-				pNext.add(this.GRAVITY_VECTOR.getMult(this.dyn_settings.mass))
-			}
-
-			for(let i = 0; i < this.dyn_settings.custom_forces.length; i++)
-			{
-				let force_info = this.dyn_settings.custom_forces[i]
-				let v = pNext.getSub(force_info.p)
-				
-				if(0 < force_info.influence_radius)
-				{
-					
-					if(v.mag() < force_info.influence_radius)
-					{
-						
-						let vForce =  v.getMult(force_info.strength)
-						pNext.add(vForce)
-					}
-				}
-				else
-				{
-					let vForce = v.getMult(force_info.strength)
-					pNext.add(vForce)
-				}
-				
-			}
-
-			this.m.setRow(2,pNext)
-			this.m.rotate(aNext)
-		}
-
-		// add interaction
-		if(this.interaction_settings.enable)
-			this.update_matrix_with_user_interaction()
-	
-		/*
-		let axe_cns_info = { vCollisionLimit : null}
-		if(this.axe_cns_settings.enable)
-			axe_cns_info = this.update_matrix_axe_cns()
-		*/
 	
 
 		if( this.do_border_collision )
@@ -452,164 +447,175 @@ export class body
 
 		}
 
-		// FOR NEXT EVAL
-		let momentum = this.m.get_row(2).getSub(this.last_m.get_row(2))
-		/*
-		if( ( 0 < this.axe_cns_settings.dyn_bounce_coef)&&(axe_cns_info.vCollisionLimit!=null))
-		{
-			let vCollisionAdjust = axe_cns_info.vCollisionLimit
-			let momentum_inv = momentum.getMult(-1)
 
-			let new_momentum = vCollisionAdjust.getAdd(momentum_inv)
-			momentum = new_momentum.getMult(this.axe_cns_settings.dyn_bounce_coef)
+		if(this.isSelected())
+		{
+			this.stroke_color = this.HIGHLIGHT_STROKE_COLOR
+			this.stroke_width = this.HIGHLIGHT_STROKE_WIDTH	
 		}
-			*/
-
-		let momentum_mag = Math.max(-this.dyn_settings.speed_limit_translate,
-			Math.min( this.dyn_settings.speed_limit_translate, momentum.mag()))
-		momentum.normalize()
-		momentum.mult(momentum_mag)	
-		this.momentum = momentum	
-
-		let angular_momentum = this.m.getRotation() - this.last_m.getRotation()
-		
-		if( 3.14 < angular_momentum )
-			angular_momentum -= 2*3.14
-		if( angular_momentum < -3.14 )
-			angular_momentum += 2*3.14	
-		this.angular_momentum = angular_momentum	
-
-		this.angular_momentum = Math.max(-this.dyn_settings.speed_limit_rotate,
-			Math.min( this.dyn_settings.speed_limit_rotate, angular_momentum))
-		
-		this.last_m = new Matrix2d(this.m) // to keep track of the last position
-	
-	}
-
-	update_matrix_with_user_interaction()
-	{
-		if(this.interaction_info == null )
-			return false
-
-		let mode = 'rotate_priority'
-
-		if( mode = 'rotate_priority' )
+		else
 		{
-			let pCenter = this.m.get_row(2)
-			let pAttach = this.interaction_info.vAttach.getMult( this.m )
-			let pMouse = this.interaction_info.pUser
-
-			// pATTACH
-			let vMouseToAttach = pAttach.getSub(pMouse)
-			let vMouseToAttach_mag = Math.min( vMouseToAttach.mag(),
-				this.interaction_settings.radius_threshold)
-			
-			vMouseToAttach.normalize()
-			vMouseToAttach.mult(vMouseToAttach_mag)
-			let pTarget = pMouse.getAdd(vMouseToAttach)
-			
-
-			let vAttach_world = pAttach.getSub(pCenter)
-			let _mCurrent = new Matrix2d(this.m)
-			
-			
-			// solve angle
-			let vCenterToMouse = pTarget.getSub(pCenter)
-			vCenterToMouse.normalize()
-			vAttach_world.normalize()
-			let aDelta = vAttach_world.getRotation(vCenterToMouse,false)
-			_mCurrent.rotate(aDelta*this.interaction_settings.rotate_resolution_priority)
-	
-			// solve translate
-			let pSelectionAttach_afterRotate = this.interaction_info.vAttach.getMult( _mCurrent )
-			let vDelta = pTarget.getSub(pSelectionAttach_afterRotate)
-			
-			// get force
-			let aMouseAttract = aDelta*this.interaction_settings.rotate_resolution_priority*this.interaction_settings.coef
-			let vMouseAttract = vDelta.getMult(this.interaction_settings.coef)
-	
-			
-			//add to matrix
-			if( this.interaction_settings.do_translation == true)
-				this.m.setRow(2,this.m.get_row(2).getAdd(vMouseAttract))
-
-			this.m.rotate(aMouseAttract)	
-
-		}
-		else if ( mode == 'split_force' )
-		{
-	
+			this.stroke_color = this.args.stroke_color
+			this.stroke_width = this.args.stroke_width	
 		}
 
 
-		return true
 	}
 
-
-
-	draw()
+	isSelected()
 	{
-        if( this.Time.one_update_debug_time_passed )
-            logger.info("draw");
+		return this.interaction.vCenter_to_userFirstGrab_mLocal != null
+	}
 
-		if(this.visibility == false)
+	cleanUserInteractionInfo()
+	{
+		this.interaction.vCenter_to_userFirstGrab_mLocal = null
+	}
+
+	setUserFirstInteractionInfo( pUser, pUserPressed )
+	{			
+		if( this.isPointInside(pUser) == false)
 			return false
 
-        ctx.save()// save current drawing style
-
-		// STYLE
-		this.drawApplyStyle(ctx)
-
-		// DRAW SHAPE
-		const drawFunction = this.drawFactory[this.shape_type];
-		if (!drawFunction) {
-			console.warn("Unknown shape:", this.shape_type);
-			ctx.restore();
+		if( this.interaction.vCenter_to_userFirstGrab_mLocal != null)
 			return false
-		}		
-		drawFunction( ctx, this.m, this.txt);
-       
-		// RENDER
-		if( this.color != null)
-			ctx.fill()
 
-		if( this.stroke_color != null)
-			ctx.stroke()
-
-		//ctx.resetTransform();	
-        ctx.restore();// restore drawing style
 		
-		return true
+		
+		// vOffset
+		let m = this.trsf.get()
+		let pCenter= m.get_row(2)
+		let vCenter_to_pPressed = pUserPressed.getSub( pCenter )
+		this.interaction.vCenter_to_userFirstGrab_mLocal = vCenter_to_pPressed.getMult(m.getInverse(), true)	
+		
+		return true		
 	}
 
-
-	drawApplyStyle(ctx)
+	get_shape_matrix()
 	{
-
-
-		if( this.color != null)
-			ctx.fillStyle = this.color
-
-		if( this.isSelected )
-        {
-            ctx.strokeStyle = this.stroke_color_highlight
-            ctx.lineWidth = this.stroke_width_highlight
-        }
-        else
-        {
-            ctx.strokeStyle = this.stroke_color
-            ctx.lineWidth = this.stroke_width
-        }
-				
+		return this.m_shape.getMult(this.m)
 	}
+
+
 
 	isPointInside(point)
 	{
-		let mShape = new Matrix2d(this.m);
-		let s = this.interaction_settings.scale_selection_shape;
+		let mShape = this.trsf.get_interaction_shape()
+		let s = this.interaction.settings.scale_selection_shape;
 		mShape = mShape.scale(s,s);
 		
 		return this.isPointInsideFactory[this.shape_type](point, mShape);
+	}
+
+	get_render_infos_interaction_shape_debug()
+	{
+		return [ {
+			shape_type : this.shape_type,      
+			m : this.trsf.get_interaction_shape(), 
+			color : null,
+			stroke_color : this.color, 
+			stroke_width : 1,        
+		} ]		
+	}
+
+
+	get_render_infos_matrix_debug()
+	{
+		let SIZE = 10
+		let THICKNESS = 2
+		let STROKE_THICKENESS = 1
+
+		let m = this.trsf.get()
+		let vX = m.get_row(0).getMult(SIZE)
+		let vY = m.get_row(1).getMult(SIZE)
+		let p = m.get_row(2)
+
+		let mAxeX = new Matrix2d(m)
+		mAxeX.setRow(2,p.getAdd(vX))
+		mAxeX.setScale(SIZE,THICKNESS)
+
+		let mAxeY = new Matrix2d(m)
+		mAxeY.setRow(2,p.getAdd(vY))
+		mAxeY.setScale(THICKNESS,SIZE)
+
+		return [ {
+			shape_type : 'circle',      
+			m : m, 
+			color : 'black',
+			stroke_color : 'black', 
+			stroke_width : STROKE_THICKENESS,        
+		},
+		{
+			shape_type : 'rectangle',      
+			m : mAxeX, 
+			color : 'red',
+			stroke_color : 'black', 
+			stroke_width : STROKE_THICKENESS,        
+		},
+		{
+			shape_type : 'rectangle',      
+			m : mAxeY, 
+			color : 'green',
+			stroke_color : 'black', 
+			stroke_width : STROKE_THICKENESS,        
+		},	
+	]		
+	}	
+
+	get_render_infos()
+	{
+		return [ {
+			shape_type : this.shape_type,      
+			m : this.trsf.get_shape(), 
+			color : this.color,
+			stroke_color : this.stroke_color, 
+			stroke_width : this.stroke_width,        
+		} ]
+	}
+
+	get_render_infos_interaction_debug()
+	{
+		if( this.interaction.vCenter_to_userFirstGrab_mLocal == null )
+			return []
+
+		let pUser = this.Game_engine.User.Coords.p
+		let m = this.trsf.get()
+		let pCenter = m.get_row(2)
+
+		let vCenter_to_userFirstGrab_mLocal = this.interaction.vCenter_to_userFirstGrab_mLocal
+		let vCenter_to_userFirstGrab = vCenter_to_userFirstGrab_mLocal.getMult(m, true )
+		let pUserFirstGrab = pCenter.getAdd( vCenter_to_userFirstGrab )
+
+		let render_infos = []
+		render_infos.push({
+			shape_type : 'circle',  
+			m : new Matrix2d().setTranslation(pUserFirstGrab).setScale(5), 
+			color : 'yellow',
+			stroke_color : 'black', 
+			strokes_width : 5,            
+		} )
+		
+		render_infos.push({
+			shape_type : 'circle',  
+			m : new Matrix2d().setTranslation(pCenter).setScale(5), 
+			color : 'yellow',
+			stroke_color : 'black', 
+			strokes_width : 5,            
+		} )
+		
+		render_infos.push({
+			shape_type : 'line',
+			points : [pUserFirstGrab, pCenter] , 
+			stroke_color : 'yellow', 
+			lineWidth : 2 })
+
+		render_infos.push({
+			shape_type : 'line',
+			points : [pUserFirstGrab, pUser] , 
+			stroke_color : 'red', 
+			lineWidth : 2 })
+		
+		return render_infos
 	}
 
 }
@@ -641,3 +647,377 @@ class Effect
 	}
 }
 */
+
+
+class Transform
+{
+	GRAVITY_VECTOR = new Vector2d(0,-0.981)
+
+	constructor( arg_m, 
+		arg_m_shape = null,
+		arg_m_interaction = null,
+		obj_parent = null )
+	{
+		
+		this.obj_parent = obj_parent
+
+		// POSITION AND MOVEMENT
+		let in_body_matrix = null
+		if( arg_m instanceof Matrix2d)
+			in_body_matrix = arg_m
+		else
+			in_body_matrix = new Matrix2d(arg_m) // if not a matrix, convert it to one
+
+		let in_shape_matrix = null
+		if( arg_m_shape != null )
+		{
+			if( arg_m_shape instanceof Matrix2d)
+				in_shape_matrix = arg_m_shape
+			else
+				in_shape_matrix = new Matrix2d(arg_m_shape) // if not a matrix, convert it to one	
+		}
+		else{
+			in_shape_matrix = new Matrix2d(in_body_matrix)
+		}
+
+		let in_interaction_matrix = null
+		if( arg_m_interaction != null ){
+			if( arg_m_interaction instanceof Matrix2d)
+				in_interaction_matrix = arg_m_interaction
+			else
+				in_interaction_matrix = new Matrix2d(arg_m_interaction) // if not a matrix, convert it to one
+		}
+
+		
+		let m_body_world = new Matrix2d(in_body_matrix).normalize()
+		
+		
+		this.m_body_to_shape = in_shape_matrix.getMult(m_body_world.getInverse()) // to keep track of the shape matrix without the position and rotation
+		this.m_body_to_interaction = this.m_body_to_shape
+		if ( in_interaction_matrix != null )
+			this.m_body_to_interaction = in_interaction_matrix.getMult(m_body_world.getInverse()) // to keep track of the interaction matrix without the position and rotation
+
+		this.m_parent_to_body = m_body_world
+		if( this.obj_parent != null )
+			this.m_parent_to_body = m_body_world.getMult(this.obj_parent.trsf.get().getInverse())
+
+		this.m_body_modif = new Matrix2d() // to keep track of the user interaction movement
+	
+
+		// FOR DYN
+		this.last_m = new Matrix2d(this.get()) // to keep track of the last position
+		this.momentum = new Vector2d()
+		this.angular_momentum = 0
+
+	}
+
+	get_body()
+	{
+		// m_body
+		let m_body_init = this.m_parent_to_body
+		if( this.obj_parent != null )
+			 m_body_init = this.m_parent_to_body.getMult(this.obj_parent.trsf.get())
+		return m_body_init		
+	}
+
+	get()
+	{
+		// m_body
+		let m_body_init = this.get_body()
+		// m_body_dyn
+		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
+
+		return m_body_modified
+	}
+
+	get_shape()
+	{
+		let m_body_dyn = this.get()
+
+		return this.m_body_to_shape.getMult(m_body_dyn)
+	}	
+
+	get_interaction_shape()
+	{
+		let m_body_dyn = this.get()
+
+		return this.m_body_to_interaction.getMult(m_body_dyn)
+	}		
+
+	update(
+		transform_settings,
+		interaction,
+		dyn_settings
+	)
+	{
+		
+		// add interaction
+		this.update_with_user_interaction( transform_settings, interaction )
+		if( dyn_settings.enable )
+			this.trsf.update_with_dynamics( dyn_settings, transform_settings )
+	
+				
+	}
+	
+	update_with_user_interaction( transform_settings , Interaction )
+	{
+		if(Interaction.vCenter_to_userFirstGrab_mLocal == null )
+			return false
+
+		if(Interaction.settings.type != 'move' )
+			return false
+		
+		
+		let pUser = Interaction.pUser
+		let m = new Matrix2d( this.get() )
+		let pCenter = m.get_row(2)
+
+		let vCenter_to_userFirstGrab_mLocal = Interaction.vCenter_to_userFirstGrab_mLocal
+		let vCenter_to_userFirstGrab = vCenter_to_userFirstGrab_mLocal.getMult(m, true)
+		
+		/*
+		let pUserGrab = pCenter.getAdd( vCenter_to_userFirstGrab )
+		
+		//vCenter_to_userGrab.log('vCenter_to_userGrab')
+
+		// pATTACH
+		
+		let _vUser_to_userGrab = pUserGrab.getSub(pUser)
+		let _vUser_to_userGrab_mag = Math.min( _vUser_to_userGrab.mag(),
+			Interaction.settings.radius_threshold)
+		
+			_vUser_to_userGrab.normalize()
+			_vUser_to_userGrab.mult(_vUser_to_userGrab_mag )
+		let _pUserGrab_modif = pUser.getAdd(_vUser_to_userGrab)
+		
+		let vCenter_to_userGrab_adjusted = _pUserGrab_modif.getSub(pCenter)
+		*/
+
+		// SOLVE MATRIX
+		let _m = new Matrix2d(m)
+		
+		// SOLVE MATRIX ROTATE
+		let aMouseAttract = 0
+		if( 0 < Interaction.settings.rotate_resolution_priority)
+		{
+			// update matrix tmp
+			let vCenter_to_user = Interaction.pUser.getSub(pCenter)
+			vCenter_to_user.normalize()			
+			vCenter_to_userFirstGrab.normalize()
+			let aDelta = vCenter_to_user.getRotation(vCenter_to_userFirstGrab, false)
+			_m.rotate(aDelta*Interaction.settings.rotate_resolution_priority)
+			
+			// get force
+			aMouseAttract = aDelta*Interaction.settings.rotate_resolution_priority*Interaction.settings.coef
+			
+		}
+		// solve translate
+		let _vCenter_to_userGrab_afterRotate = vCenter_to_userFirstGrab_mLocal.getMult( _m, true )
+		let pUserGrab_afterRotate = pCenter.getAdd( _vCenter_to_userGrab_afterRotate )	 
+		let vDelta = pUser.getSub(pUserGrab_afterRotate)
+		
+		// get force
+		let vMouseAttract = vDelta.getMult(Interaction.settings.coef)
+
+		//add to matrix
+		if( Interaction.settings.do_translation == true)
+			m.setRow(2,m.get_row(2).getAdd(vMouseAttract))
+
+		//console.log(aMouseAttract)
+		m.rotate(aMouseAttract)	
+						
+
+		apply_transform_settings( m , this, transform_settings)
+		
+
+		let m_body_to_user = m.getMult(this.get_body().getInverse())
+		this.m_body_modif = m_body_to_user
+
+		return true
+	}
+
+
+
+	update_with_dynamics( dyn_settings, transform_settings )
+	{
+		//ADD DYN
+		let m = new Matrix2d( this.get() )
+
+		let p = m.get_row(2)
+		let vMomentum = this.momentum.getMult(1-dyn_settings.friction_translate)
+	
+		let pNext = p.getAdd(vMomentum)
+		let aNext = this.angular_momentum*(1-dyn_settings.friction_rotate)
+	
+		if(dyn_settings.enable_gravity)
+		{
+			pNext.add(this.GRAVITY_VECTOR.getMult(dyn_settings.mass))
+		}
+
+		for(let i = 0; i < dyn_settings.custom_forces.length; i++)
+		{
+			let force_info = dyn_settings.custom_forces[i]
+			let v = pNext.getSub(force_info.p)
+			
+			if(0 < force_info.influence_radius)
+			{
+				
+				if(v.mag() < force_info.influence_radius)
+				{
+					
+					let vForce =  v.getMult(force_info.strength)
+					pNext.add(vForce)
+				}
+			}
+			else
+			{
+				let vForce = v.getMult(force_info.strength)
+				pNext.add(vForce)
+			}
+			
+		}
+
+		m.setRow(2,pNext)
+		m.rotate(aNext)
+
+		apply_transform_settings( m , this, transform_settings )
+
+		this.m_body_modif = m.getMult(this.get_body().getInverse())
+
+
+
+		// FOR NEXT EVAL
+		let momentum = m.get_row(2).getSub(this.last_m.get_row(2))
+		/*
+		if( ( 0 < this.axe_cns_settings.dyn_bounce_coef)&&(axe_cns_info.vCollisionLimit!=null))
+		{
+			let vCollisionAdjust = axe_cns_info.vCollisionLimit
+			let momentum_inv = momentum.getMult(-1)
+
+			let new_momentum = vCollisionAdjust.getAdd(momentum_inv)
+			momentum = new_momentum.getMult(this.axe_cns_settings.dyn_bounce_coef)
+		}
+			*/
+
+		let momentum_mag = Math.max(-dyn_settings.speed_limit_translate,
+			Math.min( dyn_settings.speed_limit_translate, momentum.mag()))
+		momentum.normalize()
+		momentum.mult(momentum_mag)	
+		this.momentum = momentum	
+
+		let angular_momentum = m.getRotation() - this.last_m.getRotation()
+		
+		if( 180 < angular_momentum )
+			angular_momentum -= 360
+		if( angular_momentum < -180 )
+			angular_momentum += 360	
+		this.angular_momentum = angular_momentum	
+
+		this.angular_momentum = Math.max(-dyn_settings.speed_limit_rotate,
+			Math.min( dyn_settings.speed_limit_rotate, angular_momentum))
+		
+		this.last_m = new Matrix2d(m) // to keep track of the last position
+			
+	}
+
+}
+
+
+
+function apply_transform_settings( m , trsf , transform_settings)
+{
+
+	let m_ref = null
+	if( transform_settings.parent_limit_space == true )
+		m_ref = trsf.obj_parent.trsf.get()
+	else
+		m_ref = trsf.get_body()	
+
+	let m_local = m.getMult(m_ref.getInverse())
+	
+	if ( transform_settings.translate_limits != null )
+	{
+		let xLimits = transform_settings.translate_limits[0]
+		let yLimits = transform_settings.translate_limits[1]
+
+		let p_local = m_local.get_row(2)
+		p_local.x = Math.max(xLimits[0], Math.min(xLimits[1], p_local.x))
+		p_local.y = Math.max(yLimits[0], Math.min(yLimits[1], p_local.y))				
+		
+		m_local.setRow( 2, p_local )
+		let _m = m_local.getMult(m_ref) 
+
+		let _p = _m.get_row(2)
+		m.setRow( 2, _p)
+		//m = _m
+	}
+	
+	
+	if ( transform_settings.rotate_limits != null )
+	{
+		let r = m_local.getRotation() // -0 to -360
+		let r_pos = r *-1 // 0 to 360
+
+		// -180 to 180
+		let r_max =  transform_settings.rotate_limits[1]
+		let r_min = transform_settings.rotate_limits[0]
+		
+		 // -0 to -360
+		let r_max_pos = r_max 
+		if( r_max < 0  )
+			r_max_pos = r_max + 360
+
+		let r_min_pos = r_min
+		if( r_min_pos < 0 )
+			r_min_pos = r_min + 360
+
+		let r_middle = ( (r_max - r_min)/2 + r_min )% 360
+		let r_middle_opposite = ( r_middle + 180 )% 360
+
+		// compute new r
+		let r_pos_clamped = r_pos
+
+		// MAX CLAMP
+		if( r_max_pos < r_middle_opposite )
+		{
+			if( ( r_max_pos < r_pos_clamped )&&( r_pos_clamped <= r_middle_opposite ) )
+				r_pos_clamped = r_max_pos
+		}
+		else
+		{
+			if( ( r_max_pos < r_pos_clamped )&&( r_pos_clamped <= 360 ) )
+				r_pos_clamped = r_max_pos	
+			if( ( 0 < r_pos_clamped )&&( r_pos_clamped <= r_middle_opposite ) )
+				r_pos_clamped = r_max_pos						
+		}
+
+		// MIN CLAMP
+		if( r_middle_opposite < r_min_pos  )
+		{
+			if( ( r_middle_opposite < r_pos_clamped )&&( r_pos_clamped <= r_min_pos ) )
+				r_pos_clamped = r_min_pos
+		}
+		else
+		{
+			if( ( r_middle_opposite < r_pos_clamped )&&( r_pos_clamped <= 360 ) )
+				r_pos_clamped = r_min_pos	
+			if( ( 0 < r_pos_clamped )&&( r_pos_clamped <= r_min_pos ) )
+				r_pos_clamped = r_min_pos						
+		}
+
+
+		let r_clamped = r_pos_clamped * -1
+		
+		m_local.setRotation(r_clamped)
+		let _m = m_local.getMult(m_ref) 
+
+		
+		m.setRow( 0,  _m.get_row(0) )
+		m.setRow( 1,  _m.get_row(1) )
+	}	
+		
+	//parent_limit_space : false,
+	//translate_limits: [[-100,100],[0,0]],
+	//rotate_limits: [-15,14],
+	return m
+}
