@@ -4,7 +4,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<head>
-		<title>slide_behavior_A</title>
+		<title>slide_behavior</title>
 		<style>
 			body {
 				font-family: verdana; 
@@ -16,6 +16,22 @@
 <body>
 	<canvas id = "myCanvas"></canvas>	
 	<canvas id = "backgroundCanvas"></canvas>
-    <script src="sketch.js" type="module"></script>
   </body>
 </html>
+
+<script type="module" >
+	import { gameEngine } from '../../core/gameEngine.js';
+	import { scene_info } from './scene_info.js';
+
+	var GameEngine = new gameEngine();
+	GameEngine.load_scene(scene_info);
+	GameEngine.setup();
+
+	function game_loop(){
+		GameEngine.update();
+		GameEngine.draw();
+		requestAnimationFrame(game_loop);
+	}
+
+	game_loop();
+</script>

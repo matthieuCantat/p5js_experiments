@@ -711,7 +711,7 @@ class Transform
 			m = this.update_with_dynamics( m , dyn_settings )
 			m = this.update_with_transform_settings( m, transform_settings )
 			m = this.update_with_border_collision( m, border_collision_info )
-			this.update_dynamic_data(m)
+			this.update_dynamic_data(m,dyn_settings)
 		}
 		
 		this.m_body_modif = m.getMult(this.get_body().getInverse())
@@ -1030,7 +1030,7 @@ class Transform
 	}
 
 
-	update_dynamic_data(m)
+	update_dynamic_data(m, dyn_settings)
 	{
 		
 		// FOR NEXT EVAL

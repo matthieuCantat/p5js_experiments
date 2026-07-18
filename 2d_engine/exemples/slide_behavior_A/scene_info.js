@@ -9,7 +9,7 @@ export var scene_info = {
 }
 
 
-let p_start = new Vector2d(-150,200)
+let p_start = new Vector2d(-150,300)
 let p_offset = new Vector2d(0,-50)
 
 let settings_list = [
@@ -244,10 +244,45 @@ for( let i = 0; i < settings_list.length; i++)
             color: COLORS[color_index], 
             shape_type:'rectangle',
 
+			transform_settings : {
+				parent_limit_space : false,
+				translate_limits: [[0,300],[-0,0]],
+				rotate_limits: [0,0],
+			},        			
             interaction_settings: settings_list[i].inter,
             dyn_settings: settings_list[i].dyn,
         } 
-	
+
+		scene_info.objs["value"+i] =  {
+			m : new Matrix2d(p.getAdd(-50,-10), 0, 3), 
+			"parent":`slide${i}`,
+			"color": "black",
+			"shape_type": "text",
+			"txt": settings_list[i].title,
+			"interaction_settings": {
+				"enable": false,
+				"coef": 0.2,
+				"rotate_resolution_priority": 1.0,
+				"radius_threshold": 0,
+				"do_translation": true
+			},
+			transform_settings : {
+				parent_limit_space : false,
+				translate_limits: [[0,0],[-0,0]],
+				//rotate_limits: [0,90],
+			},            
+			"dyn_settings": {
+				"enable": false,
+				enable_gravity:false,
+				mass:0.9,
+				"friction_translate": 0.1,
+				"friction_rotate": 0.001,
+				"speed_limit_translate": 30,
+				"speed_limit_rotate": 0.3
+			},
+			//"debug":["toto"]
+		},	
+	/*
     scene_info.cns.push(
         {
 			"mode": "axe",
@@ -262,7 +297,7 @@ for( let i = 0; i < settings_list.length; i++)
 			"dyn_bounce_coef":0.5,			
         }
     )
-	
+	*/
 	
     p.add(p_offset)
 }
