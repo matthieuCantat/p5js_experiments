@@ -2,7 +2,7 @@ export var scene_info = {
     "objs": {
         "root": {
             "m": [0, 0, 0, 50, 20],
-            //"m_interaction": [0, -60, 0, 200, 340],
+            "m_interaction": [0, -60, 0, 200, 340],
             "color": "yellow",
             "shape_type": "rectangle",
             "interaction_settings": {
@@ -19,10 +19,13 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }
         },
         "spine1": {
             "m": [0, 50, 0, 50, 20],
-            //"m_interaction": [0, 50, 0, 200, 30],
+            "m_interaction": [0, 50, 0, 200, 30],
             "parent":"root",
             "color": "green",
             "shape_type": "rectangle",
@@ -47,10 +50,13 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }            
         },   
         "spine2": {
             "m": [0, 100, 0, 50, 20],
-            //"m_interaction": [0, 100, 0, 200, 30],
+            "m_interaction": [0, 100, 0, 200, 30],
             "parent":"spine1",
             "color": "green",
             "shape_type": "rectangle",
@@ -75,10 +81,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         }, 
         "head": {
             "m": [0, 185, 0, 1, 1],
             "m_shape": [0, 220, 0, 30, 50],
+            "m_interaction": [0, 220, 0, 100, 70],
             "parent":"spine2",
             "color": "green",
             "shape_type": "rectangle",
@@ -103,10 +113,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },          
         "clavicle_L": {
             "m": [20, 150, 0, 1, 1],
             "m_shape": [50, 150, 0, 50, 20],
+            "m_interaction": [50, 150, 0, 70, 40],
             "parent":"spine2",
             "color": "blue",
             "shape_type": "rectangle",
@@ -131,10 +145,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },     
         "arm_L": {
             "m": [110, 120, -10, 1, 1],
             "m_shape": [120, 80, -10, 20, 50],
+            "m_interaction": [120, 80, -10, 40, 80],
             "parent":"clavicle_L",
             "color": "blue",
             "shape_type": "rectangle",
@@ -159,10 +177,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },   
         "armLower_L": {
             "m": [130, 10, -10, 1, 1],
             "m_shape": [140, -30, -10, 20, 50],
+            "m_interaction": [140, -30, -10, 40, 80],
             "parent":"arm_L",
             "color": "blue",
             "shape_type": "rectangle",
@@ -187,10 +209,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },   
         "hand_L": {
             "m": [150, -100, -10, 1, 1],
             "m_shape": [155, -120, -10, 20, 30],
+            "m_interaction": [155, -120, -10, 40, 50],
             "parent":"armLower_L",
             "color": "blue",
             "shape_type": "rectangle",
@@ -215,10 +241,15 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
+            
         },      
         "clavicle_R": {
             "m": [-20, 150, 0, 1, 1],
             "m_shape": [-50, 150, 0, 50, 20],
+            "m_interaction":  [-50, 150, 0, 80, 40],
             "parent":"spine2",
             "color": "red",
             "shape_type": "rectangle",
@@ -243,10 +274,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },     
         "arm_R": {
             "m": [-110, 120, 10, 1, 1],
             "m_shape": [-120, 80, 10, 20, 50],
+            "m_interaction":  [-120, 80, 10, 40, 80],
             "parent":"clavicle_R",
             "color": "red",
             "shape_type": "rectangle",
@@ -271,10 +306,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },   
         "armLower_R": {
             "m": [-130, 10, 10, 1, 1],
             "m_shape": [-140, -30, 10, 20, 50],
+            "m_interaction":  [-140, -30, 10, 40, 80],
             "parent":"arm_R",
             "color": "red",
             "shape_type": "rectangle",
@@ -299,10 +338,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },   
         "hand_R": {
             "m": [-150, -100, 10, 1, 1],
             "m_shape": [-155, -120, 10, 20, 30],
+            "m_interaction":  [-155, -120, 10, 40, 80],
             "parent":"armLower_R",
             "color": "red",
             "shape_type": "rectangle",
@@ -327,10 +370,13 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },                                                           
         "hip": {
             "m": [0, -50, 0, 50, 20],
-            //"m_interaction": [0, -50, 0, 100, 30],
+            "m_interaction": [0, -50, 0, 100, 30],
             "parent":"root",
             "color": "green",
             "shape_type": "rectangle",
@@ -355,11 +401,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },
         "leg_L": {
             "m": [50, -100, 0, 1, 1],
             "m_shape": [50, -130, 0, 20, 50],
-            //"m_interaction": [70, -130, 0, 70, 55],
+            "m_interaction": [70, -130, 0, 70, 55],
             "parent":"hip",
             "color": "blue",
             "shape_type": "rectangle",
@@ -384,11 +433,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },
         "legLower_L": {
             "m": [50, -210, 0, 1, 1],
             "m_shape": [50, -240, 0, 20, 50],
-            //"m_interaction": [70, -240, 0, 70, 55],
+            "m_interaction": [70, -240, 0, 70, 55],
             "parent":"leg_L",
             "color": "blue",
             "shape_type": "rectangle",
@@ -413,11 +465,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },
         "foot_L": {
             "m": [50, -320, 0, 20, 20],
             "m_shape": [70, -320, 0, 40, 20],
-            //"m_interaction": [70, -340, 0, 70, 45],
+            "m_interaction": [70, -340, 0, 70, 45],
             "parent":"legLower_L",
             "color": "blue",
             "shape_type": "rectangle",
@@ -442,11 +497,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },          
         "leg_R": {
             "m": [-50, -100, 0, 20, 20],
             "m_shape": [-50, -130, 0, 20, 50],
-            //"m_interaction": [-70, -130, 0, 70, 55],
+            "m_interaction": [-70, -130, 0, 70, 55],
             "parent":"hip",
             "color": "red",
             "shape_type": "rectangle",
@@ -471,11 +529,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         }, 
         "legLower_R": {
             "m": [-50, -210, 0, 20, 20],
             "m_shape": [-50, -240, 0, 20, 50],
-            //"m_interaction": [-70, -240, 0, 70, 55],
+            "m_interaction": [-70, -240, 0, 70, 55],
             "parent":"leg_R",
             "color": "red",
             "shape_type": "rectangle",
@@ -500,11 +561,14 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },     
         "foot_R": {
             "m": [-50, -320, 0, 20, 20],
             "m_shape": [-70, -320, 0, 40, 20],
-            //"m_interaction": [-70, -340, 0, 70, 45],
+            "m_interaction": [-70, -340, 0, 70, 45],
             "parent":"legLower_R",
             "color": "red",
             "shape_type": "rectangle",
@@ -529,6 +593,9 @@ export var scene_info = {
                 "speed_limit_translate": 30,
                 "speed_limit_rotate": 0.3
             },
+            "debug": {
+                "shape_interaction_visibility": true
+            }    
         },                                
     },
     "cns": []

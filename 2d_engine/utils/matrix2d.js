@@ -136,9 +136,46 @@ export default function Matrix2d(a,b,c,d,e,f) {
 Matrix2d.prototype = {
 
 	
+	set: function(a,b,c,d,e,f) {
+	
+		if (arguments.length === 0)
+		{
+			// do nothing
+		}
+		else if (arguments.length === 1)
+		{
+			if (a instanceof Matrix2d)
+			{
+				// init from matrix
+				let m = a
+				this.a = m.a
+				this.b = m.b
+				this.c = m.c
+				this.d = m.d
+				this.e = m.e
+				this.f = m.f
+			}
+		}
+		else if (arguments.length === 6)
+		{
+			this.a = a
+			this.b = b
+			this.c = c
+			this.d = d
+			this.e = e
+			this.f = f
+		}			
+	},
 
 	______TRANSLATE: null,
 
+	getTranslateX: function() {
+		return this.e
+	},
+
+	getTranslateY: function() {
+		return this.f
+	},
 
 	setTranslation: function(x,y) {
 		if (arguments.length === 1)

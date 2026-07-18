@@ -31,18 +31,6 @@ export class body
 		text: isPointInside_rectangle,
 	}
 
-	BORDERS_CENTER_POINTS = [
-		new Vector2d(0,280),
-		new Vector2d(170,0),
-		new Vector2d(0,-420),
-		new Vector2d(-180,0)
-	]
-	BORDERS_NORMALS = [
-		new Vector2d(0,-1),
-		new Vector2d(-1,0),
-		new Vector2d(0,1),
-		new Vector2d(1,0)
-	]	
 
 	HIGHLIGHT_STROKE_COLOR = "yellow"
 	HIGHLIGHT_STROKE_WIDTH = 5
@@ -62,6 +50,7 @@ export class body
 			shape_visibility : true,
 			m_interaction: null,
 			shape_type: "rectangle",
+			shape_type_interaction: null,
 			color: "white",
 			color_brignthess: 0.7,
 			stroke_color: "black",
@@ -75,6 +64,7 @@ export class body
 			txt : '',
 			Game_engine: null,
 			Time: null,
+			debug : {},
 		}
 		this.args = { ...defaultOptions, ...in_options };
 
@@ -133,6 +123,7 @@ export class body
 
 		this.visibility = this.args.visibility
 		this.shape_visibility = this.args.shape_visibility
+		
 		// TRANSFORM
 
 		let transform_settings_default = {
@@ -183,8 +174,22 @@ export class body
 		}
 		this.axe_cns_settings = { ...axe_cns_settings_default, ...in_options.axe_cns_settings };
 		*/
+		this.border_collision_info = {
+			do_border_collision : this.args.do_border_collision,		
+			borders_center_points : [
+				new Vector2d(0,280),
+				new Vector2d(170,0),
+				new Vector2d(0,-420),
+				new Vector2d(-180,0)
+			],
+			borders_normals : [
+				new Vector2d(0,-1),
+				new Vector2d(-1,0),
+				new Vector2d(0,1),
+				new Vector2d(1,0)
+			]	
+		}
 		
-		this.do_border_collision = this.args.do_border_collision
 
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// EFFECTS
@@ -237,9 +242,13 @@ export class body
 
 
 		// PARENT
-	
 		
-
+		this.shape_type_interaction = this.args.shape_type_interaction
+		if( this.shape_type_interaction == null )
+			this.shape_type_interaction = this.shape_type
+		
+		
+		this.debug = this.args.debug
 
 	}
 
@@ -342,110 +351,14 @@ export class body
 		this.trsf.update(
 			this.transform_settings,
 			this.interaction,
-			this.dyn_settings
+			this.dyn_settings,
+			this.border_collision_info
 		)
 	
 		//let axe_cns_info = { vCollisionLimit : null}
 		//if(this.axe_cns_settings.enable)
 		//	axe_cns_info = this.update_matrix_axe_cns()
 		
-	
-
-		if( this.do_border_collision )
-		{
-			let pCenter = this.m.get_row(2)
-			let vX = this.m.get_row(0)
-			let vY = this.m.get_row(1)
-			let min_radius = Math.min(vX.mag(),vY.mag())
-
-			
-			// first resolve center core
-			for( let i = 0 ; i < 4 ;i++)
-			{
-				let v = pCenter.getSub(this.BORDERS_CENTER_POINTS[i])
-				let vBorder = this.BORDERS_NORMALS[i].getNormal()
-				vBorder.normalize()
-				let dot_proj = v.dot(vBorder)
-				let pProj = vBorder.mult(dot_proj).getAdd(this.BORDERS_CENTER_POINTS[i])
-				let v_proj_to_center = pCenter.getSub(pProj)
-				
-				let side_dot = v_proj_to_center.dot(this.BORDERS_NORMALS[i])
-				let isOnScreenSide = 0 < side_dot
-				if ( isOnScreenSide )
-				{
-					if( v_proj_to_center.mag() < min_radius )
-					{
-						let push_mag = min_radius - v_proj_to_center.mag() 
-						let vPush =  v_proj_to_center.getNormalized()
-						vPush.mult(push_mag )
-						pCenter.add(vPush)
-					}
-				}
-				else
-				{
-					let push_mag = v_proj_to_center.mag()+min_radius
-					let vPush =  v_proj_to_center.getNormalized()
-					vPush.mult(-push_mag )
-					pCenter.add(vPush)
-				}
-			}
-			this.m.setRow(2,pCenter)
-
-			// solve
-		
-			/*
-
-			for( let i = 0 ; i < 4 ;i++)
-			{
-				pCenter = this.m.get_row(2)
-
-				vX = this.m.get_row(0)
-				vY = this.m.get_row(1)					
-				let points = [
-					pCenter.getAdd(vX.getMult(-1)).getAdd(vY),
-					pCenter.getAdd(vX).getAdd(vY),
-					pCenter.getAdd(vX).getAdd(vY.getMult(-1)),
-					pCenter.getAdd(vX.getMult(-1)).getAdd(vY.getMult(-1)),
-				]
-
-				for( let j = 0 ; j < 4 ;j++)
-				{
-
-
-					let v = points[j].getSub(this.BORDERS_CENTER_POINTS[i])
-					let vBorder = this.BORDERS_NORMALS[i].getNormal()
-					vBorder.normalize()
-					let dot_proj = v.dot(vBorder)
-					let pProj = vBorder.mult(dot_proj).getAdd(this.BORDERS_CENTER_POINTS[i])
-					let v_proj_to_center = pCenter.getSub(pProj).normalize()
-					let v_proj_to_point = points[j].getSub(pProj)
-
-					let side_dot = v_proj_to_point.dot(this.BORDERS_NORMALS[i])
-					let isOnScreenSide = 0 < side_dot
-					if ( isOnScreenSide == false )
-					{
-						let push_mag = v_proj_to_point.mag()
-						
-						let vPushToCenter_mag = v_proj_to_point.dot(v_proj_to_center)
-						let vPushToCenter = v_proj_to_center.getMult(vPushToCenter_mag)
-
-						let vPushRot = v_proj_to_point.getSub(vPushToCenter)
-						let _p = points[i].getAdd(vPushRot)
-						let vA = points[i].getSub(pCenter)
-						let vB = _p.getSub(pCenter)
-						let rot = vA.getRotation(vB)
-
-						this.m.setRow(2,this.m.get_row(2).add(vPushToCenter))
-						this.m.rotate(rot)
-						
-
-					}
-				}
-			}
-			this.m.setRow(2,pCenter)			
-			*/
-
-		}
 
 
 		if(this.isSelected())
@@ -503,19 +416,25 @@ export class body
 		let mShape = this.trsf.get_interaction_shape()
 		let s = this.interaction.settings.scale_selection_shape;
 		mShape = mShape.scale(s,s);
-		
-		return this.isPointInsideFactory[this.shape_type](point, mShape);
+
+		return this.isPointInsideFactory[this.shape_type_interaction](point, mShape);
 	}
 
 	get_render_infos_interaction_shape_debug()
 	{
-		return [ {
-			shape_type : this.shape_type,      
-			m : this.trsf.get_interaction_shape(), 
-			color : null,
-			stroke_color : this.color, 
-			stroke_width : 1,        
-		} ]		
+		let interaction_render = []
+		if( this.debug.shape_interaction_visibility )
+		{
+			interaction_render.push({
+				shape_type : this.shape_type_interaction,      
+				m : this.trsf.get_interaction_shape(), 
+				color : null,
+				stroke_color : this.color, 
+				stroke_width : 1,        
+			} )
+		}
+
+		return interaction_render
 	}
 
 
@@ -564,13 +483,33 @@ export class body
 
 	get_render_infos()
 	{
-		return [ {
+		let draw_info = [ {
 			shape_type : this.shape_type,      
 			m : this.trsf.get_shape(), 
+			txt: this.txt,
 			color : this.color,
 			stroke_color : this.stroke_color, 
 			stroke_width : this.stroke_width,        
 		} ]
+		/*
+		for ( const key of this.args.debug)
+		{
+			
+			draw_info.push(
+				{
+					shape_type : 'text',      
+					m : this.trsf.get_shape().setScale(4), 
+					txt : `${this.trsf.get_shape().getRotation()}`,
+					color : this.color,
+					stroke_color : this.stroke_color, 
+					stroke_width : this.stroke_width,        
+				}
+			)
+			
+		}
+		*/
+
+		return draw_info
 	}
 
 	get_render_infos_interaction_debug()
@@ -705,9 +644,12 @@ class Transform
 	
 
 		// FOR DYN
-		this.last_m = new Matrix2d(this.get()) // to keep track of the last position
-		this.momentum = new Vector2d()
-		this.angular_momentum = 0
+		this.dyn_data = {
+			last_m : new Matrix2d(this.get()),
+			momentum : new Vector2d(),
+			angular_momentum : 0,
+		}
+		
 
 	}
 
@@ -747,29 +689,40 @@ class Transform
 	update(
 		transform_settings,
 		interaction,
-		dyn_settings
+		dyn_settings,
+		border_collision_info
 	)
 	{
+		let do_interaction = ( (interaction.vCenter_to_userFirstGrab_mLocal != null )&&(interaction.settings.type == 'move' ) )
 		
-		// add interaction
-		this.update_with_user_interaction( transform_settings, interaction )
+
+
+		let m = new Matrix2d( this.get() )
+		
+		if( do_interaction )
+		{
+			m = this.update_with_user_interaction( m, interaction )
+			m = this.update_with_transform_settings( m, transform_settings )
+		}
+
+
 		if( dyn_settings.enable )
-			this.trsf.update_with_dynamics( dyn_settings, transform_settings )
-	
-				
+		{
+			m = this.update_with_dynamics( m , dyn_settings )
+			m = this.update_with_transform_settings( m, transform_settings )
+			m = this.update_with_border_collision( m, border_collision_info )
+			this.update_dynamic_data(m)
+		}
+		
+		this.m_body_modif = m.getMult(this.get_body().getInverse())
+
 	}
 	
-	update_with_user_interaction( transform_settings , Interaction )
+	update_with_user_interaction( m , Interaction )
 	{
-		if(Interaction.vCenter_to_userFirstGrab_mLocal == null )
-			return false
-
-		if(Interaction.settings.type != 'move' )
-			return false
 		
 		
 		let pUser = Interaction.pUser
-		let m = new Matrix2d( this.get() )
 		let pCenter = m.get_row(2)
 
 		let vCenter_to_userFirstGrab_mLocal = Interaction.vCenter_to_userFirstGrab_mLocal
@@ -825,29 +778,23 @@ class Transform
 
 		//console.log(aMouseAttract)
 		m.rotate(aMouseAttract)	
-						
 
-		apply_transform_settings( m , this, transform_settings)
-		
-
-		let m_body_to_user = m.getMult(this.get_body().getInverse())
-		this.m_body_modif = m_body_to_user
-
-		return true
+		return m
 	}
 
 
 
-	update_with_dynamics( dyn_settings, transform_settings )
+
+
+	update_with_dynamics( m, dyn_settings )
 	{
 		//ADD DYN
-		let m = new Matrix2d( this.get() )
 
 		let p = m.get_row(2)
-		let vMomentum = this.momentum.getMult(1-dyn_settings.friction_translate)
+		let vMomentum = this.dyn_data.momentum.getMult(1-dyn_settings.friction_translate)
 	
 		let pNext = p.getAdd(vMomentum)
-		let aNext = this.angular_momentum*(1-dyn_settings.friction_rotate)
+		let aNext = this.dyn_data.angular_momentum*(1-dyn_settings.friction_rotate)
 	
 		if(dyn_settings.enable_gravity)
 		{
@@ -880,14 +827,214 @@ class Transform
 		m.setRow(2,pNext)
 		m.rotate(aNext)
 
-		apply_transform_settings( m , this, transform_settings )
+		return m
+	}
 
-		this.m_body_modif = m.getMult(this.get_body().getInverse())
+	update_with_border_collision( m, border_collision_info )
+	{
+		if( border_collision_info.do_border_collision )
+		{
+			let pCenter = m.get_row(2)
+			let vX = m.get_row(0)
+			let vY = m.get_row(1)
+			let min_radius = Math.min(vX.mag(),vY.mag())
+
+			
+			// first resolve center core
+			for( let i = 0 ; i < 4 ;i++)
+			{
+				let v = pCenter.getSub(border_collision_info.borders_center_points[i])
+				let vBorder = border_collision_info.borders_normals[i].getNormal()
+				vBorder.normalize()
+				let dot_proj = v.dot(vBorder)
+				let pProj = vBorder.mult(dot_proj).getAdd(border_collision_info.borders_center_points[i])
+				let v_proj_to_center = pCenter.getSub(pProj)
+				
+				let side_dot = v_proj_to_center.dot(border_collision_info.borders_normals[i])
+				let isOnScreenSide = 0 < side_dot
+				if ( isOnScreenSide )
+				{
+					if( v_proj_to_center.mag() < min_radius )
+					{
+						let push_mag = min_radius - v_proj_to_center.mag() 
+						let vPush =  v_proj_to_center.getNormalized()
+						vPush.mult(push_mag )
+						pCenter.add(vPush)
+					}
+				}
+				else
+				{
+					let push_mag = v_proj_to_center.mag()+min_radius
+					let vPush =  v_proj_to_center.getNormalized()
+					vPush.mult(-push_mag )
+					pCenter.add(vPush)
+				}
+			}
+			m.setRow(2,pCenter)
+
+			// solve
+		
+			/*
+
+			for( let i = 0 ; i < 4 ;i++)
+			{
+				pCenter = this.m.get_row(2)
+
+				vX = this.m.get_row(0)
+				vY = this.m.get_row(1)					
+				let points = [
+					pCenter.getAdd(vX.getMult(-1)).getAdd(vY),
+					pCenter.getAdd(vX).getAdd(vY),
+					pCenter.getAdd(vX).getAdd(vY.getMult(-1)),
+					pCenter.getAdd(vX.getMult(-1)).getAdd(vY.getMult(-1)),
+				]
+
+				for( let j = 0 ; j < 4 ;j++)
+				{
 
 
+					let v = points[j].getSub(this.borders_center_points[i])
+					let vBorder = this.borders_normals[i].getNormal()
+					vBorder.normalize()
+					let dot_proj = v.dot(vBorder)
+					let pProj = vBorder.mult(dot_proj).getAdd(this.borders_center_points[i])
+					let v_proj_to_center = pCenter.getSub(pProj).normalize()
+					let v_proj_to_point = points[j].getSub(pProj)
 
+					let side_dot = v_proj_to_point.dot(this.borders_normals[i])
+					let isOnScreenSide = 0 < side_dot
+					if ( isOnScreenSide == false )
+					{
+						let push_mag = v_proj_to_point.mag()
+						
+						let vPushToCenter_mag = v_proj_to_point.dot(v_proj_to_center)
+						let vPushToCenter = v_proj_to_center.getMult(vPushToCenter_mag)
+
+						let vPushRot = v_proj_to_point.getSub(vPushToCenter)
+						let _p = points[i].getAdd(vPushRot)
+						let vA = points[i].getSub(pCenter)
+						let vB = _p.getSub(pCenter)
+						let rot = vA.getRotation(vB)
+
+						this.m.setRow(2,this.m.get_row(2).add(vPushToCenter))
+						this.m.rotate(rot)
+						
+
+					}
+				}
+			}
+			this.m.setRow(2,pCenter)			
+			*/
+
+		}	
+		
+		return m
+	}
+
+	update_with_transform_settings( m , transform_settings)
+	{
+
+		let m_ref = null
+		if( transform_settings.parent_limit_space == true )
+			m_ref = this.obj_parent.trsf.get()
+		else
+			m_ref = this.get_body()	
+
+		let m_local = m.getMult(m_ref.getInverse())
+		
+		if ( transform_settings.translate_limits != null )
+		{
+			let xLimits = transform_settings.translate_limits[0]
+			let yLimits = transform_settings.translate_limits[1]
+
+			let p_local = m_local.get_row(2)
+			p_local.x = Math.max(xLimits[0], Math.min(xLimits[1], p_local.x))
+			p_local.y = Math.max(yLimits[0], Math.min(yLimits[1], p_local.y))				
+			
+			m_local.setRow( 2, p_local )
+			let _m = m_local.getMult(m_ref) 
+
+			let _p = _m.get_row(2)
+			m.setRow( 2, _p)
+			//m = _m
+		}
+		
+		
+		if ( transform_settings.rotate_limits != null )
+		{
+			let r = m_local.getRotation() // 0 to 360
+			let r_pos = r // 0 to 360
+
+			// -180 to 180
+			let r_max =  transform_settings.rotate_limits[1]
+			let r_min = transform_settings.rotate_limits[0]
+			
+			// -0 to -360
+			let r_max_pos = r_max 
+			if( r_max < 0  )
+				r_max_pos = r_max + 360
+
+			let r_min_pos = r_min
+			if( r_min_pos < 0 )
+				r_min_pos = r_min + 360
+
+			let r_middle = ( (r_max - r_min)/2 + r_min )% 360
+			let r_middle_opposite = ( r_middle + 180 )% 360
+
+			// compute new r
+			let r_pos_clamped = r_pos
+
+			// MAX CLAMP
+			if( r_max_pos < r_middle_opposite )
+			{
+				if( ( r_max_pos < r_pos_clamped )&&( r_pos_clamped <= r_middle_opposite ) )
+					r_pos_clamped = r_max_pos
+			}
+			else
+			{
+				if( ( r_max_pos < r_pos_clamped )&&( r_pos_clamped <= 360 ) )
+					r_pos_clamped = r_max_pos	
+				if( ( 0 < r_pos_clamped )&&( r_pos_clamped <= r_middle_opposite ) )
+					r_pos_clamped = r_max_pos						
+			}
+
+			// MIN CLAMP
+			if( r_middle_opposite < r_min_pos  )
+			{
+				if( ( r_middle_opposite < r_pos_clamped )&&( r_pos_clamped <= r_min_pos ) )
+					r_pos_clamped = r_min_pos
+			}
+			else
+			{
+				if( ( r_middle_opposite < r_pos_clamped )&&( r_pos_clamped <= 360 ) )
+					r_pos_clamped = r_min_pos	
+				if( ( 0 < r_pos_clamped )&&( r_pos_clamped <= r_min_pos ) )
+					r_pos_clamped = r_min_pos						
+			}
+
+
+			let r_clamped = r_pos_clamped 
+			
+			m_local.setRotation(r_clamped)
+			let _m = m_local.getMult(m_ref) 
+
+			
+			m.setRow( 0,  _m.get_row(0) )
+			m.setRow( 1,  _m.get_row(1) )
+		}	
+			
+		//parent_limit_space : false,
+		//translate_limits: [[-100,100],[0,0]],
+		//rotate_limits: [-15,14],
+		return m
+	}
+
+
+	update_dynamic_data(m)
+	{
+		
 		// FOR NEXT EVAL
-		let momentum = m.get_row(2).getSub(this.last_m.get_row(2))
+		let momentum = m.get_row(2).getSub(this.dyn_data.last_m.get_row(2))
 		/*
 		if( ( 0 < this.axe_cns_settings.dyn_bounce_coef)&&(axe_cns_info.vCollisionLimit!=null))
 		{
@@ -903,121 +1050,23 @@ class Transform
 			Math.min( dyn_settings.speed_limit_translate, momentum.mag()))
 		momentum.normalize()
 		momentum.mult(momentum_mag)	
-		this.momentum = momentum	
+		this.dyn_data.momentum = momentum	
 
-		let angular_momentum = m.getRotation() - this.last_m.getRotation()
+		let angular_momentum = m.getRotation() - this.dyn_data.last_m.getRotation()
 		
 		if( 180 < angular_momentum )
 			angular_momentum -= 360
 		if( angular_momentum < -180 )
 			angular_momentum += 360	
-		this.angular_momentum = angular_momentum	
+		this.dyn_data.angular_momentum = angular_momentum	
 
-		this.angular_momentum = Math.max(-dyn_settings.speed_limit_rotate,
+		this.dyn_data.angular_momentum = Math.max(-dyn_settings.speed_limit_rotate,
 			Math.min( dyn_settings.speed_limit_rotate, angular_momentum))
 		
-		this.last_m = new Matrix2d(m) // to keep track of the last position
+		this.dyn_data.last_m.set(m) 
 			
 	}
 
-}
 
 
-
-function apply_transform_settings( m , trsf , transform_settings)
-{
-
-	let m_ref = null
-	if( transform_settings.parent_limit_space == true )
-		m_ref = trsf.obj_parent.trsf.get()
-	else
-		m_ref = trsf.get_body()	
-
-	let m_local = m.getMult(m_ref.getInverse())
-	
-	if ( transform_settings.translate_limits != null )
-	{
-		let xLimits = transform_settings.translate_limits[0]
-		let yLimits = transform_settings.translate_limits[1]
-
-		let p_local = m_local.get_row(2)
-		p_local.x = Math.max(xLimits[0], Math.min(xLimits[1], p_local.x))
-		p_local.y = Math.max(yLimits[0], Math.min(yLimits[1], p_local.y))				
-		
-		m_local.setRow( 2, p_local )
-		let _m = m_local.getMult(m_ref) 
-
-		let _p = _m.get_row(2)
-		m.setRow( 2, _p)
-		//m = _m
-	}
-	
-	
-	if ( transform_settings.rotate_limits != null )
-	{
-		let r = m_local.getRotation() // -0 to -360
-		let r_pos = r *-1 // 0 to 360
-
-		// -180 to 180
-		let r_max =  transform_settings.rotate_limits[1]
-		let r_min = transform_settings.rotate_limits[0]
-		
-		 // -0 to -360
-		let r_max_pos = r_max 
-		if( r_max < 0  )
-			r_max_pos = r_max + 360
-
-		let r_min_pos = r_min
-		if( r_min_pos < 0 )
-			r_min_pos = r_min + 360
-
-		let r_middle = ( (r_max - r_min)/2 + r_min )% 360
-		let r_middle_opposite = ( r_middle + 180 )% 360
-
-		// compute new r
-		let r_pos_clamped = r_pos
-
-		// MAX CLAMP
-		if( r_max_pos < r_middle_opposite )
-		{
-			if( ( r_max_pos < r_pos_clamped )&&( r_pos_clamped <= r_middle_opposite ) )
-				r_pos_clamped = r_max_pos
-		}
-		else
-		{
-			if( ( r_max_pos < r_pos_clamped )&&( r_pos_clamped <= 360 ) )
-				r_pos_clamped = r_max_pos	
-			if( ( 0 < r_pos_clamped )&&( r_pos_clamped <= r_middle_opposite ) )
-				r_pos_clamped = r_max_pos						
-		}
-
-		// MIN CLAMP
-		if( r_middle_opposite < r_min_pos  )
-		{
-			if( ( r_middle_opposite < r_pos_clamped )&&( r_pos_clamped <= r_min_pos ) )
-				r_pos_clamped = r_min_pos
-		}
-		else
-		{
-			if( ( r_middle_opposite < r_pos_clamped )&&( r_pos_clamped <= 360 ) )
-				r_pos_clamped = r_min_pos	
-			if( ( 0 < r_pos_clamped )&&( r_pos_clamped <= r_min_pos ) )
-				r_pos_clamped = r_min_pos						
-		}
-
-
-		let r_clamped = r_pos_clamped * -1
-		
-		m_local.setRotation(r_clamped)
-		let _m = m_local.getMult(m_ref) 
-
-		
-		m.setRow( 0,  _m.get_row(0) )
-		m.setRow( 1,  _m.get_row(1) )
-	}	
-		
-	//parent_limit_space : false,
-	//translate_limits: [[-100,100],[0,0]],
-	//rotate_limits: [-15,14],
-	return m
 }

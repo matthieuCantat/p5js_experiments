@@ -54,6 +54,89 @@ export class Constraints_info
                         cns.value_base.push(cns.objs[i].m.get_row(2).y)
                 }
             }
+
+            if( cns.mode === 'connection' )
+            {
+                let src_attr = cns.src[1]
+                let dst_attr = cns.dst[1]
+
+                let expr_txt = ''
+                if( dst_attr.slice(-2) == '()' )
+                {
+                    let dst_attr_modified = dst_attr.slice(0,-2);
+                    expr_txt = `dst_obj.${dst_attr_modified}( src_obj.${src_attr} );`;
+                }
+                else 
+                    expr_txt = `dst_obj.${dst_attr} = src_obj.${src_attr} ;`;
+
+                cns.connection_fn = Function("src_obj", "dst_obj", expr_txt);
+                
+            }  
+
+            if( cns.mode === 'expression' )
+            {
+                
+                let out_attr = cns.out[1]
+                let in_expr_txt = cns.expression
+
+                let expr_elements = in_expr_txt.split(' ')
+                let args_names = []
+                for( let i = 0 ; i < expr_elements.length; i++ )
+                {
+                    let el = expr_elements[i]
+                    if( el == '+' || el == '-' || el == '*' || el == '/' || el == '(' || el == ')' )
+                        continue
+
+                    let found = false
+                    for( let attr in cns )
+                    {
+                        if( attr == 'expression' )
+                            continue
+                        if( attr == 'mode' )
+                            continue
+                        if( attr == 'out' )
+                            continue
+                        if( attr === el )
+                        {
+                            found = true
+                            break
+                        }
+                    }
+
+                    if( found )
+                    {
+                        
+                        if( typeof cns[el] === 'number' )
+                            expr_elements[i] = `${cns[el]}`
+                        else
+                        {
+                            expr_elements[i] = `${el}.${cns[el][1]}`  
+                            args_names.push(el)
+                        }
+                              
+                    }
+
+                }
+                
+                args_names.push('out')
+                let in_expr_txt_modified = expr_elements.join(' ')
+                
+
+                let expr_txt = ''
+                if( out_attr.slice(-2) == '()' )
+                {
+                    let out_attr_modified = out_attr.slice(0,-2);
+                    expr_txt = `out.${out_attr_modified}( ${in_expr_txt_modified} );`;
+                }
+                else 
+                    expr_txt = `out.${out_attr} = ${in_expr_txt_modified} ;`;
+
+                
+                //console.log(args_names,expr_txt)
+                cns.expression_fn = Function(...args_names, expr_txt);
+                cns.args_names = args_names
+                
+            }                       
         }
     }
 
@@ -67,6 +150,29 @@ export class Constraints_info
         
         for( let cns of this.data )
         {
+            if( cns.mode === 'connection' )
+            {
+                let src_obj = this.Game_engine.Objs[cns.src[0]]
+                let dst_obj = this.Game_engine.Objs[cns.dst[0]]
+
+                cns.connection_fn(src_obj, dst_obj)
+            }
+
+            if( cns.mode === 'expression' )
+            {
+                let objs = []
+                for( let arg_name of cns.args_names)
+                {
+                    let obj_name = cns[arg_name][0]
+                    objs.push(this.Game_engine.Objs[obj_name])
+                }
+                    
+                
+                cns.expression_fn(...objs);
+                
+
+            }
+
             if( cns.mode === 'instance' )
             {
                 // GET INDEX OF SELECTED OBJ

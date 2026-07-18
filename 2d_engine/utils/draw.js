@@ -191,14 +191,16 @@ export var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth - 20;
 canvas.height = window.innerHeight - 20;
+var HALF_WIDTH = canvas.width / 2;
+var HALF_HEIGHT = canvas.height / 2;
 
 
-export function cX(pos) { return canvas.width / 2 + pos.x ; }
-export function cY(pos) { return 0.4 * canvas.height - pos.y ; }
+export function cX(pos) { return pos.x + HALF_WIDTH ; }
+export function cY(pos) { return HALF_HEIGHT - pos.y ; }
 export function cR(rotation){ return rotation*-1 ; }
 
-export function cX_inv(pos) { return pos.x - canvas.width / 2  ; }
-export function cY_inv(pos) { return  0.4 * canvas.height - pos.y ; }
+export function cX_inv(pos) { return pos.x - HALF_WIDTH  ; }
+export function cY_inv(pos) { return  HALF_HEIGHT - pos.y ; }
 export function cR_inv(rotation){ return rotation*-1 ; }
 
 
@@ -300,9 +302,11 @@ export function draw_text(ctx, { m = null , txt = '' })
 	let orient = m.getRotation()
 	let scale = m.getScale()
 	
-
 	ctx.font =''+Math.ceil(scale.x)*7+'px serif';
+
+	ctx.beginPath();
 	ctx.fillText(txt, cX(p), cY(p));
+	ctx.closePath();
 	
 }
 

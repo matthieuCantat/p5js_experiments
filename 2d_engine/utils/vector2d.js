@@ -94,12 +94,14 @@ export default class Vector2d
         let det = this.x*vOther.y - this.y*vOther.x      // Determinant
         let angle = Math.atan2(det, dot)  // atan2(y, x) or atan2(sin, cos) 
       
+        
         if(clockwise)
         {
-            let v_ortho = this.getOrtho()
-            if(0 < v_ortho.dot(vOther) )
-                angle = 2*Math.PI+angle
             angle = angle *-1
+            let v_ortho = this.getOrtho()
+            if( v_ortho.dot(vOther) < 0 )
+                angle = angle + Math.PI*2
+            
         }
         
         return angle

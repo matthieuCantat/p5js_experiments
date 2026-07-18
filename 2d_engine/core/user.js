@@ -76,7 +76,7 @@ export class User
 		let HELPER_START_POINT_LIFTIME = 50
 		
 		
-		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.State.isInteracting )
+		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.Event.fingerOnScreen.status )
 		if( draw_press_position )
 		{	
 			let start_size = User.DRAW_DEFAULT.circle_size_anim_start + User.DRAW_DEFAULT.circle_size
@@ -91,11 +91,11 @@ export class User
 				stroke_color : 'black', 
 				strokes_width : 5,            
 			})
-
-
-
 		}
+		
 
+
+		/*
 		let draw_release_position = ( 0 < this.Counter.isNotInteracting < HELPER_START_POINT_LIFTIME )&&( this.State.isInteracting )
 		if( draw_release_position )
 		{
@@ -114,8 +114,9 @@ export class User
 			
 
 		}
+			*/
 		
-		if( this.State.isInteracting )
+		if( this.Event.fingerOnScreen.status )
 		{
 			// CURRENT MOUSE PRESSED
 						

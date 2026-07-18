@@ -22,6 +22,8 @@ export class gameEngine {
         draw_body_interaction_shapes : true,
         draw_body_matrices : false,
     }
+    PHONE_HALF_DIMENTIONS = [ 180, 350 ]
+    DESKTOP_HALF_DIMENTIONS = [ 250, 400 ]
     
     constructor() {
         logger.info("constructor")
@@ -86,56 +88,195 @@ export class gameEngine {
             shape_type : 'uniform_background', 
             color: 'grey' } )
         
-        // grid
-        for( let i = 0 ; i < 10; i++ )
-            this.Render.queue_background.push( { 
-                shape_type : 'line', 
-                points : [{x:-1000,y:-500 + 100*i},{x:1000,y:-500 + 100*i}], 
-                stroke_color : 'black', 
-                stroke_width : 1 } )
 
-        for( let i = 0 ; i < 10; i++ )
-            this.Render.queue_background.push( { 
-                shape_type : 'line', 
-                points : [{x:-500+100*i,y:-1000},{x:-500+100*i,y:1000}], 
-                stroke_color : 'black', 
-                stroke_width : 1 } )
-        
+        // grid A
+        {
+            let grid_thickness = 0.2
+            let grid_incr = 10
+            for( let i = 0 ; i < 100; i++ )
+            {
+                let x_abs = this.DESKTOP_HALF_DIMENTIONS[0]
+                let y_abs = grid_incr*i
+                if ( this.DESKTOP_HALF_DIMENTIONS[1] < y_abs)
+                    break
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:-x_abs, y: y_abs},
+                        {x: x_abs, y: y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } )
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:-x_abs, y:-y_abs},
+                        {x: x_abs, y:-y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } ) 
+            }
+
+            for( let i = 0 ; i < 100; i++ )
+            {
+                let x_abs = grid_incr*i
+                let y_abs = this.DESKTOP_HALF_DIMENTIONS[1]
+                if ( this.DESKTOP_HALF_DIMENTIONS[0] < x_abs)
+                    break
+
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:x_abs, y:-y_abs},
+                        {x:x_abs, y:y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } )
+
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:-x_abs, y:-y_abs},
+                        {x:-x_abs, y:y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } )                
+            }
+        }
+
+
+        // grid A
+        {
+            let grid_thickness = 0.4
+            let grid_incr = 50
+            for( let i = 0 ; i < 100; i++ )
+            {
+                let x_abs = this.DESKTOP_HALF_DIMENTIONS[0]
+                let y_abs = grid_incr*i
+                if ( this.DESKTOP_HALF_DIMENTIONS[1] < y_abs)
+                    break
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:-x_abs, y: y_abs},
+                        {x: x_abs, y: y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } )
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:-x_abs, y:-y_abs},
+                        {x: x_abs, y:-y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } ) 
+            }
+
+            for( let i = 0 ; i < 100; i++ )
+            {
+                let x_abs = grid_incr*i
+                let y_abs = this.DESKTOP_HALF_DIMENTIONS[1]
+                if ( this.DESKTOP_HALF_DIMENTIONS[0] < x_abs)
+                    break
+
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:x_abs, y:-y_abs},
+                        {x:x_abs, y:y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } )
+
+                this.Render.queue_background.push( { 
+                    shape_type : 'line', 
+                    points : [
+                        {x:-x_abs, y:-y_abs},
+                        {x:-x_abs, y:y_abs}
+                    ], 
+                    stroke_color : 'black', 
+                    stroke_width : grid_thickness } )                
+            }
+        }
+
+
+        // grid A
+        {
+            let grid_thickness = 2
+            let grid_incr = 100
+            let grid_color = 'lightgrey'
+            for( let i = 0 ; i < 100; i++ )
+            {
+                let y_abs = grid_incr*i
+                if ( this.DESKTOP_HALF_DIMENTIONS[1] < y_abs)
+                    break
+                this.Render.queue_background.push( { 
+                    shape_type : 'text', 
+                    txt : `${y_abs}`,
+                    m : new Matrix2d().setTranslation(0,y_abs).setScale(grid_thickness),
+                    color : grid_color } )
+                this.Render.queue_background.push( { 
+                    shape_type : 'text', 
+                    txt : `${-y_abs}`,
+                    m : new Matrix2d().setTranslation(0,-y_abs).setScale(grid_thickness),
+                    color : grid_color } ) 
+            }
+
+            for( let i = 0 ; i < 100; i++ )
+            {
+                let x_abs = grid_incr*i
+                if ( this.DESKTOP_HALF_DIMENTIONS[0] < x_abs)
+                    break
+
+                this.Render.queue_background.push( { 
+                    shape_type : 'text', 
+                    txt : `${x_abs}`,
+                    m : new Matrix2d().setTranslation(x_abs,0).setScale(grid_thickness),
+                    color : grid_color } )
+                this.Render.queue_background.push( { 
+                    shape_type : 'text', 
+                    txt : `${-x_abs}`,
+                    m : new Matrix2d().setTranslation(-x_abs,0).setScale(grid_thickness),
+                    color : grid_color } )              
+            }
+        }        
+
+        // MAIN GRID AXIS
         this.Render.queue_background.push( { 
             shape_type : 'line', 
-            points : [{x:-1000,y:0},{x:1000,y:0}], 
+            points : [{x:-this.DESKTOP_HALF_DIMENTIONS[0],y:0},{x:this.DESKTOP_HALF_DIMENTIONS[0],y:0}], 
             stroke_color : 'black', 
             stroke_width : 3 } )
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
-            points : [{x:0,y:-1000},{x:0,y:1000}], 
+            points : [{x:0,y:-this.DESKTOP_HALF_DIMENTIONS[1]},{x:0,y:this.DESKTOP_HALF_DIMENTIONS[1]}], 
             stroke_color : 'black', 
             stroke_width : 3 } )
             
-        //phone dims
-
+        //PHONE DIMS
         this.Render.queue_background.push( { 
             shape_type : 'line', 
-            points : [{x:-1000,y:-420},{x:1000,y:-420}], 
+            points : [{x:-this.DESKTOP_HALF_DIMENTIONS[0],y:-this.PHONE_HALF_DIMENTIONS[1]},{x:this.DESKTOP_HALF_DIMENTIONS[0],y:-this.PHONE_HALF_DIMENTIONS[1]}], 
             stroke_color : 'red', 
             stroke_width : 3 } )                
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
-            points : [{x:-1000,y:280},{x:1000,y:280}], 
+            points : [{x:-this.DESKTOP_HALF_DIMENTIONS[0],y:this.PHONE_HALF_DIMENTIONS[1]},{x:this.DESKTOP_HALF_DIMENTIONS[0],y:this.PHONE_HALF_DIMENTIONS[1]}], 
             stroke_color : 'red', 
             stroke_width : 3 } )         
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
-            points : [{x:-180,y:-1000},{x:-180,y:1000}], 
+            points : [{x:-this.PHONE_HALF_DIMENTIONS[0],y:-this.DESKTOP_HALF_DIMENTIONS[1]},{x:-this.PHONE_HALF_DIMENTIONS[0],y:this.DESKTOP_HALF_DIMENTIONS[1]}], 
             stroke_color : 'red', 
             stroke_width : 3 } )       
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
-            points : [{x:170,y:-1000},{x:170,y:1000}], 
+            points : [{x:this.PHONE_HALF_DIMENTIONS[0],y:-this.DESKTOP_HALF_DIMENTIONS[1]},{x:this.PHONE_HALF_DIMENTIONS[0],y:this.DESKTOP_HALF_DIMENTIONS[1]}], 
             stroke_color : 'red', 
             stroke_width : 3 } ) 
         
