@@ -653,6 +653,41 @@ class Transform
 
 	}
 
+
+	set(m)
+	{
+		this.m_body_modif = m.getMult(this.get_body().getInverse())
+	}
+
+	setTranslate(p)
+	{
+		let m = this.get()
+		m.setRow(2,p)
+		this.set(m)
+	}
+	
+	setTranslateX( value )
+	{
+		let m = this.get()
+		m.setRow(2,new Vector2d(value,m.get_row(2).y))
+		this.set(m)
+	}
+
+	setTranslateY( value )
+	{
+		let m = this.get()
+		m.setRow(2,new Vector2d(m.get_row(2).x,value))
+		this.set(m)
+	}
+
+	setRotationDeg( value )
+	{
+		let m = this.get()
+		m.setRotationDeg(value)
+		this.set(m)
+	}
+
+
 	get_body()
 	{
 		// m_body
@@ -714,7 +749,8 @@ class Transform
 			this.update_dynamic_data(m,dyn_settings)
 		}
 		
-		this.m_body_modif = m.getMult(this.get_body().getInverse())
+		this.set(m)
+		//this.m_body_modif = m.getMult(this.get_body().getInverse())
 
 	}
 	

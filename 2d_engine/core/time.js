@@ -26,6 +26,10 @@ export class Time {
       this.one_update_debug_time_passed = false;
 
     }
+
+    get(){
+      return this.elapsed
+    }
   
     update() {
       

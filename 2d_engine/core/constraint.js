@@ -1,7 +1,8 @@
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
-import { project_point_on_line, multiply_vector_with_matrix } from '../utils/math.js';
+import { project_point_on_line, round } from '../utils/math.js';
 import { Logger } from './logger.js';
+
 
 const logger = new Logger("constraints Manager");
 
@@ -132,6 +133,9 @@ export class Constraints_info
                     expr_txt = `out.${out_attr} = ${in_expr_txt_modified} ;`;
 
                 
+                // add math function to args_names
+                args_names.push('ctx')
+
                 //console.log(args_names,expr_txt)
                 cns.expression_fn = Function(...args_names, expr_txt);
                 cns.args_names = args_names
@@ -163,9 +167,14 @@ export class Constraints_info
                 let objs = []
                 for( let arg_name of cns.args_names)
                 {
+                    if( cns[arg_name] == undefined )
+                        continue
                     let obj_name = cns[arg_name][0]
                     objs.push(this.Game_engine.Objs[obj_name])
                 }
+
+                var ctx = { round: round }
+                objs.push(ctx)
                     
                 
                 cns.expression_fn(...objs);
@@ -261,10 +270,12 @@ export class Constraints_info
                 let pAxe = vOffset.getAdd( m_driver.get_row(2) )		
                 
                 // add axe constraint
-                let pDriven = cns.driven_objs[0].m.get_row(2)
+                let m = cns.driven_objs[0].trsf.get()
+                let pDriven = m.get_row(2)
                 let pDriven_on_axe = project_point_on_line( pDriven, vAxe, pAxe )
                 
-                cns.driven_objs[0].m.setRow(2,pDriven_on_axe)
+                m.setRow(2,pDriven_on_axe)
+                
 
                 if(cns.enable_limits)
                 {
@@ -297,7 +308,8 @@ export class Constraints_info
                         pDriven_on_axe = pLimit
                     }				
                     
-                    cns.driven_objs[0].m.setRow(2,pDriven_on_axe)    
+
+                    m.setRow(2,pDriven_on_axe)    
                 }
 
                 
@@ -305,9 +317,9 @@ export class Constraints_info
 
                 if( 0 < cns.rotation_constraint_coef )
                 {
-                    let vX = cns.driven_objs[0].m.get_row(cns.rotation_constraint_axe)
+                    let vX = m.get_row(cns.rotation_constraint_axe)
                     let aDelta = vX.getRotation(vAxe)
-                    cns.driven_objs[0].m.rotate(aDelta*cns.rotation_constraint_coef)
+                    m.rotate(aDelta*cns.rotation_constraint_coef)
                 }
 
                 let user_is_modifying_driven = false;
@@ -359,12 +371,13 @@ export class Constraints_info
                         //<<<<<< pCurrent
 
 
-                    cns.driven_objs[0].m.setRow(2,pDriven);
+                    m.setRow(2,pDriven);
 
                     this.Game_engine.game_time = l_current/step_incr;
                     
                 }
                 
+                cns.driven_objs[0].trsf.set(m)
         
                 //return out_info
                     

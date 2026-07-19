@@ -212,28 +212,30 @@ export var scene_info = {
 		},									
 	},
 	
-	"cns": [
+	"cns": [		
 		{
-			mode: 'connection',
-			src : [ 'rotate', 'trsf.get_shape().getRotation()' ],
-			dst : [ 'rotate_value', 'txt'],
-		},
+			mode: 'expression',
+			A : [ 'rotate', 'trsf.get_shape().getRotation()' ],
+			expression : 'ctx.round( A , 1 )',
+			out : [ 'rotate_value', 'txt'],
+		}, 		
 		
 		{
 			mode: 'connection',
 			src : [ 'rotate', 'trsf.get_shape().getRotation()'],
-			dst : [ 'rotate_connect', 'trsf.m_body_modif.setRotationDeg()' ],
+			dst : [ 'rotate_connect', 'trsf.setRotationDeg()' ],
 		}, 
-		
 		{
-			mode: 'connection',
-			src : [ 'translate', 'trsf.get_shape().getTranslateX()'],
-			dst : [ 'translate_value', 'txt'],
-		}, 	
+			mode: 'expression',
+			A : [ 'translate', 'trsf.get_shape().getTranslateX()'],
+			expression : 'ctx.round( A , 1 )',
+			out : [ 'translate_value', 'txt'],
+		}, 
+
 		{
 			mode: 'connection',
 			src : [ 'translate', 'trsf.get_shape().getTranslateX()' ],
-			dst : [ 'translate_connect', 'trsf.m_body_modif.setRotationDeg()' ],
+			dst : [ 'translate_connect', 'trsf.setRotationDeg()' ],
 		}, 	
 		
 		{
@@ -242,9 +244,16 @@ export var scene_info = {
 			B : [ 'rotate', 'trsf.get_shape().getRotation()' ],
 			C : 2,
 			expression : ' A + B * C ',
-			out : [ 'translate_connectB', 'trsf.m_body_modif.setRotationDeg()' ],
+			out : [ 'translate_connectB', 'trsf.setRotationDeg()' ],
 		}, 
+		{
+			mode: 'expression',
+			A : [ 'translate', 'Game_engine.Time.get()' ],
+			expression : ' Math.sin( A * 3 ) * 150',
+			out : [ 'translate_connectB', 'trsf.setTranslateY()' ],
+		}, 		
 			 		 
 	],	
+	
 						
 }

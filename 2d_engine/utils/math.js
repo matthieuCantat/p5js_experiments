@@ -118,7 +118,7 @@ export function multiply_vector_with_matrix( v, m, normalize=false )
 export function round( value, decimals )
 {
   let factor = Math.pow(10, decimals);
-  return Math.round(value * factor) / factor;
+  return Math.round( (value + Number.EPSILON )* factor) / factor;
 }
 
 export function degree(value) {
