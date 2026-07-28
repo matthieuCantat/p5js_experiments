@@ -258,7 +258,7 @@ for( let i = 0; i < settings_list.length; i++)
 			"parent":`slide${i}`,
 			"color": "black",
 			"shape_type": "text",
-			"txt": settings_list[i].title,
+			"text": settings_list[i].title,
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,

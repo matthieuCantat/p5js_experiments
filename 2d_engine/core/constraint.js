@@ -34,11 +34,35 @@ export class Constraints_info
         
     }
 
-    setup(data)
+    setup(raw_data)
     {
+        let cns_args = []
+        for( let cns_arg of raw_data )
+        {
+            // Convert to obj 
+            if(cns_arg.mode === 'instance')
+            {
+                for( let i = 0 ; i < cns_arg.objs.length; i++ )
+                    cns_arg.objs[i] = this.Objs[cns_arg.objs[i]]
+            }
+            else if(cns_arg.mode === 'axe')
+            {
+                if( typeof cns_arg.driver_obj === 'string' ){
+                    cns_arg.driver_obj = this.Objs[cns_arg.driver_obj]
+                }
+                
+                for ( let i = 0 ; i < cns_arg.driven_objs.length; i++ )
+                    if( typeof cns_arg.driven_objs[i] === 'string' )
+                        cns_arg.driven_objs[i] = this.Objs[cns_arg.driven_objs[i]]
+            }
+            
+            cns_args.push( cns_arg )
+        }
+
+
         logger.info("setup")
 
-        this.data = data   
+        this.data = cns_args   
         // store offset
         for( let cns of this.data )
         {
@@ -76,69 +100,29 @@ export class Constraints_info
 
             if( cns.mode === 'expression' )
             {
-                
-                let out_attr = cns.out[1]
                 let in_expr_txt = cns.expression
 
-                let expr_elements = in_expr_txt.split(' ')
-                let args_names = []
-                for( let i = 0 ; i < expr_elements.length; i++ )
+                var in_args = {}    
+                for( let attr in cns )
                 {
-                    let el = expr_elements[i]
-                    if( el == '+' || el == '-' || el == '*' || el == '/' || el == '(' || el == ')' )
+                    if( attr == 'expression' )
                         continue
-
-                    let found = false
-                    for( let attr in cns )
-                    {
-                        if( attr == 'expression' )
-                            continue
-                        if( attr == 'mode' )
-                            continue
-                        if( attr == 'out' )
-                            continue
-                        if( attr === el )
-                        {
-                            found = true
-                            break
-                        }
-                    }
-
-                    if( found )
-                    {
-                        
-                        if( typeof cns[el] === 'number' )
-                            expr_elements[i] = `${cns[el]}`
-                        else
-                        {
-                            expr_elements[i] = `${el}.${cns[el][1]}`  
-                            args_names.push(el)
-                        }
-                              
-                    }
-
+                    if( attr == 'mode' )
+                        continue
+                    if( attr == 'out' )
+                        continue
+                    in_args[attr] = cns[attr]
                 }
                 
-                args_names.push('out')
-                let in_expr_txt_modified = expr_elements.join(' ')
+                let out_attr = null
+                if( cns.out instanceof Array )
+                    out_attr = cns.out[1]
                 
-
-                let expr_txt = ''
-                if( out_attr.slice(-2) == '()' )
-                {
-                    let out_attr_modified = out_attr.slice(0,-2);
-                    expr_txt = `out.${out_attr_modified}( ${in_expr_txt_modified} );`;
-                }
-                else 
-                    expr_txt = `out.${out_attr} = ${in_expr_txt_modified} ;`;
-
                 
-                // add math function to args_names
-                args_names.push('ctx')
-
-                //console.log(args_names,expr_txt)
-                cns.expression_fn = Function(...args_names, expr_txt);
-                cns.args_names = args_names
+                let out_info = build_expression_function( in_expr_txt, in_args, out_attr )
+                
+                cns.expression_fn = out_info.function;
+                cns.args_names = out_info.args_names
                 
             }                       
         }
@@ -172,12 +156,9 @@ export class Constraints_info
                     let obj_name = cns[arg_name][0]
                     objs.push(this.Game_engine.Objs[obj_name])
                 }
+              
+                execute_expression_function( cns.expression_fn, objs )
 
-                var ctx = { round: round }
-                objs.push(ctx)
-                    
-                
-                cns.expression_fn(...objs);
                 
 
             }
@@ -394,3 +375,77 @@ export class Constraints_info
 
 
 
+
+export function build_expression_function( in_expr_txt, in_args, out_attr)
+{
+                    
+    let expr_elements = in_expr_txt.split(' ')
+    let args_names = []
+    for( let i = 0 ; i < expr_elements.length; i++ )
+    {
+        let el = expr_elements[i]
+        if( el == '+' || el == '-' || el == '*' || el == '/' || el == '(' || el == ')' )
+            continue
+
+        let found = false
+        for( let attr in in_args )
+        {
+            if( attr === el )
+            {
+                found = true
+                break
+            }
+        }
+
+        if( found )
+        {
+            
+            if( typeof in_args[el] === 'number' )
+                expr_elements[i] = `${in_args[el]}`
+            else
+            {
+                expr_elements[i] = `${el}.${in_args[el][1]}`  
+                args_names.push(el)
+            }
+                  
+        }
+
+    }
+    if( out_attr !== null )
+        args_names.push('out')
+    
+    let in_expr_txt_modified = expr_elements.join(' ')
+    
+
+    let expr_txt = ''
+    if( out_attr == null )
+    {
+        expr_txt = `${in_expr_txt_modified} ;`;
+    }
+    else if( out_attr.slice(-2) == '()' )
+    {
+        let out_attr_modified = out_attr.slice(0,-2);
+        expr_txt = `out.${out_attr_modified}( ${in_expr_txt_modified} );`;
+    }
+    else
+    {
+        expr_txt = `out.${out_attr} = ${in_expr_txt_modified} ;`;
+    } 
+    
+    // add math function to args_names
+    args_names.push('ctx')
+
+    //console.log(args_names,expr_txt)
+    var expression_fn = Function(...args_names, expr_txt);
+    return { function : expression_fn, args_names : args_names }
+}
+
+
+
+export function execute_expression_function( fn, in_values)
+{
+    var ctx = { round: round }
+    in_values.push(ctx)
+    
+    return fn(...in_values);
+}

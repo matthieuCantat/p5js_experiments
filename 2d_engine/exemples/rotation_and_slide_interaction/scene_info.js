@@ -42,7 +42,7 @@ export var scene_info = {
 			"parent":"rotate",
 			"color": "blue",
 			"shape_type": "text",
-			"txt": "0.0",
+			"text": "0.0",
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -132,7 +132,7 @@ export var scene_info = {
 			"parent":"translate",
 			"color": "blue",
 			"shape_type": "text",
-			"txt": "0.0",
+			"text": "0.0",
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -217,7 +217,7 @@ export var scene_info = {
 			mode: 'expression',
 			A : [ 'rotate', 'trsf.get_shape().getRotation()' ],
 			expression : 'ctx.round( A , 1 )',
-			out : [ 'rotate_value', 'txt'],
+			out : [ 'rotate_value', 'text'],
 		}, 		
 		
 		{
@@ -229,7 +229,7 @@ export var scene_info = {
 			mode: 'expression',
 			A : [ 'translate', 'trsf.get_shape().getTranslateX()'],
 			expression : 'ctx.round( A , 1 )',
-			out : [ 'translate_value', 'txt'],
+			out : [ 'translate_value', 'text'],
 		}, 
 
 		{

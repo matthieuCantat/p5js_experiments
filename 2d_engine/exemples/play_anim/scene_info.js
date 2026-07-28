@@ -30,7 +30,7 @@ scene_info["objs"] = {
         "m": [20, -350, 0, 5,20],
         "color": "blue",
         "shape_type": "rectangle",
-        "txt": 1,
+        "text": 1,
         "interaction_settings": {
             'enable':true,
             'coef':1.0,
@@ -49,7 +49,7 @@ scene_info["objs"] = {
         "m": [20, -320, 0, 5,20],
         "color": "red",
         "shape_type": "text",
-        "txt": 1,                     
+        "text": 1,                     
     },       
     "play_button": {
         "m": [-145, -350, 90, 20,20],

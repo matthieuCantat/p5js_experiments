@@ -233,12 +233,12 @@ export function draw_uniform_background(
 
 
 
-export function draw_background_text(txt,p,color,size)
+export function draw_background_text(text,p,color,size)
 {
 	
 	bgCtx.fillStyle = color
 	bgCtx.font = size + "px arial";
-	bgCtx.fillText(txt, cX(p), cY(p));
+	bgCtx.fillText(text, cX(p), cY(p));
 	
 	
 }
@@ -296,7 +296,7 @@ export function draw_rectangle(ctx, { m = null, sub_draw = false } )
 
 
 
-export function draw_text(ctx, { m = null , txt = '' })
+export function draw_text(ctx, { m = null , text = '' })
 {
 	let p = m.get_row(2)
 	let orient = m.getRotation()
@@ -305,7 +305,7 @@ export function draw_text(ctx, { m = null , txt = '' })
 	ctx.font =''+Math.ceil(scale.x)*7+'px serif';
 
 	ctx.beginPath();
-	ctx.fillText(txt, cX(p), cY(p));
+	ctx.fillText(text, cX(p), cY(p));
 	ctx.closePath();
 	
 }

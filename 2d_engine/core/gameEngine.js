@@ -4,6 +4,7 @@
 import { Time } from './time.js'
 import { User } from './user.js'
 import { Constraints_info } from './constraint.js'
+import { EventActions } from './eventActions.js'
 import {
 	COLORS,
 	canvas,} from '../utils/draw.js'
@@ -33,6 +34,7 @@ export class gameEngine {
         this.Time = new Time();
         this.User = new User( this, this.Time );
         this.Constraints = new Constraints_info( this.User, this, this.Time );
+        this.EventActions = new EventActions( this, this.Time );
         this.Objs = {};
         this.body_effects = [];
         this.Render = new Render();
@@ -49,29 +51,11 @@ export class gameEngine {
             this.Objs[obj] = new body( { ...scene_info.objs[obj], Game_engine:this, Time: this.Time } )
         
         // LOAD CONSTRAINTS
-        let cns_args = []
-        for( let cns_arg of scene_info.cns )
-        {
-            // Convert to obj 
-            if(cns_arg.mode === 'instance')
-            {
-                for( let i = 0 ; i < cns_arg.objs.length; i++ )
-                    cns_arg.objs[i] = this.Objs[cns_arg.objs[i]]
-            }
-            else if(cns_arg.mode === 'axe')
-            {
-                if( typeof cns_arg.driver_obj === 'string' ){
-                    cns_arg.driver_obj = this.Objs[cns_arg.driver_obj]
-                }
-                
-                for ( let i = 0 ; i < cns_arg.driven_objs.length; i++ )
-                    if( typeof cns_arg.driven_objs[i] === 'string' )
-                        cns_arg.driven_objs[i] = this.Objs[cns_arg.driven_objs[i]]
-            }
-            
-            cns_args.push( cns_arg )
-        }
-        this.Constraints.setup( cns_args )
+        this.Constraints.setup( scene_info.cns )
+
+        
+        // LOAD EVENT ACTIONS
+        this.EventActions.setup( scene_info.eventActions )
             
     }
 
@@ -213,12 +197,12 @@ export class gameEngine {
                     break
                 this.Render.queue_background.push( { 
                     shape_type : 'text', 
-                    txt : `${y_abs}`,
+                    text : `${y_abs}`,
                     m : new Matrix2d().setTranslation(0,y_abs).setScale(grid_thickness),
                     color : grid_color } )
                 this.Render.queue_background.push( { 
                     shape_type : 'text', 
-                    txt : `${-y_abs}`,
+                    text : `${-y_abs}`,
                     m : new Matrix2d().setTranslation(0,-y_abs).setScale(grid_thickness),
                     color : grid_color } ) 
             }
@@ -231,12 +215,12 @@ export class gameEngine {
 
                 this.Render.queue_background.push( { 
                     shape_type : 'text', 
-                    txt : `${x_abs}`,
+                    text : `${x_abs}`,
                     m : new Matrix2d().setTranslation(x_abs,0).setScale(grid_thickness),
                     color : grid_color } )
                 this.Render.queue_background.push( { 
                     shape_type : 'text', 
-                    txt : `${-x_abs}`,
+                    text : `${-x_abs}`,
                     m : new Matrix2d().setTranslation(-x_abs,0).setScale(grid_thickness),
                     color : grid_color } )              
             }
@@ -301,6 +285,8 @@ export class gameEngine {
             elem.update()
         
         this.Constraints.update()
+
+        this.EventActions.update()
 
         this.Time.update()
     }

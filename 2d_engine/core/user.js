@@ -130,15 +130,16 @@ export class User
 
 			
 		
-			
+			/*
 			// SELECTED OBJ SELECTION
-			if( this.Selection.obj != null)
+			const selected_obj = this.Selection.get_selected_obj( this.Game_engine)
+			if( selected_obj != null)
 			{
-				let m = this.Selection.obj.m
-				let m_init = this.Selection.obj.m_init
-				let v = this.Selection.vOffset
-				let interaction_type = this.Selection.obj.interaction_settings.attr
-				let interaction = this.Selection.obj.interaction
+				let m = selected_obj.m
+				let m_init = selected_obj.m_init
+				let v = selected_obj.interaction.vCenter_to_userFirstGrab_mLocal
+				let interaction_type = selected_obj.interaction_settings.attr
+				let interaction = selected_obj.interaction
 				let pObjAttachInteraction = v.getMult(m)
 
 				let pObjCenter = m.get_row(2)
@@ -301,39 +302,10 @@ export class User
 				else if(interaction_type == 'tr')
 				{
 
-					/*
-					draw_queue.push({
-						shape_type : 'circle',  
-						m : new Matrix2d().setTranslation(pObjAttachInteraction).setScale(5), 
-						color : 'yellow',
-						stroke_color : 'black', 
-						strokes_width : 5,            
-					} )
-
-					draw_queue.push({
-						shape_type : 'circle',  
-						m : new Matrix2d().setTranslation(pObjCenter).setScale(5), 
-						color : 'yellow',
-						stroke_color : 'black', 
-						strokes_width : 5,            
-					} )
-		
-					draw_queue.push({
-						shape_type : 'line',
-						points : [pObjAttachInteraction, pObjCenter] , 
-						stroke_color : 'yellow', 
-						lineWidth : 2 })
-
-					draw_queue.push({
-						shape_type : 'line',
-						points : [pObjAttachInteraction, this.Coords.p] , 
-						stroke_color : 'red', 
-						lineWidth : 2 })
-						*/
 				}				
 				else if(interaction_type == 'button_hold')
 				{
-					let Shape = this.Selection.obj.duplicate()
+					let Shape = selected_obj.obj.duplicate()
 					//Shape.color = null
 					let current_scale = Shape.m.getScale()
 
@@ -347,17 +319,18 @@ export class User
 				}					
 				else if(interaction_type == 'button_first_press')
 				{
-					console.log("button_first_press", this.Selection.obj)
+					console.log("button_first_press", selected_obj.obj)
 					
 					let effect_inst = new body_effect(
-						this.Selection.obj,
-						this.Selection.obj.effects,
+						selected_obj.obj,
+						selected_obj.obj.effects,
 						this.Time)
 					this.Game_engine.body_effects.push(effect_inst)
 				
-					this.Selection.clear()
+					selected_obj.clear()
 				}	
 			}
+				*/
 
 			// TRAIL
 			
@@ -382,8 +355,10 @@ export class User
 	{
 		for( let n in Objs )
 		{
-			if(this.Selection.obj == Objs[n])
+			const selected_obj = this.Selection.get_selected_obj(this.Game_engine)
+			if( selected_obj == Objs[n] )
 			{
+				
 				for( let event in Objs[n].events )
 					Objs[n].events[event].status = this.Event[event].status
 			}
@@ -820,7 +795,6 @@ class Event{
 
 		this.idle.count += 1
 		
-		
 	}
 
 
@@ -871,8 +845,16 @@ class Selection
 		}
 
 		return true
-	
 	}	
+
+	get_selected_obj(Game_engine)
+	{
+		for( let n in Game_engine.Objs )
+			if( Game_engine.Objs[n].interaction.vCenter_to_userFirstGrab_mLocal != null)
+				return Game_engine.Objs[n]
+		return null		
+	}
+
 
 
 

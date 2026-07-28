@@ -9,6 +9,7 @@ import Matrix2d from '../utils/matrix2d.js';
 import { body_effect } from './effect.js';
 import Vector2d from '../utils/vector2d.js';
 import { Logger } from './logger.js';
+import { build_expression_function, execute_expression_function } from './constraint.js';
 
 const logger = new Logger("body");
 
@@ -56,15 +57,14 @@ export class body
 			stroke_color: "black",
 			stroke_width: 2,
             interaction: null,
-			effect_name: null,
 			event_effects: {},
-			event_cmds: {},
 			dyn_settings: {},
 			do_border_collision:false,
-			txt : '',
+			text : '',
 			Game_engine: null,
 			Time: null,
 			debug : {},
+			//eventActions : [],
 		}
 		this.args = { ...defaultOptions, ...in_options };
 
@@ -82,10 +82,9 @@ export class body
 		//
 		//this.m = new Matrix2d(mShape)
 		//this.m.normalize()
-//
+
 		//this.m_shape = mShape.getMult(this.m.getInverse()) // to keep track of the shape matrix without the position and rotation
 		//
-//
 		//this.m_init = new Matrix2d(this.args.m)
 		
 		let parent_obj = null
@@ -118,7 +117,7 @@ export class body
 		
 		// OTHER
         this.interaction = this.args.interaction
-		this.txt = this.args.txt
+		this.text = this.args.text
 
 
 		this.visibility = this.args.visibility
@@ -191,14 +190,17 @@ export class body
 		}
 		
 
+		this.interaction = {
+			settings : _interaction_settings,
+			vCenter_to_userFirstGrab_mLocal : null,
+			pUser : this.Game_engine.User.Coords.p,
+			vOffset : null,	
+		}
+
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// EFFECTS
 		/////////////////////////////////////////////////////////
 
-		this.effect_name = this.args.effect_name
-		
-		this.event_cmds = this.args.event_cmds
-	
 		this.events = {
 			'touchDown':      { name:'touchDown'     , status: false, count:0, effect_insts: [] },
 			'touchUp':        { name:'touchUp'       , status: false, count:0, effect_insts: [] },
@@ -210,12 +212,6 @@ export class body
 			'idle':           { name:'idle'          , status: false, count:0, effect_insts: [] },
 		}
 		
-		this.interaction = {
-			settings : _interaction_settings,
-			vCenter_to_userFirstGrab_mLocal : null,
-			pUser : this.Game_engine.User.Coords.p,
-			vOffset : null,	
-		}
 		
 		// update effect duration with event ref
 		this.event_effects = this.args.event_effects
@@ -240,6 +236,11 @@ export class body
 			}
 		}
 
+		//this.eventActions = this.args.eventActions
+
+		/////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////// OTHERS
+		/////////////////////////////////////////////////////////
 
 		// PARENT
 		
@@ -253,10 +254,98 @@ export class body
 	}
 
 
-
+	
 	update_event_effects()
 	{
 		
+
+		/*
+		// Check if any event is triggered and create the effect instance if needed	
+		for( const eventAction of this.eventActions)
+		{
+			const event_name = eventAction.event;
+			
+			if( this.events[event_name].status == false ) 
+				continue
+			
+			var action = eventAction.action
+			if( action.mode == 'expression' )
+			{
+
+                let in_expr_txt = action.expression
+
+                var in_args = {}    
+                for( let attr in action )
+                {
+                    if( attr == 'expression' )
+                        continue
+                    if( attr == 'mode' )
+                        continue
+                    if( attr == 'out' )
+                        continue
+                    in_args[attr] = action[attr]
+                }
+
+                let out_attr = null
+                if( action.out instanceof Array )
+                    out_attr = action.out[1]
+                
+			
+
+				let out_info = build_expression_function( in_expr_txt , in_args, out_attr)
+				
+				out_info.args_names
+				out_info.function
+
+                let objs = []
+                for( let arg_name of out_info.args_names)
+                {
+					if( action[arg_name] == undefined )
+                        continue
+                    let obj_name = action[arg_name][0]
+                    objs.push(this.Game_engine.Objs[obj_name])
+                }
+
+				execute_expression_function( out_info.function, objs )
+                
+			}
+		}
+		*/
+
+
+		for( const key in this.events)
+		{
+			
+			let no_effects_linked = ( this.event_effects[key] == null )
+			if( no_effects_linked )
+				continue
+
+			let isTriggered = (this.events[key].status == true)
+			if( isTriggered == false ) 
+				continue
+
+			let effect_already_running = (0 < this.events[key].effect_insts.length )
+			let isNotRepeatable = this.event_effects[key].isRepeatable == false
+			let oneEffectAtTheTime = ((isNotRepeatable)&&(effect_already_running))
+		
+			if(oneEffectAtTheTime)
+				continue
+
+			
+			let effect_inst = new body_effect(
+				this,
+				this.event_effects[key].effects,
+				this.Time,)
+
+			this.events[key].effect_insts.push( effect_inst	)
+			this.Game_engine.body_effects.push( effect_inst )	
+		
+		}
+		//this.eventActions					
+	
+
+
+
 		// clean
 		for( const key in this.events)
 		{
@@ -274,11 +363,8 @@ export class body
 				else
 				{
 					effect_inst_cleaned.push(effect_insts[i])
-				}
-					
+				}		
 			}
-
-			
 			this.events[key].effect_insts = effect_inst_cleaned
 		}
 
@@ -486,7 +572,7 @@ export class body
 		let draw_info = [ {
 			shape_type : this.shape_type,      
 			m : this.trsf.get_shape(), 
-			txt: this.txt,
+			text: this.text,
 			color : this.color,
 			stroke_color : this.stroke_color, 
 			stroke_width : this.stroke_width,        
@@ -499,7 +585,7 @@ export class body
 				{
 					shape_type : 'text',      
 					m : this.trsf.get_shape().setScale(4), 
-					txt : `${this.trsf.get_shape().getRotation()}`,
+					text : `${this.trsf.get_shape().getRotation()}`,
 					color : this.color,
 					stroke_color : this.stroke_color, 
 					stroke_width : this.stroke_width,        
@@ -706,6 +792,24 @@ class Transform
 
 		return m_body_modified
 	}
+
+	
+	getTranslate()
+	{
+		let m = this.get()
+		return m.get_row(2)
+	}
+
+	getTranslateX()
+	{
+		return this.getTranslate().x
+	}
+
+	getTranslateY( )
+	{
+		return this.getTranslate().y
+	}
+
 
 	get_shape()
 	{
