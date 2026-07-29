@@ -70,7 +70,7 @@ export var scene_info = {
 		},
 		"triggerRotateLastEvent_fingerOnScreen": {
 			"m":  [-50, -1000, 0, 4, 4],
-			"color": "red",
+			"color": "green",
 			"shape_type": "text",
 			"text": "Yes",	        
 		},
@@ -81,10 +81,16 @@ export var scene_info = {
 			"text": "grab",	        
 		},
 		"triggerRotateLastEvent_drag": {
-			"m":  [0, -1000, 0, 4, 4],
+			"m":  [50, -1000, 0, 4, 4],
 			"color": "blue",
 			"shape_type": "text",
 			"text": "drag",	        
+		},
+		"triggerRotateLastEvent_flick": {
+			"m":  [50, -1000, 0, 4, 4],
+			"color": "red",
+			"shape_type": "text",
+			"text": "flick",	        
 		},
 		"triggerRotateLastEvent_idle": {
 			"m":  [0, -1000, 0, 4, 4],
@@ -167,6 +173,12 @@ export var scene_info = {
 			A : [ 'triggerRotateLastEvent_drag', 'trsf.getTranslateY()' ],
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_drag', 'trsf.setTranslateY()' ],
+		},
+		{
+			mode: 'expression',
+			A : [ 'triggerRotateLastEvent_flick', 'trsf.getTranslateY()' ],
+			expression : 'A - 10',
+			out : [ 'triggerRotateLastEvent_flick', 'trsf.setTranslateY()' ],
 		},
 		{
 			mode: 'expression',
@@ -284,6 +296,22 @@ export var scene_info = {
 			event_max_duration : 1000,
 			action : {
 				in_args : [ 'triggerRotateLastEvent_drag' ],
+				fn : (obj) => {
+					obj.trsf.setTranslateY( 300 );
+				  },
+			}
+		},
+		{
+			event_start : {
+				in_args : [ 'triggerRotate' ],
+				fn : (obj) => {
+					return obj.events.flick.status;
+				  }
+			},
+			event_end : null,
+			event_max_duration : 1000,
+			action : {
+				in_args : [ 'triggerRotateLastEvent_flick' ],
 				fn : (obj) => {
 					obj.trsf.setTranslateY( 300 );
 				  },

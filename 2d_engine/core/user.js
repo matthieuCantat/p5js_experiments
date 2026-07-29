@@ -575,9 +575,11 @@ class Coords{
 		this.p_last.set( this.p )
 
 
-		this.p_history.unshift(this.p)
+		this.p_history.unshift(new Vector2d(this.p))
 		if ( this.POINT_HISTORY_MAX_SIZE < this.p_history.length)
-			this.p_history.pop(); // Remove the oldest if over size			
+			this.p_history.pop(); // Remove the oldest if over size		
+		
+		
 	}
 }
 
@@ -590,14 +592,15 @@ class Event{
 	static THRESHOLD = {
 		frame_nbr:{
 			touch_up_fix : 30,
-			tap : 20,
-			grab : 21,
-			drag : 4,
+			tap : 10,
+			//grab : 10,
+			//drag : 4,
 			idle : 200,
 		},
 		distance:{
 			hold : 0.01,
-			drag : 0.01,
+			drag : 50,
+			flick : 0,
 		},
 	}
 
@@ -643,7 +646,26 @@ class Event{
 					this.touchUp.status = true
 			}
 		}
+		//fix fingerOnScreen
+		threshold = Math.min( this.touchDown.history.length, this.touchUp.history.length)
+		this.fingerOnScreen.status = false
+		for( let i = 0 ; i < threshold ; i++)
+		{
+			if( this.touchUp.history[i] )
+				break
+			if( this.touchDown.history[i] )
+			{
+				this.fingerOnScreen.status = true
+				break
+			}
+		}
 
+		// fix coords
+		if( this.fingerOnScreen.status == false )
+		{
+				Coords.p_history = [] // clear history on release
+		}
+	
 		//Tap
 		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.touchDown.history.length)
 		this.tap.status = false	
@@ -678,7 +700,7 @@ class Event{
 
 		//grab
 		this.grab.status = false
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.grab, this.fingerOnScreen.history.length)
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.fingerOnScreen.history.length)
 		if( this.fingerOnScreen.status )
 		{
 			this.grab.status = true
@@ -735,40 +757,30 @@ class Event{
 
 		
 		//drag
-		this.drag.status = false
-		if( State.isInteracting )
+		threshold =  Coords.p_history.length
+
+		let distance_total = 0
+		for( let i = 1 ; i < threshold ; i++)
 		{
-			let history_is_valid_size = ( Event.THRESHOLD.frame_nbr.drag <= Coords.p_history.length )
+			let distance = Coords.p_history[i].getSub(Coords.p_history[i-1]).mag()
+			distance_total +=  distance
+		}
+		console.log(distance_total)
+		this.drag.status = false
+		if( this.grab.status )
+		{
+			this.drag.status = Event.THRESHOLD.distance.drag < distance_total
+		}
+
+		this.flick.status = false
+		if( this.tap.status )
+		{
 			
-			let history_contain_only_points = true
-			if(history_is_valid_size === true)
+			if( Event.THRESHOLD.distance.flick < distance_total )
 			{
-				for( let i = 0; i < Event.THRESHOLD.frame_nbr.drag; i++)
-				{
-					if( Coords.p_history[i] === null)
-					{
-						history_contain_only_points = false
-						break
-					}
-				}
+				this.flick.status = true
+				this.tap.status = false
 			}
-
-			let each_points_delta_respect_threshold = true
-			if( (history_is_valid_size === true) && (history_contain_only_points === true) )
-			{
-				for( let i = 1; i < Event.THRESHOLD.frame_nbr.drag; i++)
-				{
-					let distance = Coords.p_history[i].getSub(Coords.p_history[i-1]).mag()
-					if( distance < Event.THRESHOLD.distance.drag)
-					{
-						each_points_delta_respect_threshold = false
-						break
-					}
-				}
-			}
-
-			if( (history_is_valid_size === true) && (history_contain_only_points === true) && (each_points_delta_respect_threshold === true) )
-				this.drag.status = true
 		}
 		
 		//
@@ -777,7 +789,7 @@ class Event{
 		this.swipeRight.status = false
 		this.swipeUp.status = false
 		this.swipeDown.status = false
-		this.flick.status = false
+		
 
 			
 		
