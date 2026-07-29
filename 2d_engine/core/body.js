@@ -207,7 +207,7 @@ export class body
 			'tap':            { name:'tap'           , status: false, count:0, effect_insts: [] },
 			'doubleTap':      { name:'doubleTap'     , status: false, count:0, effect_insts: [] },
 			'fingerOnScreen': { name:'fingerOnScreen', status: false, count:0, effect_insts: [] },
-			'hold':           { name:'hold'          , status: false, count:0, effect_insts: [] },
+			'grab':           { name:'grab'          , status: false, count:0, effect_insts: [] },
 			'drag':           { name:'drag'          , status: false, count:0, effect_insts: [] },
 			'idle':           { name:'idle'          , status: false, count:0, effect_insts: [] },
 		}

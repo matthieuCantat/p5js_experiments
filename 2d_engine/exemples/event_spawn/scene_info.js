@@ -38,56 +38,56 @@ export var scene_info = {
 				
 		},
 		"triggerRotateLastEventTitle": {
-			"m":  [-150, 300, 0, 5, 5],
+			"m":  [-170, 320, 0, 2, 2],
 			"color": "yellow",
 			"shape_type": "text",
-			"text": "last event : ",
+			"text": "TOUCH | TAP | ON SCREEN | BEHAVIOR",
 				        
 		},
 		"triggerRotateLastEvent_touchDown": {
-			"m":  [0, -1000, 0, 5, 5],
-			"color": "yellow",
+			"m":  [-170, -1000, 0, 4, 4],
+			"color": "green",
 			"shape_type": "text",
-			"text": "touchDown",	        
+			"text": "DN",	        
 		},
 		"triggerRotateLastEvent_touchUp": {
-			"m":  [0, -1000, 0, 5, 5],
+			"m":  [-170, -1000, 0, 4, 4],
 			"color": "red",
 			"shape_type": "text",
-			"text": "touchUp",	        
+			"text": "UP",	        
 		},
 		"triggerRotateLastEvent_tap": {
-			"m":  [0, -1000, 0, 5, 5],
+			"m":  [-100, -1000, 0, 4, 4],
 			"color": "black",
 			"shape_type": "text",
-			"text": "tap",	        
+			"text": "1",	        
 		},
 		"triggerRotateLastEvent_doubleTap": {
-			"m":  [0, -1000, 0, 5, 5],
-			"color": "green",
-			"shape_type": "text",
-			"text": "doubleTap",	        
-		},
-		"triggerRotateLastEvent_fingerOnScreen": {
-			"m":  [0, -1000, 0, 5, 5],
+			"m":  [-100, -1000, 0, 4, 4],
 			"color": "red",
 			"shape_type": "text",
-			"text": "fingerOnScreen",	        
+			"text": "2",	        
 		},
-		"triggerRotateLastEvent_hold": {
-			"m":  [0, -1000, 0, 5, 5],
+		"triggerRotateLastEvent_fingerOnScreen": {
+			"m":  [-50, -1000, 0, 4, 4],
+			"color": "red",
+			"shape_type": "text",
+			"text": "Yes",	        
+		},
+		"triggerRotateLastEvent_grab": {
+			"m":  [0, -1000, 0, 4, 4],
 			"color": "green",
 			"shape_type": "text",
-			"text": "hold",	        
+			"text": "grab",	        
 		},
 		"triggerRotateLastEvent_drag": {
-			"m":  [0, -1000, 0, 5, 5],
+			"m":  [0, -1000, 0, 4, 4],
 			"color": "blue",
 			"shape_type": "text",
 			"text": "drag",	        
 		},
 		"triggerRotateLastEvent_idle": {
-			"m":  [0, -1000, 0, 5, 5],
+			"m":  [0, -1000, 0, 4, 4],
 			"color": "black",
 			"shape_type": "text",
 			"text": "idle",	        
@@ -158,9 +158,9 @@ export var scene_info = {
 		},		
 		{
 			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_hold', 'trsf.getTranslateY()' ],
+			A : [ 'triggerRotateLastEvent_grab', 'trsf.getTranslateY()' ],
 			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_hold', 'trsf.setTranslateY()' ],
+			out : [ 'triggerRotateLastEvent_grab', 'trsf.setTranslateY()' ],
 		},
 		{
 			mode: 'expression',
@@ -261,13 +261,13 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.hold.status;
+					return obj.events.grab.status;
 				  }
 			},
 			event_end : null,
 			event_max_duration : 1000,
 			action : {
-				in_args : [ 'triggerRotateLastEvent_hold' ],
+				in_args : [ 'triggerRotateLastEvent_grab' ],
 				fn : (obj) => {
 					obj.trsf.setTranslateY( 300 );
 				  },

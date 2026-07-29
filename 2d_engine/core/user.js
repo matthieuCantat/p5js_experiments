@@ -353,10 +353,12 @@ export class User
 		
 	objs_update_events_info( Objs )
 	{
+		// GET SELECTED OBJ
+
+		// UPDATE EVENTS INFO
 		for( let n in Objs )
 		{
-			const selected_obj = this.Selection.get_selected_obj(this.Game_engine)
-			if( selected_obj == Objs[n] )
+			if( ( this.Selection.obj == Objs[n] )||( this.Selection.obj_last_eval == Objs[n] ))
 			{
 				
 				for( let event in Objs[n].events )
@@ -490,6 +492,7 @@ class State{
 			this.isReleased = false
 		
 		
+		
 		this.isInteractingExtend = false
 		if((this.isInteracting)||(this.isReleased))
 			this.isInteractingExtend = true
@@ -587,10 +590,10 @@ class Event{
 	static THRESHOLD = {
 		frame_nbr:{
 			touch_up_fix : 30,
-			tap : 30,
-			hold : 40,
+			tap : 20,
+			grab : 21,
 			drag : 4,
-			idle : 300,
+			idle : 200,
 		},
 		distance:{
 			hold : 0.01,
@@ -605,6 +608,7 @@ class Event{
 		this.tap = { status:false, count:0, history:[] } 
 		this.doubleTap = { status:false, count:0, history:[] }  
 		this.fingerOnScreen = { status:false, count:0, history:[] } 
+		this.grab = { status:false, count:0, history:[] } 
 		this.hold = { status:false, count:0, history:[] }  
 		this.drag = { status:false, count:0, history:[] }  
 		this.swipe = { status:false, count:0, history:[] }  
@@ -625,70 +629,79 @@ class Event{
 		this.touchUp.status = State.isReleased
 		this.fingerOnScreen.status = State.isInteracting
 		
-		//fix touchUp
-		if( this.touchDown.status === true )
-		{
-			let history_is_valid_size = (Event.THRESHOLD.frame_nbr.touch_up_fix <= this.touchDown.history.length )
-			if(history_is_valid_size === true)
-			{
-				for( let i = 0 ; i < Event.THRESHOLD.frame_nbr.touch_up_fix ; i++)
-				{
+		
 
-					if( this.touchUp.history[i] == true )
-						break
-					if( this.touchDown.history[i] == true )
-						this.touchUp.status = true
-				}
+		//fix touchUp
+		let threshold = Math.min( Event.THRESHOLD.frame_nbr.touch_up_fix, this.touchDown.history.length)
+		if( this.touchDown.status )
+		{
+			for( let i = 0 ; i < threshold ; i++)
+			{
+				if( this.touchUp.history[i] )
+					break
+				if( this.touchDown.history[i] )
+					this.touchUp.status = true
 			}
 		}
 
 		//Tap
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.touchDown.history.length)
 		this.tap.status = false	
-		if( this.touchUp.status === true )
+		if( this.touchUp.status )
 		{
-			let history_is_valid_size = (Event.THRESHOLD.frame_nbr.tap <= this.touchDown.history.length )
-			if(history_is_valid_size === true)
+			for( let i = 0 ; i < threshold ; i++)
 			{
-				for( let i = 0 ; i < Event.THRESHOLD.frame_nbr.tap ; i++)
+				if( this.touchDown.history[i] )
 				{
-					if( this.touchDown.history[i] === true )
-					{
-						this.tap.status = true
-						break
-					}
+					this.tap.status = true
+					break
 				}
 			}
 		}
+
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.tap.history.length)
 		// doubleTap
 		this.doubleTap.status = false	
-		if( this.tap.status === true )
+		if( this.tap.status )
 		{
-			let history_is_valid_size = (Event.THRESHOLD.frame_nbr.tap <= this.tap.history.length )
-			if(history_is_valid_size === true)
+			for( let i = 0 ; i < threshold ; i++)
 			{
-				for( let i = 0 ; i < Event.THRESHOLD.frame_nbr.tap ; i++)
+				if( this.tap.history[i] )
 				{
-					if( this.tap.history[i] === true )
-					{
-						this.doubleTap.status = true
-						break
-					}
+					this.doubleTap.status = true
+					this.tap.status = false
+					break
 				}
 			}
 		}
-			
 		
 
-		//hold
-		this.hold.status = false
+		//grab
+		this.grab.status = false
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.grab, this.fingerOnScreen.history.length)
+		if( this.fingerOnScreen.status )
+		{
+			this.grab.status = true
+			for( let i = 0 ; i < threshold ; i++)
+			{
+				if( this.fingerOnScreen.history[i] == false ) 
+				{
+					this.grab.status = false
+					break
+				}
+			}
+		}
+
+		/*
+		this.grab.status = false
 		if( State.isInteracting )
 		{
-			let history_is_valid_size = ( Event.THRESHOLD.frame_nbr.hold <= Coords.p_history.length )
+			let history_is_valid_size = ( Event.THRESHOLD.frame_nbr.grab <= Coords.p_history.length )
 			
 			let history_contain_only_points = true
 			if(history_is_valid_size === true)
 			{
-				for( let i = 0; i < Event.THRESHOLD.frame_nbr.hold; i++)
+				for( let i = 0; i < Event.THRESHOLD.frame_nbr.grab; i++)
 				{
 					if( Coords.p_history[i] == null)
 					{
@@ -701,7 +714,7 @@ class Event{
 			let each_points_delta_respect_threshold = true
 			if( (history_is_valid_size === true) && (history_contain_only_points === true) )
 			{
-				for( let i = 1; i < Event.THRESHOLD.frame_nbr.hold; i++)
+				for( let i = 1; i < Event.THRESHOLD.frame_nbr.grab; i++)
 				{
 					let distance = Coords.p_history[i].getSub(Coords.p_history[i-1]).mag()
 					if(  Event.THRESHOLD.distance.hold < distance)
@@ -715,8 +728,10 @@ class Event{
 			if( (history_is_valid_size === true) 
 				&& (history_contain_only_points === true) 
 				&& (each_points_delta_respect_threshold === true) )
-				this.hold.status = true
+				this.grab.status = true
 		}
+				
+		*/
 
 		
 		//drag
@@ -794,6 +809,8 @@ class Event{
 			this.idle.status = true
 
 		this.idle.count += 1
+
+		
 		
 	}
 
@@ -805,6 +822,8 @@ class Selection
 {
 	constructor()
 	{
+		this.obj = null
+		this.obj_last_eval = null
 	}
 
 	get_selectable_objs_names( Game_engine )
@@ -843,6 +862,9 @@ class Selection
 					break	
 			}
 		}
+
+		this.obj_last_eval = this.obj
+		this.obj = this.get_selected_obj(Game_engine)
 
 		return true
 	}	
