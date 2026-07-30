@@ -200,18 +200,11 @@ export class body
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// EFFECTS
 		/////////////////////////////////////////////////////////
-
-		this.events = {
-			'touchDown':      { name:'touchDown'     , status: false, count:0, effect_insts: [] },
-			'touchUp':        { name:'touchUp'       , status: false, count:0, effect_insts: [] },
-			'tap':            { name:'tap'           , status: false, count:0, effect_insts: [] },
-			'doubleTap':      { name:'doubleTap'     , status: false, count:0, effect_insts: [] },
-			'fingerOnScreen': { name:'fingerOnScreen', status: false, count:0, effect_insts: [] },
-			'grab':           { name:'grab'          , status: false, count:0, effect_insts: [] },
-			'drag':           { name:'drag'          , status: false, count:0, effect_insts: [] },
-			'flick':           { name:'flick'          , status: false, count:0, effect_insts: [] },
-			'idle':           { name:'idle'          , status: false, count:0, effect_insts: [] },
-		}
+		this.events = {}
+		for( const key in this.Game_engine.User.Event.data )
+			this.events[key] ={ name:key, status: false, count:0, effect_insts: [] }
+			
+		
 		
 		
 		// update effect duration with event ref

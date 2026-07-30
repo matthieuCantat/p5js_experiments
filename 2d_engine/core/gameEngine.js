@@ -39,6 +39,17 @@ export class gameEngine {
         this.body_effects = [];
         this.Render = new Render();
 
+
+        // BACKGROUND
+        this.Background = {
+            events : {}
+        }
+
+        this.Background.events = {}
+		for( const key in this.User.Event.data )
+			this.Background.events[key] ={ name:key, status: false, count:0, effect_insts: [] }
+			
+
     }
 
     load_scene( scene_info )
@@ -276,7 +287,7 @@ export class gameEngine {
 
         //	INTERACTION
         this.User.update()
-        this.User.objs_update_events_info( this.Objs )
+        this.User.objs_update_events_info( this )
 
         for( let elem in this.Objs )
             this.Objs[elem].update()

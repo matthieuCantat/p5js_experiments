@@ -76,7 +76,7 @@ export class User
 		let HELPER_START_POINT_LIFTIME = 50
 		
 		
-		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.Event.fingerOnScreen.status )
+		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.Event.data.fingerOnScreen.status )
 		if( draw_press_position )
 		{	
 			let start_size = User.DRAW_DEFAULT.circle_size_anim_start + User.DRAW_DEFAULT.circle_size
@@ -116,7 +116,7 @@ export class User
 		}
 			*/
 		
-		if( this.Event.fingerOnScreen.status )
+		if( this.Event.data.fingerOnScreen.status )
 		{
 			// CURRENT MOUSE PRESSED
 						
@@ -351,18 +351,21 @@ export class User
 
 
 		
-	objs_update_events_info( Objs )
+	objs_update_events_info( Game_engine )
 	{
+		let Objs = Game_engine.Objs
 		// GET SELECTED OBJ
 
 		// UPDATE EVENTS INFO
+		
+		var no_selection = true
 		for( let n in Objs )
 		{
 			if( ( this.Selection.obj == Objs[n] )||( this.Selection.obj_last_eval == Objs[n] ))
 			{
-				
 				for( let event in Objs[n].events )
-					Objs[n].events[event].status = this.Event[event].status
+					Objs[n].events[event].status = this.Event.data[event].status
+				no_selection = false
 			}
 			else	
 			{
@@ -370,8 +373,27 @@ export class User
 					Objs[n].events[event].status = false
 			}
 
-			Objs[n].events['idle'].status = this.Event['idle'].status
+			Objs[n].events['idle'].status = this.Event.data['idle'].status
 		}
+
+		//BACKGROUND
+		let Background = Game_engine.Background
+		if(no_selection)
+		{
+			for( let event in Background.events )
+				Background.events[event].status = this.Event.data[event].status
+
+		}
+		else
+		{
+			for( let event in Background.events )
+				Background.events[event].status = false
+		}
+
+
+
+
+
 		return true
 	}
 
@@ -595,32 +617,43 @@ class Event{
 			tap : 10,
 			//grab : 10,
 			//drag : 4,
+			hold : 50,
 			idle : 200,
 		},
 		distance:{
-			hold : 0.01,
 			drag : 50,
 			flick : 0,
 		},
+		dot:{
+			swipe:0.5
+		}
+	}
+
+	static VECTORS = {
+		up: new Vector2d(0,1),
+		down: new Vector2d(0,-1),
+		left: new Vector2d(-1,0),
+		right: new Vector2d(1,0),
 	}
 
 	constructor()
 	{
-		this.touchDown = { status:false, count:0, history:[] } 
-		this.touchUp = { status:false, count:0, history:[] } 
-		this.tap = { status:false, count:0, history:[] } 
-		this.doubleTap = { status:false, count:0, history:[] }  
-		this.fingerOnScreen = { status:false, count:0, history:[] } 
-		this.grab = { status:false, count:0, history:[] } 
-		this.hold = { status:false, count:0, history:[] }  
-		this.drag = { status:false, count:0, history:[] }  
-		this.swipe = { status:false, count:0, history:[] }  
-		this.swipeLeft = { status:false, count:0, history:[] }  
-		this.swipeRight = { status:false, count:0, history:[] }  
-		this.swipeUp = { status:false, count:0, history:[] }  
-		this.swipeDown = { status:false, count:0, history:[] }  
-		this.flick = { status:false, count:0, history:[] }  
-		this.idle = { status:false, count:0, history:[] }  
+		this.data = {
+			touchDown : { status:false, count:0, history:[] },
+			touchUp : { status:false, count:0, history:[] },
+			tap : { status:false, count:0, history:[] }, 
+			doubleTap : { status:false, count:0, history:[] },  
+			fingerOnScreen : { status:false, count:0, history:[] }, 
+			grab : { status:false, count:0, history:[] }, 
+			hold : { status:false, count:0, history:[] },  
+			drag : { status:false, count:0, history:[] },  
+			swipeLeft : { status:false, count:0, history:[] },  
+			swipeRight : { status:false, count:0, history:[] },  
+			swipeUp : { status:false, count:0, history:[] },  
+			swipeDown : { status:false, count:0, history:[] },  
+			flick : { status:false, count:0, history:[] },  
+			idle : { status:false, count:0, history:[] },  
+		}
 
 		
 	}
@@ -628,90 +661,109 @@ class Event{
 
 	update( State, Coords )
 	{
-		this.touchDown.status = State.isPressed
-		this.touchUp.status = State.isReleased
-		this.fingerOnScreen.status = State.isInteracting
+		this.data.touchDown.status = State.isPressed
+		this.data.touchUp.status = State.isReleased
+		this.data.fingerOnScreen.status = State.isInteracting
 		
 		
 
 		//fix touchUp
-		let threshold = Math.min( Event.THRESHOLD.frame_nbr.touch_up_fix, this.touchDown.history.length)
-		if( this.touchDown.status )
+		let threshold = Math.min( Event.THRESHOLD.frame_nbr.touch_up_fix, this.data.touchDown.history.length)
+		if( this.data.touchDown.status )
 		{
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.touchUp.history[i] )
+				if( this.data.touchUp.history[i] )
 					break
-				if( this.touchDown.history[i] )
-					this.touchUp.status = true
+				if( this.data.touchDown.history[i] )
+					this.data.touchUp.status = true
 			}
 		}
 		//fix fingerOnScreen
-		threshold = Math.min( this.touchDown.history.length, this.touchUp.history.length)
-		this.fingerOnScreen.status = false
+		threshold = Math.min( this.data.touchDown.history.length, this.data.touchUp.history.length)
+		this.data.fingerOnScreen.status = false
 		for( let i = 0 ; i < threshold ; i++)
 		{
-			if( this.touchUp.history[i] )
+			if( this.data.touchUp.history[i] )
 				break
-			if( this.touchDown.history[i] )
+			if( this.data.touchDown.history[i] )
 			{
-				this.fingerOnScreen.status = true
+				this.data.fingerOnScreen.status = true
 				break
 			}
 		}
 
 		// fix coords
-		if( this.fingerOnScreen.status == false )
+		if( this.data.fingerOnScreen.status == false )
 		{
 				Coords.p_history = [] // clear history on release
 		}
 	
 		//Tap
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.touchDown.history.length)
-		this.tap.status = false	
-		if( this.touchUp.status )
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.touchDown.history.length)
+		this.data.tap.status = false	
+		if( this.data.touchUp.status )
 		{
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.touchDown.history[i] )
+				if( this.data.touchDown.history[i] )
 				{
-					this.tap.status = true
+					this.data.tap.status = true
 					break
 				}
 			}
 		}
 
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.tap.history.length)
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap+1, this.data.tap.history.length)
+		
 		// doubleTap
-		this.doubleTap.status = false	
-		if( this.tap.status )
+		this.data.doubleTap.status = false	
+		if( this.data.tap.status )
 		{
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.tap.history[i] )
+				if( this.data.tap.history[i] )
 				{
-					this.doubleTap.status = true
-					this.tap.status = false
+					
+					this.data.doubleTap.status = true
+					this.data.tap.status = false
 					break
 				}
 			}
 		}
 		
+		
 
 		//grab
-		this.grab.status = false
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.fingerOnScreen.history.length)
-		if( this.fingerOnScreen.status )
+		this.data.grab.status = false
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.fingerOnScreen.history.length)
+		if( this.data.fingerOnScreen.status )
 		{
-			this.grab.status = true
+			this.data.grab.status = true
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.fingerOnScreen.history[i] == false ) 
+				if( this.data.fingerOnScreen.history[i] == false ) 
 				{
-					this.grab.status = false
+					this.data.grab.status = false
 					break
 				}
 			}
+		}
+
+		
+		this.data.hold.status = false
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.hold, this.data.grab.history.length)
+		if( this.data.grab.status )
+		{
+			this.data.hold.status = true
+			for( let i = 0 ; i < threshold ; i++)
+			{
+				if( this.data.grab.history[i] == false ) 
+				{
+					this.data.hold.status = false
+					break
+				}
+			}	
 		}
 
 		/*
@@ -757,59 +809,87 @@ class Event{
 
 		
 		//drag
-		threshold =  Coords.p_history.length
+		threshold =  Math.min( Event.THRESHOLD.frame_nbr.hold, Coords.p_history.length )
 
 		let distance_total = 0
+		let v_total = new Vector2d()
 		for( let i = 1 ; i < threshold ; i++)
 		{
-			let distance = Coords.p_history[i].getSub(Coords.p_history[i-1]).mag()
-			distance_total +=  distance
+			let p_new = Coords.p_history[i-1]
+			let p_old = Coords.p_history[i]
+
+			let v = p_new.getSub(p_old)
+			let distance = v.mag()
+
+			distance_total += distance
+			v_total.add(v)
 		}
-		console.log(distance_total)
-		this.drag.status = false
-		if( this.grab.status )
+		v_total.normalize()
+		
+		this.data.drag.status = false
+		if( this.data.grab.status )
 		{
-			this.drag.status = Event.THRESHOLD.distance.drag < distance_total
+			this.data.drag.status = Event.THRESHOLD.distance.drag < distance_total
 		}
 
-		this.flick.status = false
-		if( this.tap.status )
+		if( this.data.drag.status )
+		{
+			this.data.hold.status = false
+		}
+
+
+		//flick
+		this.data.flick.status = false
+		if( this.data.tap.status )
 		{
 			
 			if( Event.THRESHOLD.distance.flick < distance_total )
 			{
-				this.flick.status = true
-				this.tap.status = false
+				this.data.flick.status = true
+				this.data.tap.status = false
 			}
 		}
 		
 		//
-		this.swipe.status = false
-		this.swipeLeft.status = false
-		this.swipeRight.status = false
-		this.swipeUp.status = false
-		this.swipeDown.status = false
+		this.data.swipeLeft.status = false
+		this.data.swipeRight.status = false
+		this.data.swipeUp.status = false
+		this.data.swipeDown.status = false
+
+		if( this.data.flick.status )
+		{
+			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.left) )
+				this.data.swipeLeft.status = true
+			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.right) )
+				this.data.swipeRight.status = true
+			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.up) )
+				this.data.swipeUp.status = true
+			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.down) )
+				this.data.swipeDown.status = true
+			
+			
+		}
 		
 
 			
 		
 		//this.add_to_history( )
-		for (const [key, value] of Object.entries(this) ) 
+		for (const key in this.data ) 
 		{
-			this[key].history.unshift(this[key].status)
-			if ( this.HISTORY_NBR < this[key].history.length)
-				this[key].history.pop(); // Remove the oldest if over size		
+			this.data[key].history.unshift(this.data[key].status)
+			if ( this.HISTORY_NBR < this.data[key].history.length)
+				this.data[key].history.pop(); // Remove the oldest if over size		
 		}
 		
 		// idle handle
-		for (const [key, value] of Object.entries(this))
+		for (const key in this.data)
 		{
 			if( key == 'idle')
 				continue
-			if( this[key].status == true)
+			if( this.data[key].status == true)
 			{
-				this.idle.count = 0
-				this.idle.status = false
+				this.data.idle.count = 0
+				this.data.idle.status = false
 				break
 			}	
 		}
@@ -817,10 +897,10 @@ class Event{
 
 		
 
-		if( Event.THRESHOLD.frame_nbr.idle < this.idle.count )
-			this.idle.status = true
+		if( Event.THRESHOLD.frame_nbr.idle < this.data.idle.count )
+			this.data.idle.status = true
 
-		this.idle.count += 1
+		this.data.idle.count += 1
 
 		
 		
