@@ -46,21 +46,43 @@ export class body
 			name : '',
 			parent : null,
 			m: new Matrix2d(),
-			m_shape: null,
 			visibility : true,
-			shape_visibility : true,
-			m_interaction: null,
-			shape_type: "rectangle",
-			shape_type_interaction: null,
-			color: "white",
-			color_brignthess: 0.7,
-			stroke_color: "black",
-			stroke_width: 2,
+			shapes_visibility : true,
+			shapes : [
+				{
+					m : null,
+					type : "rectangle",
+					color : "white",
+					color_brigthness:0.7,
+					stroke_color:"black",
+					stoke_width: 2,
+					text : '',
+				}
+			],
+			interaction_shapes :[
+				{
+					m :null,
+					type : "rectangle"
+				}
+			],
+
+			//shape_visibility : true,
+			//m_shape: null,
+			//shape_type: "rectangle",
+			//color: "white",
+			//stroke_color: "black",
+			//stroke_width: 2,
+			//color_brignthess: 0.7,
+			//text : '',
+
+			//m_interaction: null,
+			//shape_type_interaction: null,
+			
             interaction: null,
 			event_effects: {},
 			dyn_settings: {},
 			do_border_collision:false,
-			text : '',
+			
 			Game_engine: null,
 			Time: null,
 			debug : {},
@@ -91,8 +113,8 @@ export class body
 		if( this.args.parent != null )
 			parent_obj = this.Game_engine.Objs[this.args.parent]
 		this.trsf = new Transform(  this.args.m, 
-									this.args.m_shape,
-									this.args.m_interaction,
+									this.args.shapes,
+									this.args.interaction_shapes,
 									parent_obj )
 		
 		// FOR DYN
@@ -101,6 +123,7 @@ export class body
 		//this.angular_momentum = 0
 
 		// ASPECT
+		/*
 		this.shape_type = this.args.shape_type
 		this.color = this.args.color
 		if( this.args.color_brignthess != 1.0 )
@@ -114,14 +137,28 @@ export class body
 
 		this.stroke_color = this.args.stroke_color
 		this.stroke_width = this.args.stroke_width
-		
+		this.text = this.args.text
+		this.shape_visibility = this.args.shape_visibility
+		*/
+
+		this.shapes_dynamic_data = []
+		for( let shape_info of this.args.shapes )
+		{
+			this.shapes_dynamic_data.push(
+				{
+					stroke_color : shape_info.stoke_color,
+					stroke_width : shape_info.stroke_width,
+				}
+			)
+		}
+
 		// OTHER
         this.interaction = this.args.interaction
-		this.text = this.args.text
+		
 
 
 		this.visibility = this.args.visibility
-		this.shape_visibility = this.args.shape_visibility
+		this.shapes_visibility = this.args.shapes_visibility
 		
 		// TRANSFORM
 
@@ -398,14 +435,17 @@ export class body
 
 	duplicate()
 	{
+		return null
+		/*
 		return new body(
-			{	m : new Matrix2d(this.trsf.get_shape()), 
+			{	m : new Matrix2d(this.trsf.get_shapes()), 
 				shape_type: this.shape_type,
 				color: this.color, 
 				interaction:this.interaction,
 				Game_engine:this.Game_engine,
 				Time:this.Time,}
 			)
+				*/
 	}
 
 	isMoving()
@@ -440,17 +480,22 @@ export class body
 		//	axe_cns_info = this.update_matrix_axe_cns()
 		
 
-
-		if(this.isSelected())
+		let is_selected = this.isSelected()
+		for( let i = 0; i < this.args.shapes.length; i++ )
 		{
-			this.stroke_color = this.HIGHLIGHT_STROKE_COLOR
-			this.stroke_width = this.HIGHLIGHT_STROKE_WIDTH	
+			if(is_selected)
+			{
+				this.shapes_dynamic_data[i].stroke_color = this.HIGHLIGHT_STROKE_COLOR
+				this.shapes_dynamic_data[i].stroke_width = this.HIGHLIGHT_STROKE_WIDTH	
+			}
+			else
+			{
+				this.shapes_dynamic_data[i].stroke_color = this.args.shapes[i].stroke_color
+				this.shapes_dynamic_data[i].stroke_width = this.args.shapes[i].stroke_width	
+			}
+			
 		}
-		else
-		{
-			this.stroke_color = this.args.stroke_color
-			this.stroke_width = this.args.stroke_width	
-		}
+		
 
 
 	}
@@ -484,37 +529,51 @@ export class body
 		return true		
 	}
 
-	get_shape_matrix()
-	{
-		return this.m_shape.getMult(this.m)
-	}
-
-
-
 	isPointInside(point)
 	{
-		let mShape = this.trsf.get_interaction_shape()
-		let s = this.interaction.settings.scale_selection_shape;
-		mShape = mShape.scale(s,s);
+		
+		var shapes_matrices = this.trsf.get_interaction_shapes()
+		for( let i = 0; i < shapes_matrices.length; i++ )
+		{
+			let mShape = shapes_matrices[i]
+			let s = this.interaction.settings.scale_selection_shape;
+			mShape = mShape.scale(s,s);
 
-		return this.isPointInsideFactory[this.shape_type_interaction](point, mShape);
+			let shape_type = this.args.interaction_shapes[i].type
+
+			let is_inside = this.isPointInsideFactory[shape_type](point, mShape);
+			if( is_inside )
+				return true
+		}
+
+		return false
 	}
 
 	get_render_infos_interaction_shape_debug()
 	{
-		let interaction_render = []
+		var color = 'black'
+		if( 0 < this.args.shapes.length )
+			color = this.args.shapes[0].color
+
+		let draw_info = []
 		if( this.debug.shape_interaction_visibility )
 		{
-			interaction_render.push({
-				shape_type : this.shape_type_interaction,      
-				m : this.trsf.get_interaction_shape(), 
-				color : null,
-				stroke_color : this.color, 
-				stroke_width : 1,        
-			} )
+			var shapes_matrices = this.trsf.get_interaction_shapes()
+			for( let i = 0; i < shapes_matrices.length; i++ )
+			{
+				draw_info.push(
+					{
+						shape_type : this.args.interaction_shapes[i].type,      
+						m : shapes_matrices[i], 
+						color : null,
+						stroke_color : color, 
+						stroke_width : 1,   	
+					}
+				)
+			}
 		}
 
-		return interaction_render
+		return draw_info
 	}
 
 
@@ -563,31 +622,24 @@ export class body
 
 	get_render_infos()
 	{
-		let draw_info = [ {
-			shape_type : this.shape_type,      
-			m : this.trsf.get_shape(), 
-			text: this.text,
-			color : this.color,
-			stroke_color : this.stroke_color, 
-			stroke_width : this.stroke_width,        
-		} ]
-		/*
-		for ( const key of this.args.debug)
+		let shapes_matrices = this.trsf.get_shapes()
+
+		var draw_info = []
+		for( let i = 0; i < shapes_matrices.length; i++ )
 		{
-			
 			draw_info.push(
 				{
-					shape_type : 'text',      
-					m : this.trsf.get_shape().setScale(4), 
-					text : `${this.trsf.get_shape().getRotation()}`,
-					color : this.color,
-					stroke_color : this.stroke_color, 
-					stroke_width : this.stroke_width,        
+					shape_type : this.args.shapes[i].type,      
+					m : shapes_matrices[i], 
+					text: this.args.shapes[i].text,
+					color : this.args.shapes[i].color,
+					stroke_color : this.shapes_dynamic_data[i].stroke_color, 
+					stroke_width : this.shapes_dynamic_data[i].stroke_width,   	
 				}
 			)
-			
 		}
-		*/
+		
+		
 
 		return draw_info
 	}
@@ -673,53 +725,77 @@ class Transform
 	GRAVITY_VECTOR = new Vector2d(0,-0.981)
 
 	constructor( arg_m, 
-		arg_m_shape = null,
-		arg_m_interaction = null,
+		arg_shapes_info = null,
+		arg_interaction_shapes_info = null,
 		obj_parent = null )
 	{
 		
 		this.obj_parent = obj_parent
 
-		// POSITION AND MOVEMENT
+		// BODY
 		let in_body_matrix = null
 		if( arg_m instanceof Matrix2d)
 			in_body_matrix = arg_m
 		else
 			in_body_matrix = new Matrix2d(arg_m) // if not a matrix, convert it to one
 
-		let in_shape_matrix = null
-		if( arg_m_shape != null )
-		{
-			if( arg_m_shape instanceof Matrix2d)
-				in_shape_matrix = arg_m_shape
-			else
-				in_shape_matrix = new Matrix2d(arg_m_shape) // if not a matrix, convert it to one	
-		}
-		else{
-			in_shape_matrix = new Matrix2d(in_body_matrix)
-		}
-
-		let in_interaction_matrix = null
-		if( arg_m_interaction != null ){
-			if( arg_m_interaction instanceof Matrix2d)
-				in_interaction_matrix = arg_m_interaction
-			else
-				in_interaction_matrix = new Matrix2d(arg_m_interaction) // if not a matrix, convert it to one
-		}
-
-		
 		let m_body_world = new Matrix2d(in_body_matrix).normalize()
-		
-		
-		this.m_body_to_shape = in_shape_matrix.getMult(m_body_world.getInverse()) // to keep track of the shape matrix without the position and rotation
-		this.m_body_to_interaction = this.m_body_to_shape
-		if ( in_interaction_matrix != null )
-			this.m_body_to_interaction = in_interaction_matrix.getMult(m_body_world.getInverse()) // to keep track of the interaction matrix without the position and rotation
 
+		// PARENT
 		this.m_parent_to_body = m_body_world
 		if( this.obj_parent != null )
 			this.m_parent_to_body = m_body_world.getMult(this.obj_parent.trsf.get().getInverse())
 
+		// SHAPES
+		var in_shapes_matices = []
+		for( const shape_info of arg_shapes_info )
+		{
+			let m = null
+			if( ( shape_info.m === null)||( shape_info.m === undefined) )
+				m = in_body_matrix
+			else if( shape_info.m instanceof Matrix2d)
+				m = shape_info.m
+			else
+				m = new Matrix2d(shape_info.m) // if not a matrix, convert it to one	
+			in_shapes_matices.push( m )
+		}
+
+		//if( arg_shapes_info.length === 0 )
+		//	in_shapes_matices.push( new Matrix2d(in_body_matrix) )
+		
+		this.m_body_to_shapes = []
+		for( const m of in_shapes_matices )
+			this.m_body_to_shapes.push( m.getMult(m_body_world.getInverse())  )
+		
+
+		// INTERACTION
+		var in_interactions_matices = []
+		for( let i = 0; i < arg_interaction_shapes_info.length; i++ )
+		{
+			let shape_info = arg_interaction_shapes_info[i]
+
+			let m = null
+			if( shape_info.m === null)
+				m = in_shapes_matices[i]
+			if( shape_info.m instanceof Matrix2d)
+				m = shape_info.m
+			else
+				m = new Matrix2d(shape_info.m) // if not a matrix, convert it to one	
+				in_interactions_matices.push( m )
+		}
+
+		if( arg_interaction_shapes_info.length === 0 )
+			in_interactions_matices = in_shapes_matices
+
+		this.m_body_to_interactions = []
+		for( let m of in_interactions_matices )
+		{
+			this.m_body_to_interactions.push( m.getMult(m_body_world.getInverse()) )// to keep track of the interaction matrix without the position and rotation
+		}
+		
+
+
+		// ANIMATION
 		this.m_body_modif = new Matrix2d() // to keep track of the user interaction movement
 	
 
@@ -805,18 +881,26 @@ class Transform
 	}
 
 
-	get_shape()
+	get_shapes()
 	{
 		let m_body_dyn = this.get()
 
-		return this.m_body_to_shape.getMult(m_body_dyn)
+		var shape_matrices = []
+		for( const m of this.m_body_to_shapes )
+			shape_matrices.push( m.getMult(m_body_dyn) )
+
+		return shape_matrices
 	}	
 
-	get_interaction_shape()
+	get_interaction_shapes()
 	{
 		let m_body_dyn = this.get()
 
-		return this.m_body_to_interaction.getMult(m_body_dyn)
+		var interaction_shape_matrices = []
+		for( const m of this.m_body_to_interactions )
+			interaction_shape_matrices.push( m.getMult(m_body_dyn) )
+
+		return interaction_shape_matrices
 	}		
 
 	update(

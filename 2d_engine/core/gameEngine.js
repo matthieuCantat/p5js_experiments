@@ -353,12 +353,14 @@ export class gameEngine {
         }        
 
         // BODYS
+        
         for( let elem in this.Objs )
         {
+            
             if( this.DEBUG.draw_body_interaction_shapes)
                 this.Render.queue.push( ...this.Objs[elem].get_render_infos_interaction_shape_debug() )
             
-            if( this.Objs[elem].shape_visibility == true )
+            if( this.Objs[elem].shapes_visibility == true )
                 this.Render.queue.push( ...this.Objs[elem].get_render_infos() )
 
             this.Render.queue.push( ...this.Objs[elem].get_render_infos_interaction_debug() )

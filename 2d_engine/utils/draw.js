@@ -237,7 +237,7 @@ export function draw_background_text(text,p,color,size)
 {
 	
 	bgCtx.fillStyle = color
-	bgCtx.font = size + "px arial";
+	bgCtx.font = size + "px monospace";
 	bgCtx.fillText(text, cX(p), cY(p));
 	
 	
@@ -302,7 +302,7 @@ export function draw_text(ctx, { m = null , text = '' })
 	let orient = m.getRotation()
 	let scale = m.getScale()
 	
-	ctx.font =''+Math.ceil(scale.x)*7+'px serif';
+	ctx.font =''+Math.ceil(scale.x)*7+'px monospace';
 
 	ctx.beginPath();
 	ctx.fillText(text, cX(p), cY(p));
