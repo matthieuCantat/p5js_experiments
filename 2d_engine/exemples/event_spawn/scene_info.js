@@ -81,9 +81,9 @@ export var scene_info = {
 					"type": "rectangle",
 				},
 				{
-					"color": "yellow",
+					"color": "white",
 					"type": "text",
-					"text": "rotate| DN      |",	
+					"text": "rotate| Dn      |",	
 				}
 			]        
 		},
@@ -102,9 +102,9 @@ export var scene_info = {
 					"type": "rectangle",
 				},
 				{
-					"color": "yellow",
+					"color": "cyan",
 					"type": "text",
-					"text": "rotate| UP      |",	
+					"text": "rotate| Up      |",	
 				}
 			]  	        
 		},
@@ -118,14 +118,14 @@ export var scene_info = {
 					"type": "rectangle",
 				},
 				{
-					"m":  [-64, 4-1000, 0, 10, 10],
+					"m":  [-80, 4-1000, 0, 10, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
 					"color": "yellow",
 					"type": "text",
-					"text": "rotate|       ON |",	
+					"text": "rotate|     ON |",	
 				}
 			]  	        
 		},
