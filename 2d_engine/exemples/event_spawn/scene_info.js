@@ -68,135 +68,279 @@ export var scene_info = {
 		},
 		
 		"triggerRotateLastEvent_touchDown": {
-			"m":  [-115, 0, 0, 2, 2],
+			"m":  [-88, -1000, 0, 2, 2],
 			"shapes" : [
 				{
-					"m":  [-156, 0, 0, 25, 10],
+					"m":  [-155, -1000, 0, 25, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
-					"m":  [-110, 0, 0, 10, 10],
+					"m":  [-110, -1000, 0, 10, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
 					"color": "white",
 					"type": "text",
-					"text": "rotate| Dn      |",	
+					"text": "rotate| Dn      |       ",	
 					"text_centered": true,
 				}
 			]        
 		},
 		
 		"triggerRotateLastEvent_touchUp": {
-			"m":  [-180, -1000, 0, 2, 2],
+			"m":  [-88, -1000, 0, 2, 2],
 			"shapes":[
 				{
-					"m":  [-156, 4-1000, 0, 25, 10],
+					"m":  [-155, -1000, 0, 25, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
-					"m":  [-110, 4-1000, 0, 10, 10],
+					"m":  [-110, -1000, 0, 10, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
 					"color": "cyan",
 					"type": "text",
-					"text": "rotate| Up      |",	
+					"text": "rotate| Up      |       ",
+					"text_centered": true,
 				}
 			]  	        
 		},
 		
 		"triggerRotateLastEvent_fingerOnScreen": {
-			"m":  [-180, -1000, 0, 2, 2],
+			"m":  [-88, -1000, 0, 2, 2],
 			"shapes":[
 				{
-					"m":  [-156, 4-1000, 0, 25, 10],
+					"m":  [-155, -1000, 0, 25, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
-					"m":  [-80, 4-1000, 0, 10, 10],
+					"m":  [-80, -1000, 0, 10, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
 					"color": "yellow",
 					"type": "text",
-					"text": "rotate|     ON |",	
+					"text": "rotate|     On  |       ",
+					"text_centered": true,
 				}
 			]  	        
 		},
-		/*
+		
 		"triggerRotateLastEvent_tap": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "black",
-			"shape_type": "text",
-			"text": "rotate|             |            | TAP 1",	 	        
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-38, -1000, 0, 10, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "yellow",
+					"type": "text",
+					"text": "rotate|         | 1     ",	
+					"text_centered": true,
+				}
+			]  	    			        
 		},
 		"triggerRotateLastEvent_doubleTap": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            | TAP 2",	 	        
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-38, -1000, 0, 10, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "cyan",
+					"type": "text",
+					"text": "rotate|         | 2     ",	
+					"text_centered": true,
+				}
+			]  	    			        
 		},
+		/*
 		"triggerRotateLastEvent_grab": {
 			"m":  [-180, -1000, 0, 2, 2],
 			"color": "green",
 			"shape_type": "text",
 			"text": "rotate|             | GRAB",
 		},
+		*/
 		"triggerRotateLastEvent_hold": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            | HOLD",      
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "cyan",
+					"type": "text",
+					"text": "rotate|         | Hold  ",	
+					"text_centered": true,
+				}
+			] ,      
 		},
 		"triggerRotateLastEvent_drag": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "blue",
-			"shape_type": "text",
-			"text": "rotate|             |            | DRAG",           
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "red",
+					"type": "text",
+					"text": "rotate|         | Drag  ",	
+					"text_centered": true,
+				}
+			] ,             
 		},
+		/*
 		"triggerRotateLastEvent_flick": {
 			"m":  [-180, -1000, 0, 2, 2],
 			"color": "red",
 			"shape_type": "text",
 			"text": "rotate|             |            | flick",	        
 		},
+		*/
 		"triggerRotateLastEvent_swipeLeft": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            |         <<<<",	        
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "white",
+					"type": "text",
+					"text": "rotate|         | <<<<  ",		
+					"text_centered": true,
+				}
+			] ,   	        
 		},
 		"triggerRotateLastEvent_swipeRight": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            |         >>>>",	 	        
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "cyan",
+					"type": "text",
+					"text": "rotate|         | >>>>  ",		
+					"text_centered": true,
+				}
+			] ,    	        
 		},
 		"triggerRotateLastEvent_swipeUp": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            |         ^^^^",	        
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "red",
+					"type": "text",
+					"text": "rotate|         | ^^^^  ",	
+					"text_centered": true,
+				}
+			] ,    	  
+			    
 		},
 		"triggerRotateLastEvent_swipeDown": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            |         vvvv",       
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "yellow",
+					"type": "text",
+					"text": "rotate|         | vvvv  ",	
+					"text_centered": true,
+				}
+			] ,    	  
+			     
 		},
 		"triggerRotateLastEvent_idle": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "black",
-			"shape_type": "text",
-			"text": "rotate|             |            | idle",	        
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "red",
+					"type": "text",
+					"text": "rotate|         | Idle  ",	
+					"text_centered": true,
+				}
+			] ,    	  	        
 		},
+		/*
 		"triggerTranslate": {
 			"m": [-100, -300, 0, 1, 1],
 			"m_shape": [-100, -300, 90, 10, 50],
@@ -235,7 +379,7 @@ export var scene_info = {
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_touchDown', 'trsf.getTranslateY()' ],
-			expression : 'A',
+			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_touchDown', 'trsf.setTranslateY()' ],
 		}, 	
 		{
@@ -250,7 +394,6 @@ export var scene_info = {
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_fingerOnScreen', 'trsf.setTranslateY()' ],
 		},		
-		/*	
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_tap', 'trsf.getTranslateY()' ],
@@ -263,12 +406,14 @@ export var scene_info = {
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_doubleTap', 'trsf.setTranslateY()' ],
 		},
+		/*	
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_grab', 'trsf.getTranslateY()' ],
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_grab', 'trsf.setTranslateY()' ],
 		},
+		*/
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_hold', 'trsf.getTranslateY()' ],
@@ -281,12 +426,14 @@ export var scene_info = {
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_drag', 'trsf.setTranslateY()' ],
 		},
+		/*
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_flick', 'trsf.getTranslateY()' ],
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_flick', 'trsf.setTranslateY()' ],
 		},
+		*/
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_swipeLeft', 'trsf.getTranslateY()' ],
@@ -317,7 +464,7 @@ export var scene_info = {
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_idle', 'trsf.setTranslateY()' ],
 		},	
-		*/
+		
 			
 	],	
 	"eventActions" : [
@@ -369,7 +516,6 @@ export var scene_info = {
 				  },
 			}
 		},
-		/*
 		{
 			event_start : {
 				in_args : [ 'triggerRotate' ],
@@ -402,6 +548,7 @@ export var scene_info = {
 				  },
 			}
 		},
+		/*
 		{
 			event_start : {
 				in_args : [ 'triggerRotate' ],
@@ -417,7 +564,7 @@ export var scene_info = {
 					obj.trsf.setTranslateY( 300 );
 				  },
 			}
-		},
+		},*/
 		{
 			event_start : {
 				in_args : [ 'triggerRotate' ],
@@ -449,7 +596,7 @@ export var scene_info = {
 					obj.trsf.setTranslateY( 300 );
 				  },
 			}
-		},
+		},/*
 		{
 			event_start : {
 				in_args : [ 'triggerRotate' ],
@@ -465,7 +612,7 @@ export var scene_info = {
 					obj.trsf.setTranslateY( 300 );
 				  },
 			}
-		},
+		},*/
 		{
 			event_start : {
 				in_args : [ 'triggerRotate' ],
@@ -546,6 +693,6 @@ export var scene_info = {
 				  },
 			}
 		}
-			*/
+			
 	]					
 }
