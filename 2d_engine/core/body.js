@@ -57,6 +57,7 @@ export class body
 					stroke_color:"black",
 					stoke_width: 2,
 					text : '',
+					text_centered : false,
 				}
 			],
 			interaction_shapes :[
@@ -632,6 +633,7 @@ export class body
 					shape_type : this.args.shapes[i].type,      
 					m : shapes_matrices[i], 
 					text: this.args.shapes[i].text,
+					text_centered : this.args.shapes[i].text_centered,
 					color : this.args.shapes[i].color,
 					stroke_color : this.shapes_dynamic_data[i].stroke_color, 
 					stroke_width : this.shapes_dynamic_data[i].stroke_width,   	

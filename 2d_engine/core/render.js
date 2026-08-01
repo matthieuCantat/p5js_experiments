@@ -126,7 +126,8 @@ export class Render
 
         // DRAW SHAPE
         const drawFunction = this.drawFactory[draw_args.shape_type];
-        if (!drawFunction) {
+        if (!drawFunction) 
+        {
             console.warn("Unknown shape:", draw_args.shape_type);
             ctx.restore();
             return false
@@ -134,11 +135,15 @@ export class Render
         drawFunction( ctx, draw_args );
         
         // RENDER
-        if( draw_args.color != null)
-            ctx.fill()
-        
-        if( draw_args.stroke_color != null)
-            ctx.stroke()
+        if( draw_args.shape_type != 'text')
+        {
+            if( draw_args.color != null)
+                ctx.fill()
+            
+            if( draw_args.stroke_color != null)
+                ctx.stroke()
+        }
+
 
         //ctx.resetTransform();	
         ctx.restore();// restore drawing style

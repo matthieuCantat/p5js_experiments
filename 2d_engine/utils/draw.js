@@ -295,7 +295,7 @@ export function draw_rectangle(ctx, { m = null, sub_draw = false } )
 }
 
 
-
+/*
 export function draw_text(ctx, { m = null , text = '' })
 {
 	let p = m.get_row(2)
@@ -304,10 +304,39 @@ export function draw_text(ctx, { m = null , text = '' })
 	
 	ctx.font =''+Math.ceil(scale.x)*7+'px monospace';
 
-	ctx.beginPath();
+	//ctx.beginPath();
 	ctx.fillText(text, cX(p), cY(p));
-	ctx.closePath();
+	//ctx.closePath();
 	
+}
+*/
+
+export function draw_text(ctx, { m, text = '', text_centered = false }) {
+    const p = m.get_row(2);
+    const rot = m.getRotation();
+    const scale = m.getScale();
+
+	//ctx.beginPath();
+    ctx.save();
+
+    ctx.translate(cX(p), cY(p));
+    ctx.rotate(rot);
+
+    ctx.font = `${7 * scale.x}px monospace`;
+	
+	ctx.textAlign = "start";
+	ctx.textBaseline = "alphabetic";
+
+	if( text_centered )
+	{
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+	}
+
+    ctx.fillText(text, 0, 0);
+
+    ctx.restore();
+	//ctx.closePath();
 }
 
 export function draw_circle_simple(ctx, { m = null } )
