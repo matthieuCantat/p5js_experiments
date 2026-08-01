@@ -68,15 +68,15 @@ export var scene_info = {
 		},
 		
 		"triggerRotateLastEvent_touchDown": {
-			"m":  [-180, -1000, 0, 2, 2],
+			"m":  [-115, 0, 0, 2, 2],
 			"shapes" : [
 				{
-					"m":  [-156, 4-1000, 0, 25, 10],
+					"m":  [-156, 0, 0, 25, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
 				{
-					"m":  [-110, 4-1000, 0, 10, 10],
+					"m":  [-110, 0, 0, 10, 10],
 					"color": "black",
 					"type": "rectangle",
 				},
@@ -84,6 +84,7 @@ export var scene_info = {
 					"color": "white",
 					"type": "text",
 					"text": "rotate| Dn      |",	
+					"text_centered": true,
 				}
 			]        
 		},
@@ -234,7 +235,7 @@ export var scene_info = {
 		{
 			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_touchDown', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
+			expression : 'A',
 			out : [ 'triggerRotateLastEvent_touchDown', 'trsf.setTranslateY()' ],
 		}, 	
 		{
