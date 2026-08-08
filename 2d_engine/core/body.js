@@ -238,9 +238,8 @@ export class body
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// EFFECTS
 		/////////////////////////////////////////////////////////
-		this.events = {}
-		for( const key in this.Game_engine.User.Event.data )
-			this.events[key] ={ name:key, status: false, count:0, effect_insts: [] }
+		this.Event = new Event( this.Game_engine, this )
+		
 			
 		
 		
@@ -466,8 +465,8 @@ export class body
 			return false
 
 		
-
-		this.update_event_effects()
+		this.Event.update()
+		//this.update_event_effects()
 		
 		this.trsf.update(
 			this.transform_settings,
@@ -1288,5 +1287,114 @@ class Transform
 	}
 
 
+
+}
+
+
+
+
+class Event{
+
+	static HISTORY_NBR = 40
+
+	static THRESHOLD = {
+		frame_nbr:{
+			touch_up_fix : 30,
+			tap : 10,
+			pause : 50,
+			idle : 200,
+		},
+		distance:{
+			move : 50,
+			flick : 0,
+		},
+		dot:{
+			swipe:0.5
+		}
+	}
+
+	static VECTORS = {
+		up: new Vector2d(0,1),
+		down: new Vector2d(0,-1),
+		left: new Vector2d(-1,0),
+		right: new Vector2d(1,0),
+	}
+
+	constructor(Game_engine,Obj)
+	{
+		this.Game_engine = Game_engine
+		this.Obj = Obj
+		this.user_event_names = []
+
+
+		this.data = {}
+		// FILL FROM USER
+		for( const key in Game_engine.User.Event.data )
+		{
+			this.user_event_names.push( key )
+			this.data[key] ={ status:false, count:0, history:[]  }	
+		}
+		// HOLD
+		this.data['hold'] ={ status:false, count:0, history:[]  }// select and pause	
+				
+	}
+
+	update_from_user( Game_engine )
+	{
+		for( let event of this.user_event_names )
+			this.data[event].status = Game_engine.User.Event.data[event].status
+	}
+
+	clear()
+	{
+		for( let event in this.data )
+		{
+			this.data[event] = { status:false, count:0, history:[] }
+		}
+			
+	}
+
+	update()
+	{
+		if( this.Game_engine.User.Selection.obj != this.Obj )
+			return
+
+		/////////////////////////////////////////////////////////////
+		// OTHER
+		/////////////////////////////////////////////////////////////
+
+		// HOLD
+		var obj_already_drag = false
+		for( let drag_past of this.data.move.history )
+		{
+			if( drag_past )
+			{
+				obj_already_drag = true
+				break
+			}
+		}
+		
+		this.data.hold.status = false
+		if( this.data.pause.status && ( obj_already_drag == false ) )
+		{
+			this.data.pause.status = false
+			this.data.hold.status = true
+		}
+		
+
+
+
+		/////////////////////////////////////////////////////////////
+		// HISTORY
+		/////////////////////////////////////////////////////////////
+
+		//this.add_to_history( )
+		for (const key in this.data ) 
+		{
+			this.data[key].history.unshift(this.data[key].status)
+			if ( this.HISTORY_NBR < this.data[key].history.length)
+				this.data[key].history.pop(); // Remove the oldest if over size		
+		}
+	}
 
 }

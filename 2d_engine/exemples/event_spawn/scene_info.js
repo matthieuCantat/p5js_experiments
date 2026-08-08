@@ -183,6 +183,27 @@ export var scene_info = {
 			"text": "rotate|             | GRAB",
 		},
 		*/
+		"triggerRotateLastEvent_pause": {
+			"m":  [-88, -1000, 0, 2, 2],
+			"shapes":[
+				{
+					"m":  [-155, -1000, 0, 25, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"m":  [-28, -1000, 0, 20, 10],
+					"color": "black",
+					"type": "rectangle",
+				},
+				{
+					"color": "cyan",
+					"type": "text",
+					"text": "rotate|         | Pause  ",	
+					"text_centered": true,
+				}
+			] ,      
+		},
 		"triggerRotateLastEvent_hold": {
 			"m":  [-88, -1000, 0, 2, 2],
 			"shapes":[
@@ -204,7 +225,7 @@ export var scene_info = {
 				}
 			] ,      
 		},
-		"triggerRotateLastEvent_drag": {
+		"triggerRotateLastEvent_move": {
 			"m":  [-88, -1000, 0, 2, 2],
 			"shapes":[
 				{
@@ -220,7 +241,7 @@ export var scene_info = {
 				{
 					"color": "red",
 					"type": "text",
-					"text": "rotate|         | Drag  ",	
+					"text": "rotate|         | Move  ",	
 					"text_centered": true,
 				}
 			] ,             
@@ -416,15 +437,21 @@ export var scene_info = {
 		*/
 		{
 			mode: 'expression',
+			A : [ 'triggerRotateLastEvent_pause', 'trsf.getTranslateY()' ],
+			expression : 'A - 10',
+			out : [ 'triggerRotateLastEvent_pause', 'trsf.setTranslateY()' ],
+		},
+		{
+			mode: 'expression',
 			A : [ 'triggerRotateLastEvent_hold', 'trsf.getTranslateY()' ],
 			expression : 'A - 10',
 			out : [ 'triggerRotateLastEvent_hold', 'trsf.setTranslateY()' ],
 		},
 		{
 			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_drag', 'trsf.getTranslateY()' ],
+			A : [ 'triggerRotateLastEvent_move', 'trsf.getTranslateY()' ],
 			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_drag', 'trsf.setTranslateY()' ],
+			out : [ 'triggerRotateLastEvent_move', 'trsf.setTranslateY()' ],
 		},
 		/*
 		{
@@ -472,7 +499,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.touchDown.status;
+					return obj.Event.data.touchDown.status;
 				  }
 			},
 			event_end : null,
@@ -488,7 +515,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.touchUp.status;
+					return obj.Event.data.touchUp.status;
 				  }
 			},
 			event_end : null,
@@ -504,7 +531,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.fingerOnScreen.status;
+					return obj.Event.data.fingerOnScreen.status;
 				  }
 			},
 			event_end : null,
@@ -520,7 +547,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.tap.status;
+					return obj.Event.data.tap.status;
 				  }
 			},
 			event_end : null,
@@ -536,7 +563,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.doubleTap.status;
+					return obj.Event.data.doubleTap.status;
 				  }
 			},
 			event_end : null,
@@ -553,7 +580,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.grab.status;
+					return obj.Event.data.grab.status;
 				  }
 			},
 			event_end : null,
@@ -569,7 +596,23 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.hold.status;
+					return obj.Event.data.pause.status;
+				  }
+			},
+			event_end : null,
+			event_max_duration : 1000,
+			action : {
+				in_args : [ 'triggerRotateLastEvent_pause' ],
+				fn : (obj) => {
+					obj.trsf.setTranslateY( 300 );
+				  },
+			}
+		},
+		{
+			event_start : {
+				in_args : [ 'triggerRotate' ],
+				fn : (obj) => {
+					return obj.Event.data.hold.status;
 				  }
 			},
 			event_end : null,
@@ -585,13 +628,13 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.drag.status;
+					return obj.Event.data.move.status;
 				  }
 			},
 			event_end : null,
 			event_max_duration : 1000,
 			action : {
-				in_args : [ 'triggerRotateLastEvent_drag' ],
+				in_args : [ 'triggerRotateLastEvent_move' ],
 				fn : (obj) => {
 					obj.trsf.setTranslateY( 300 );
 				  },
@@ -601,7 +644,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.flick.status;
+					return obj.Event.data.flick.status;
 				  }
 			},
 			event_end : null,
@@ -617,7 +660,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.swipeLeft.status;
+					return obj.Event.data.swipeLeft.status;
 				  }
 			},
 			event_end : null,
@@ -633,7 +676,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.swipeRight.status;
+					return obj.Event.data.swipeRight.status;
 				  }
 			},
 			event_end : null,
@@ -649,7 +692,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.swipeUp.status;
+					return obj.Event.data.swipeUp.status;
 				  }
 			},
 			event_end : null,
@@ -665,7 +708,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.swipeDown.status;
+					return obj.Event.data.swipeDown.status;
 				  }
 			},
 			event_end : null,
@@ -681,7 +724,7 @@ export var scene_info = {
 			event_start : {
 				in_args : [ 'triggerRotate' ],
 				fn : (obj) => {
-					return obj.events.idle.status;
+					return obj.Event.data.idle.status;
 				  }
 			},
 			event_end : null,

@@ -363,19 +363,21 @@ export class User
 		{
 			if( ( this.Selection.obj == Objs[n] )||( this.Selection.obj_last_eval == Objs[n] ))
 			{
-				for( let event in Objs[n].events )
-					Objs[n].events[event].status = this.Event.data[event].status
+				Objs[n].Event.update_from_user(Game_engine)
+				//for( let event in Objs[n].events )
+				//	Objs[n].events[event].status = this.Event.data[event].status
 				no_selection = false
 			}
 			else	
 			{
-				for( let event in Objs[n].events )
-					Objs[n].events[event].status = false
+				Objs[n].Event.clear()
+				//for( let event in Objs[n].events )
+				//	Objs[n].events[event].status = false
 			}
 
-			Objs[n].events['idle'].status = this.Event.data['idle'].status
+			//Objs[n].events['idle'].status = this.Event.data['idle'].status
 		}
-
+		/*
 		//BACKGROUND
 		let Background = Game_engine.Background
 		if(no_selection)
@@ -389,6 +391,7 @@ export class User
 			for( let event in Background.events )
 				Background.events[event].status = false
 		}
+			*/
 
 
 
@@ -615,13 +618,11 @@ class Event{
 		frame_nbr:{
 			touch_up_fix : 30,
 			tap : 10,
-			//grab : 10,
-			//drag : 4,
-			hold : 50,
+			pause : 50,
 			idle : 200,
 		},
 		distance:{
-			drag : 50,
+			move : 50,
 			flick : 0,
 		},
 		dot:{
@@ -639,20 +640,24 @@ class Event{
 	constructor()
 	{
 		this.data = {
+			// TOUCH
 			touchDown : { status:false, count:0, history:[] },
 			touchUp : { status:false, count:0, history:[] },
+			fingerOnScreen : { status:false, count:0, history:[] }, // between touchDown and touchUp
+			// TIMING AND DIRECTION
 			tap : { status:false, count:0, history:[] }, 
-			doubleTap : { status:false, count:0, history:[] },  
-			fingerOnScreen : { status:false, count:0, history:[] }, 
-			grab : { status:false, count:0, history:[] }, 
-			hold : { status:false, count:0, history:[] },  
-			drag : { status:false, count:0, history:[] },  
+			doubleTap : { status:false, count:0, history:[] }, 
+			flick : { status:false, count:0, history:[] },  
 			swipeLeft : { status:false, count:0, history:[] },  
 			swipeRight : { status:false, count:0, history:[] },  
 			swipeUp : { status:false, count:0, history:[] },  
 			swipeDown : { status:false, count:0, history:[] },  
-			flick : { status:false, count:0, history:[] },  
-			idle : { status:false, count:0, history:[] },  
+			idle : { status:false, count:0, history:[] },   
+			manipulate : { status:false, count:0, history:[] },
+			// MANIPULATION DETAILS
+			pause : { status:false, count:0, history:[] },//delete this  
+			move : { status:false, count:0, history:[] },
+			
 		}
 
 		
@@ -661,12 +666,15 @@ class Event{
 
 	update( State, Coords )
 	{
+
+		//////////////////////////////////////////////////////////////////////////////
+		// TOUCH
+		//////////////////////////////////////////////////////////////////////////////
+
 		this.data.touchDown.status = State.isPressed
 		this.data.touchUp.status = State.isReleased
 		this.data.fingerOnScreen.status = State.isInteracting
 		
-		
-
 		//fix touchUp
 		let threshold = Math.min( Event.THRESHOLD.frame_nbr.touch_up_fix, this.data.touchDown.history.length)
 		if( this.data.touchDown.status )
@@ -698,6 +706,13 @@ class Event{
 		{
 				Coords.p_history = [] // clear history on release
 		}
+
+
+		//////////////////////////////////////////////////////////////////////////////
+		// TIME AND DIRECTION
+		//////////////////////////////////////////////////////////////////////////////
+		
+
 	
 		//Tap
 		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.touchDown.history.length)
@@ -734,82 +749,43 @@ class Event{
 		
 		
 
-		//grab
-		this.data.grab.status = false
+		//manipulate
+		this.data.manipulate.status = false
 		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.fingerOnScreen.history.length)
 		if( this.data.fingerOnScreen.status )
 		{
-			this.data.grab.status = true
+			this.data.manipulate.status = true
 			for( let i = 0 ; i < threshold ; i++)
 			{
 				if( this.data.fingerOnScreen.history[i] == false ) 
 				{
-					this.data.grab.status = false
+					this.data.manipulate.status = false
 					break
 				}
 			}
 		}
 
 		
-		this.data.hold.status = false
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.hold, this.data.grab.history.length)
-		if( this.data.grab.status )
+
+		this.data.pause.status = false
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.pause, this.data.manipulate.history.length)
+		if( this.data.manipulate.status )
 		{
-			this.data.hold.status = true
+			this.data.pause.status = true
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.data.grab.history[i] == false ) 
+				if( this.data.manipulate.history[i] == false ) 
 				{
-					this.data.hold.status = false
+					this.data.pause.status = false
 					break
 				}
 			}	
 		}
 
-		/*
-		this.grab.status = false
-		if( State.isInteracting )
-		{
-			let history_is_valid_size = ( Event.THRESHOLD.frame_nbr.grab <= Coords.p_history.length )
-			
-			let history_contain_only_points = true
-			if(history_is_valid_size === true)
-			{
-				for( let i = 0; i < Event.THRESHOLD.frame_nbr.grab; i++)
-				{
-					if( Coords.p_history[i] == null)
-					{
-						history_contain_only_points = false
-						break
-					}
-				}
-			}
-
-			let each_points_delta_respect_threshold = true
-			if( (history_is_valid_size === true) && (history_contain_only_points === true) )
-			{
-				for( let i = 1; i < Event.THRESHOLD.frame_nbr.grab; i++)
-				{
-					let distance = Coords.p_history[i].getSub(Coords.p_history[i-1]).mag()
-					if(  Event.THRESHOLD.distance.hold < distance)
-					{
-						each_points_delta_respect_threshold = false
-						break
-					}
-				}
-			}
-
-			if( (history_is_valid_size === true) 
-				&& (history_contain_only_points === true) 
-				&& (each_points_delta_respect_threshold === true) )
-				this.grab.status = true
-		}
-				
-		*/
 
 		
-		//drag
-		threshold =  Math.min( Event.THRESHOLD.frame_nbr.hold, Coords.p_history.length )
+		//move
+		threshold =  Math.min( Event.THRESHOLD.frame_nbr.pause, Coords.p_history.length )
 
 		let distance_total = 0
 		let v_total = new Vector2d()
@@ -826,16 +802,33 @@ class Event{
 		}
 		v_total.normalize()
 		
-		this.data.drag.status = false
-		if( this.data.grab.status )
+		this.data.move.status = false
+		if( this.data.manipulate.status )
 		{
-			this.data.drag.status = Event.THRESHOLD.distance.drag < distance_total
+			this.data.move.status = Event.THRESHOLD.distance.move < distance_total
 		}
 
-		if( this.data.drag.status )
+		if( this.data.move.status )
 		{
-			this.data.hold.status = false
+			this.data.pause.status = false
 		}
+		/*
+		var obj_already_drag = false
+		for( let drag_past of this.data.move.history )
+		{
+			if( drag_past )
+			{
+				obj_already_drag = true
+				break
+			}
+		}
+
+		if( this.data.pause.status && obj_already_drag )
+		{
+			this.data.pause.status = false
+			this.data.pause.status = true
+		}
+		*/
 
 
 		//flick
@@ -872,6 +865,12 @@ class Event{
 		
 
 			
+
+
+
+		/////////////////////////////////////////////////////////////
+		// HISTORY
+		/////////////////////////////////////////////////////////////
 		
 		//this.add_to_history( )
 		for (const key in this.data ) 
@@ -880,6 +879,14 @@ class Event{
 			if ( this.HISTORY_NBR < this.data[key].history.length)
 				this.data[key].history.pop(); // Remove the oldest if over size		
 		}
+
+		
+
+
+		/////////////////////////////////////////////////////////////
+		// IDLE
+		/////////////////////////////////////////////////////////////
+
 		
 		// idle handle
 		for (const key in this.data)
