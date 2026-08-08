@@ -3,9 +3,10 @@ import Matrix2d from '../../utils/matrix2d.js';
 import { COLORS } from '../../utils/draw.js'
 
 
+
 export var scene_info = {
     "objs":{
-		"triggerRotate": {
+		"ROT": {
 			"m": [-100, 50, 0, 1, 1],
 			"shapes" : [
 				{
@@ -48,326 +49,23 @@ export var scene_info = {
 			},
 				
 		},
-		"triggerRotateLastEventTitle": {
-			"m":  [-180, 330, 0, 2, 2],
+		"TRA": {
+			"m": [-100, -300, 0, 1, 1],
 			"shapes" : [
 				{
-					"m":  [-20, 334, 0, 120, 10],
-					"color": "black",
+					"m": [-100, -300, 90, 10, 50],
+					"color": "red",
 					"type": "rectangle",
-				},
-				{
-					"color": "yellow",
-					"type": "text",
-					"text": "      |  touch  | select | BEHAVIOR",					
+					"stroke_color":"black",
+					"stroke_width":1,
 				}
 			],
-			"interaction_shapes": [],
-			
-				        
-		},
-		
-		"triggerRotateLastEvent_touchDown": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes" : [
+			"interaction_shapes": [
 				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
+					"m" :  [-100, -300, 90, 120, 120],
 					"type": "rectangle",
-				},
-				{
-					"m":  [-110, -1000, 0, 10, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "white",
-					"type": "text",
-					"text": "rotate| Dn      |       ",	
-					"text_centered": true,
 				}
-			]        
-		},
-		
-		"triggerRotateLastEvent_touchUp": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-110, -1000, 0, 10, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "cyan",
-					"type": "text",
-					"text": "rotate| Up      |       ",
-					"text_centered": true,
-				}
-			]  	        
-		},
-		
-		"triggerRotateLastEvent_fingerOnScreen": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-80, -1000, 0, 10, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "yellow",
-					"type": "text",
-					"text": "rotate|     On  |       ",
-					"text_centered": true,
-				}
-			]  	        
-		},
-		
-		"triggerRotateLastEvent_tap": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-38, -1000, 0, 10, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "yellow",
-					"type": "text",
-					"text": "rotate|         | 1     ",	
-					"text_centered": true,
-				}
-			]  	    			        
-		},
-		"triggerRotateLastEvent_doubleTap": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-38, -1000, 0, 10, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "cyan",
-					"type": "text",
-					"text": "rotate|         | 2     ",	
-					"text_centered": true,
-				}
-			]  	    			        
-		},
-		/*
-		"triggerRotateLastEvent_grab": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "green",
-			"shape_type": "text",
-			"text": "rotate|             | GRAB",
-		},
-		*/
-		"triggerRotateLastEvent_pause": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "cyan",
-					"type": "text",
-					"text": "rotate|         | Pause  ",	
-					"text_centered": true,
-				}
-			] ,      
-		},
-		"triggerRotateLastEvent_hold": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "cyan",
-					"type": "text",
-					"text": "rotate|         | Hold  ",	
-					"text_centered": true,
-				}
-			] ,      
-		},
-		"triggerRotateLastEvent_move": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "red",
-					"type": "text",
-					"text": "rotate|         | Move  ",	
-					"text_centered": true,
-				}
-			] ,             
-		},
-		/*
-		"triggerRotateLastEvent_flick": {
-			"m":  [-180, -1000, 0, 2, 2],
-			"color": "red",
-			"shape_type": "text",
-			"text": "rotate|             |            | flick",	        
-		},
-		*/
-		"triggerRotateLastEvent_swipeLeft": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "white",
-					"type": "text",
-					"text": "rotate|         | <<<<  ",		
-					"text_centered": true,
-				}
-			] ,   	        
-		},
-		"triggerRotateLastEvent_swipeRight": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "cyan",
-					"type": "text",
-					"text": "rotate|         | >>>>  ",		
-					"text_centered": true,
-				}
-			] ,    	        
-		},
-		"triggerRotateLastEvent_swipeUp": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "red",
-					"type": "text",
-					"text": "rotate|         | ^^^^  ",	
-					"text_centered": true,
-				}
-			] ,    	  
-			    
-		},
-		"triggerRotateLastEvent_swipeDown": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "yellow",
-					"type": "text",
-					"text": "rotate|         | vvvv  ",	
-					"text_centered": true,
-				}
-			] ,    	  
-			     
-		},
-		"triggerRotateLastEvent_idle": {
-			"m":  [-88, -1000, 0, 2, 2],
-			"shapes":[
-				{
-					"m":  [-155, -1000, 0, 25, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"m":  [-28, -1000, 0, 20, 10],
-					"color": "black",
-					"type": "rectangle",
-				},
-				{
-					"color": "red",
-					"type": "text",
-					"text": "rotate|         | Idle  ",	
-					"text_centered": true,
-				}
-			] ,    	  	        
-		},
-		/*
-		"triggerTranslate": {
-			"m": [-100, -300, 0, 1, 1],
-			"m_shape": [-100, -300, 90, 10, 50],
-			"m_interaction": [-100, -300, 90, 120, 120],
-			"color": "red",
-			"shape_type": "rectangle",
+			],
 			"interaction_settings": {
 				"enable": true,
 				"coef": 0.2,
@@ -393,349 +91,111 @@ export var scene_info = {
 				"shape_interaction_visibility" : false,
 			},				        
 		},		
-		*/				
+				
 	},
-	
-	"cns": [	
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_touchDown', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_touchDown', 'trsf.setTranslateY()' ],
-		}, 	
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_touchUp', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_touchUp', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_fingerOnScreen', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_fingerOnScreen', 'trsf.setTranslateY()' ],
-		},		
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_tap', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_tap', 'trsf.setTranslateY()' ],
-		},	
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_doubleTap', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_doubleTap', 'trsf.setTranslateY()' ],
-		},
-		/*	
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_grab', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_grab', 'trsf.setTranslateY()' ],
-		},
-		*/
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_pause', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_pause', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_hold', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_hold', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_move', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_move', 'trsf.setTranslateY()' ],
-		},
-		/*
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_flick', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_flick', 'trsf.setTranslateY()' ],
-		},
-		*/
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_swipeLeft', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_swipeLeft', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_swipeRight', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_swipeRight', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_swipeUp', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_swipeUp', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_swipeDown', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_swipeDown', 'trsf.setTranslateY()' ],
-		},
-		{
-			mode: 'expression',
-			A : [ 'triggerRotateLastEvent_idle', 'trsf.getTranslateY()' ],
-			expression : 'A - 10',
-			out : [ 'triggerRotateLastEvent_idle', 'trsf.setTranslateY()' ],
-		},	
+	"cns": [],	
+	"eventActions" : []					
+}
+
+
+
+var info = {
+	'ROT' : {
+		'y' : 300,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	},
+	'TRA' : {
+		'y' : 250,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	}
+}
+
+
+
+var y_min = -1000
+
+let x = -165
+let font_size = 2
+let h = font_size * 5
+
+
+for( let obj_name in info )
+{
+	let obj_y = info[obj_name].y
+	let obj_w = obj_name.length*5
+
+	for( let i = 0 ; i < info[obj_name]['events_names'].length ; i++ )
+	{
+		let event_names = info[obj_name]['events_names'][i]
+		let event_pos = info[obj_name]['events_pos'][i]
 		
+		for( let event_name of event_names )
+		{
 			
-	],	
-	"eventActions" : [
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.touchDown.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_touchDown' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
+			let event_w = event_name.length*5
+
+			let n = `${obj_name}TriggerLastEvent_${event_name}`
+
+			scene_info.objs[n] = {
+				"m":  [0, y_min, 0, 1, 1],
+				"shapes" : [
+					{
+						"m":  [x, y_min, 0, obj_w, h],
+						"color": "black",
+						"type": "rectangle",
+					},
+					{
+						"m":  [x, y_min, 0, font_size, font_size],
+						"color": "white",
+						"type": "text",
+						"text": `${obj_name}`,	
+						"text_centered": true,
+					},
+					{
+						"m":  [event_pos, y_min, 0, event_w, h],
+						"color": "black",
+						"type": "rectangle",
+					},
+					{
+						"m":  [ event_pos , y_min, 0, font_size, font_size],
+						"color": "white",
+						"type": "text",
+						"text": `${event_name}`,	
+						"text_centered": true,
+					}
+				]        
 			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.touchUp.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_touchUp' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.fingerOnScreen.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_fingerOnScreen' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.tap.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_tap' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.doubleTap.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_doubleTap' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		/*
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.grab.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_grab' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},*/
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.pause.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_pause' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.hold.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_hold' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.move.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_move' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},/*
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.flick.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_flick' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},*/
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.swipeLeft.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_swipeLeft' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.swipeRight.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_swipeRight' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.swipeUp.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_swipeUp' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.swipeDown.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_swipeDown' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
-		},
-		{
-			event_start : {
-				in_args : [ 'triggerRotate' ],
-				fn : (obj) => {
-					return obj.Event.data.idle.status;
-				  }
-			},
-			event_end : null,
-			event_max_duration : 1000,
-			action : {
-				in_args : [ 'triggerRotateLastEvent_idle' ],
-				fn : (obj) => {
-					obj.trsf.setTranslateY( 300 );
-				  },
-			}
+
+			scene_info.cns.push(
+				{
+					mode: 'expression',
+					A : [ n, 'trsf.getTranslateY()' ],
+					expression : 'A - 10',
+					out : [ n, 'trsf.setTranslateY()' ],
+				},
+			)
+
+			scene_info.eventActions.push(
+				{
+					event_start : {
+						in_args : [ obj_name ],
+						fn : (obj) => {
+							return obj.Event.data[event_name].status;
+						  }
+					},
+					event_end : null,
+					event_max_duration : 1000,
+					action : {
+						in_args : [ n ],
+						fn : (obj) => {
+							obj.trsf.setTranslateY( obj_y );
+						  },
+					}
+				},
+			)
+
 		}
-			
-	]					
+	}
 }

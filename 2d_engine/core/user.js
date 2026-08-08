@@ -368,12 +368,8 @@ export class User
 				//	Objs[n].events[event].status = this.Event.data[event].status
 				no_selection = false
 			}
-			else	
-			{
-				Objs[n].Event.clear()
-				//for( let event in Objs[n].events )
-				//	Objs[n].events[event].status = false
-			}
+			
+			Objs[n].Event.clear()
 
 			//Objs[n].events['idle'].status = this.Event.data['idle'].status
 		}

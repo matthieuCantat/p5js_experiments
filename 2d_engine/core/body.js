@@ -1320,6 +1320,11 @@ class Event{
 		right: new Vector2d(1,0),
 	}
 
+	static unselected_events_names = [
+		'unselected',
+		'idle'
+	]
+
 	constructor(Game_engine,Obj)
 	{
 		this.Game_engine = Game_engine
@@ -1334,9 +1339,20 @@ class Event{
 			this.user_event_names.push( key )
 			this.data[key] ={ status:false, count:0, history:[]  }	
 		}
+
+		
 		// HOLD
-		this.data['hold'] ={ status:false, count:0, history:[]  }// select and pause	
-				
+		this.data['hold']       = { status:false, count:0, history:[]  }// select and pause	
+		this.data['unselected'] = { status:false, count:0, history:[]  }// select and pause	
+		this.data['idle']       = { status:false, count:0, history:[]  }// select and pause	
+		
+		this.unselected_events_names = Event.unselected_events_names
+		this.selected_events_names = []
+		for( let event_name in this.data )
+		{
+			if( this.unselected_events_names.includes(event_name) == false )
+				this.selected_events_names.push(event_name)
+		}
 	}
 
 	update_from_user( Game_engine )
@@ -1347,54 +1363,98 @@ class Event{
 
 	clear()
 	{
-		for( let event in this.data )
+		if( this.is_selected() )
 		{
-			this.data[event] = { status:false, count:0, history:[] }
+			for( let event of this.unselected_events_names )
+				this.data[event] = { status:false, count:0, history:[] }
 		}
+		else
+		{
+			for( let event of this.selected_events_names )
+				this.data[event] = { status:false, count:0, history:[] }
+		}
+
 			
+	}
+
+	is_selected()
+	{
+		return ( (this.Game_engine.User.Selection.obj == this.Obj )||( this.Game_engine.User.Selection.obj_last_eval == this.Obj ))
 	}
 
 	update()
 	{
-		if( this.Game_engine.User.Selection.obj != this.Obj )
-			return
-
-		/////////////////////////////////////////////////////////////
-		// OTHER
-		/////////////////////////////////////////////////////////////
-
-		// HOLD
-		var obj_already_drag = false
-		for( let drag_past of this.data.move.history )
+		
+		if( this.is_selected() )
 		{
-			if( drag_past )
+
+			/////////////////////////////////////////////////////////////
+			// OTHER
+			/////////////////////////////////////////////////////////////
+
+			// HOLD
+			var obj_already_drag = false
+			for( let drag_past of this.data.move.history )
 			{
-				obj_already_drag = true
-				break
+				if( drag_past )
+				{
+					obj_already_drag = true
+					break
+				}
 			}
+			
+			this.data.hold.status = false
+			if( this.data.pause.status && ( obj_already_drag == false ) )
+			{
+				this.data.pause.status = false
+				this.data.hold.status = true
+			}
+			
+
+
+
+			/////////////////////////////////////////////////////////////
+			// HISTORY
+			/////////////////////////////////////////////////////////////
+
+			//this.add_to_history( )
+			for (const key of this.selected_events_names) 
+				this.fill_history(key)
+
 		}
-		
-		this.data.hold.status = false
-		if( this.data.pause.status && ( obj_already_drag == false ) )
+		else
 		{
-			this.data.pause.status = false
-			this.data.hold.status = true
+
+			/////////////////////////////////////////////////////////////
+			// NOT SELECTED
+			/////////////////////////////////////////////////////////////
+
+			
+			this.data['unselected'].status = true
+
+
+			this.data.idle.status = false
+			
+			if( this.data.unselected.status )
+			{
+				this.data.idle.status = Event.THRESHOLD.frame_nbr.idle < this.data.unselected.history.length
+				
+			}
+	
+
+			for (const key of this.unselected_events_names) 
+				this.fill_history(key)
+			
+	
+
 		}
-		
+	}
 
-
-
-		/////////////////////////////////////////////////////////////
-		// HISTORY
-		/////////////////////////////////////////////////////////////
-
-		//this.add_to_history( )
-		for (const key in this.data ) 
-		{
-			this.data[key].history.unshift(this.data[key].status)
-			if ( this.HISTORY_NBR < this.data[key].history.length)
-				this.data[key].history.pop(); // Remove the oldest if over size		
-		}
+	fill_history(event_name)
+	{
+		this.data[event_name].history.unshift(this.data[event_name].status)
+		if ( this.HISTORY_NBR < this.data[event_name].history.length)
+			this.data[event_name].history.pop(); // Remove the oldest if over size		
 	}
 
 }
