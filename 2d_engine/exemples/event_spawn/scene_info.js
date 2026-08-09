@@ -101,15 +101,40 @@ export var scene_info = {
 
 var info = {
 	'ROT' : {
-		'y' : 300,
+		'y' : 240,
 		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'TRA' : {
-		'y' : 250,
+		'y' : 220,
 		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
-	}
+	},
+	'_bg_center' : {
+		'y' : 340,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	},
+	'_bg_up' : {
+		'y' : 320,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	},
+	'_bg_down' : {
+		'y' : 300,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	},
+	'_bg_left' : {
+		'y' : 280,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	},
+	'_bg_right' : {
+		'y' : 260,
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_pos' : [-100, 0 , 100],
+	},
 }
 
 
@@ -172,7 +197,7 @@ for( let obj_name in info )
 				{
 					mode: 'expression',
 					A : [ n, 'trsf.getTranslateY()' ],
-					expression : 'A - 10',
+					expression : 'A - 5',
 					out : [ n, 'trsf.setTranslateY()' ],
 				},
 			)

@@ -41,23 +41,22 @@ export class gameEngine {
 
 
         // BACKGROUND
-        this.Background = {
-            events : {}
-        }
-
-        this.Background.events = {}
-		for( const key in this.User.Event.data )
-			this.Background.events[key] ={ name:key, status: false, count:0, effect_insts: [] }
-			
+       
 
     }
 
     load_scene( scene_info )
     {
         logger.info("load_scene")
+        let background_info = get_background_info()
 
         // LOAD OBJS
         this.Objs = {}
+
+        for( let obj in background_info.objs )
+            this.Objs[obj] = new body( { ...background_info.objs[obj], Game_engine:this, Time: this.Time } )
+        
+        
         for( let obj in scene_info.objs )
             this.Objs[obj] = new body( { ...scene_info.objs[obj], Game_engine:this, Time: this.Time } )
         
@@ -406,6 +405,182 @@ export class gameEngine {
 
 
     
+}
+
+
+
+function get_background_info()
+{
+    let background_info = {
+        "objs": {
+            "_bg_center": {
+                "m": [0, 0, 0, 1, 1],
+                "shapes" : [
+                    {
+                        "m": [0, 0, 0, 130, 300],
+                        "color": null,
+                        "type": "rectangle",
+                        "stroke_color":"black",
+                        "stroke_width":1,
+                    }
+                ],
+                "interaction_shapes": [
+                    {
+                        "m": [0, 0, 0, 130, 300],
+                        "type": "rectangle",
+                    }
+                ],
+                "interaction_settings": {
+                    "enable": true,
+                    "coef": 0.2,
+                    "rotate_resolution_priority": 1.0,
+                    "radius_threshold": 0,
+                    "do_translation": true
+                },
+                transform_settings : {
+                    parent_limit_space : false,
+                    translate_limits: [[0,0],[-0,0]],
+                    rotate_limits: [0,0],
+                },            
+                "debug":{
+                    "shape_interaction_visibility" : false,
+                },
+            },
+            "_bg_up": {
+                "m": [0, 0, 0, 1, 1],
+                "shapes" : [
+                    {
+                        "m": [0, 330, 0, 190, 30],
+                        "color": null,
+                        "type": "rectangle",
+                        "stroke_color":"black",
+                        "stroke_width":1,
+                    }
+                ],
+                "interaction_shapes": [
+                    {
+                        "m": [0, 330, 0, 190, 30],
+                        "type": "rectangle",
+                    }
+                ],
+                "interaction_settings": {
+                    "enable": true,
+                    "coef": 0.2,
+                    "rotate_resolution_priority": 1.0,
+                    "radius_threshold": 0,
+                    "do_translation": true
+                },
+                transform_settings : {
+                    parent_limit_space : false,
+                    translate_limits: [[0,0],[-0,0]],
+                    rotate_limits: [0,0],
+                },            
+                "debug":{
+                    "shape_interaction_visibility" : true,
+                },
+            },
+            "_bg_down": {
+                "m": [0, 0, 0, 1, 1],
+                "shapes" : [
+                    {
+                        "m": [0, -330, 0, 190, 30],
+                        "color": null,
+                        "type": "rectangle",
+                        "stroke_color":"black",
+                        "stroke_width":1,
+                    }
+                ],
+                "interaction_shapes": [
+                    {
+                        "m": [0, -330, 0, 190, 30],
+                        "type": "rectangle",
+                    }
+                ],
+                "interaction_settings": {
+                    "enable": true,
+                    "coef": 0.2,
+                    "rotate_resolution_priority": 1.0,
+                    "radius_threshold": 0,
+                    "do_translation": true
+                },
+                transform_settings : {
+                    parent_limit_space : false,
+                    translate_limits: [[0,0],[-0,0]],
+                    rotate_limits: [0,0],
+                },            
+                "debug":{
+                    "shape_interaction_visibility" : true,
+                },
+            },
+            "_bg_left": {
+                "m": [0, 0, 0, 1, 1],
+                "shapes" : [
+                    {
+                        "m": [-160, 0, 0, 30, 300],
+                        "color": null,
+                        "type": "rectangle",
+                        "stroke_color":"black",
+                        "stroke_width":1,
+                    }
+                ],
+                "interaction_shapes": [
+                    {
+                        "m": [-160, 0, 0, 30, 300],
+                        "type": "rectangle",
+                    }
+                ],
+                "interaction_settings": {
+                    "enable": true,
+                    "coef": 0.2,
+                    "rotate_resolution_priority": 1.0,
+                    "radius_threshold": 0,
+                    "do_translation": true
+                },
+                transform_settings : {
+                    parent_limit_space : false,
+                    translate_limits: [[0,0],[-0,0]],
+                    rotate_limits: [0,0],
+                },            
+                "debug":{
+                    "shape_interaction_visibility" : true,
+                },
+            },
+            "_bg_right": {
+                "m": [0, 0, 0, 1, 1],
+                "shapes" : [
+                    {
+                        "m": [160, 0, 0, 30, 300],
+                        "color": null,
+                        "type": "rectangle",
+                        "stroke_color":"black",
+                        "stroke_width":1,
+                    }
+                ],
+                "interaction_shapes": [
+                    {
+                        "m": [160, 0, 0, 30, 300],
+                        "type": "rectangle",
+                    }
+                ],
+                "interaction_settings": {
+                    "enable": true,
+                    "coef": 0.2,
+                    "rotate_resolution_priority": 1.0,
+                    "radius_threshold": 0,
+                    "do_translation": true
+                },
+                transform_settings : {
+                    parent_limit_space : false,
+                    translate_limits: [[0,0],[-0,0]],
+                    rotate_limits: [0,0],
+                },            
+                "debug":{
+                    "shape_interaction_visibility" : true,
+                },
+            },
+        }
+    }
+    return background_info
 }
 
 

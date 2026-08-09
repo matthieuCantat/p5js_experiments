@@ -1379,7 +1379,7 @@ class Event{
 
 	is_selected()
 	{
-		return ( (this.Game_engine.User.Selection.obj == this.Obj )||( this.Game_engine.User.Selection.obj_last_eval == this.Obj ))
+		return this.Game_engine.User.Selection.is_selected( this.Obj )
 	}
 
 	update()

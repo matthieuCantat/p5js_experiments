@@ -350,6 +350,7 @@ export class User
 
 
 
+
 		
 	objs_update_events_info( Game_engine )
 	{
@@ -361,36 +362,15 @@ export class User
 		var no_selection = true
 		for( let n in Objs )
 		{
-			if( ( this.Selection.obj == Objs[n] )||( this.Selection.obj_last_eval == Objs[n] ))
+			if( this.Selection.is_selected( Objs[n] ) )
 			{
 				Objs[n].Event.update_from_user(Game_engine)
-				//for( let event in Objs[n].events )
-				//	Objs[n].events[event].status = this.Event.data[event].status
 				no_selection = false
 			}
 			
 			Objs[n].Event.clear()
-
-			//Objs[n].events['idle'].status = this.Event.data['idle'].status
 		}
-		/*
-		//BACKGROUND
-		let Background = Game_engine.Background
-		if(no_selection)
-		{
-			for( let event in Background.events )
-				Background.events[event].status = this.Event.data[event].status
-
-		}
-		else
-		{
-			for( let event in Background.events )
-				Background.events[event].status = false
-		}
-			*/
-
-
-
+		
 
 
 		return true
@@ -921,6 +901,12 @@ class Selection
 		this.obj_last_eval = null
 	}
 
+		
+	is_selected( obj )
+	{
+		return ( ( this.obj == obj )||( this.obj_last_eval == obj ))
+	}
+	
 	get_selectable_objs_names( Game_engine )
 	{
 		let selectable_objs_names = []
