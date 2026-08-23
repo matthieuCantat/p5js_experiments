@@ -66,19 +66,8 @@ export class body
 					type : "rectangle"
 				}
 			],
+			highlight_when_selected : true,
 
-			//shape_visibility : true,
-			//m_shape: null,
-			//shape_type: "rectangle",
-			//color: "white",
-			//stroke_color: "black",
-			//stroke_width: 2,
-			//color_brignthess: 0.7,
-			//text : '',
-
-			//m_interaction: null,
-			//shape_type_interaction: null,
-			
             interaction: null,
 			event_effects: {},
 			dyn_settings: {},
@@ -116,7 +105,8 @@ export class body
 		this.trsf = new Transform(  this.args.m, 
 									this.args.shapes,
 									this.args.interaction_shapes,
-									parent_obj )
+									parent_obj,
+									this )
 		
 		// FOR DYN
 		//this.last_m = new Matrix2d(this.args.m) // to keep track of the last position
@@ -160,7 +150,7 @@ export class body
 
 		this.visibility = this.args.visibility
 		this.shapes_visibility = this.args.shapes_visibility
-		
+		this.highlight_when_selected = this.args.highlight_when_selected
 		// TRANSFORM
 
 		let transform_settings_default = {
@@ -481,22 +471,25 @@ export class body
 		
 
 		let is_selected = this.isSelected()
-		for( let i = 0; i < this.args.shapes.length; i++ )
+		if( this.highlight_when_selected )
 		{
-			if(is_selected)
+			for( let i = 0; i < this.args.shapes.length; i++ )
 			{
-				this.shapes_dynamic_data[i].stroke_color = this.HIGHLIGHT_STROKE_COLOR
-				this.shapes_dynamic_data[i].stroke_width = this.HIGHLIGHT_STROKE_WIDTH	
+				if(is_selected)
+				{
+					this.shapes_dynamic_data[i].stroke_color = this.HIGHLIGHT_STROKE_COLOR
+					this.shapes_dynamic_data[i].stroke_width = this.HIGHLIGHT_STROKE_WIDTH	
+				}
+				else
+				{
+					this.shapes_dynamic_data[i].stroke_color = this.args.shapes[i].stroke_color
+					this.shapes_dynamic_data[i].stroke_width = this.args.shapes[i].stroke_width	
+				}
+				
 			}
-			else
-			{
-				this.shapes_dynamic_data[i].stroke_color = this.args.shapes[i].stroke_color
-				this.shapes_dynamic_data[i].stroke_width = this.args.shapes[i].stroke_width	
-			}
-			
+					
 		}
-		
-
+	
 
 	}
 
@@ -633,6 +626,7 @@ export class body
 					m : shapes_matrices[i], 
 					text: this.args.shapes[i].text,
 					text_centered : this.args.shapes[i].text_centered,
+					text_rotation : this.args.shapes[i].text_rotation,
 					color : this.args.shapes[i].color,
 					stroke_color : this.shapes_dynamic_data[i].stroke_color, 
 					stroke_width : this.shapes_dynamic_data[i].stroke_width,   	
@@ -728,9 +722,10 @@ class Transform
 	constructor( arg_m, 
 		arg_shapes_info = null,
 		arg_interaction_shapes_info = null,
-		obj_parent = null )
+		obj_parent = null,
+	    body = null )
 	{
-		
+		this.body = body
 		this.obj_parent = obj_parent
 
 		// BODY
@@ -813,7 +808,7 @@ class Transform
 
 	set(m)
 	{
-		this.m_body_modif = m.getMult(this.get_body().getInverse())
+		this.m_body_modif = m.getMult( this.get_body().getInverse() )
 	}
 
 	setTranslate(p)
@@ -861,6 +856,7 @@ class Transform
 		// m_body_dyn
 		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
 
+		
 		return m_body_modified
 	}
 

@@ -241,8 +241,21 @@ for( let i = 0; i < settings_list.length; i++)
 
     scene_info.objs["slide"+i] = {
             m : new Matrix2d(p, 0, scale), 
-            color: COLORS[color_index], 
-            shape_type:'rectangle',
+			shapes : [
+				{
+					m : new Matrix2d(p, 0, scale), 
+					color: COLORS[color_index], 
+					type : 'rectangle',
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
+			interaction_shapes: [
+				{
+					m : new Matrix2d(p, 0, scale),
+					"type": "rectangle",
+				}
+			],
 
 			transform_settings : {
 				parent_limit_space : false,
@@ -256,9 +269,15 @@ for( let i = 0; i < settings_list.length; i++)
 		scene_info.objs["value"+i] =  {
 			m : new Matrix2d(p.getAdd(-50,-10), 0, 3), 
 			"parent":`slide${i}`,
-			"color": "black",
-			"shape_type": "text",
-			"text": settings_list[i].title,
+			shapes : [
+				{
+					m : new Matrix2d(p.getAdd(-50,-10), 0, 2), 
+					"color": "black",
+					"type": "text",
+					"text": `${settings_list[i].title}`,	
+					"text_centered": false,
+				},
+			],
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -280,24 +299,9 @@ for( let i = 0; i < settings_list.length; i++)
 				"speed_limit_translate": 30,
 				"speed_limit_rotate": 0.3
 			},
-			//"debug":["toto"]
+			
 		},	
-	/*
-    scene_info.cns.push(
-        {
-			"mode": "axe",
-			"driver_obj": "root",
-			"driven_objs":['slide'+i],
-			"p_axe": new Vector2d( p ),
-			"v_axe": new Vector2d(1,0),
-			"enable":true,
-			"enable_limits":true,
-			"limit_max":350,
-			"limit_min":0,
-			"dyn_bounce_coef":0.5,			
-        }
-    )
-	*/
+	
 	
     p.add(p_offset)
 }

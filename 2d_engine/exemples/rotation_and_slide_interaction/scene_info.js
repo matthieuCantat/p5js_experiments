@@ -7,10 +7,21 @@ export var scene_info = {
     "objs":{
 		"rotate": {
 			"m": [0, 0, 0, 1, 1],
-			"m_shape": [0, 50, 0, 10, 50],
-			"m_interaction": [0, 50, 0, 100, 100],
-			"color": "red",
-			"shape_type": "rectangle",
+			shapes : [
+				{
+					m : [0, 50, 0, 10, 50], 
+					color: "red", 
+					type : 'rectangle',
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
+			interaction_shapes: [
+				{
+					m : [0, 50, 0, 100, 100],
+					"type": "rectangle",
+				}
+			],
 			"interaction_settings": {
 				"enable": true,
 				"coef": 0.2,
@@ -21,7 +32,7 @@ export var scene_info = {
 			transform_settings : {
 				parent_limit_space : false,
 				translate_limits: [[0,0],[-0,0]],
-				//rotate_limits: [0,90],
+				//rotate_limits: [0,0],
 			},            
 			"dyn_settings": {
 				"enable": false,
@@ -38,11 +49,15 @@ export var scene_info = {
 		},
 		"rotate_value": {
 			"m": [0, 100, 0, 1, 1],
-			"m_shape": [0, 100, 0, 2, 2],
 			"parent":"rotate",
-			"color": "blue",
-			"shape_type": "text",
-			"text": "0.0",
+			shapes : [
+				{
+					m : [0, 100, 0, 3, 3],
+					color: "blue", 
+					type : 'text',
+					"text": "0.0",
+				}
+			],
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -52,7 +67,7 @@ export var scene_info = {
 			},
 			transform_settings : {
 				parent_limit_space : false,
-				translate_limits: [[0,0],[-0,0]],
+				//translate_limits: [[0,0],[-0,0]],
 				//rotate_limits: [0,90],
 			},            
 			"dyn_settings": {
@@ -68,9 +83,15 @@ export var scene_info = {
 		},	
 		"rotate_connect": {
 			"m": [0, 200, 0, 1, 1],
-			"m_shape": [0, 250, 0, 10, 50],
-			"color": "green",
-			"shape_type": "rectangle",
+			shapes : [
+				{
+					m : [0, 250, 0, 10, 50],
+					color: "green", 
+					type : 'rectangle',
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -96,11 +117,21 @@ export var scene_info = {
 		},			
 		"translate": {
 			"m": [0, -200, 0, 1, 1],
-			"m_shape": [0, -200, 0, 50, 10],
-			"m_interaction": [0, -200, 0, 100, 100],
-			"color": "red",
-			"shape_type": "rectangle",
-			"shape_type_interaction": "circle",
+			shapes : [
+				{
+					m : [0, -200, 0, 50, 10],
+					color: "red", 
+					type : 'rectangle',
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
+			interaction_shapes: [
+				{
+					m : [0, -200, 0, 100, 100],
+					"type": "circle",
+				}
+			],
 			"interaction_settings": {
 				"enable": true,
 				"coef": 0.2,
@@ -128,11 +159,15 @@ export var scene_info = {
 		},		
 		"translate_value": {
 			"m": [-20, -200, 0, 1, 1],
-			"m_shape": [-20, -200, 0, 2, 2],
 			"parent":"translate",
-			"color": "blue",
-			"shape_type": "text",
-			"text": "0.0",
+			shapes : [
+				{
+					m : [-20, -200, 0, 3, 3],
+					color: "blue", 
+					type : 'text',
+					"text": "0.0",
+				}
+			],
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -157,10 +192,16 @@ export var scene_info = {
 		},
 		"translate_connect": {
 			"m": [-50, -200, 0, 1, 1],
-			"m_shape": [-50, -200, 0, 10, 50],
-			"color": "green",
 			"parent":"translate",
-			"shape_type": "rectangle",
+			shapes : [
+				{
+					m : [-50, -200, 0, 10, 50],
+					color: "green", 
+					type : 'rectangle',
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -185,9 +226,15 @@ export var scene_info = {
 		},
 		"translate_connectB": {
 			"m": [-150, -50, 0, 1, 1],
-			"m_shape": [-150, -50, 0, 10, 50],
-			"color": "orange",
-			"shape_type": "rectangle",
+			shapes : [
+				{
+					m : [-150, -50, 0, 10, 50],
+					color: "orange", 
+					type : 'rectangle',
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
 			"interaction_settings": {
 				"enable": false,
 				"coef": 0.2,
@@ -209,39 +256,40 @@ export var scene_info = {
 				"speed_limit_translate": 30,
 				"speed_limit_rotate": 0.3
 			},	
-		},									
+		},					
+						
 	},
 	
 	"cns": [		
 		{
 			mode: 'expression',
-			A : [ 'rotate', 'trsf.get_shape().getRotation()' ],
+			A : [ 'rotate', 'trsf.get_shapes()[0].getRotation()' ],
 			expression : 'ctx.round( A , 1 )',
-			out : [ 'rotate_value', 'text'],
+			out : [ 'rotate_value', 'args.shapes[0].text'],
 		}, 		
 		
 		{
 			mode: 'connection',
-			src : [ 'rotate', 'trsf.get_shape().getRotation()'],
+			src : [ 'rotate', 'trsf.get_shapes()[0].getRotation()'],
 			dst : [ 'rotate_connect', 'trsf.setRotationDeg()' ],
 		}, 
 		{
 			mode: 'expression',
-			A : [ 'translate', 'trsf.get_shape().getTranslateX()'],
+			A : [ 'translate', 'trsf.get_shapes()[0].getTranslateX()'],
 			expression : 'ctx.round( A , 1 )',
-			out : [ 'translate_value', 'text'],
+			out : [ 'translate_value', 'args.shapes[0].text'],
 		}, 
 
 		{
 			mode: 'connection',
-			src : [ 'translate', 'trsf.get_shape().getTranslateX()' ],
+			src : [ 'translate', 'trsf.get_shapes()[0].getTranslateX()' ],
 			dst : [ 'translate_connect', 'trsf.setRotationDeg()' ],
 		}, 	
 		
 		{
 			mode: 'expression',
-			A : [ 'translate', 'trsf.get_shape().getTranslateX()' ],
-			B : [ 'rotate', 'trsf.get_shape().getRotation()' ],
+			A : [ 'translate', 'trsf.get_shapes()[0].getTranslateX()' ],
+			B : [ 'rotate', 'trsf.get_shapes()[0].getRotation()' ],
 			C : 2,
 			expression : ' A + B * C ',
 			out : [ 'translate_connectB', 'trsf.setRotationDeg()' ],
@@ -251,7 +299,7 @@ export var scene_info = {
 			A : [ 'translate', 'Game_engine.Time.get()' ],
 			expression : ' Math.sin( A * 3 ) * 150',
 			out : [ 'translate_connectB', 'trsf.setTranslateY()' ],
-		}, 		
+		}, 	
 			 		 
 	],	
 	

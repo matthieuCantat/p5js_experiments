@@ -311,16 +311,17 @@ export function draw_text(ctx, { m = null , text = '' })
 }
 */
 
-export function draw_text(ctx, { m, text = '', text_centered = false }) {
+export function draw_text(ctx, { m, text = '', text_centered = false, text_rotation = false }) {
     const p = m.get_row(2);
-    const rot = m.getRotation();
+    const rot = m.getRotationRad();
     const scale = m.getScale();
 
 	//ctx.beginPath();
     ctx.save();
 
     ctx.translate(cX(p), cY(p));
-    ctx.rotate(rot);
+	if( text_rotation )
+    	ctx.rotate(rot);
 
     ctx.font = `${7 * scale.x}px monospace`;
 	

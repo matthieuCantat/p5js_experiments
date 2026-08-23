@@ -54,11 +54,11 @@ export class gameEngine {
         this.Objs = {}
 
         for( let obj in background_info.objs )
-            this.Objs[obj] = new body( { ...background_info.objs[obj], Game_engine:this, Time: this.Time } )
+            this.Objs[obj] = new body( { ...background_info.objs[obj], name : obj, Game_engine:this, Time: this.Time } )
         
         
         for( let obj in scene_info.objs )
-            this.Objs[obj] = new body( { ...scene_info.objs[obj], Game_engine:this, Time: this.Time } )
+            this.Objs[obj] = new body( { ...scene_info.objs[obj], name : obj, Game_engine:this, Time: this.Time } )
         
         // LOAD CONSTRAINTS
         this.Constraints.setup( scene_info.cns )
@@ -420,8 +420,9 @@ function get_background_info()
                         "m": [0, 0, 0, 130, 300],
                         "color": null,
                         "type": "rectangle",
-                        "stroke_color":"black",
+                        "stroke_color":null,
                         "stroke_width":1,
+                        
                     }
                 ],
                 "interaction_shapes": [
@@ -445,6 +446,7 @@ function get_background_info()
                 "debug":{
                     "shape_interaction_visibility" : false,
                 },
+                "highlight_when_selected":false,
             },
             "_bg_up": {
                 "m": [0, 0, 0, 1, 1],
@@ -453,8 +455,9 @@ function get_background_info()
                         "m": [0, 330, 0, 190, 30],
                         "color": null,
                         "type": "rectangle",
-                        "stroke_color":"black",
+                        "stroke_color":null,
                         "stroke_width":1,
+                        
                     }
                 ],
                 "interaction_shapes": [
@@ -476,8 +479,9 @@ function get_background_info()
                     rotate_limits: [0,0],
                 },            
                 "debug":{
-                    "shape_interaction_visibility" : true,
+                    "shape_interaction_visibility" : false,
                 },
+                "highlight_when_selected":false,
             },
             "_bg_down": {
                 "m": [0, 0, 0, 1, 1],
@@ -486,8 +490,9 @@ function get_background_info()
                         "m": [0, -330, 0, 190, 30],
                         "color": null,
                         "type": "rectangle",
-                        "stroke_color":"black",
+                        "stroke_color":null,
                         "stroke_width":1,
+                        
                     }
                 ],
                 "interaction_shapes": [
@@ -509,8 +514,9 @@ function get_background_info()
                     rotate_limits: [0,0],
                 },            
                 "debug":{
-                    "shape_interaction_visibility" : true,
+                    "shape_interaction_visibility" : false,
                 },
+                "highlight_when_selected":false,
             },
             "_bg_left": {
                 "m": [0, 0, 0, 1, 1],
@@ -519,8 +525,9 @@ function get_background_info()
                         "m": [-160, 0, 0, 30, 300],
                         "color": null,
                         "type": "rectangle",
-                        "stroke_color":"black",
+                        "stroke_color":null,
                         "stroke_width":1,
+                        
                     }
                 ],
                 "interaction_shapes": [
@@ -542,8 +549,9 @@ function get_background_info()
                     rotate_limits: [0,0],
                 },            
                 "debug":{
-                    "shape_interaction_visibility" : true,
+                    "shape_interaction_visibility" : false,
                 },
+                "highlight_when_selected":false,
             },
             "_bg_right": {
                 "m": [0, 0, 0, 1, 1],
@@ -552,8 +560,9 @@ function get_background_info()
                         "m": [160, 0, 0, 30, 300],
                         "color": null,
                         "type": "rectangle",
-                        "stroke_color":"black",
+                        "stroke_color":null,
                         "stroke_width":1,
+                        
                     }
                 ],
                 "interaction_shapes": [
@@ -575,8 +584,9 @@ function get_background_info()
                     rotate_limits: [0,0],
                 },            
                 "debug":{
-                    "shape_interaction_visibility" : true,
+                    "shape_interaction_visibility" : false,
                 },
+                "highlight_when_selected":false,
             },
         }
     }
