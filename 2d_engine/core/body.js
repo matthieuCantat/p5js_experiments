@@ -48,18 +48,19 @@ export class body
 			m: new Matrix2d(),
 			visibility : true,
 			shapes_visibility : true,
-			shapes : [
-				{
-					m : null,
-					type : "rectangle",
-					color : "white",
-					color_brigthness:0.7,
-					stroke_color:"black",
-					stoke_width: 2,
-					text : '',
-					text_centered : false,
-				}
-			],
+			shapes : [],
+			//shapes : [
+			//	{
+			//		m : null,
+			//		type : "rectangle",
+			//		color : "white",
+			//		color_brigthness:0.7,
+			//		stroke_color:"black",
+			//		stoke_width: 2,
+			//		text : '',
+			//		text_centered : false,
+			//	}
+			//],
 			interaction_shapes :[
 				{
 					m :null,

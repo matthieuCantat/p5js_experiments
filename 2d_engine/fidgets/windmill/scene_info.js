@@ -2,10 +2,21 @@ export var scene_info = {
     "objs": {
         "root": {
             "m": [0, 0, 0, 18, 18],
-            //"m_interaction": [0, -60, 0, 200, 340],
-            "color": "yellow",
-            "shape_type": "circle",
-            "stroke_color": "yellow",
+            shapes : [
+                {
+                    m : [0, 0, 0, 18, 18],
+                    color: "yellow",
+                    type : 'circle',
+                    stroke_color: "black",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [0, 0, 0, 18, 18],
+                    "type": "circle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.1,
@@ -23,13 +34,14 @@ export var scene_info = {
         },
         "rectangle_rotate_top": {
             "m": [0, 0, 0, 1, 1],
-            "m_shape":null,
-            "shape_visibility": false,
-            "m_interaction": [0, 140, 0, 50, 50],
             "parent":"root",
-            "color": "green",
-            "shape_type": "rectangle",
-            "stroke_color": null,
+            interaction_shapes: [
+                {
+                    m : [0, 140, 0, 50, 50],
+                    "type": "rectangle",
+                }
+            ],
+            "shape_visibility": false,
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -54,13 +66,14 @@ export var scene_info = {
         },   
         "rectangle_rotate_left": {
             "m": [0, 0, 0, 1, 1],
-            "m_shape": null,
-            "shape_visibility": false,
-            "m_interaction": [140, 0, 0, 50, 50],
             "parent":"root",
-            "color": "green",
-            "shape_type": "rectangle",
-            "stroke_color": null,
+            interaction_shapes: [
+                {
+                    m : [140, 0, 0, 50, 50],
+                    "type": "rectangle",
+                }
+            ],
+            "shape_visibility": false,
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -85,13 +98,14 @@ export var scene_info = {
         },
         "rectangle_rotate_down": {
             "m": [0, 0, 0, 1, 1],
-            "m_shape":null,
-            "shape_visibility": false,
-            "m_interaction": [0, -140, 0, 50, 50],
             "parent":"root",
-            "color": "green",
-            "shape_type": "rectangle",
-            "stroke_color": null,
+            interaction_shapes: [
+                {
+                    m : [0, -140, 0, 50, 50],
+                    "type": "rectangle",
+                }
+            ],
+            "shape_visibility": false,
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -116,13 +130,14 @@ export var scene_info = {
         },   
         "rectangle_rotate_right": {
             "m": [0, 0, 0, 1, 1],
-            "m_shape": null,
-            "shape_visibility": false,
-            "m_interaction": [-140, 0, 0, 50, 50],
             "parent":"root",
-            "color": "green",
-            "shape_type": "rectangle",
-            "stroke_color": null,
+            interaction_shapes: [
+                {
+                    m : [-140, 0, 0, 50, 50],
+                    "type": "rectangle",
+                }
+            ],
+            "shape_visibility": false,
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -147,12 +162,22 @@ export var scene_info = {
         },  
         "rectangle_translate_top": {
             "m": [0, 0, 0, 50, 20],
-            "m_shape": [0, 70, 0, 8, 40],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"rectangle_rotate_top",
-            "color": "white",
-            "shape_type": "rectangle",
-            "stroke_color": "white",
+            shapes : [
+                {
+                    m : [0, 70, 0, 8, 40],
+                    color: "white",
+                    type : 'rectangle',
+                    stroke_color: "black",
+                    stroke_width: 1,    
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [0, 70, 0, 8, 40],
+                    "type": "rectangle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -177,12 +202,22 @@ export var scene_info = {
         },   
         "rectangle_translate_left": {
             "m": [0, 0, 0, 50, 20],
-            "m_shape": [70, 0, 0, 40, 8],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"rectangle_rotate_left",
-            "color": "white",
-            "shape_type": "rectangle",
-            "stroke_color": "white",
+            shapes : [
+                {
+                    m : [70, 0, 0, 40, 8],
+                    color: "white",
+                    type : 'rectangle',
+                    stroke_color: "black",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [70, 0, 0, 40, 8],
+                    "type": "rectangle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -207,12 +242,22 @@ export var scene_info = {
         },
         "rectangle_translate_down": {
             "m": [0, 0, 0, 20, 50],
-            "m_shape": [0, -70, 0, 8, 40],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"rectangle_rotate_down",
-            "color": "white",
-            "shape_type": "rectangle",
-            "stroke_color": "white",
+            shapes : [
+                {
+                    m : [0, -70, 0, 8, 40],
+                    color: "white",
+                    type : 'rectangle',
+                    stroke_color: "black",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [   
+                {
+                    m : [0, -70, 0, 8, 40],
+                    "type": "rectangle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -237,12 +282,22 @@ export var scene_info = {
         },   
         "rectangle_translate_right": {
             "m": [0, 0, 0, 20, 50],
-            "m_shape": [-70, 0, 0, 40, 8],
-            //"m_interaction": [0, 50, 0, 200, 30],
-            "parent":"rectangle_rotate_right",
-            "color": "white",
-            "shape_type": "rectangle",
-            "stroke_color": "white",
+            parent : "rectangle_rotate_right",
+            shapes : [
+                {
+                    m : [-70, 0, 0, 40, 8],
+                    color: "white",
+                    type : 'rectangle',
+                    stroke_color: "black",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-70, 0, 0, 40, 8],
+                    "type": "rectangle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -267,12 +322,16 @@ export var scene_info = {
         },          
         "trap_topRight": {
             "m": [50, 50, 45, 55, 10],
-            "m_shape": [50, 50, 45, 55, 10],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"root",
-            "color": "red",
-            "shape_type": "trapezoid",
-            "stroke_color": "red",
+            shapes : [
+                {
+                    m : [50, 50, 45, 55, 10],
+                    color: "red",
+                    type : 'trapezoid',
+                    stroke_color: "red",
+                    stroke_width: 1,
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -297,12 +356,22 @@ export var scene_info = {
         },
         "trap_downRight": {
             "m": [50, -50, 135, 55, 10],
-            "m_shape": [50, -50, 135, 55, 10],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"root",
-            "color": "red",
-            "shape_type": "trapezoid",
-            "stroke_color": "red",
+            shapes : [
+                {
+                    m : [50, -50, 135, 55, 10],  
+                    color: "red",
+                    type : 'trapezoid',
+                    stroke_color: "red",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [50, -50, 135, 55, 10],
+                    "type": "trapezoid",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -327,12 +396,22 @@ export var scene_info = {
         },  
         "trap_downLeft": {
             "m": [-50, -50, -135, 55, 10],
-            "m_shape": [-50, -50, -135, 55, 10],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"root",
-            "color": "red",
-            "shape_type": "trapezoid",
-            "stroke_color": "red",
+            shapes : [
+                {
+                    m : [-50, -50, -135, 55, 10],  
+                    color: "red",
+                    type : 'trapezoid',
+                    stroke_color: "red",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-50, -50, -135, 55, 10],
+                    "type": "trapezoid",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -357,12 +436,22 @@ export var scene_info = {
         },   
         "trap_upLeft": {
             "m": [-50, 50, -45, 55, 10],
-            "m_shape": [-50, 50, -45, 55, 10],
-            //"m_interaction": [0, 50, 0, 200, 30],
             "parent":"root",
-            "color": "red",
-            "shape_type": "trapezoid",
-            "stroke_color": "red",
+            shapes : [
+                {
+                    m : [-50, 50, -45, 55, 10],
+                    color: "red",
+                    type : 'trapezoid',
+                    stroke_color: "red",
+                    stroke_width: 1,                    
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-50, 50, -45, 55, 10],
+                    type: "trapezoid",
+                }
+            ],          
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
