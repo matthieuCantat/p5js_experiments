@@ -4,10 +4,20 @@ export var scene_info = {
     "objs":{
 
         "obj":{ 
-            m : [0,200, 0, 100,20], 
-            color: 'blue', 
-            shape_type:'rectangle',
-
+            m : [0,300, 0, 100,20], 
+            shapes : [
+              {
+                m : [0,300, 0, 100,20], 
+                color: "blue", 
+                type : 'rectangle',
+              }
+            ],
+            interaction_shapes:[
+              {
+                m : [0,300, 0, 100,20], 
+                "type": "rectangle",
+              }
+            ],
             interaction_settings:{
               'enable':true,
               'coef':0.5,
@@ -16,9 +26,9 @@ export var scene_info = {
             },
 
             dyn_settings:{
-              enable:true,
-              enable_gravity:true,
-              mass:0.3,
+              enable:false,
+              enable_gravity:false,
+              mass:0.1,
             },
 
             do_border_collision:true,

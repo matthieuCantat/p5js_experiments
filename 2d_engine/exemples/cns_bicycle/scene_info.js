@@ -2,8 +2,19 @@ export var scene_info = {
     "objs": {
         "ground": {
             "m": [100, -70, 0, 50, 320],
-            "color": "yellow",
-            "shape_type": "rectangle",
+            shapes : [
+                {
+                    m : [100, -70, 0, 50, 320],
+                    color: "yellow",
+                    type : 'rectangle',
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [100, -70, 0, 50, 320],
+                    "type": "rectangle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.1,
@@ -33,8 +44,19 @@ export var scene_info = {
         "bicycle": {
             "m": [-110, 0, 0, 50, 100],
             "parent":"ground",
-            "color": "green",
-            "shape_type": "rectangle",
+            shapes : [
+                {
+                    m : [-110, 0, 0, 50, 100],
+                    color: "green",
+                    type : 'rectangle',
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-110, 0, 0, 50, 100],
+                    "type": "rectangle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.2,
@@ -71,8 +93,21 @@ export var scene_info = {
         "wheelA": {
             "m": [-10, 100, 0, 60],
             "parent":"bicycle",
-            "color": "blue",
-            "shape_type": "circle",
+            shapes : [
+                {
+                    m : [-10, 100, 0, 60],
+                    color: "blue",
+                    type : 'circle',
+                    stroke_color: "black",
+                    stroke_width: 1,                    
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-10, 100, 0, 60],
+                    "type": "circle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.1,
@@ -107,8 +142,21 @@ export var scene_info = {
         "wheelB": {
             "m": [-10, -100, 0, 60],
             "parent":"bicycle",
-            "color": "blue",
-            "shape_type": "circle",
+            shapes : [
+                {
+                    m : [-10, -100, 0, 60],
+                    color: "blue",
+                    type : 'circle',
+                    stroke_color: "black",
+                    stroke_width: 1,
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-10, -100, 0, 60],
+                    "type": "circle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.1,
@@ -143,8 +191,21 @@ export var scene_info = {
         "gear_pedals": {
             "m": [-50, 10, 0, 20],
             "parent":"bicycle",
-            "color": "red",
-            "shape_type": "circle",
+            shapes : [
+                {
+                    m : [-50, 10, 0, 20],
+                    color: "red",
+                    type : 'circle',
+                    stroke_color: "black",
+                    stroke_width: 1,                    
+                }
+            ],
+            interaction_shapes: [
+                {
+                    m : [-50, 10, 0, 20],
+                    "type": "circle",
+                }
+            ],
             "interaction_settings": {
                 "enable": true,
                 "coef": 0.01,

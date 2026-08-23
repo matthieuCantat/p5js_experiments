@@ -38,9 +38,17 @@ for( let j = 0; j <scales.length; j++)
         
         scene_info["objs"]['shape'+j+'_'+i] = { 
                 m : [ pStartCol.x, pStartCol.y, 0, scales[j].x, scales[j].y], 
-                color: COLORS[color_index], 
+                shapes : [
+                    {
+                        m :[ pStartCol.x, pStartCol.y, 0, scales[j].x, scales[j].y],  
+                        color: COLORS[color_index], 
+                        type : shape_types[i],
+                        stroke_color: "black",
+                        stroke_width: 1,
+                    }
+                ],
                 interaction_settings :{attr:'r'},
-                shape_type:shape_types[i] }
+                 }
 
         
         pStartCol.add(p_offset_Y)
