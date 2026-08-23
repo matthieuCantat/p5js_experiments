@@ -7,10 +7,20 @@ import { COLORS } from '../../utils/draw.js'
 export var scene_info = {
     "objs":{
         "rotate": {
-            "name": "rotate",
-            "m": [0, 0, 0, 150],
-            "color": "blue",
-            "shape_type": "circle",
+            "m": [0, 0, 0, 1, 1],
+            shapes : [
+				{
+					m : [0, 0, 0, 150],
+					color: "blue", 
+					type : 'circle',
+				}
+			],
+            interaction_shapes: [
+				{
+					m : [0, 0, 0, 150],
+					"type": "circle",
+				}
+			],
             "interaction_settings": {
                 'type':'move',
                 'enable':true,
@@ -45,9 +55,20 @@ for( let i = 0; i < nbr; i++)
     scene_info.objs['slide'+i] = {
             name : 'slide'+i,
             m : [p.x, p.y, -aCurrent+90, 70, 20], 
-            color: COLORS[color_index], 
-            shape_type:'rectangle',
             parent : 'rotate',
+            shapes : [
+				{
+					m : [p.x, p.y, -aCurrent+90, 70, 20], 
+					color: COLORS[color_index], 
+					type : 'rectangle',
+				}
+			],
+            interaction_shapes: [
+				{
+					m : [p.x, p.y, -aCurrent+90, 70, 20], 
+					"type": "rectangle",
+				}
+			],
             transform_settings : {
                 parent_limit_space : false,
                 translate_limits: [[-100,0],[0,0]],
