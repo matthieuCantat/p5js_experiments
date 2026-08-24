@@ -45,8 +45,9 @@ export class EventActions
 
         this.data = raw_data   
         // store offset
-        for( let cns of this.data )
+        for( let i = 0 ; i < this.data.length ; i++ )
         {
+            this.data[i].action.nbr_eval = 0
             /*
             // EVENT START FUNTION
             {
@@ -162,8 +163,16 @@ export class EventActions
 
             var duration_end_out = 0 < cns.event_max_duration && cns.event_max_duration < cns.action.nbr_eval
 
+
+            var event_conditions_are_valid = event_start_out && !event_end_out
             
-            if( event_start_out && !event_end_out && !duration_end_out )
+            if( event_conditions_are_valid )
+                cns.action.nbr_eval += 1
+            else
+                cns.action.nbr_eval = 0
+
+
+            if( event_conditions_are_valid && !duration_end_out )
             {
                 let action_args = []
                 for( let obj_name of cns.action.in_args)
@@ -173,8 +182,8 @@ export class EventActions
                     action_args.push(this.Game_engine.Objs[obj_name])
                 }
                 cns.action.fn(...action_args) 
-                cns.action.nbr_eval += 1
             }
+
 
 
         }

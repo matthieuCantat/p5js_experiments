@@ -158,7 +158,7 @@ for( let obj_name in info )
 		
 		for( let event_name of event_names )
 		{
-			
+
 			let event_w = event_name.length*5
 
 			let n = `${obj_name}TriggerLastEvent_${event_name}`
@@ -224,3 +224,69 @@ for( let obj_name in info )
 		}
 	}
 }
+
+
+
+// ADD SOME SOUND
+
+scene_info.eventActions.push(
+	{
+		event_start : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {return obj.Event.data['touchDown'].status;}
+		},
+		event_end : null,
+		event_max_duration : 1,
+		action : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {obj.Game_engine.playSoundSample( "sfx_wii_short_tick_02" );},
+		}
+	},
+)
+
+
+scene_info.eventActions.push(
+	{
+		event_start : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {return obj.Event.data['tap'].status;}
+		},
+		event_end : null,
+		event_max_duration : 1,
+		action : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {obj.Game_engine.playSoundSample( "sfx_wii_bell_long_01" );},
+		}
+	},
+)
+
+scene_info.eventActions.push(
+	{
+		event_start : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {return obj.Event.data['doubleTap'].status;}
+		},
+		event_end : null,
+		event_max_duration : 1,
+		action : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {obj.Game_engine.playSoundSample( "sfx_wii_synth_bell_melodie_01" );},
+		}
+	},
+)
+
+
+scene_info.eventActions.push(
+	{
+		event_start : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {return obj.Event.data['idle'].status;}
+		},
+		event_end : null,
+		event_max_duration : 1,
+		action : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {obj.Game_engine.playSoundSample( "ost_creature_04" );},
+		}
+	},
+)

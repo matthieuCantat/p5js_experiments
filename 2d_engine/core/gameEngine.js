@@ -11,6 +11,7 @@ import {
 import { body } from './body.js'
 import { Logger } from './logger.js';
 import { Render } from './render.js';
+import { playSoundSample } from './sound.js';
 import Matrix2d from '../utils/matrix2d.js';
 import Vector2d from '../utils/vector2d.js';
 
@@ -401,6 +402,11 @@ export class gameEngine {
         this.Render.draw()
        
                 
+    }
+
+    playSoundSample(name)
+    {
+        playSoundSample(name)
     }
 
 
