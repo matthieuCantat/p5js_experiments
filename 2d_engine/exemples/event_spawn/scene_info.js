@@ -249,6 +249,39 @@ scene_info.eventActions.push(
 	{
 		event_start : {
 			in_args : [ 'TRA' ],
+			fn : (obj) => {return obj.Event.data['touchUp'].status;}
+		},
+		event_end : null,
+		event_max_duration : 1,
+		action : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {obj.Game_engine.playSoundSample( "sfx_occulus_artificial_close_01" );},
+		}
+	},
+)
+
+scene_info.eventActions.push(
+	{
+		event_start : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {return obj.Event.data['hold'].status;}
+		},
+		event_end : null,
+		event_max_duration : 1,
+		action : {
+			in_args : [ 'TRA' ],
+			fn : (obj) => {obj.Game_engine.playSoundSample( "sfx_creature_synth_03" );},
+		}
+	},
+)
+
+
+
+
+scene_info.eventActions.push(
+	{
+		event_start : {
+			in_args : [ 'TRA' ],
 			fn : (obj) => {return obj.Event.data['tap'].status;}
 		},
 		event_end : null,
