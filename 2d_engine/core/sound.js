@@ -27,14 +27,88 @@ async function loadSamples() {
 loadSamples();
 
 
-export function playSoundSample( name ) {
-    if (!sounds_to_buffer[name]) {
+export function playSoundSample( sound_file_name, { volume = 1, fade_in_seconds = 0, loop = false } ) {
+    
+    if (!sounds_to_buffer[sound_file_name]) {
         console.log("Sample not loaded yet!");
         return;
     }
+    console.log("playSoundSample")
 
+    // create a buffer source, setup effect
     const source = audioCtx.createBufferSource();
-    source.buffer = sounds_to_buffer[name];
-    source.connect(audioCtx.destination);
+    source.buffer = sounds_to_buffer[sound_file_name];
+    source.loop = loop;
+   
+    const gainNode = audioCtx.createGain();
+    
+    source.connect( gainNode );
+    
+    gainNode.connect(audioCtx.destination);
+
+
+    // play sound
     source.start();
+    
+    // set the volume fade in
+    gainNode.gain.value = volume;
+    if( 0 < fade_in_seconds )
+    {
+        
+        const now = audioCtx.currentTime;
+
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(volume, now + fade_in_seconds);
+
+    
+    }
+   
+    
+
+    source.onended = () => {
+        console.log(' END')
+      };
+
+    return gainNode;
+}
+
+
+export class Sound {
+
+    constructor( ) {
+        this.gains = {}
+    }
+    
+    start(name, sound_file_name, { fade_in_seconds = 0, loop = false }  ){
+        console.log("Sound start")
+        this.gains[name] = playSoundSample( sound_file_name, { volume : 1, fade_in_seconds : fade_in_seconds, loop : loop }  )
+    }
+
+    end( name, { fade_out_seconds = 0 } ) {
+        
+        if (!this.gains[name]) {
+            console.log("Sound not found!");
+            return;
+        }
+        let gainNode = this.gains[name]
+        if( 0 < fade_out_seconds )
+        {
+            console.log("Sound end")
+            const fadeOutDuration = fade_out_seconds;
+            const now = audioCtx.currentTime;
+
+            gainNode.gain.cancelScheduledValues(now);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + fadeOutDuration);
+
+        }
+        else
+        {
+            gainNode.gain.value = 0;
+        }
+     
+    }
+
+
 }

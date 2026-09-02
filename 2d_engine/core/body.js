@@ -258,7 +258,7 @@ export class body
 			}
 		}
 
-		//this.eventActions = this.args.eventActions
+		
 
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// OTHERS
@@ -363,7 +363,7 @@ export class body
 			this.Game_engine.body_effects.push( effect_inst )	
 		
 		}
-		//this.eventActions					
+					
 	
 
 
@@ -1384,6 +1384,7 @@ class Event{
 		
 		if( this.is_selected() )
 		{
+
 
 			/////////////////////////////////////////////////////////////
 			// OTHER

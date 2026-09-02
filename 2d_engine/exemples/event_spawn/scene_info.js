@@ -102,37 +102,37 @@ export var scene_info = {
 var info = {
 	'ROT' : {
 		'y' : 240,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'TRA' : {
 		'y' : 220,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'_bg_center' : {
 		'y' : 340,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'_bg_up' : {
 		'y' : 320,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'_bg_down' : {
 		'y' : 300,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'_bg_left' : {
 		'y' : 280,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 	'_bg_right' : {
 		'y' : 260,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
+		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
 		'events_pos' : [-100, 0 , 100],
 	},
 }
@@ -158,7 +158,7 @@ for( let obj_name in info )
 		
 		for( let event_name of event_names )
 		{
-
+		
 			let event_w = event_name.length*5
 
 			let n = `${obj_name}TriggerLastEvent_${event_name}`
@@ -204,20 +204,24 @@ for( let obj_name in info )
 
 			scene_info.eventActions.push(
 				{
-					event_start : {
-						in_args : [ obj_name ],
-						fn : (obj) => {
-							return obj.Event.data[event_name].status;
-						  }
+					event : {
+						start : {
+							in_args : [ obj_name ],
+							fn : (obj) => {return obj.Event.data[event_name].status;},
+						},
+						end : null,
+						max_duration : 1000,
 					},
-					event_end : null,
-					event_max_duration : 1000,
 					action : {
-						in_args : [ n ],
-						fn : (obj) => {
-							obj.trsf.setTranslateY( obj_y );
-						  },
-					}
+						start : {
+							in_args : [ n ],
+							fn : (obj) => {
+								obj.trsf.setTranslateY( obj_y );
+							},
+							duration : 1,
+						},
+						end : {},
+					},
 				},
 			)
 
@@ -231,19 +235,159 @@ for( let obj_name in info )
 
 scene_info.eventActions.push(
 	{
-		event_start : {
-			in_args : [ 'TRA' ],
-			fn : (obj) => {return obj.Event.data['touchDown'].status;}
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['idle'].status;}
+			},
+			end : null,
+			max_duration : 1,
 		},
-		event_end : null,
-		event_max_duration : 1,
 		action : {
-			in_args : [ 'TRA' ],
-			fn : (obj) => {obj.Game_engine.playSoundSample( "sfx_wii_short_tick_02" );},
-		}
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_touchDown","ost_creature_04", { volume : 1, fade_in_seconds : 2, loop : true } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.end( "TRA_touchDown", { fade_out_seconds : 2 } );
+				},
+				duration : 1,
+			},
+		},
+
 	},
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['hold'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_hold","sfx_creature_synth_03", { volume : 1, fade_in_seconds : 2, loop : true } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.end( "TRA_hold", { fade_out_seconds : 2 } );
+				},
+				duration : 1,
+			},
+		},
+
+	},
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['tap'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_tap","sfx_wii_bell_long_01", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {}
+		},
+
+	},
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['doubleTap'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_doubleTap","sfx_wii_synth_bell_melodie_01", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {}
+		},
+
+	},	
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['grab'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_grab","sfx_wii_short_tick_02", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {}
+		},
+
+	},
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['release'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_release","sfx_occulus_artificial_close_01", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {}
+		},
+
+	},			
 )
 
+
+/*
 
 scene_info.eventActions.push(
 	{
@@ -323,3 +467,4 @@ scene_info.eventActions.push(
 		}
 	},
 )
+*/

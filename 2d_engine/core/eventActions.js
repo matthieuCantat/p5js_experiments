@@ -47,55 +47,58 @@ export class EventActions
         // store offset
         for( let i = 0 ; i < this.data.length ; i++ )
         {
-            this.data[i].action.nbr_eval = 0
+            this.data[i].action.start.nbr_eval = 0
+            this.data[i].action.end.nbr_eval = 0
+
+            
             /*
             // EVENT START FUNTION
             {
                 var in_args = {}    
-                for( let attr in cns.event_start )
+                for( let attr in cns.event.start )
                 {
                     if( attr == 'expression' )
                         continue
                     if( attr == 'out' )
                         continue
-                    in_args[attr] = cns.event_start[attr]
+                    in_args[attr] = cns.event.start[attr]
                 }
                 
                 let out_attr = null
-                if( cns.event_start.out instanceof Array )
-                    out_attr = cns.event_start.out[1]
+                if( cns.event.start.out instanceof Array )
+                    out_attr = cns.event.start.out[1]
                 
-                let out_info = build_expression_function( cns.event_start.expression, 
+                let out_info = build_expression_function( cns.event.start.expression, 
                                                         in_args, 
                                                         out_attr )
                 
-                cns.event_start.expression_fn = out_info.function;
-                cns.event_start.args_names = out_info.args_names   
+                cns.event.start.expression_fn = out_info.function;
+                cns.event.start.args_names = out_info.args_names   
             }    
 
             // EVENT END FUNTION
-            if( cns.event_end !== null )
+            if( cns.event.end !== null )
             {
                 var in_args = {}    
-                for( let attr in cns.event_end )
+                for( let attr in cns.event.end )
                 {
                     if( attr == 'expression' )
                         continue
                     if( attr == 'out' )
                         continue
-                    in_args[attr] = cns.event_end[attr]
+                    in_args[attr] = cns.event.end[attr]
                 }
                 
                 let out_attr = null
-                if( cns.event_end.out instanceof Array )
-                    out_attr = cns.event_end.out[1]
+                if( cns.event.end.out instanceof Array )
+                    out_attr = cns.event.end.out[1]
                 
-                let out_info = build_expression_function( cns.event_end.expression, 
+                let out_info = build_expression_function( cns.event.end.expression, 
                                                         in_args, 
                                                         out_attr )
                 
-                cns.event_end.expression_fn = out_info.function;
-                cns.event_end.args_names = out_info.args_names   
+                cns.event.end.expression_fn = out_info.function;
+                cns.event.end.args_names = out_info.args_names   
             }    
             
             // OUT FUNCTION
@@ -127,7 +130,19 @@ export class EventActions
         }
     }
 
-    
+   
+   _extract_replace_with_obj_args( event_fn_info )
+   {
+       var extracted_args = []
+       for( let obj_name of event_fn_info.in_args )
+       {
+           if( event_fn_info[obj_name] == 'fn' )
+               continue
+           extracted_args.push(this.Game_engine.Objs[obj_name])
+       }
+       return extracted_args
+   }
+
 	// CONSTRAINT
 	update()
     {
@@ -137,52 +152,48 @@ export class EventActions
         
         for( let cns of this.data )
         {
-        
-            let event_start_args = []
-            for( let obj_name of cns.event_start.in_args )
-            {
-                if( cns.event_start[obj_name] == 'fn' )
-                    continue
-                event_start_args.push(this.Game_engine.Objs[obj_name])
-            }
-            var event_start_out = cns.event_start.fn(...event_start_args)
             
-
+            var event_start_out = cns.event.start.fn(...this._extract_replace_with_obj_args( cns.event.start ))
+            
             var event_end_out = false
-            if( cns.event_end !== null )
-            {
-                let event_end_args = []
-                for( let obj_name of cns.event_end.in_args )
-                {
-                    if( cns.event_end[obj_name] == 'fn' )
-                        continue
-                    event_end_args.push(this.Game_engine.Objs[obj_name])
-                }
-                event_end_out = cns.event_end.fn(...event_end_args)   
-            }
+            if( cns.event.end !== null )
+                event_end_out = cns.event.end.fn(...this._extract_replace_with_obj_args( cns.event.end ))   
 
-            var duration_end_out = 0 < cns.event_max_duration && cns.event_max_duration < cns.action.nbr_eval
-
+            
 
             var event_conditions_are_valid = event_start_out && !event_end_out
             
             if( event_conditions_are_valid )
-                cns.action.nbr_eval += 1
+            {
+                cns.action.start.nbr_eval += 1
+                cns.action.end.nbr_eval = 0
+            }
             else
-                cns.action.nbr_eval = 0
+            {
+                cns.action.start.nbr_eval = 0
+                cns.action.end.nbr_eval += 1
+            }
+                
+
+            //if ( cns.name == 'toto' )
+            //    console.log(cns.action.start.nbr_eval, cns.action.end.nbr_eval)
+
+            var duration_end_out = 0 < cns.event.max_duration && cns.event.max_duration < cns.action.start.nbr_eval
 
 
             if( event_conditions_are_valid && !duration_end_out )
             {
-                let action_args = []
-                for( let obj_name of cns.action.in_args)
-                {
-                    if( cns.action[obj_name] == 'fn' )
-                        continue
-                    action_args.push(this.Game_engine.Objs[obj_name])
-                }
-                cns.action.fn(...action_args) 
+                cns.action.start.fn(...this._extract_replace_with_obj_args(cns.action.start)) 
             }
+            else if ( cns.action.end.nbr_eval === 1 )
+            {
+                //console.log("END ACTION",cns )
+                if( cns.action.end.fn !== undefined )
+                    cns.action.end.fn(...this._extract_replace_with_obj_args(cns.action.end)) 
+            
+                cns.action.end.nbr_eval += 1
+            }
+                
 
 
 
@@ -190,7 +201,9 @@ export class EventActions
     }
 
 
+    
+    
+    
 
 }
-
 

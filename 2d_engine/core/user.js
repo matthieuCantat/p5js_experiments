@@ -593,7 +593,7 @@ class Event{
 	static THRESHOLD = {
 		frame_nbr:{
 			touch_up_fix : 30,
-			tap : 10,
+			tap : 7,
 			pause : 50,
 			idle : 200,
 		},
@@ -605,6 +605,7 @@ class Event{
 			swipe:0.5
 		}
 	}
+
 
 	static VECTORS = {
 		up: new Vector2d(0,1),
@@ -624,6 +625,8 @@ class Event{
 			tap : { status:false, count:0, history:[] }, 
 			doubleTap : { status:false, count:0, history:[] }, 
 			flick : { status:false, count:0, history:[] },  
+			grab : { status:false, count:0, history:[] },
+			release : { status:false, count:0, history:[] },
 			swipeLeft : { status:false, count:0, history:[] },  
 			swipeRight : { status:false, count:0, history:[] },  
 			swipeUp : { status:false, count:0, history:[] },  
@@ -639,6 +642,122 @@ class Event{
 		
 	}
 		
+
+	get_basic_interaction_event()
+	{
+		//console.log("get_basic_interaction_event")
+		/////////////////////////////// INFO
+		let FIRST_INTERVAL_MULT = 0
+
+		let threshold = Event.THRESHOLD.frame_nbr.tap*4 + FIRST_INTERVAL_MULT
+		threshold = Math.min( threshold, this.data.touchUp.history.length)
+		threshold = Math.min( threshold, this.data.touchDown.history.length)	
+	
+		let touchDown_frames = []
+		let touchUp_frames = []
+		for( let i = 0 ; i < threshold ; i++)
+		{
+			if( this.data.touchDown.history[i] )
+				touchDown_frames.push(i)
+	
+			if( this.data.touchUp.history[i] )
+				touchUp_frames.push(i)
+		}
+	
+		//console.log( touchDown_frames.length, touchUp_frames.length)
+			
+		//   tDn     tUp       tDn        tUp
+		//    |-------|---------|---------|---------      (>
+		//        10  |     10  |     10  |   10+
+		//                                
+		//     
+		/////////////////////////////// DETECTION
+
+		let nothing_detected = false
+		if( (  touchDown_frames.length == 0 ) 
+			&& (touchUp_frames.length == 0) )
+		{
+			nothing_detected = true
+		}
+		if( nothing_detected )
+			return { grab : false , release : false , tap : false, doubleTap : false }
+
+
+		
+
+		var grab_detected = false
+		if( (  touchDown_frames.length == 1 ) 
+			&& (touchUp_frames.length == 0) )
+		{
+			if( Event.THRESHOLD.frame_nbr.tap + FIRST_INTERVAL_MULT < touchDown_frames[0] )
+				grab_detected = true
+	
+		}
+		if( grab_detected )
+			return { grab : true , release : false , tap : false, doubleTap : false }
+
+
+
+
+
+	
+		var doubleTap_detected = false
+		if( (touchDown_frames.length == 2 ) 
+			&& (touchUp_frames.length == 2) )
+		{
+			let delta_btw_last_tap_and_now = touchUp_frames[0] 
+			let last_tap_duration = touchDown_frames[0] - touchUp_frames[0]
+			let first_tap_duration = touchDown_frames[1] - touchUp_frames[1]
+			let delta_btw_taps = touchUp_frames[1] - touchDown_frames[0]
+	
+			if( (delta_btw_last_tap_and_now < Event.THRESHOLD.frame_nbr.tap + FIRST_INTERVAL_MULT ) 
+				&& ( last_tap_duration < Event.THRESHOLD.frame_nbr.tap)
+				&& ( first_tap_duration < Event.THRESHOLD.frame_nbr.tap )
+				&& ( delta_btw_taps < Event.THRESHOLD.frame_nbr.tap ) )
+				doubleTap_detected = true
+		}
+		if( doubleTap_detected )
+		{
+			this.data.touchDown.history = []
+			this.data.touchUp.history  = []
+			return { grab : false , release : false , tap : false, doubleTap : true }
+		}
+
+
+	
+		var tap_detected = false
+		if( (touchDown_frames.length == 1 ) 
+			&& (touchUp_frames.length == 1) )
+		{
+			let delta_btw_last_tap_and_now = touchUp_frames[0] 
+			let last_tap_duration = touchDown_frames[0] - touchUp_frames[0]
+		
+	
+			if( (Event.THRESHOLD.frame_nbr.tap < delta_btw_last_tap_and_now   ) 
+				&& ( last_tap_duration < Event.THRESHOLD.frame_nbr.tap)  )
+				tap_detected = true
+		}
+		if( tap_detected )
+			return { grab : false , release : false , tap : true, doubleTap : false }
+
+
+
+
+		var release_detected = false
+		if( ( touchDown_frames.length == 0 )
+			&&( touchUp_frames.length == 1 ) )
+		{
+			if(  touchUp_frames[0] < Event.THRESHOLD.frame_nbr.tap *2 )
+				release_detected = true
+	
+		}
+		if( release_detected )
+			return { grab : false , release : true , tap : false, doubleTap : false }
+
+
+		return { grab : false , release : false , tap : false, doubleTap : false }
+	}	
+
 
 	update( State, Coords )
 	{
@@ -688,40 +807,19 @@ class Event{
 		// TIME AND DIRECTION
 		//////////////////////////////////////////////////////////////////////////////
 		
-
-	
-		//Tap
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.touchDown.history.length)
-		this.data.tap.status = false	
-		if( this.data.touchUp.status )
-		{
-			for( let i = 0 ; i < threshold ; i++)
-			{
-				if( this.data.touchDown.history[i] )
-				{
-					this.data.tap.status = true
-					break
-				}
-			}
-		}
-
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap+1, this.data.tap.history.length)
+			
+		//   tDn     tUp       tDn        tUp
+		//    |-------|---------|---------|      (>
+		//        10  |     10  |     10  | 
+		//                                
+		//      
 		
-		// doubleTap
-		this.data.doubleTap.status = false	
-		if( this.data.tap.status )
-		{
-			for( let i = 0 ; i < threshold ; i++)
-			{
-				if( this.data.tap.history[i] )
-				{
-					
-					this.data.doubleTap.status = true
-					this.data.tap.status = false
-					break
-				}
-			}
-		}
+		let _info = this.get_basic_interaction_event()
+
+		this.data.grab.status = _info['grab']
+		this.data.release.status = _info['release']
+		this.data.tap.status = _info['tap']
+		this.data.doubleTap.status = _info['doubleTap']
 		
 		
 
