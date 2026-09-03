@@ -97,43 +97,48 @@ export var scene_info = {
 	"eventActions" : []					
 }
 
+const event_names = [ 
+	["touchDown","touchUp"], 
+	["tap", "doubleTap", "grab", "release", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle'],
+	["pause", "hold", "move",]]
 
+const event_pos = [-100, -20 , 100, 160]
 
 var info = {
 	'ROT' : {
 		'y' : 240,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names':event_names,
+		'events_pos' : event_pos,
 	},
 	'TRA' : {
 		'y' : 220,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names': event_names,
+		'events_pos' : event_pos,
 	},
 	'_bg_center' : {
 		'y' : 340,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names': event_names,
+		'events_pos' : event_pos,
 	},
 	'_bg_up' : {
 		'y' : 320,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names': event_names,
+		'events_pos' : event_pos,
 	},
 	'_bg_down' : {
 		'y' : 300,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names': event_names,
+		'events_pos' : event_pos,
 	},
 	'_bg_left' : {
 		'y' : 280,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names': event_names,
+		'events_pos' : event_pos,
 	},
 	'_bg_right' : {
 		'y' : 260,
-		'events_names': [ ["touchDown","touchUp"], ["fingerOnScreen"], ["tap", "doubleTap", "grab", "release", "pause", "hold", "move", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle']],
-		'events_pos' : [-100, 0 , 100],
+		'events_names': event_names,
+		'events_pos' : event_pos,
 	},
 }
 
@@ -207,7 +212,10 @@ for( let obj_name in info )
 					event : {
 						start : {
 							in_args : [ obj_name ],
-							fn : (obj) => {return obj.Event.data[event_name].status;},
+							fn : (obj) => {
+								//if( event_name == "swipeUp" )
+								//	console.log(`event ${event_name} status : ${obj.Event.data[event_name].status}`);
+								return obj.Event.data[event_name].status;},
 						},
 						end : null,
 						max_duration : 1000,

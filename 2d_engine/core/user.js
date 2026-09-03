@@ -575,8 +575,11 @@ class Coords{
 			
 		this.p_last.set( this.p )
 
+		if( State.isInteracting )
+			this.p_history.unshift(new Vector2d(this.p))
+		else
+			this.p_history.unshift( null )
 
-		this.p_history.unshift(new Vector2d(this.p))
 		if ( this.POINT_HISTORY_MAX_SIZE < this.p_history.length)
 			this.p_history.pop(); // Remove the oldest if over size		
 		
@@ -593,7 +596,7 @@ class Event{
 	static THRESHOLD = {
 		frame_nbr:{
 			touch_up_fix : 30,
-			tap : 7,
+			tap : 10,
 			pause : 50,
 			idle : 200,
 		},
@@ -643,13 +646,16 @@ class Event{
 	}
 		
 
-	get_basic_interaction_event()
+	get_basic_interaction_event( Coords)
 	{
 		//console.log("get_basic_interaction_event")
-		/////////////////////////////// INFO
-		let FIRST_INTERVAL_MULT = 0
+		/////////////////////////////// INFO TOUCH STATE
+		let ADD = 4
+		let MIN_DISTANCE = 1
 
-		let threshold = Event.THRESHOLD.frame_nbr.tap*4 + FIRST_INTERVAL_MULT
+		let sample_duration = Event.THRESHOLD.frame_nbr.tap*4 + ADD
+
+		let threshold = sample_duration
 		threshold = Math.min( threshold, this.data.touchUp.history.length)
 		threshold = Math.min( threshold, this.data.touchDown.history.length)	
 	
@@ -663,6 +669,34 @@ class Event{
 			if( this.data.touchUp.history[i] )
 				touchUp_frames.push(i)
 		}
+
+
+		//////////////////////////////// INFO COORDS
+
+		threshold = sample_duration
+		threshold =  Math.min( threshold, Coords.p_history.length )
+		
+
+		let distance_total = 0
+		let v_total = new Vector2d()
+		for( let i = 1 ; i < threshold ; i++)
+		{
+			let p_new = Coords.p_history[i-1]
+			let p_old = Coords.p_history[i]
+
+			if( (p_new == null)||(p_old == null) )
+				continue
+			let v = p_new.getSub(p_old)
+			let distance = v.mag()
+
+			distance_total += distance
+			v_total.add(v)
+		
+		}
+		v_total.normalize()
+
+		
+		//console.log( distance_total )
 	
 		//console.log( touchDown_frames.length, touchUp_frames.length)
 			
@@ -673,6 +707,17 @@ class Event{
 		//     
 		/////////////////////////////// DETECTION
 
+		let out_info = { 
+			grab : false , 
+			release : false , 
+			tap : false, 
+			doubleTap : false,
+			swipeLeft : false,
+			swipeRight : false,
+			swipeUp : false,
+			swipeDown : false,
+		}
+
 		let nothing_detected = false
 		if( (  touchDown_frames.length == 0 ) 
 			&& (touchUp_frames.length == 0) )
@@ -680,7 +725,7 @@ class Event{
 			nothing_detected = true
 		}
 		if( nothing_detected )
-			return { grab : false , release : false , tap : false, doubleTap : false }
+			return out_info
 
 
 		
@@ -689,12 +734,16 @@ class Event{
 		if( (  touchDown_frames.length == 1 ) 
 			&& (touchUp_frames.length == 0) )
 		{
-			if( Event.THRESHOLD.frame_nbr.tap + FIRST_INTERVAL_MULT < touchDown_frames[0] )
+			if( Event.THRESHOLD.frame_nbr.tap + ADD < touchDown_frames[0] )
 				grab_detected = true
-	
+			
 		}
 		if( grab_detected )
-			return { grab : true , release : false , tap : false, doubleTap : false }
+		{
+			out_info.grab = true
+			return out_info
+		}
+			
 
 
 
@@ -702,15 +751,15 @@ class Event{
 
 	
 		var doubleTap_detected = false
-		if( (touchDown_frames.length == 2 ) 
-			&& (touchUp_frames.length == 2) )
+		if( ( 1 < touchDown_frames.length  ) 
+			&& ( 1 < touchUp_frames.length ) )
 		{
-			let delta_btw_last_tap_and_now = touchUp_frames[0] 
+			let tap_to_now = touchUp_frames[0] 
 			let last_tap_duration = touchDown_frames[0] - touchUp_frames[0]
 			let first_tap_duration = touchDown_frames[1] - touchUp_frames[1]
 			let delta_btw_taps = touchUp_frames[1] - touchDown_frames[0]
 	
-			if( (delta_btw_last_tap_and_now < Event.THRESHOLD.frame_nbr.tap + FIRST_INTERVAL_MULT ) 
+			if( (tap_to_now < Event.THRESHOLD.frame_nbr.tap + ADD ) 
 				&& ( last_tap_duration < Event.THRESHOLD.frame_nbr.tap)
 				&& ( first_tap_duration < Event.THRESHOLD.frame_nbr.tap )
 				&& ( delta_btw_taps < Event.THRESHOLD.frame_nbr.tap ) )
@@ -720,25 +769,54 @@ class Event{
 		{
 			this.data.touchDown.history = []
 			this.data.touchUp.history  = []
-			return { grab : false , release : false , tap : false, doubleTap : true }
+
+			out_info.doubleTap = true
+			return out_info
 		}
 
 
 	
 		var tap_detected = false
-		if( (touchDown_frames.length == 1 ) 
-			&& (touchUp_frames.length == 1) )
+		if( ( 0 < touchDown_frames.length  ) 
+			&& ( 0 < touchUp_frames.length ) )
 		{
-			let delta_btw_last_tap_and_now = touchUp_frames[0] 
+			let tap_to_now = touchUp_frames[0] 
 			let last_tap_duration = touchDown_frames[0] - touchUp_frames[0]
 		
 	
-			if( (Event.THRESHOLD.frame_nbr.tap < delta_btw_last_tap_and_now   ) 
+			if( (Event.THRESHOLD.frame_nbr.tap + ADD < tap_to_now   ) 
 				&& ( last_tap_duration < Event.THRESHOLD.frame_nbr.tap)  )
 				tap_detected = true
 		}
+
+		
+
 		if( tap_detected )
-			return { grab : false , release : false , tap : true, doubleTap : false }
+		{
+			
+			if( Event.THRESHOLD.distance.flick < distance_total )
+			{
+				
+				if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.left) )
+					out_info.swipeLeft = true
+				else if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.right) )
+					out_info.swipeRight = true
+				else if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.up) )
+					out_info.swipeUp = true
+				else if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.down) )
+					out_info.swipeDown = true
+				else
+					out_info.swipeLeft = true
+
+				
+				return out_info
+			}
+			else{
+				out_info.tap = true
+				return out_info
+			}
+		}
+			
 
 
 
@@ -752,10 +830,14 @@ class Event{
 	
 		}
 		if( release_detected )
-			return { grab : false , release : true , tap : false, doubleTap : false }
+		{
+			out_info.release = true
+			return out_info
+		}
+			
 
 
-		return { grab : false , release : false , tap : false, doubleTap : false }
+		return out_info
 	}	
 
 
@@ -797,10 +879,11 @@ class Event{
 		}
 
 		// fix coords
-		if( this.data.fingerOnScreen.status == false )
-		{
-				Coords.p_history = [] // clear history on release
-		}
+		
+		//if( this.data.fingerOnScreen.status == false )
+		//{
+		//		Coords.p_history = [] // clear history on release
+		//}
 
 
 		//////////////////////////////////////////////////////////////////////////////
@@ -814,12 +897,16 @@ class Event{
 		//                                
 		//      
 		
-		let _info = this.get_basic_interaction_event()
+		let _info = this.get_basic_interaction_event( Coords )
 
 		this.data.grab.status = _info['grab']
 		this.data.release.status = _info['release']
 		this.data.tap.status = _info['tap']
 		this.data.doubleTap.status = _info['doubleTap']
+		this.data.swipeLeft.status = _info['swipeLeft']
+		this.data.swipeRight.status = _info['swipeRight']
+		this.data.swipeUp.status = _info['swipeUp']
+		this.data.swipeDown.status = _info['swipeDown']
 		
 		
 
@@ -840,7 +927,7 @@ class Event{
 		}
 
 		
-
+		
 		this.data.pause.status = false
 		threshold = Math.min( Event.THRESHOLD.frame_nbr.pause, this.data.manipulate.history.length)
 		if( this.data.manipulate.status )
@@ -856,7 +943,7 @@ class Event{
 			}	
 		}
 
-
+		
 		
 		//move
 		threshold =  Math.min( Event.THRESHOLD.frame_nbr.pause, Coords.p_history.length )
@@ -867,6 +954,9 @@ class Event{
 		{
 			let p_new = Coords.p_history[i-1]
 			let p_old = Coords.p_history[i]
+			
+			if( (p_new == null)||(p_old == null) )
+				continue
 
 			let v = p_new.getSub(p_old)
 			let distance = v.mag()
@@ -875,6 +965,8 @@ class Event{
 			v_total.add(v)
 		}
 		v_total.normalize()
+
+		
 		
 		this.data.move.status = false
 		if( this.data.manipulate.status )
@@ -886,6 +978,9 @@ class Event{
 		{
 			this.data.pause.status = false
 		}
+
+		
+
 		/*
 		var obj_already_drag = false
 		for( let drag_past of this.data.move.history )
@@ -904,7 +999,7 @@ class Event{
 		}
 		*/
 
-
+		/*
 		//flick
 		this.data.flick.status = false
 		if( this.data.tap.status )
@@ -936,10 +1031,10 @@ class Event{
 			
 			
 		}
-		
+		*/
 
 			
-
+		
 
 
 		/////////////////////////////////////////////////////////////
@@ -960,7 +1055,7 @@ class Event{
 		/////////////////////////////////////////////////////////////
 		// IDLE
 		/////////////////////////////////////////////////////////////
-
+		
 		
 		// idle handle
 		for (const key in this.data)

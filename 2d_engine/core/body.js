@@ -1357,9 +1357,10 @@ class Event{
 		for( let event of this.user_event_names )
 			this.data[event].status = Game_engine.User.Event.data[event].status
 	}
-
+	
 	clear()
 	{
+		
 		if( this.is_selected() )
 		{
 			for( let event of this.unselected_events_names )
@@ -1370,10 +1371,11 @@ class Event{
 			for( let event of this.selected_events_names )
 				this.data[event] = { status:false, count:0, history:[] }
 		}
+			
 
 			
 	}
-
+	
 	is_selected()
 	{
 		return this.Game_engine.User.Selection.is_selected( this.Obj )
