@@ -76,7 +76,7 @@ export class User
 		let HELPER_START_POINT_LIFTIME = 50
 		
 		
-		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.Event.data.fingerOnScreen.status )
+		let draw_press_position = (0 < this.Counter.isInteracting < HELPER_START_POINT_LIFTIME )&&( this.Event.data.advance.fingerOnScreen.status )
 		if( draw_press_position )
 		{	
 			let start_size = User.DRAW_DEFAULT.circle_size_anim_start + User.DRAW_DEFAULT.circle_size
@@ -116,7 +116,7 @@ export class User
 		}
 			*/
 		
-		if( this.Event.data.fingerOnScreen.status )
+		if( this.Event.data.advance.fingerOnScreen.status )
 		{
 			// CURRENT MOUSE PRESSED
 						
@@ -617,38 +617,53 @@ class Event{
 		right: new Vector2d(1,0),
 	}
 
+	static events_types = {
+		'simple' : ['touchDown','touchUp','fingerOnScreen'],
+	}
+
 	constructor()
 	{
+		let event_list = [
+				// TOUCH
+				"touchDown" ,
+				"touchUp" ,
+				"fingerOnScreen" , // between touchDown and touchUp
+				// MANIPULATION
+				"grab" ,
+				"release" ,
+				"idle" ,   
+				"manipulate" ,
+				// INTERACTION ADVANCE
+				"tap" , 
+				"doubleTap" , 
+				"flick" ,  
+				"swipeLeft" ,  
+				"swipeRight" ,  
+				"swipeUp" ,  
+				"swipeDown" ,  
+				// MANIPULATION DETAILS
+				"pause" ,//delete this  
+				"move" ,
+		]
+
 		this.data = {
-			// TOUCH
-			touchDown : { status:false, count:0, history:[] },
-			touchUp : { status:false, count:0, history:[] },
-			fingerOnScreen : { status:false, count:0, history:[] }, // between touchDown and touchUp
-			// TIMING AND DIRECTION
-			tap : { status:false, count:0, history:[] }, 
-			doubleTap : { status:false, count:0, history:[] }, 
-			flick : { status:false, count:0, history:[] },  
-			grab : { status:false, count:0, history:[] },
-			release : { status:false, count:0, history:[] },
-			swipeLeft : { status:false, count:0, history:[] },  
-			swipeRight : { status:false, count:0, history:[] },  
-			swipeUp : { status:false, count:0, history:[] },  
-			swipeDown : { status:false, count:0, history:[] },  
-			idle : { status:false, count:0, history:[] },   
-			manipulate : { status:false, count:0, history:[] },
-			// MANIPULATION DETAILS
-			pause : { status:false, count:0, history:[] },//delete this  
-			move : { status:false, count:0, history:[] },
-			
+			'simple' : {},
+			'advance' : {},
+		}
+
+		for( let n of event_list)
+		{
+			this.data.simple[n]  = { status:false, count:0, history:[] }
+			this.data.advance[n] = { status:false, count:0, history:[] }
 		}
 
 		
 	}
 		
 
-	get_basic_interaction_event( Coords)
+	get_advance_interaction_event( Coords )
 	{
-		//console.log("get_basic_interaction_event")
+		
 		/////////////////////////////// INFO TOUCH STATE
 		let ADD = 4
 		let MIN_DISTANCE = 1
@@ -656,17 +671,17 @@ class Event{
 		let sample_duration = Event.THRESHOLD.frame_nbr.tap*4 + ADD
 
 		let threshold = sample_duration
-		threshold = Math.min( threshold, this.data.touchUp.history.length)
-		threshold = Math.min( threshold, this.data.touchDown.history.length)	
+		threshold = Math.min( threshold, this.data.advance.touchUp.history.length)
+		threshold = Math.min( threshold, this.data.advance.touchDown.history.length)	
 	
 		let touchDown_frames = []
 		let touchUp_frames = []
 		for( let i = 0 ; i < threshold ; i++)
 		{
-			if( this.data.touchDown.history[i] )
+			if( this.data.advance.touchDown.history[i] )
 				touchDown_frames.push(i)
 	
-			if( this.data.touchUp.history[i] )
+			if( this.data.advance.touchUp.history[i] )
 				touchUp_frames.push(i)
 		}
 
@@ -767,8 +782,8 @@ class Event{
 		}
 		if( doubleTap_detected )
 		{
-			this.data.touchDown.history = []
-			this.data.touchUp.history  = []
+			this.data.advance.touchDown.history = []
+			this.data.advance.touchUp.history  = []
 
 			out_info.doubleTap = true
 			return out_info
@@ -841,6 +856,142 @@ class Event{
 	}	
 
 
+
+
+	get_simple_interaction_event( Coords )
+	{
+		
+		/////////////////////////////// INFO TOUCH STATE
+		let ADD = 4
+		let MIN_DISTANCE = 1
+
+		let sample_duration = Event.THRESHOLD.frame_nbr.tap*4 + ADD
+
+		let threshold = sample_duration
+		threshold = Math.min( threshold, this.data.advance.touchUp.history.length)
+		threshold = Math.min( threshold, this.data.advance.touchDown.history.length)	
+	
+		let touchDown_frames = []
+		let touchUp_frames = []
+		for( let i = 0 ; i < threshold ; i++)
+		{
+			if( this.data.advance.touchDown.history[i] )
+				touchDown_frames.push(i)
+	
+			if( this.data.advance.touchUp.history[i] )
+				touchUp_frames.push(i)
+		}
+
+
+		//////////////////////////////// INFO COORDS
+
+		threshold = sample_duration
+		threshold =  Math.min( threshold, Coords.p_history.length )
+		
+
+		let distance_total = 0
+		let v_total = new Vector2d()
+		for( let i = 1 ; i < threshold ; i++)
+		{
+			let p_new = Coords.p_history[i-1]
+			let p_old = Coords.p_history[i]
+
+			if( (p_new == null)||(p_old == null) )
+				continue
+			let v = p_new.getSub(p_old)
+			let distance = v.mag()
+
+			distance_total += distance
+			v_total.add(v)
+		
+		}
+		v_total.normalize()
+
+		
+		//console.log( distance_total )
+	
+		//console.log( touchDown_frames.length, touchUp_frames.length)
+			
+		//   tDn     tUp       tDn        tUp
+		//    |-------|---------|---------|---------      (>
+		//        10  |     10  |     10  |   10+
+		//                                
+		//     
+		/////////////////////////////// DETECTION
+
+		let out_info = { 
+			grab : false , 
+			release : false , 
+			tap : false, 
+			doubleTap : false,
+			swipeLeft : false,
+			swipeRight : false,
+			swipeUp : false,
+			swipeDown : false,
+		}
+
+		let nothing_detected = false
+		if( (  touchDown_frames.length == 0 ) 
+			&& (touchUp_frames.length == 0) )
+		{
+			nothing_detected = true
+		}
+		if( nothing_detected )
+			return out_info
+
+
+		
+
+		var grab_detected = false
+		if( (  0 < touchDown_frames.length ) )
+		{
+			if( touchUp_frames.length == 0 )
+			{
+				grab_detected = true
+			}
+			else
+			{
+				if( touchDown_frames[0] < touchUp_frames[0] )
+					grab_detected = true
+			}
+			
+		}
+		if( grab_detected )
+		{
+			out_info.grab = true
+			return out_info
+		}
+			
+
+
+		var release_detected = false
+		if( (  0 < touchUp_frames.length ) )
+		{
+			if( touchDown_frames.length == 0 )
+			{
+				release_detected = true
+			}
+			else
+			{
+				if( touchUp_frames[0] < touchDown_frames[0] )
+					release_detected = true
+			}
+			
+		}
+		if( release_detected )
+		{
+			out_info.release = true
+			return out_info
+		}
+			
+
+
+		return out_info
+	}	
+	
+	
+
+
 	update( State, Coords )
 	{
 
@@ -848,43 +999,42 @@ class Event{
 		// TOUCH
 		//////////////////////////////////////////////////////////////////////////////
 
-		this.data.touchDown.status = State.isPressed
-		this.data.touchUp.status = State.isReleased
-		this.data.fingerOnScreen.status = State.isInteracting
+		this.data.advance.touchDown.status = State.isPressed
+		this.data.advance.touchUp.status = State.isReleased
+		this.data.advance.fingerOnScreen.status = State.isInteracting
 		
 		//fix touchUp
-		let threshold = Math.min( Event.THRESHOLD.frame_nbr.touch_up_fix, this.data.touchDown.history.length)
-		if( this.data.touchDown.status )
+		let threshold = Math.min( Event.THRESHOLD.frame_nbr.touch_up_fix, this.data.advance.touchDown.history.length)
+		if( this.data.advance.touchDown.status )
 		{
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.data.touchUp.history[i] )
+				if( this.data.advance.touchUp.history[i] )
 					break
-				if( this.data.touchDown.history[i] )
-					this.data.touchUp.status = true
+				if( this.data.advance.touchDown.history[i] )
+					this.data.advance.touchUp.status = true
 			}
 		}
 		//fix fingerOnScreen
-		threshold = Math.min( this.data.touchDown.history.length, this.data.touchUp.history.length)
-		this.data.fingerOnScreen.status = false
+		threshold = Math.min( this.data.advance.touchDown.history.length, this.data.advance.touchUp.history.length)
+		this.data.advance.fingerOnScreen.status = false
 		for( let i = 0 ; i < threshold ; i++)
 		{
-			if( this.data.touchUp.history[i] )
+			if( this.data.advance.touchUp.history[i] )
 				break
-			if( this.data.touchDown.history[i] )
+			if( this.data.advance.touchDown.history[i] )
 			{
-				this.data.fingerOnScreen.status = true
+				this.data.advance.fingerOnScreen.status = true
 				break
 			}
 		}
 
-		// fix coords
-		
-		//if( this.data.fingerOnScreen.status == false )
-		//{
-		//		Coords.p_history = [] // clear history on release
-		//}
+		////////////////// UPDATE SIMPOLE
 
+		
+		this.data.simple.touchDown.status = this.data.advance.touchDown.status
+		this.data.simple.touchUp.status = this.data.advance.touchUp.status
+		this.data.simple.fingerOnScreen.status = this.data.advance.fingerOnScreen.status
 
 		//////////////////////////////////////////////////////////////////////////////
 		// TIME AND DIRECTION
@@ -897,51 +1047,66 @@ class Event{
 		//                                
 		//      
 		
-		let _info = this.get_basic_interaction_event( Coords )
+		let _info = this.get_advance_interaction_event( Coords )
 
-		this.data.grab.status = _info['grab']
-		this.data.release.status = _info['release']
-		this.data.tap.status = _info['tap']
-		this.data.doubleTap.status = _info['doubleTap']
-		this.data.swipeLeft.status = _info['swipeLeft']
-		this.data.swipeRight.status = _info['swipeRight']
-		this.data.swipeUp.status = _info['swipeUp']
-		this.data.swipeDown.status = _info['swipeDown']
+		this.data.advance.grab.status = _info['grab']
+		this.data.advance.release.status = _info['release']
+		this.data.advance.tap.status = _info['tap']
+		this.data.advance.doubleTap.status = _info['doubleTap']
+		this.data.advance.swipeLeft.status = _info['swipeLeft']
+		this.data.advance.swipeRight.status = _info['swipeRight']
+		this.data.advance.swipeUp.status = _info['swipeUp']
+		this.data.advance.swipeDown.status = _info['swipeDown']
+		
+
+
+		_info = this.get_simple_interaction_event( Coords )
+
+
+		this.data.simple.grab.status = _info['grab']
+		this.data.simple.release.status = _info['release']
+		this.data.simple.tap.status = _info['tap']
+		this.data.simple.doubleTap.status = _info['doubleTap']
+		this.data.simple.swipeLeft.status = _info['swipeLeft']
+		this.data.simple.swipeRight.status = _info['swipeRight']
+		this.data.simple.swipeUp.status = _info['swipeUp']
+		this.data.simple.swipeDown.status = _info['swipeDown']
 		
 		
-
 		//manipulate
-		this.data.manipulate.status = false
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.fingerOnScreen.history.length)
-		if( this.data.fingerOnScreen.status )
+		this.data.advance.manipulate.status = false
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.tap, this.data.advance.fingerOnScreen.history.length)
+		if( this.data.advance.fingerOnScreen.status )
 		{
-			this.data.manipulate.status = true
+			this.data.advance.manipulate.status = true
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.data.fingerOnScreen.history[i] == false ) 
+				if( this.data.advance.fingerOnScreen.history[i] == false ) 
 				{
-					this.data.manipulate.status = false
+					this.data.advance.manipulate.status = false
 					break
 				}
 			}
 		}
-
+		this.data.simple.manipulate.status = this.data.advance.manipulate.status
 		
 		
-		this.data.pause.status = false
-		threshold = Math.min( Event.THRESHOLD.frame_nbr.pause, this.data.manipulate.history.length)
-		if( this.data.manipulate.status )
+		
+		this.data.advance.pause.status = false
+		threshold = Math.min( Event.THRESHOLD.frame_nbr.pause, this.data.advance.manipulate.history.length)
+		if( this.data.advance.manipulate.status )
 		{
-			this.data.pause.status = true
+			this.data.advance.pause.status = true
 			for( let i = 0 ; i < threshold ; i++)
 			{
-				if( this.data.manipulate.history[i] == false ) 
+				if( this.data.advance.manipulate.history[i] == false ) 
 				{
-					this.data.pause.status = false
+					this.data.advance.pause.status = false
 					break
 				}
 			}	
 		}
+		
 
 		
 		
@@ -968,73 +1133,19 @@ class Event{
 
 		
 		
-		this.data.move.status = false
-		if( this.data.manipulate.status )
+		this.data.advance.move.status = false
+		if( this.data.advance.manipulate.status )
 		{
-			this.data.move.status = Event.THRESHOLD.distance.move < distance_total
+			this.data.advance.move.status = Event.THRESHOLD.distance.move < distance_total
 		}
 
-		if( this.data.move.status )
+		if( this.data.advance.move.status )
 		{
-			this.data.pause.status = false
+			this.data.advance.pause.status = false
 		}
 
-		
-
-		/*
-		var obj_already_drag = false
-		for( let drag_past of this.data.move.history )
-		{
-			if( drag_past )
-			{
-				obj_already_drag = true
-				break
-			}
-		}
-
-		if( this.data.pause.status && obj_already_drag )
-		{
-			this.data.pause.status = false
-			this.data.pause.status = true
-		}
-		*/
-
-		/*
-		//flick
-		this.data.flick.status = false
-		if( this.data.tap.status )
-		{
-			
-			if( Event.THRESHOLD.distance.flick < distance_total )
-			{
-				this.data.flick.status = true
-				this.data.tap.status = false
-			}
-		}
-		
-		//
-		this.data.swipeLeft.status = false
-		this.data.swipeRight.status = false
-		this.data.swipeUp.status = false
-		this.data.swipeDown.status = false
-
-		if( this.data.flick.status )
-		{
-			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.left) )
-				this.data.swipeLeft.status = true
-			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.right) )
-				this.data.swipeRight.status = true
-			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.up) )
-				this.data.swipeUp.status = true
-			if( Event.THRESHOLD.dot.swipe < v_total.dot(Event.VECTORS.down) )
-				this.data.swipeDown.status = true
-			
-			
-		}
-		*/
-
-			
-		
+		this.data.simple.move.status = this.data.advance.move.status
+		this.data.simple.pause.status = this.data.advance.pause.status
 
 
 		/////////////////////////////////////////////////////////////
@@ -1042,14 +1153,21 @@ class Event{
 		/////////////////////////////////////////////////////////////
 		
 		//this.add_to_history( )
-		for (const key in this.data ) 
+		for (const key in this.data.advance ) 
 		{
-			this.data[key].history.unshift(this.data[key].status)
-			if ( this.HISTORY_NBR < this.data[key].history.length)
-				this.data[key].history.pop(); // Remove the oldest if over size		
+			this.data.advance[key].history.unshift(this.data.advance[key].status)
+			if ( this.HISTORY_NBR < this.data.advance[key].history.length)
+				this.data.advance[key].history.pop(); // Remove the oldest if over size		
 		}
 
 		
+		//this.add_to_history( )
+		for (const key in this.data.simple ) 
+			{
+				this.data.simple[key].history.unshift(this.data.simple[key].status)
+				if ( this.HISTORY_NBR < this.data.simple[key].history.length)
+					this.data.simple[key].history.pop(); // Remove the oldest if over size		
+			}
 
 
 		/////////////////////////////////////////////////////////////
@@ -1058,14 +1176,14 @@ class Event{
 		
 		
 		// idle handle
-		for (const key in this.data)
+		for (const key in this.data.advance)
 		{
 			if( key == 'idle')
 				continue
-			if( this.data[key].status == true)
+			if( this.data.advance[key].status == true)
 			{
-				this.data.idle.count = 0
-				this.data.idle.status = false
+				this.data.advance.idle.count = 0
+				this.data.advance.idle.status = false
 				break
 			}	
 		}
@@ -1073,12 +1191,38 @@ class Event{
 
 		
 
-		if( Event.THRESHOLD.frame_nbr.idle < this.data.idle.count )
-			this.data.idle.status = true
+		if( Event.THRESHOLD.frame_nbr.idle < this.data.advance.idle.count )
+			this.data.advance.idle.status = true
 
-		this.data.idle.count += 1
+		this.data.advance.idle.count += 1
 
 		
+
+
+
+
+		
+		
+		// idle handle
+		for (const key in this.data.simple)
+		{
+			if( key == 'idle')
+				continue
+			if( this.data.simple[key].status == true)
+			{
+				this.data.simple.idle.count = 0
+				this.data.simple.idle.status = false
+				break
+			}	
+		}
+		
+
+		
+
+		if( Event.THRESHOLD.frame_nbr.idle < this.data.simple.idle.count )
+			this.data.simple.idle.status = true
+
+		this.data.simple.idle.count += 1
 		
 	}
 

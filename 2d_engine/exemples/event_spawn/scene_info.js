@@ -89,7 +89,8 @@ export var scene_info = {
 			},
 			"debug":{
 				"shape_interaction_visibility" : false,
-			},				        
+			},		
+			event_type : "simple",		        
 		},		
 				
 	},
@@ -256,7 +257,7 @@ scene_info.eventActions.push(
 			start : {
 				in_args : [ 'TRA' ],
 				fn : (obj) => {
-					obj.Game_engine.Sound.start( "TRA_touchDown","ost_creature_04", { volume : 1, fade_in_seconds : 2, loop : true } ); //"sfx_wii_short_tick_02"
+					obj.Game_engine.Sound.start( "TRA_touchDown","ost_quest2_whiteSound_02", { volume : 1, fade_in_seconds : 2, loop : true } ); //"sfx_wii_short_tick_02"
 				},
 				duration : 1,
 			},	
@@ -383,7 +384,7 @@ scene_info.eventActions.push(
 			start : {
 				in_args : [ 'TRA' ],
 				fn : (obj) => {
-					obj.Game_engine.Sound.start( "TRA_release","sfx_occulus_artificial_close_01", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+					obj.Game_engine.Sound.start( "TRA_release","sfx_occulus_tap_dry_hollow_01", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
 				},
 				duration : 1,
 			},	

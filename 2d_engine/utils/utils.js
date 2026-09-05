@@ -46,4 +46,14 @@ class EventEmitter {
       if (!this.listeners[event]) return;
       this.listeners[event].forEach(callback => callback(payload));
     }
-  }
+}
+
+
+
+
+export function history_fill( data, elem, max_nbr)
+{
+	data.unshift(elem)
+	if ( max_nbr < data.length)
+		data.pop(); // Remove the oldest if over size		
+}

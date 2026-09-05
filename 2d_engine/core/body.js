@@ -78,6 +78,7 @@ export class body
 			Time: null,
 			debug : {},
 			//eventActions : [],
+			event_type : 'advance',
 		}
 		this.args = { ...defaultOptions, ...in_options };
 
@@ -229,7 +230,7 @@ export class body
 		/////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////// EFFECTS
 		/////////////////////////////////////////////////////////
-		this.Event = new Event( this.Game_engine, this )
+		this.Event = new Event( this.Game_engine, this, this.args.event_type)
 		
 			
 		
@@ -1322,16 +1323,17 @@ class Event{
 		'idle'
 	]
 
-	constructor(Game_engine,Obj)
+	constructor(Game_engine,Obj, event_type )
 	{
 		this.Game_engine = Game_engine
 		this.Obj = Obj
 		this.user_event_names = []
+		this.event_type = event_type
 
 
 		this.data = {}
 		// FILL FROM USER
-		for( const key in Game_engine.User.Event.data )
+		for( const key in Game_engine.User.Event.data[event_type] )
 		{
 			this.user_event_names.push( key )
 			this.data[key] ={ status:false, count:0, history:[]  }	
@@ -1355,7 +1357,7 @@ class Event{
 	update_from_user( Game_engine )
 	{
 		for( let event of this.user_event_names )
-			this.data[event].status = Game_engine.User.Event.data[event].status
+			this.data[event].status = Game_engine.User.Event.data[this.event_type][event].status
 	}
 	
 	clear()

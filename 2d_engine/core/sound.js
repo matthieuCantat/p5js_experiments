@@ -2,8 +2,10 @@
 var sounds_to_buffer = { 
     "sfx_wii_bell_long_01" : null,
     "ost_creature_04" : null,
+    "ost_quest2_whiteSound_02": null,
     "sfx_wii_synth_bell_melodie_01": null,
     "sfx_wii_short_tick_02": null,
+    "sfx_occulus_tap_dry_hollow_01":null,
     "sfx_occulus_artificial_close_01" : null,
     "sfx_creature_synth_03":null,
 };
