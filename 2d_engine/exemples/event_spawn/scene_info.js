@@ -98,12 +98,20 @@ export var scene_info = {
 	"eventActions" : []					
 }
 
-const event_names = [ 
-	["touchDown","touchUp"], 
-	["tap", "doubleTap", "grab", "release", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle'],
-	["pause", "hold", "move",]]
+const event_names = {
+	'user' : [
+		["touchDown","touchUp"], 
+		["tap", "doubleTap", "grab", "release", "swipeLeft", "swipeRight", "swipeUp", "swipeDown",'idle'],
+		["pause", "hold", "move",],
+	],
+	'obj' : [
+		[ 'move_tx+','move_tx-', 'move_ty+','move_ty-',  'move_r', 'limit_hit_t', 'limit_hit_r',]
+	]
+} 
+	
 
-const event_pos = [-100, -20 , 100, 160]
+
+const event_pos = [-100, -20 , 40, 120]
 
 var info = {
 	'ROT' : {
@@ -157,83 +165,88 @@ for( let obj_name in info )
 	let obj_y = info[obj_name].y
 	let obj_w = obj_name.length*5
 
-	for( let i = 0 ; i < info[obj_name]['events_names'].length ; i++ )
+	let i_pos = 0
+	for( let event_type in info[obj_name]['events_names'] )
 	{
-		let event_names = info[obj_name]['events_names'][i]
-		let event_pos = info[obj_name]['events_pos'][i]
-		
-		for( let event_name of event_names )
+		for( let i = 0; i < info[obj_name]['events_names'][event_type].length; i++ )
 		{
-		
-			let event_w = event_name.length*5
+			let event_names = info[obj_name]['events_names'][event_type][i]
+			let event_pos = info[obj_name]['events_pos'][i_pos]
+			
+			for( let event_name of event_names )
+			{
+			
+				let event_w = event_name.length*5
 
-			let n = `${obj_name}TriggerLastEvent_${event_name}`
+				let n = `${obj_name}TriggerLastEvent_${event_name}`
 
-			scene_info.objs[n] = {
-				"m":  [0, y_min, 0, 1, 1],
-				"shapes" : [
+				scene_info.objs[n] = {
+					"m":  [0, y_min, 0, 1, 1],
+					"shapes" : [
+						{
+							"m":  [x, y_min, 0, obj_w, h],
+							"color": "black",
+							"type": "rectangle",
+						},
+						{
+							"m":  [x, y_min, 0, font_size, font_size],
+							"color": "white",
+							"type": "text",
+							"text": `${obj_name}`,	
+							"text_centered": true,
+						},
+						{
+							"m":  [event_pos, y_min, 0, event_w, h],
+							"color": "black",
+							"type": "rectangle",
+						},
+						{
+							"m":  [ event_pos , y_min, 0, font_size, font_size],
+							"color": "white",
+							"type": "text",
+							"text": `${event_name}`,	
+							"text_centered": true,
+						}
+					]        
+				}
+
+				scene_info.cns.push(
 					{
-						"m":  [x, y_min, 0, obj_w, h],
-						"color": "black",
-						"type": "rectangle",
+						mode: 'expression',
+						A : [ n, 'trsf.getTranslateY()' ],
+						expression : 'A - 5',
+						out : [ n, 'trsf.setTranslateY()' ],
 					},
+				)
+
+				scene_info.eventActions.push(
 					{
-						"m":  [x, y_min, 0, font_size, font_size],
-						"color": "white",
-						"type": "text",
-						"text": `${obj_name}`,	
-						"text_centered": true,
+						event : {
+							start : {
+								in_args : [ obj_name ],
+								fn : (obj) => {
+									//if( event_name == "swipeUp" )
+									//	console.log(`event ${event_name} status : ${obj.Event.data[event_name].status}`);
+									return obj.Event.data[event_type][event_name].status;},
+							},
+							end : null,
+							max_duration : 1000,
+						},
+						action : {
+							start : {
+								in_args : [ n ],
+								fn : (obj) => {
+									obj.trsf.setTranslateY( obj_y );
+								},
+								duration : 1,
+							},
+							end : {},
+						},
 					},
-					{
-						"m":  [event_pos, y_min, 0, event_w, h],
-						"color": "black",
-						"type": "rectangle",
-					},
-					{
-						"m":  [ event_pos , y_min, 0, font_size, font_size],
-						"color": "white",
-						"type": "text",
-						"text": `${event_name}`,	
-						"text_centered": true,
-					}
-				]        
+				)
 			}
 
-			scene_info.cns.push(
-				{
-					mode: 'expression',
-					A : [ n, 'trsf.getTranslateY()' ],
-					expression : 'A - 5',
-					out : [ n, 'trsf.setTranslateY()' ],
-				},
-			)
-
-			scene_info.eventActions.push(
-				{
-					event : {
-						start : {
-							in_args : [ obj_name ],
-							fn : (obj) => {
-								//if( event_name == "swipeUp" )
-								//	console.log(`event ${event_name} status : ${obj.Event.data[event_name].status}`);
-								return obj.Event.data[event_name].status;},
-						},
-						end : null,
-						max_duration : 1000,
-					},
-					action : {
-						start : {
-							in_args : [ n ],
-							fn : (obj) => {
-								obj.trsf.setTranslateY( obj_y );
-							},
-							duration : 1,
-						},
-						end : {},
-					},
-				},
-			)
-
+			i_pos += 1
 		}
 	}
 }
@@ -247,7 +260,7 @@ scene_info.eventActions.push(
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['idle'].status;}
+				fn : (obj) => {return obj.Event.data.user['idle'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -276,7 +289,7 @@ scene_info.eventActions.push(
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['hold'].status;}
+				fn : (obj) => {return obj.Event.data.user['hold'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -305,7 +318,7 @@ scene_info.eventActions.push(
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['tap'].status;}
+				fn : (obj) => {return obj.Event.data.user['tap'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -328,7 +341,7 @@ scene_info.eventActions.push(
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['doubleTap'].status;}
+				fn : (obj) => {return obj.Event.data.user['doubleTap'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -351,7 +364,7 @@ scene_info.eventActions.push(
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['grab'].status;}
+				fn : (obj) => {return obj.Event.data.user['grab'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -374,7 +387,7 @@ scene_info.eventActions.push(
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['release'].status;}
+				fn : (obj) => {return obj.Event.data.user['release'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -392,12 +405,35 @@ scene_info.eventActions.push(
 			end : {}
 		},
 
-	},			
+	},
 	{
 		event : {
 			start : {
 				in_args : [ 'TRA' ],
-				fn : (obj) => {return obj.Event.data['move'].status;}
+				fn : (obj) => {return obj.Event.data.obj['limit_hit_t'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( "TRA_hit_t","sfx_wii_bell_simple_05", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			
+			end : {}
+		},
+
+	},					
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data.obj['move_tx+'].status;}
 			},
 			end : null,
 			max_duration : 1,
@@ -416,7 +452,7 @@ scene_info.eventActions.push(
 				},
 				duration : 1,
 			},	
-
+			/*
 			duration : {
 				in_args : [ 'TRA' ],
 				fn : (obj) => {
@@ -425,17 +461,103 @@ scene_info.eventActions.push(
 						{ volume : obj.trsf.dyn_data.t_speed_normalized } ); //"sfx_wii_short_tick_02"
 				},
 			},
-			
+			*/
 			end : {
 				in_args : [ 'TRA' ],
 				fn : (obj) => {
-					obj.Game_engine.Sound.end( "TRA_move", { fade_out_seconds :  0 } );
+					obj.Game_engine.Sound.end( "TRA_move", { fade_out_seconds :  0.1 } );
 				},
 				duration : 1,
 			},
 		},
 
 	},	
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data.obj['move_tx+'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( 
+						"TRA_move_tx+",
+						"sfx_wii_artificial_slide_down_01", 
+						{ volume : 1, 
+							fade_in_seconds : 0, 
+							loop : true } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			/*
+			duration : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.modif( 
+						"TRA_move",
+						{ volume : obj.trsf.dyn_data.t_speed_normalized } ); //"sfx_wii_short_tick_02"
+				},
+			},
+			*/
+			end : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.end( "TRA_move_tx+", { fade_out_seconds :  0.1 } );
+				},
+				duration : 1,
+			},
+		},
+
+	},	
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data.obj['move_tx-'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( 
+						"TRA_move_tx-",
+						"sfx_wii_artificial_slide_up_01", 
+						{ volume : 1, 
+							fade_in_seconds : 0, 
+							loop : true } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+			/*
+			duration : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.modif( 
+						"TRA_move",
+						{ volume : obj.trsf.dyn_data.t_speed_normalized } ); //"sfx_wii_short_tick_02"
+				},
+			},
+			*/
+			end : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.end( "TRA_move_tx-", { fade_out_seconds :  0.1 } );
+				},
+				duration : 1,
+			},
+		},
+
+	},		
 )
 
 
@@ -445,7 +567,7 @@ scene_info.eventActions.push(
 	{
 		event_start : {
 			in_args : [ 'TRA' ],
-			fn : (obj) => {return obj.Event.data['touchUp'].status;}
+			fn : (obj) => {return obj.Event.data.user['touchUp'].status;}
 		},
 		event_end : null,
 		event_max_duration : 1,
@@ -460,7 +582,7 @@ scene_info.eventActions.push(
 	{
 		event_start : {
 			in_args : [ 'TRA' ],
-			fn : (obj) => {return obj.Event.data['hold'].status;}
+			fn : (obj) => {return obj.Event.data.user['hold'].status;}
 		},
 		event_end : null,
 		event_max_duration : 1,
@@ -478,7 +600,7 @@ scene_info.eventActions.push(
 	{
 		event_start : {
 			in_args : [ 'TRA' ],
-			fn : (obj) => {return obj.Event.data['tap'].status;}
+			fn : (obj) => {return obj.Event.data.user['tap'].status;}
 		},
 		event_end : null,
 		event_max_duration : 1,
@@ -493,7 +615,7 @@ scene_info.eventActions.push(
 	{
 		event_start : {
 			in_args : [ 'TRA' ],
-			fn : (obj) => {return obj.Event.data['doubleTap'].status;}
+			fn : (obj) => {return obj.Event.data.user['doubleTap'].status;}
 		},
 		event_end : null,
 		event_max_duration : 1,
@@ -509,7 +631,7 @@ scene_info.eventActions.push(
 	{
 		event_start : {
 			in_args : [ 'TRA' ],
-			fn : (obj) => {return obj.Event.data['idle'].status;}
+			fn : (obj) => {return obj.Event.data.user['idle'].status;}
 		},
 		event_end : null,
 		event_max_duration : 1,

@@ -1,4 +1,5 @@
 import { draw_circle, draw_line, cX_inv, cY_inv} from '../utils/draw.js'
+import { history_fill } from '../utils/utils.js'
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
 import { body_effect } from './effect.js';
@@ -1155,19 +1156,29 @@ class Event{
 		//this.add_to_history( )
 		for (const key in this.data.advance ) 
 		{
-			this.data.advance[key].history.unshift(this.data.advance[key].status)
-			if ( this.HISTORY_NBR < this.data.advance[key].history.length)
-				this.data.advance[key].history.pop(); // Remove the oldest if over size		
+			history_fill(
+				this.data.advance[key].history,
+				this.data.advance[key].status,	
+				this.HISTORY_NBR
+			)
+			//this.data.advance[key].history.unshift(this.data.advance[key].status)
+			//if ( this.HISTORY_NBR < this.data.advance[key].history.length)
+			//	this.data.advance[key].history.pop(); // Remove the oldest if over size		
 		}
 
 		
 		//this.add_to_history( )
 		for (const key in this.data.simple ) 
-			{
-				this.data.simple[key].history.unshift(this.data.simple[key].status)
-				if ( this.HISTORY_NBR < this.data.simple[key].history.length)
-					this.data.simple[key].history.pop(); // Remove the oldest if over size		
-			}
+		{
+			history_fill(
+				this.data.simple[key].history,
+				this.data.simple[key].status,	
+				this.HISTORY_NBR
+			)
+			//this.data.simple[key].history.unshift(this.data.simple[key].status)
+			//if ( this.HISTORY_NBR < this.data.simple[key].history.length)
+			//	this.data.simple[key].history.pop(); // Remove the oldest if over size		
+		}
 
 
 		/////////////////////////////////////////////////////////////

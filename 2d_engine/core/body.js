@@ -5,6 +5,7 @@ isPointInside_circle,
 isPointInside_triangle,
 COLORS_TO_RGB,
 } from '../utils/draw.js';
+import { history_fill } from '../utils/utils.js';
 import Matrix2d from '../utils/matrix2d.js';
 import { body_effect } from './effect.js';
 import Vector2d from '../utils/vector2d.js';
@@ -726,6 +727,7 @@ class Transform
 		t_speed_max : 10,
 		r_speed_min : 0,
 		r_speed_max : 10,
+		t_acceleration_collision : -10,
 	}
 
 	constructor( arg_m, 
@@ -810,11 +812,24 @@ class Transform
 			momentum : new Vector2d(),
 			angular_momentum : 0,
 			t_speed : 0,
+			t_speed_last : 0,
 			t_speed_normalized : 0,
 			r_speed : 0,
+			r_speed_last : 0,
 			r_speed_normalized : 0,
+			t_acceleration : 0,
+			r_acceleration : 0,
+			t_collide : false,
 		}
 
+		this.transform_limit_data = {
+			translate_collision : false,
+			translate_collision_last : false,
+			translate_collision_hit : false,
+			rotate_collision : false,
+			rotate_collision_last : false,
+			translate_collision_hit : false,
+		}
 		
 
 	}
@@ -1176,15 +1191,45 @@ class Transform
 
 		let m_local = m.getMult(m_ref.getInverse())
 		
+
+		this.transform_limit_data.translate_collision_last = this.transform_limit_data.translate_collision
 		if ( transform_settings.translate_limits != null )
 		{
 			let xLimits = transform_settings.translate_limits[0]
 			let yLimits = transform_settings.translate_limits[1]
 
+
 			let p_local = m_local.get_row(2)
-			p_local.x = Math.max(xLimits[0], Math.min(xLimits[1], p_local.x))
-			p_local.y = Math.max(yLimits[0], Math.min(yLimits[1], p_local.y))				
+
+			this.transform_limit_data.translate_collision = false
+
+			// limite axe X
+			let x_new = Math.min(xLimits[1], p_local.x)
+			//if( 0.1 <  p_local.x - xLimits[1])
+			//	this.transform_limit_data.translate_collision = true
+
+			x_new = Math.max(xLimits[0], x_new)
+			//if( 0.1 <  xLimits[0] - p_local.x )
+			//	this.transform_limit_data.translate_collision = true
+
+			// limite axe Y
+			let y_new = Math.min(yLimits[1], p_local.y)
+			//if( 0.1 < p_local.y - yLimits[1] )
+			//	this.transform_limit_data.translate_collision = true
+
+			y_new = Math.max(yLimits[0], y_new)				
+			//if( 0.1 < yLimits[0] - p_local.y  )
+			//	this.transform_limit_data.translate_collision = true
 			
+			//this.transform_limit_data.translate_collision_hit = false
+			//if( this.transform_limit_data.translate_collision != this.transform_limit_data.translate_collision_last)
+			//	this.transform_limit_data.translate_collision_hit = true
+
+
+			p_local.x = x_new
+			p_local.y = y_new
+
+
 			m_local.setRow( 2, p_local )
 			let _m = m_local.getMult(m_ref) 
 
@@ -1194,6 +1239,7 @@ class Transform
 		}
 		
 		
+		this.transform_limit_data.rotate_collision_last = this.transform_limit_data.rotate_collision
 		if ( transform_settings.rotate_limits != null )
 		{
 			let r = m_local.getRotation() // 0 to 360
@@ -1248,6 +1294,15 @@ class Transform
 
 
 			let r_clamped = r_pos_clamped 
+
+
+			this.transform_limit_data.rotate_collision = false
+			if( 1 < Math.abs( r - r_clamped ) )
+				this.transform_limit_data.rotate_collision = true
+
+			this.transform_limit_data.rotate_collision_hit = false
+			if( this.transform_limit_data.rotate_collision != this.transform_limit_data.rotate_collision_last)
+				this.transform_limit_data.rotate_collision_hit = true
 			
 			m_local.setRotation(r_clamped)
 			let _m = m_local.getMult(m_ref) 
@@ -1299,6 +1354,8 @@ class Transform
 		
 		this.dyn_data.last_m.set(m) 
 
+		this.dyn_data.t_speed_last = this.dyn_data.t_speed
+		this.dyn_data.r_speed_last = this.dyn_data.r_speed
 
 
 		this.dyn_data.t_speed = momentum_mag
@@ -1312,6 +1369,14 @@ class Transform
 		max_v = Transform.info_compute_values.r_speed_max
 		this.dyn_data.r_speed_normalized = (angular_momentum - min_v)/(max_v-min_v)
 			
+		this.dyn_data.t_acceleration = this.dyn_data.t_speed - this.dyn_data.t_speed_last
+		this.dyn_data.r_acceleration = this.dyn_data.r_speed - this.dyn_data.r_speed_last
+	
+		
+		if( this.dyn_data.t_acceleration < Transform.info_compute_values.t_acceleration_collision )
+			this.dyn_data.t_collide = true
+		else
+			this.dyn_data.t_collide = false
 	}
 
 
@@ -1361,33 +1426,49 @@ class Event{
 		this.event_type = event_type
 
 
-		this.data = {}
+		this.data = {
+			'user':{},
+			'obj':{},
+		}
 		// FILL FROM USER
 		for( const key in Game_engine.User.Event.data[event_type] )
 		{
 			this.user_event_names.push( key )
-			this.data[key] ={ status:false, count:0, history:[]  }	
+			this.data.user[key] ={ status:false, count:0, history:[]  }	
 		}
 
 		
 		// HOLD
-		this.data['hold']       = { status:false, count:0, history:[]  }// select and pause	
-		this.data['unselected'] = { status:false, count:0, history:[]  }// select and pause	
-		this.data['idle']       = { status:false, count:0, history:[]  }// select and pause	
+		this.data.user['hold']       = { status:false, count:0, history:[]  }// select and pause	
+		this.data.user['unselected'] = { status:false, count:0, history:[]  }// select and pause	
+		this.data.user['idle']       = { status:false, count:0, history:[]  }// select and pause	
 		
 		this.unselected_events_names = Event.unselected_events_names
 		this.selected_events_names = []
-		for( let event_name in this.data )
+		for( let event_name in this.data.user )
 		{
 			if( this.unselected_events_names.includes(event_name) == false )
 				this.selected_events_names.push(event_name)
 		}
+
+		// OBJ EVENT
+		this.data.obj['move_t']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['move_tx+']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['move_tx-']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['move_ty+']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['move_ty-']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['move_r']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['limit_t']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['limit_r']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['limit_hit_t']  = { status:false, count:0, history:[]  }// select and pause	
+		this.data.obj['limit_hit_r']  = { status:false, count:0, history:[]  }// select and pause	
+				
 	}
 
 	update_from_user( Game_engine )
 	{
 		for( let event of this.user_event_names )
-			this.data[event].status = Game_engine.User.Event.data[this.event_type][event].status
+			this.data.user[event].status = Game_engine.User.Event.data[this.event_type][event].status
 	}
 	
 	clear()
@@ -1396,12 +1477,12 @@ class Event{
 		if( this.is_selected() )
 		{
 			for( let event of this.unselected_events_names )
-				this.data[event] = { status:false, count:0, history:[] }
+				this.data.user[event] = { status:false, count:0, history:[] }
 		}
 		else
 		{
 			for( let event of this.selected_events_names )
-				this.data[event] = { status:false, count:0, history:[] }
+				this.data.user[event] = { status:false, count:0, history:[] }
 		}
 			
 
@@ -1426,7 +1507,7 @@ class Event{
 
 			// HOLD
 			var obj_already_drag = false
-			for( let drag_past of this.data.move.history )
+			for( let drag_past of this.data.user.move.history )
 			{
 				if( drag_past )
 				{
@@ -1435,11 +1516,11 @@ class Event{
 				}
 			}
 			
-			this.data.hold.status = false
-			if( this.data.pause.status && ( obj_already_drag == false ) )
+			this.data.user.hold.status = false
+			if( this.data.user.pause.status && ( obj_already_drag == false ) )
 			{
-				this.data.pause.status = false
-				this.data.hold.status = true
+				this.data.user.pause.status = false
+				this.data.user.hold.status = true
 			}
 			
 
@@ -1451,7 +1532,11 @@ class Event{
 
 			//this.add_to_history( )
 			for (const key of this.selected_events_names) 
-				this.fill_history(key)
+				history_fill(
+					this.data.user[key].history,
+					this.data.user[key].status,	
+					this.HISTORY_NBR
+				)
 
 		}
 		else
@@ -1462,31 +1547,74 @@ class Event{
 			/////////////////////////////////////////////////////////////
 
 			
-			this.data['unselected'].status = true
+			this.data.user['unselected'].status = true
 
 
-			this.data.idle.status = false
+			this.data.user.idle.status = false
 			
-			if( this.data.unselected.status )
+			if( this.data.user.unselected.status )
 			{
-				this.data.idle.status = Event.THRESHOLD.frame_nbr.idle < this.data.unselected.history.length
+				this.data.user.idle.status = Event.THRESHOLD.frame_nbr.idle < this.data.user.unselected.history.length
 				
 			}
 	
 
 			for (const key of this.unselected_events_names) 
-				this.fill_history(key)
+				history_fill(
+					this.data.user[key].history,
+					this.data.user[key].status,	
+					this.HISTORY_NBR
+				)
 			
-	
-
 		}
+
+
+		this.data.obj['move_t'].status = false  
+		this.data.obj['move_tx+'].status = false  
+		this.data.obj['move_tx-'].status = false  
+		this.data.obj['move_ty+'].status = false  
+		this.data.obj['move_ty-'].status = false  
+		if ( 0.0001 < this.Obj.trsf.dyn_data.momentum.mag()  ) 
+		{
+			this.data.obj['move_t'].status = true
+
+			let v = this.Obj.trsf.dyn_data.momentum
+			if( 0.9 < v.dot(Event.VECTORS.left) )
+				this.data.obj['move_tx+'].status = true
+			else if( 0.9 < v.dot(Event.VECTORS.right) )
+				this.data.obj['move_tx-'].status = true
+			else if( 0.9 < v.dot(Event.VECTORS.up) )
+				this.data.obj['move_ty+'].status = true
+			else if( 0.9 < v.dot(Event.VECTORS.down) )
+				this.data.obj['move_ty-'].status = true
+			
+		}    
+			
+
+		this.data.obj['move_r'].status = false  
+		if ( 0.0001 < this.Obj.trsf.dyn_data.angular_momentum  )     
+			this.data.obj['move_r'].status = true
+
+
+		this.data.obj['limit_hit_t'].status = false
+		if ( this.Obj.trsf.dyn_data.t_collide )//( this.Obj.trsf.transform_limit_data.translate_collision_hit  ) 
+			this.data.obj['limit_hit_t'].status = true
+
+		this.data.obj['limit_hit_r'].status = false
+		if ( this.Obj.trsf.transform_limit_data.rotate_collision_hit  ) 
+			this.data.obj['limit_hit_r'].status = false
+		 
+		
+
+
+		for (const key in this.data.obj) 
+			history_fill(
+				this.data.obj[key].history,
+				this.data.obj[key].status,	
+				this.HISTORY_NBR
+			)
+
 	}
 
-	fill_history(event_name)
-	{
-		this.data[event_name].history.unshift(this.data[event_name].status)
-		if ( this.HISTORY_NBR < this.data[event_name].history.length)
-			this.data[event_name].history.pop(); // Remove the oldest if over size		
-	}
 
 }

@@ -8,6 +8,10 @@ var sounds_to_buffer = {
     "sfx_occulus_tap_dry_hollow_01":null,
     "sfx_occulus_artificial_close_01" : null,
     "sfx_creature_synth_03":null,
+    "sfx_wii_champagne_cork_01":null,
+    "sfx_wii_bell_simple_05":null,
+    "sfx_wii_artificial_slide_down_01":null,
+    "sfx_wii_artificial_slide_up_01":null,
 };
 
 
@@ -94,9 +98,13 @@ export class Sound {
             return;
         }
         let gainNode = this.gains[name]
-        if( volume != null )
+        console.log(volume)
+        if( volume !== null )
         {
-            gainNode.gain.value = volume;
+            const now = audioCtx.currentTime;
+            gainNode.gain.cancelScheduledValues(now);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+            gainNode.gain.linearRampToValueAtTime(volume, now + 0.1);
 
         }
       
@@ -123,7 +131,9 @@ export class Sound {
         }
         else
         {
-            gainNode.gain.value = 0;
+            const now = audioCtx.currentTime;
+            gainNode.gain.cancelScheduledValues(now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.1);
         }
      
     }
