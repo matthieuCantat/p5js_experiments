@@ -82,9 +82,25 @@ export class Sound {
         this.gains = {}
     }
     
-    start(name, sound_file_name, { fade_in_seconds = 0, loop = false }  ){
+    start(name, sound_file_name, { volume, fade_in_seconds = 0, loop = false }  ){
         console.log("Sound start")
-        this.gains[name] = playSoundSample( sound_file_name, { volume : 1, fade_in_seconds : fade_in_seconds, loop : loop }  )
+        this.gains[name] = playSoundSample( sound_file_name, { volume : volume, fade_in_seconds : fade_in_seconds, loop : loop }  )
+    }
+    
+    modif( name, { volume = null } ) {
+        
+        if (!this.gains[name]) {
+            console.log("Sound not found!");
+            return;
+        }
+        let gainNode = this.gains[name]
+        if( volume != null )
+        {
+            gainNode.gain.value = volume;
+
+        }
+      
+     
     }
 
     end( name, { fade_out_seconds = 0 } ) {

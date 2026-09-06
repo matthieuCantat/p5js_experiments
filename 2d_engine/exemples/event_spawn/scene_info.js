@@ -257,7 +257,7 @@ scene_info.eventActions.push(
 			start : {
 				in_args : [ 'TRA' ],
 				fn : (obj) => {
-					obj.Game_engine.Sound.start( "TRA_touchDown","ost_quest2_whiteSound_02", { volume : 1, fade_in_seconds : 2, loop : true } ); //"sfx_wii_short_tick_02"
+					obj.Game_engine.Sound.start( "TRA_touchDown","ost_creature_04", { volume : 1, fade_in_seconds : 2, loop : true } ); //"sfx_wii_short_tick_02"
 				},
 				duration : 1,
 			},	
@@ -393,6 +393,49 @@ scene_info.eventActions.push(
 		},
 
 	},			
+	{
+		event : {
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {return obj.Event.data['move'].status;}
+			},
+			end : null,
+			max_duration : 1,
+		},
+		action : {
+			
+			start : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.start( 
+						"TRA_move",
+						"ost_quest2_whiteSound_02", 
+						{ volume : obj.trsf.dyn_data.t_speed_normalized, 
+							fade_in_seconds : 0, 
+							loop : true } ); //"sfx_wii_short_tick_02"
+				},
+				duration : 1,
+			},	
+
+			duration : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.modif( 
+						"TRA_move",
+						{ volume : obj.trsf.dyn_data.t_speed_normalized } ); //"sfx_wii_short_tick_02"
+				},
+			},
+			
+			end : {
+				in_args : [ 'TRA' ],
+				fn : (obj) => {
+					obj.Game_engine.Sound.end( "TRA_move", { fade_out_seconds :  0 } );
+				},
+				duration : 1,
+			},
+		},
+
+	},	
 )
 
 

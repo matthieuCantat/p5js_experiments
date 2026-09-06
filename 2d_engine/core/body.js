@@ -719,7 +719,14 @@ class Effect
 
 class Transform
 {
-	GRAVITY_VECTOR = new Vector2d(0,-0.981)
+	static GRAVITY_VECTOR = new Vector2d(0,-0.981)
+
+	static info_compute_values = {
+		t_speed_min : 0,
+		t_speed_max : 10,
+		r_speed_min : 0,
+		r_speed_max : 10,
+	}
 
 	constructor( arg_m, 
 		arg_shapes_info = null,
@@ -802,7 +809,12 @@ class Transform
 			last_m : new Matrix2d(this.get()),
 			momentum : new Vector2d(),
 			angular_momentum : 0,
+			t_speed : 0,
+			t_speed_normalized : 0,
+			r_speed : 0,
+			r_speed_normalized : 0,
 		}
+
 		
 
 	}
@@ -927,11 +939,16 @@ class Transform
 			m = this.update_with_dynamics( m , dyn_settings )
 			m = this.update_with_transform_settings( m, transform_settings )
 			m = this.update_with_border_collision( m, border_collision_info )
-			this.update_dynamic_data(m,dyn_settings)
 		}
 		
+		this.update_dynamic_data(m,dyn_settings)
 		this.set(m)
 		//this.m_body_modif = m.getMult(this.get_body().getInverse())
+
+		// fill info
+
+		
+
 
 	}
 	
@@ -1281,6 +1298,19 @@ class Transform
 			Math.min( dyn_settings.speed_limit_rotate, angular_momentum))
 		
 		this.dyn_data.last_m.set(m) 
+
+
+
+		this.dyn_data.t_speed = momentum_mag
+		this.dyn_data.r_speed = angular_momentum
+
+		let min_v = Transform.info_compute_values.t_speed_min
+		let max_v = Transform.info_compute_values.r_speed_max
+		this.dyn_data.t_speed_normalized = (momentum_mag - min_v)/(max_v-min_v)
+		
+		min_v = Transform.info_compute_values.r_speed_min
+		max_v = Transform.info_compute_values.r_speed_max
+		this.dyn_data.r_speed_normalized = (angular_momentum - min_v)/(max_v-min_v)
 			
 	}
 

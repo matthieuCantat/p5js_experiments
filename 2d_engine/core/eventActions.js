@@ -193,6 +193,12 @@ export class EventActions
             
                 cns.action.end.nbr_eval += 1
             }
+            else
+            {
+                if((cns.action.duration !== undefined )&&( cns.action.end.fn !== undefined ))
+                    cns.action.duration.fn(...this._extract_replace_with_obj_args(cns.action.duration)) 
+
+            }
                 
 
 
