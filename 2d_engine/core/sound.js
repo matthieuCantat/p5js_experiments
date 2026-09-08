@@ -9,6 +9,7 @@ var sounds_to_buffer = {
     "sfx_occulus_artificial_close_01" : null,
     "sfx_creature_synth_03":null,
     "sfx_wii_champagne_cork_01":null,
+    "sfx_wii_bell_simple_04":null,
     "sfx_wii_bell_simple_05":null,
     "sfx_wii_artificial_slide_down_01":null,
     "sfx_wii_artificial_slide_up_01":null,
