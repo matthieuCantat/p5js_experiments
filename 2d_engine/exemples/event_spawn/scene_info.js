@@ -79,7 +79,7 @@ export var scene_info = {
 				rotate_limits: [0,0],
 			},            
 			"dyn_settings": {
-				"enable": false,
+				"enable": true,
 				enable_gravity:false,
 				mass:0.9,
 				"friction_translate": 0.1,

@@ -13,6 +13,7 @@ var sounds_to_buffer = {
     "sfx_wii_bell_simple_05":null,
     "sfx_wii_artificial_slide_down_01":null,
     "sfx_wii_artificial_slide_up_01":null,
+    "sfx_ballon_squeak_stretch_01":null,
 };
 
 

@@ -1,7 +1,7 @@
 import Vector2d from '../../utils/vector2d.js';
 import Matrix2d from '../../utils/matrix2d.js';
 import { COLORS } from '../../utils/draw.js'
-
+import { get_body_sfx } from '../../template/event_action_template.js';
 
 		
 export var scene_info = {
@@ -40,7 +40,13 @@ export var scene_info = {
         },
     },
     "cns":[],
+    "eventActions":[],
 }
+
+
+//for( let info of get_body_sfx('rotate') )
+//	scene_info.eventActions.push( info )
+
 
 let nbr = 10
 let aIncr = 360/nbr
@@ -106,6 +112,10 @@ for( let i = 0; i < nbr; i++)
     }
 	
     //scene_info.cns.push(axe_cns)
+
+        
+    for( let info of get_body_sfx(`slide${i}`) )
+        scene_info.eventActions.push( info )
 
 
     aCurrent += aIncr

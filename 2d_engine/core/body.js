@@ -823,7 +823,15 @@ class Transform
 			r_speed_normalized : 0,
 			t_acceleration : 0,
 			r_acceleration : 0,
-			t_collide : false,
+		}
+
+		this.dyn_data_local = {
+			t_speed : 0,
+			t_speed_last : 0,
+			r_speed : 0,
+			r_speed_last : 0,
+			t_acceleration : 0,
+			r_acceleration : 0,
 		}
 
 		this.transform_limit_args = transform_settings
@@ -1056,7 +1064,7 @@ class Transform
 	
 		if(dyn_settings.enable_gravity)
 		{
-			pNext.add(this.GRAVITY_VECTOR.getMult(dyn_settings.mass))
+			pNext.add(Transform.GRAVITY_VECTOR.getMult(dyn_settings.mass))
 		}
 
 		for(let i = 0; i < dyn_settings.custom_forces.length; i++)
@@ -1342,25 +1350,19 @@ class Transform
 	update_dynamic_data(m, dyn_settings)
 	{
 		
-		// FOR NEXT EVAL
-		let momentum = m.get_row(2).getSub(this.dyn_data.last_m.get_row(2))
-		/*
-		if( ( 0 < this.axe_cns_settings.dyn_bounce_coef)&&(axe_cns_info.vCollisionLimit!=null))
-		{
-			let vCollisionAdjust = axe_cns_info.vCollisionLimit
-			let momentum_inv = momentum.getMult(-1)
+		// momentum
+		let p = m.get_row(2)
+		let last_p = this.dyn_data.last_m.get_row(2)
 
-			let new_momentum = vCollisionAdjust.getAdd(momentum_inv)
-			momentum = new_momentum.getMult(this.axe_cns_settings.dyn_bounce_coef)
-		}
-			*/
-
+		let momentum = p.getSub(last_p)
+		
 		let momentum_mag = Math.max(-dyn_settings.speed_limit_translate,
 			Math.min( dyn_settings.speed_limit_translate, momentum.mag()))
 		momentum.normalize()
 		momentum.mult(momentum_mag)	
 		this.dyn_data.momentum = momentum	
 
+		// angular momentum
 		let angular_momentum = m.getRotation() - this.dyn_data.last_m.getRotation()
 		
 		if( 180 < angular_momentum )
@@ -1372,8 +1374,9 @@ class Transform
 		this.dyn_data.angular_momentum = Math.max(-dyn_settings.speed_limit_rotate,
 			Math.min( dyn_settings.speed_limit_rotate, angular_momentum))
 		
-		this.dyn_data.last_m.set(m) 
+		
 
+		// speed
 		this.dyn_data.t_speed_last = this.dyn_data.t_speed
 		this.dyn_data.r_speed_last = this.dyn_data.r_speed
 
@@ -1388,15 +1391,43 @@ class Transform
 		min_v = Transform.info_compute_values.r_speed_min
 		max_v = Transform.info_compute_values.r_speed_max
 		this.dyn_data.r_speed_normalized = (angular_momentum - min_v)/(max_v-min_v)
-			
+		
+		// accelecation
 		this.dyn_data.t_acceleration = this.dyn_data.t_speed - this.dyn_data.t_speed_last
 		this.dyn_data.r_acceleration = this.dyn_data.r_speed - this.dyn_data.r_speed_last
 	
+
+		// speed local
+		let m_init = this.get_body()
+		let m_init_inv = m_init.getInverse()
+
+		let m_local = m.getMult( m_init_inv )
+		let last_m_local = this.dyn_data.last_m.getMult( m_init_inv )
+
+		let p_local = m_local.get_row(2)
+		let last_p_local = last_m_local.get_row(2)
+
 		
-		if( this.dyn_data.t_acceleration < Transform.info_compute_values.t_acceleration_collision )
-			this.dyn_data.t_collide = true
-		else
-			this.dyn_data.t_collide = false
+		this.dyn_data_local.t_speed_last = this.dyn_data_local.t_speed 
+		this.dyn_data_local.t_speed = p_local.getSub(last_p_local)
+
+		// angular momentum local
+		let angular_momentum_local = m_local.getRotation() - last_m_local.getRotation()
+		
+		if( 180 < angular_momentum_local )
+			angular_momentum_local -= 360
+		if( angular_momentum_local < -180 )
+			angular_momentum_local += 360	
+
+		this.dyn_data_local.r_speed_last = this.dyn_data_local.r_speed
+		this.dyn_data_local.r_speed = angular_momentum	
+
+		// acceleration  local
+		this.dyn_data_local.t_acceleration = this.dyn_data_local.t_speed.getSub(this.dyn_data_local.t_speed_last)
+		this.dyn_data_local.r_acceleration = this.dyn_data_local.r_speed - this.dyn_data_local.r_speed_last
+
+		// last m
+		this.dyn_data.last_m.set(m) 
 	}
 
 
@@ -1591,72 +1622,95 @@ class Event{
 			
 		}
 
-
-		this.data.obj['move_t'].status = false  
-		this.data.obj['move_tx+'].status = false  
-		this.data.obj['move_tx-'].status = false  
-		this.data.obj['move_ty+'].status = false  
-		this.data.obj['move_ty-'].status = false  
-		if ( 0.0001 < this.Obj.trsf.dyn_data.momentum.mag()  ) 
-		{
-			this.data.obj['move_t'].status = true
-
-			let v = this.Obj.trsf.dyn_data.momentum
-			if( 0.9 < v.dot(Event.VECTORS.left) )
-				this.data.obj['move_tx+'].status = true
-			else if( 0.9 < v.dot(Event.VECTORS.right) )
-				this.data.obj['move_tx-'].status = true
-			else if( 0.9 < v.dot(Event.VECTORS.up) )
-				this.data.obj['move_ty+'].status = true
-			else if( 0.9 < v.dot(Event.VECTORS.down) )
-				this.data.obj['move_ty-'].status = true
-			
-		}    
-			
-
-		this.data.obj['move_r+'].status = false  
-		if ( 0.01 < this.Obj.trsf.dyn_data.angular_momentum  )     
-			this.data.obj['move_r+'].status = true
-
-		this.data.obj['move_r-'].status = false  
-		if ( this.Obj.trsf.dyn_data.angular_momentum < -0.01 )     
-			this.data.obj['move_r-'].status = true
-
-
+		const T_SPEED_MIN = 0.001 // 0.001
+		const R_SPEED_MIN = 0.01 // 0.01
+		const T_ACCELERATION_COLLISION_MIN = 1 // 1
+		const R_ACCELERATION_COLLISION_MIN = -0.1 // -0.1
 		
 		let tx_locked = ( (this.Obj.trsf.transform_limit_args.translate_limits != null)&&
 						(this.Obj.trsf.transform_limit_args.translate_limits[0][0] === 0 )&&
 						(this.Obj.trsf.transform_limit_args.translate_limits[0][1] === 0))
 
-		
 		let ty_locked = ( (this.Obj.trsf.transform_limit_args.translate_limits != null)&&
 						(this.Obj.trsf.transform_limit_args.translate_limits[1][0] === 0 )&&
 						(this.Obj.trsf.transform_limit_args.translate_limits[1][1] === 0))
-						
+
+		let r_locked = ( (this.Obj.trsf.transform_limit_args.rotate_limits != null)&&
+						(this.Obj.trsf.transform_limit_args.rotate_limits[0] === 0 )&&
+						(this.Obj.trsf.transform_limit_args.rotate_limits[1] === 0))
+					
+
+
+		this.data.obj['move_t'].status = false  
+		this.data.obj['move_tx+'].status = false  
+		this.data.obj['move_tx-'].status = false  
+
+		if ( ( tx_locked === false)&&
+			( T_SPEED_MIN < Math.abs(this.Obj.trsf.dyn_data_local.t_speed.x)  )  )
+		{
+			this.data.obj['move_t'].status = true
+
+			let v = this.Obj.trsf.dyn_data_local.t_speed
+			if( 0.9 < v.dot(Event.VECTORS.left) )
+				this.data.obj['move_tx+'].status = true
+			else if( 0.9 < v.dot(Event.VECTORS.right) )
+				this.data.obj['move_tx-'].status = true
+		} 
+		
+		this.data.obj['move_ty+'].status = false  
+		this.data.obj['move_ty-'].status = false
+		if ( ( ty_locked === false)&&  		
+			( T_SPEED_MIN < Math.abs(this.Obj.trsf.dyn_data_local.t_speed.y ) ) )
+		{
+			this.data.obj['move_t'].status = true
+
+			let v = this.Obj.trsf.dyn_data_local.t_speed
+			if( 0.9 < v.dot(Event.VECTORS.up) )
+				this.data.obj['move_ty+'].status = true
+			else if( 0.9 < v.dot(Event.VECTORS.down) )
+				this.data.obj['move_ty-'].status = true
+		}    
+			
+			
+
+		this.data.obj['move_r+'].status = false  
+		this.data.obj['move_r-'].status = false  
+		if ( r_locked === false )
+		{
+			if ( R_SPEED_MIN < this.Obj.trsf.dyn_data_local.r_speed  )     
+				this.data.obj['move_r+'].status = true
+	
+			if ( this.Obj.trsf.dyn_data_local.r_speed < -R_SPEED_MIN )     
+				this.data.obj['move_r-'].status = true
+		}
+		
+
+	
+		
 		this.data.obj['limit_hit_tx+'].status = false
 		this.data.obj['limit_hit_tx-'].status = false
-
-		if( tx_locked == false )
+	
+		if( tx_locked === false )
 		{
-			if( ( this.Obj.trsf.dyn_data.t_acceleration < -1 )&&
+			if( ( this.Obj.trsf.dyn_data_local.t_acceleration.x < -T_ACCELERATION_COLLISION_MIN )&&
 			( this.Obj.trsf.transform_limit_data.translate_collisionXpositive  )  )
 			this.data.obj['limit_hit_tx+'].status = true
 			
-			if( ( this.Obj.trsf.dyn_data.t_acceleration < -1 )&&
+			if( ( T_ACCELERATION_COLLISION_MIN  < this.Obj.trsf.dyn_data_local.t_acceleration.x  )&&
 				( this.Obj.trsf.transform_limit_data.translate_collisionXnegative  )  )
 				this.data.obj['limit_hit_tx-'].status = true
 		}
 
 		this.data.obj['limit_hit_ty+'].status = false
 		this.data.obj['limit_hit_ty-'].status = false
-
-		if( ty_locked == false )
+		
+		if( ty_locked === false )
 		{
-			if( ( this.Obj.trsf.dyn_data.t_acceleration < -1 )&&
+			if( ( this.Obj.trsf.dyn_data_local.t_acceleration.y < -T_ACCELERATION_COLLISION_MIN )&&
 			( this.Obj.trsf.transform_limit_data.translate_collisionYpositive  )  )
 			this.data.obj['limit_hit_ty+'].status = true
 			
-			if( ( this.Obj.trsf.dyn_data.t_acceleration < -1 )&&
+			if( ( T_ACCELERATION_COLLISION_MIN < this.Obj.trsf.dyn_data_local.t_acceleration.y  )&&
 				( this.Obj.trsf.transform_limit_data.translate_collisionYnegative  )  )
 				this.data.obj['limit_hit_ty-'].status = true
 		}
@@ -1665,17 +1719,19 @@ class Event{
 
 
 		this.data.obj['limit_hit_r+'].status = false
-		if( ( this.Obj.trsf.dyn_data.r_acceleration < -0.1 )&&
-			( this.Obj.trsf.transform_limit_data.rotate_collisionPositive )) 
-			this.data.obj['limit_hit_r+'].status = true
-		 
-
 		this.data.obj['limit_hit_r-'].status = false
-		if( ( this.Obj.trsf.dyn_data.r_acceleration < -0.1 )&&
-			( this.Obj.trsf.transform_limit_data.rotate_collisionNegative  ) )
-			this.data.obj['limit_hit_r-'].status = true
-		 		
-		
+		if( r_locked === false )
+		{
+			if( ( this.Obj.trsf.dyn_data_local.r_acceleration < R_ACCELERATION_COLLISION_MIN )&&
+				( this.Obj.trsf.transform_limit_data.rotate_collisionPositive )) 
+				this.data.obj['limit_hit_r+'].status = true
+			
+
+			
+			if( ( this.Obj.trsf.dyn_data_local.r_acceleration < R_ACCELERATION_COLLISION_MIN )&&
+				( this.Obj.trsf.transform_limit_data.rotate_collisionNegative  ) )
+				this.data.obj['limit_hit_r-'].status = true		
+		}
 
 
 		for (const key in this.data.obj) 

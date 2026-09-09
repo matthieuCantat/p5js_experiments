@@ -394,7 +394,42 @@ return [
             },
         },
 
-    }
+    },	
+    {
+        event : {
+            start : {
+                in_args : [ body_name ],
+                fn : (obj) => {
+                    let status = false
+                    if( obj.Event.data.user['grab'].status )
+                    {
+                        let p_user = obj.Game_engine.User.Coords.p
+                        let p_obj = obj.trsf.get().get_row(2)
+                        let v = p_user.getSub(p_obj)
+                        
+                        status = 100 < v.mag()
+                    }
+                    return status;
+                }
+            },
+            end : null,
+            max_duration : 1,
+        },
+        action : {
+            
+            start : {
+                in_args : [ body_name ],
+                fn : (obj) => {
+                    obj.Game_engine.Sound.start( `${body_name}UserPullStretch`,"sfx_ballon_squeak_stretch_01", { volume : 1, fade_in_seconds : 0, loop : false } ); //"sfx_wii_short_tick_02"
+                },
+                duration : 1,
+            },	
+            
+            end : {}
+        },
+
+    },
+
     ]
 
 }
