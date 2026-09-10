@@ -403,11 +403,7 @@ return [
                     let status = false
                     if( obj.Event.data.user['grab'].status )
                     {
-                        let p_user = obj.Game_engine.User.Coords.p
-                        let p_obj = obj.trsf.get().get_row(2)
-                        let v = p_user.getSub(p_obj)
-                        
-                        status = 100 < v.mag()
+                        status = 10 < obj.User.speed 
                     }
                     return status;
                 }

@@ -85,6 +85,7 @@ export class body
 
 		this.Game_engine = this.args.Game_engine
 		this.Time = this.args.Time
+		this.User = new User(this)
 
 
 		this.name = this.args.name
@@ -460,6 +461,8 @@ export class body
 		if( this.visibility == false )
 			return false
 
+		this.User.update()
+
 		
 		this.Event.update()
 		//this.update_event_effects()
@@ -720,6 +723,34 @@ class Effect
 }
 */
 
+
+class User
+{
+	constructor( body = null)
+	{
+		
+		this.body = body
+
+		this.v = new Vector2d()
+		this.l = 0
+		this.l_last = 0
+		this.speed = 0
+	}
+
+	update()
+	{
+		let p_user = this.body.Game_engine.User.Coords.p
+		let p_obj = this.body.trsf.get().get_row(2)
+		this.v = p_user.getSub(p_obj)
+
+		this.l_last = this.l
+		this.l = this.v.mag()
+
+		this.speed = this.l - this.l_last
+	}
+
+
+}
 
 class Transform
 {

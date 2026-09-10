@@ -1,4 +1,4 @@
-
+import { get_body_sfx } from '../../template/event_action_template.js'
 
 export var scene_info = {
     "objs":{
@@ -35,7 +35,15 @@ export var scene_info = {
           } 
     },
     "cns":[],
+    "eventActions":[],
 }
+
+
+
+// ADD SOME SOUND
+for( let info of get_body_sfx('obj') )
+	scene_info.eventActions.push( info )
+
 
 
 

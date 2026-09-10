@@ -662,7 +662,7 @@ class Event{
 	}
 		
 
-	get_advance_interaction_event( Coords )
+	get_advance_interaction_event( Coords, old_status )
 	{
 		
 		/////////////////////////////// INFO TOUCH STATE
@@ -734,6 +734,44 @@ class Event{
 			swipeDown : false,
 		}
 
+
+
+		var grab_detected = false
+		
+		if( 0 < touchDown_frames.length )
+		{
+			if(( touchUp_frames.length == 0 )
+				&&( Event.THRESHOLD.frame_nbr.tap + ADD < touchDown_frames[0] ))
+			{
+				grab_detected = true
+			}
+			else
+			{
+				if( touchDown_frames[0] < touchUp_frames[0] )
+					grab_detected = true
+			}
+		}
+		else if( 0 < touchUp_frames.length )
+		{
+			grab_detected = false
+		}
+		else if ( old_status.grab === true )
+		{
+			grab_detected = true
+		}
+			
+			
+		
+		if( grab_detected )
+		{
+			out_info.grab = true
+			return out_info
+		}		
+
+			
+
+
+
 		let nothing_detected = false
 		if( (  touchDown_frames.length == 0 ) 
 			&& (touchUp_frames.length == 0) )
@@ -742,25 +780,6 @@ class Event{
 		}
 		if( nothing_detected )
 			return out_info
-
-
-		
-
-		var grab_detected = false
-		if( (  touchDown_frames.length == 1 ) 
-			&& (touchUp_frames.length == 0) )
-		{
-			if( Event.THRESHOLD.frame_nbr.tap + ADD < touchDown_frames[0] )
-				grab_detected = true
-			
-		}
-		if( grab_detected )
-		{
-			out_info.grab = true
-			return out_info
-		}
-			
-
 
 
 
@@ -859,7 +878,7 @@ class Event{
 
 
 
-	get_simple_interaction_event( Coords )
+	get_simple_interaction_event( Coords, old_status )
 	{
 		
 		/////////////////////////////// INFO TOUCH STATE
@@ -931,20 +950,11 @@ class Event{
 			swipeDown : false,
 		}
 
-		let nothing_detected = false
-		if( (  touchDown_frames.length == 0 ) 
-			&& (touchUp_frames.length == 0) )
-		{
-			nothing_detected = true
-		}
-		if( nothing_detected )
-			return out_info
-
-
-		
+	
 
 		var grab_detected = false
-		if( (  0 < touchDown_frames.length ) )
+		
+		if( (  0 < touchDown_frames.length )||( old_status.grab === true ) )
 		{
 			if( touchUp_frames.length == 0 )
 			{
@@ -962,7 +972,17 @@ class Event{
 			out_info.grab = true
 			return out_info
 		}
-			
+	
+		
+
+		let nothing_detected = false
+		if( (  touchDown_frames.length == 0 ) 
+			&& (touchUp_frames.length == 0) )
+		{
+			nothing_detected = true
+		}
+		if( nothing_detected )
+			return out_info
 
 
 		var release_detected = false
@@ -1045,10 +1065,22 @@ class Event{
 		//   tDn     tUp       tDn        tUp
 		//    |-------|---------|---------|      (>
 		//        10  |     10  |     10  | 
-		//                                
-		//      
+		//    ]                            
+		//  
+		    
 		
-		let _info = this.get_advance_interaction_event( Coords )
+		const old_status_advance = { 
+			grab : this.data.advance.grab.status  , 
+			release : this.data.advance.release.status  , 
+			tap : this.data.advance.tap.status , 
+			doubleTap : this.data.advance.doubleTap.status ,
+			swipeLeft : this.data.advance.swipeLeft.status ,
+			swipeRight : this.data.advance.swipeRight.status ,
+			swipeUp : this.data.advance.swipeUp.status ,
+			swipeDown : this.data.advance.swipeDown.status ,
+		}
+
+		let _info = this.get_advance_interaction_event( Coords , old_status_advance)
 
 		this.data.advance.grab.status = _info['grab']
 		this.data.advance.release.status = _info['release']
@@ -1061,7 +1093,18 @@ class Event{
 		
 
 
-		_info = this.get_simple_interaction_event( Coords )
+
+		const old_status = { 
+			grab : this.data.simple.grab.status  , 
+			release : this.data.simple.release.status  , 
+			tap : this.data.simple.tap.status , 
+			doubleTap : this.data.simple.doubleTap.status ,
+			swipeLeft : this.data.simple.swipeLeft.status ,
+			swipeRight : this.data.simple.swipeRight.status ,
+			swipeUp : this.data.simple.swipeUp.status ,
+			swipeDown : this.data.simple.swipeDown.status ,
+		}
+		_info = this.get_simple_interaction_event( Coords ,old_status )
 
 
 		this.data.simple.grab.status = _info['grab']

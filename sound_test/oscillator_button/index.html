@@ -8,10 +8,12 @@
 
       function playNote() {
         const osc = audioCtx.createOscillator();
+        
         const gainNode = audioCtx.createGain();
 
         // Connect oscillator -> gain -> destination
         osc.connect(gainNode);
+
         gainNode.connect(audioCtx.destination);
 
         // Settings

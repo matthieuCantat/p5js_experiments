@@ -185,7 +185,7 @@ export class EventActions
             {
                 cns.action.start.fn(...this._extract_replace_with_obj_args(cns.action.start)) 
             }
-            else if ( cns.action.end.nbr_eval === 1 )
+            else if ( 0 < cns.action.end.nbr_eval  )
             {
                 //console.log("END ACTION",cns )
                 if( cns.action.end.fn !== undefined )
