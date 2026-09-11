@@ -1424,9 +1424,10 @@ class Transform
 		this.dyn_data.r_speed_normalized = (angular_momentum - min_v)/(max_v-min_v)
 		
 		// accelecation
+		
 		this.dyn_data.t_acceleration = this.dyn_data.t_speed - this.dyn_data.t_speed_last
 		this.dyn_data.r_acceleration = this.dyn_data.r_speed - this.dyn_data.r_speed_last
-	
+		
 
 		// speed local
 		let m_init = this.get_body()
@@ -1459,6 +1460,8 @@ class Transform
 
 		// last m
 		this.dyn_data.last_m.set(m) 
+
+		
 	}
 
 

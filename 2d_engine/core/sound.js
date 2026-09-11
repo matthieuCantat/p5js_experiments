@@ -37,21 +37,32 @@ loadSamples();
 
 export function playSoundSample( sound_file_name, { volume = 1, fade_in_seconds = 0, loop = false } ) {
     
-    if (!sounds_to_buffer[sound_file_name]) {
+    var source = null
+    if( sound_file_name === 'oscillator' )
+    {
+        let oscillator = audioCtx.createOscillator();   
+        oscillator.type = "sine";//square, sine, sawtooth, triangle
+        oscillator.frequency.value = 0; // valeur en hertz
+        source = oscillator
+    }
+    else if (!sounds_to_buffer[sound_file_name]) {
         console.log("Sample not loaded yet!");
         return;
     }
-    console.log("playSoundSample")
+    else{
+        source = audioCtx.createBufferSource();
+        source.buffer = sounds_to_buffer[sound_file_name];
+        source.loop = loop;
+    }
+    
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
 
-    // create a buffer source, setup effect
-    const source = audioCtx.createBufferSource();
-    source.buffer = sounds_to_buffer[sound_file_name];
-    source.loop = loop;
-   
     const gainNode = audioCtx.createGain();
     
-    source.connect( gainNode );
-    
+
+    source.connect( filter );
+    filter.connect( gainNode );
     gainNode.connect(audioCtx.destination);
 
 
@@ -74,55 +85,68 @@ export function playSoundSample( sound_file_name, { volume = 1, fade_in_seconds 
    
     
 
-    source.onended = () => {
-        console.log(' END')
-      };
-
-    return gainNode;
+    return { 'gain' : gainNode, 'source' : source, 'filter' : filter, 'nbr_eval' : 0  }
 }
 
 
 export class Sound {
 
     constructor( ) {
-        this.gains = {}
+        this.nodes = {}
     }
     
     start(name, sound_file_name, { volume, fade_in_seconds = 0, loop = false }  ){
-        console.log("Sound start")
-        this.gains[name] = playSoundSample( sound_file_name, { volume : volume, fade_in_seconds : fade_in_seconds, loop : loop }  )
+        //console.log("Sound start")
+        this.nodes[name] = playSoundSample( sound_file_name, { volume : volume, fade_in_seconds : fade_in_seconds, loop : loop }  )
     }
     
-    modif( name, { volume = null } ) {
+    modif( name, { volume = null, lowPass = null, oscillator_frequency = null, oscillator_amplitude = null  } ) {
         
-        if (!this.gains[name]) {
+        if (!this.nodes[name]) {
             console.log("Sound not found!");
             return;
         }
-        let gainNode = this.gains[name]
-        console.log(volume)
+
+        let gainNode = this.nodes[name].gain
         if( volume !== null )
         {
             const now = audioCtx.currentTime;
             gainNode.gain.cancelScheduledValues(now);
             gainNode.gain.setValueAtTime(gainNode.gain.value, now);
             gainNode.gain.linearRampToValueAtTime(volume, now + 0.1);
-
         }
-      
-     
+
+        let filterNode = this.nodes[name].filter
+        if( lowPass !== null )
+        {           
+            filterNode.frequency.value = lowPass;
+        }
+
+        if(( oscillator_frequency !== null )&&( oscillator_frequency !== null ))
+        {
+            let oscillator = this.nodes[name].source
+            let a = oscillator_amplitude
+            let f = oscillator_frequency
+
+            let wave = 0
+            let i = this.nodes[name].nbr_eval
+            wave +=( (Math.cos(i*f)+1)/2* a );
+            
+            oscillator.frequency.value = wave*500;
+        }
+        this.nodes[name].nbr_eval += 1
     }
 
     end( name, { fade_out_seconds = 0 } ) {
         
-        if (!this.gains[name]) {
+        if (!this.nodes[name]) {
             console.log("Sound not found!");
             return;
         }
-        let gainNode = this.gains[name]
+        let gainNode = this.nodes[name].gain
         if( 0 < fade_out_seconds )
         {
-            console.log("Sound end")
+            //console.log("Sound end")
             const fadeOutDuration = fade_out_seconds;
             const now = audioCtx.currentTime;
 
@@ -136,6 +160,7 @@ export class Sound {
             const now = audioCtx.currentTime;
             gainNode.gain.cancelScheduledValues(now);
             gainNode.gain.linearRampToValueAtTime(0, now + 0.1);
+            //this.nodes[name].source.end()
         }
      
     }
