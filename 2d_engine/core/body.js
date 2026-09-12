@@ -758,9 +758,9 @@ class Transform
 
 	static info_compute_values = {
 		t_speed_min : 0,
-		t_speed_max : 10,
+		t_speed_max : 10000,
 		r_speed_min : 0,
-		r_speed_max : 10,
+		r_speed_max : 10000,
 		t_acceleration_collision : -1,
 	}
 
@@ -1387,8 +1387,8 @@ class Transform
 
 		let momentum = p.getSub(last_p)
 		
-		let momentum_mag = Math.max(-dyn_settings.speed_limit_translate,
-			Math.min( dyn_settings.speed_limit_translate, momentum.mag()))
+		let momentum_mag = momentum.mag()//Math.max(-dyn_settings.speed_limit_translate,
+		//	Math.min( dyn_settings.speed_limit_translate, momentum.mag()))
 		momentum.normalize()
 		momentum.mult(momentum_mag)	
 		this.dyn_data.momentum = momentum	
@@ -1402,8 +1402,8 @@ class Transform
 			angular_momentum += 360	
 		this.dyn_data.angular_momentum = angular_momentum	
 
-		this.dyn_data.angular_momentum = Math.max(-dyn_settings.speed_limit_rotate,
-			Math.min( dyn_settings.speed_limit_rotate, angular_momentum))
+		this.dyn_data.angular_momentum = angular_momentum//Math.max(-dyn_settings.speed_limit_rotate,
+			//Math.min( dyn_settings.speed_limit_rotate, angular_momentum))
 		
 		
 

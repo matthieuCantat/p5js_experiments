@@ -14,6 +14,10 @@ var sounds_to_buffer = {
     "sfx_wii_artificial_slide_down_01":null,
     "sfx_wii_artificial_slide_up_01":null,
     "sfx_ballon_squeak_stretch_01":null,
+    "sfx_woosh_01":null,
+    "sfx_woosh_02":null,
+    "sfx_woosh_03":null,
+    "sfx_woosh_04":null,
 };
 
 
@@ -100,17 +104,24 @@ export class Sound {
         this.nodes[name] = playSoundSample( sound_file_name, { volume : volume, fade_in_seconds : fade_in_seconds, loop : loop }  )
     }
     
-    modif( name, { volume = null, lowPass = null, oscillator_frequency = null, oscillator_amplitude = null  } ) {
+    modif( name, { 
+        volume = null, 
+        lowPass = null, 
+        oscillator_frequency = null, 
+        oscillator_amplitude = null,
+        oscillator_offset = null  } ) {
         
         if (!this.nodes[name]) {
             console.log("Sound not found!");
             return;
         }
 
+        const now = audioCtx.currentTime;
+
         let gainNode = this.nodes[name].gain
         if( volume !== null )
         {
-            const now = audioCtx.currentTime;
+            
             gainNode.gain.cancelScheduledValues(now);
             gainNode.gain.setValueAtTime(gainNode.gain.value, now);
             gainNode.gain.linearRampToValueAtTime(volume, now + 0.1);
@@ -128,11 +139,12 @@ export class Sound {
             let a = oscillator_amplitude
             let f = oscillator_frequency
 
-            let wave = 0
+            let wave = 0 
             let i = this.nodes[name].nbr_eval
-            wave +=( (Math.cos(i*f)+1)/2* a );
+            wave += (Math.cos(i*f)+1)/2* a + oscillator_offset;
             
-            oscillator.frequency.value = wave*500;
+            oscillator.frequency.value = wave;
+                
         }
         this.nodes[name].nbr_eval += 1
     }
