@@ -39,13 +39,17 @@ async function loadSamples() {
 loadSamples();
 
 
-export function playSoundSample( sound_file_name, { volume = 1, fade_in_seconds = 0, loop = false } ) {
+export function playSoundSample( sound_file_name, 
+    { volume = 1, 
+      fade_in_seconds = 0,
+      loop = false,
+      oscillator_type = "sine" } ) {
     
     var source = null
     if( sound_file_name === 'oscillator' )
     {
         let oscillator = audioCtx.createOscillator();   
-        oscillator.type = "sine";//square, sine, sawtooth, triangle
+        oscillator.type = oscillator_type;//square, sine, sawtooth, triangle
         oscillator.frequency.value = 0; // valeur en hertz
         source = oscillator
     }
@@ -61,6 +65,7 @@ export function playSoundSample( sound_file_name, { volume = 1, fade_in_seconds 
     
     const filter = audioCtx.createBiquadFilter();
     filter.type = "lowpass";
+    filter.frequency.value = 10000
 
     const gainNode = audioCtx.createGain();
     
@@ -99,9 +104,18 @@ export class Sound {
         this.nodes = {}
     }
     
-    start(name, sound_file_name, { volume, fade_in_seconds = 0, loop = false }  ){
+    start(name, sound_file_name, { 
+        volume, 
+        fade_in_seconds = 0, 
+        loop = false,
+        oscillator_type = "sine", //square, sine, sawtooth, triangle 
+        }  ){
         //console.log("Sound start")
-        this.nodes[name] = playSoundSample( sound_file_name, { volume : volume, fade_in_seconds : fade_in_seconds, loop : loop }  )
+        this.nodes[name] = playSoundSample( sound_file_name, { 
+            volume : volume, 
+            fade_in_seconds : fade_in_seconds, 
+            loop : loop,
+            oscillator_type : oscillator_type }  )
     }
     
     modif( name, { 
@@ -109,7 +123,7 @@ export class Sound {
         lowPass = null, 
         oscillator_frequency = null, 
         oscillator_amplitude = null,
-        oscillator_offset = null  } ) {
+        oscillator_offset = 0  } ) {
         
         if (!this.nodes[name]) {
             console.log("Sound not found!");
