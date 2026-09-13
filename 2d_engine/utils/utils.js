@@ -57,3 +57,12 @@ export function history_fill( data, elem, max_nbr)
 	if ( max_nbr < data.length)
 		data.pop(); // Remove the oldest if over size		
 }
+
+
+export function list_get_random( list )
+{
+  let id = Math.floor(Math.random() * list.length )
+  //console.log(id)
+  let elem = list[id]
+  return elem
+}

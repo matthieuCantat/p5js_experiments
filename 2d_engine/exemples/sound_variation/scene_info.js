@@ -542,7 +542,19 @@ scene_info.eventActions.push(
                     if( obj.Event.data.user['grab'].status )
                     {
 						let p = obj.trsf.get().get_row(2)
-						if( (  0-5 < p.x)&&( p.x < 0+5 ) )
+						let momentum = obj.trsf.dyn_data.momentum
+						let p_last = p.getAdd(momentum)
+						
+						let pos = 0
+						
+						let is_inside_zone = ( pos-5 < p.x)&&( p.x < pos+5 )
+						let it_pass_throught = ( p_last.x < pos)&&(  pos < p.x) 
+						let it_pass_back = ( p.x < pos)&&(  pos < p_last.x) 
+											
+						if( is_inside_zone ||
+							it_pass_throught ||
+							it_pass_back
+						)
 						{
 							status = true
 						}
@@ -578,7 +590,19 @@ scene_info.eventActions.push(
                     if( obj.Event.data.user['grab'].status )
                     {
 						let p = obj.trsf.get().get_row(2)
-						if( ( 50-5 < p.x)&&( p.x < 50+5 ) )
+						let momentum = obj.trsf.dyn_data.momentum
+						let p_last = p.getAdd(momentum)
+						
+						let pos = 50
+						
+						let is_inside_zone = ( pos-5 < p.x)&&( p.x < pos+5 )
+						let it_pass_throught = ( p_last.x < pos)&&(  pos < p.x) 
+						let it_pass_back = ( p.x < pos)&&(  pos < p_last.x) 
+											
+						if( is_inside_zone ||
+							it_pass_throught ||
+							it_pass_back
+						)
 						{
 							status = true
 						}
@@ -614,7 +638,19 @@ scene_info.eventActions.push(
 					if( obj.Event.data.user['grab'].status )
 					{
 						let p = obj.trsf.get().get_row(2)
-						if( ( -50-5 < p.x)&&( p.x < -50+5 ) )
+						let momentum = obj.trsf.dyn_data.momentum
+						let p_last = p.getAdd(momentum)
+						
+						let pos = -50
+						
+						let is_inside_zone = ( pos-5 < p.x)&&( p.x < pos+5 )
+						let it_pass_throught = ( p_last.x < pos)&&(  pos < p.x) 
+						let it_pass_back = ( p.x < pos)&&(  pos < p_last.x) 
+					
+						if( is_inside_zone||
+							it_pass_throught||
+							it_pass_back 
+						 )
 						{
 							status = true
 						}
@@ -630,7 +666,7 @@ scene_info.eventActions.push(
 			start : {
 				in_args : [ 'harp' ],
 				fn : (obj) => {
-					obj.Game_engine.Sound.start( `noteC`,"sfx_wii_short_tick_02", { 
+					obj.Game_engine.Sound.start( `noteC`,"sfx_wii_bell_simple_03", { 
 						volume : 0.5, 
 						fade_in_seconds : 0, 
 						loop : false,

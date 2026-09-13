@@ -1,5 +1,23 @@
 
+
+
 var sounds_to_buffer = { 
+
+    "sfx_wii_bell_simple_01":null,
+    "sfx_wii_bell_simple_02":null,
+    "sfx_wii_bell_simple_03":null,
+    "sfx_wii_bell_simple_04":null,
+    "sfx_wii_bell_simple_05":null,
+    "sfx_wii_bell_simple_06":null, 
+
+    "sfx_woosh_01":null,
+    "sfx_woosh_02":null,
+    "sfx_woosh_03":null,
+    "sfx_woosh_04":null,
+    "sfx_wii_artificial_slide_down_01":null,
+    "sfx_wii_artificial_slide_up_01":null,
+    "sfx_wii_low_vibration_up_01":null,
+    
     "sfx_wii_bell_long_01" : null,
     "ost_creature_04" : null,
     "ost_quest2_whiteSound_02": null,
@@ -9,15 +27,8 @@ var sounds_to_buffer = {
     "sfx_occulus_artificial_close_01" : null,
     "sfx_creature_synth_03":null,
     "sfx_wii_champagne_cork_01":null,
-    "sfx_wii_bell_simple_04":null,
-    "sfx_wii_bell_simple_05":null,
-    "sfx_wii_artificial_slide_down_01":null,
-    "sfx_wii_artificial_slide_up_01":null,
     "sfx_ballon_squeak_stretch_01":null,
-    "sfx_woosh_01":null,
-    "sfx_woosh_02":null,
-    "sfx_woosh_03":null,
-    "sfx_woosh_04":null,
+   
 };
 
 
@@ -126,7 +137,7 @@ export class Sound {
         oscillator_offset = 0  } ) {
         
         if (!this.nodes[name]) {
-            console.log("Sound not found!");
+            //console.log("Sound not found!");
             return;
         }
 
@@ -166,7 +177,7 @@ export class Sound {
     end( name, { fade_out_seconds = 0 } ) {
         
         if (!this.nodes[name]) {
-            console.log("Sound not found!");
+            //console.log("Sound not found!");
             return;
         }
         let gainNode = this.nodes[name].gain
