@@ -12,6 +12,7 @@ import { body } from './body.js'
 import { Logger } from './logger.js';
 import { Render } from './render.js';
 import { Sound } from './sound.js';
+import { Animation_manager } from './animation.js';
 import Matrix2d from '../utils/matrix2d.js';
 import Vector2d from '../utils/vector2d.js';
 
@@ -40,6 +41,7 @@ export class gameEngine {
         this.body_effects = [];
         this.Render = new Render();
         this.Sound = new Sound();
+        this.Animation = new Animation_manager(this);
 
 
         // BACKGROUND
@@ -292,6 +294,8 @@ export class gameEngine {
 
         for( let elem in this.Objs )
             this.Objs[elem].update()
+
+        this.Animation.update()
         
         for( let elem of this.body_effects )
             elem.update()

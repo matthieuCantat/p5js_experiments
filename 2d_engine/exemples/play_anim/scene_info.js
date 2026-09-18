@@ -1,97 +1,148 @@
 import Vector2d from '../../utils/vector2d.js';
 import Matrix2d from '../../utils/matrix2d.js';
 import { COLORS } from '../../utils/draw.js'
+import { get_body_sfx } from '../../template/event_action_template.js'
 
 
-		
-export var scene_info = {"objs":{}, 'cns':[]}
-
-let timeline_zoom = 1.0;
-let incr = 10 * timeline_zoom
-for( let i=0; i<Math.ceil(110*2/incr)+1; i++ ){
-scene_info["objs"]["step"+i] = {
-        "m": [-90+incr*i, -350, 0, 0.5,10],
-        "color": "blue",
-        "shape_type": "rectangle",
-        "stroke_width": 0.1,
-    } 
+export var scene_info = {
+    "objs":{
+		"play_btn": {
+			"m": [0, -300, 0, 1, 1],
+			"shapes" : [
+				{
+					"m": [0, -300, 0, 25, 25],
+					"color": "red",
+					"type": "circle",
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
+			"interaction_shapes": [
+				{
+					"m" :  [ 0, -300, 0, 25, 25],
+					"type": "circle",
+				}
+			],
+			"interaction_settings": {
+				"enable": true,
+				"coef": 1.0,
+				"rotate_resolution_priority": 0.0,
+				"radius_threshold": 0,
+				"do_translation": true
+			},
+			transform_settings : {
+				parent_limit_space : false,
+				translate_limits: [[0,0],[0,0]],
+				rotate_limits: [0,0],
+			},            
+			"dyn_settings": {
+				"enable": false,
+				enable_gravity:false,
+				mass:0.9,
+				"friction_translate": 0.1,
+				"friction_rotate": 0.001,
+				"speed_limit_translate": 30,
+				"speed_limit_rotate": 0.3
+			},
+			"debug":{
+				"shape_interaction_visibility" : false,
+			},		
+			event_type : "simple",		        
+		},	
+        "body_A": {
+			"m": [0, -200, 0, 1, 1],
+			"shapes" : [
+				{
+					"m": [0, -200, 0, 10, 50],
+					"color": "red",
+					"type": "rectangle",
+					"stroke_color":"black",
+					"stroke_width":1,
+				}
+			],
+			"interaction_shapes": [
+				{
+					"m" :  [0, -200, 0, 10, 50],
+					"type": "rectangle",
+				}
+			],
+			"interaction_settings": {
+				"enable": true,
+				"coef": 1.0,
+				"rotate_resolution_priority": 0.0,
+				"radius_threshold": 0,
+				"do_translation": true
+			},
+			transform_settings : {
+				parent_limit_space : false,
+				translate_limits: [[0,0],[0,0]],
+				rotate_limits: [0,0],
+			},            
+			"dyn_settings": {
+				"enable": false,
+				enable_gravity:false,
+				mass:0.9,
+				"friction_translate": 0.1,
+				"friction_rotate": 0.001,
+				"speed_limit_translate": 30,
+				"speed_limit_rotate": 0.3
+			},
+			"debug":{
+				"shape_interaction_visibility" : false,
+			},		
+			event_type : "simple",		        
+		},        		
+	},
+	"cns": [],	
+	"eventActions" : []					
 }
 
 
-scene_info["objs"] = {
-    ...scene_info["objs"],        
-    "play_timeline": {
-        "m": [20, -350, 0, 110,3],
-        "color": "blue",
-        "shape_type": "rectangle",
-    },
 
-    "play_cursor": {
-        "m": [20, -350, 0, 5,20],
-        "color": "blue",
-        "shape_type": "rectangle",
-        "text": 1,
-        "interaction_settings": {
-            'enable':true,
-            'coef':1.0,
-            'rotate_resolution_priority':0.0,
-            'radius_threshold':0,
-            'do_translation':true,
-            'scale_selection_shape':4,
-        }, 
-        "event_effects" : {
-            'touchDown': { effects:[{ type:'particles_radial_strokes' }], isRepeatable:true},
-            'touchUp': { effects:[{ type:'water_ripple'}], isRepeatable:true},
-            'drag': { effects:[{ type:'body_color_acid_rainbow', duration:'drag'}], isRepeatable:false},
-        },                      
-    }, 
-    "play_cursor_txt": {
-        "m": [20, -320, 0, 5,20],
-        "color": "red",
-        "shape_type": "text",
-        "text": 1,                     
-    },       
-    "play_button": {
-        "m": [-145, -350, 90, 20,20],
-        "color": "blue",
-        "shape_type": "triangle",
-        "interaction_settings": {
-            'enable':true,
-            'coef':0.0,
-            'rotate_resolution_priority':1.0,
-            'radius_threshold':0,
-            'do_translation':false,
-            'scale_selection_shape':3.0,
-        },
-        
-
-        "event_effects" : {
-            'touchDown': { effects:[{ type:'particles_radial_strokes' }], isRepeatable:true},
-            'touchUp': { effects:[{ type:'water_ripple'}], isRepeatable:true},
-        },    
-        
-    },            
-}
-
-scene_info['cns'] = [
+scene_info.eventActions.push( 
     {
-        mode: 'axe',
-        driver_obj: [20, -350, 0 , 60,20],
-        driven_objs: ['play_cursor',"play_cursor_txt"],
-        v_axe: [1,0],
-        enable:true,
-        enable_limits:true,
-        limit_max: 110,
-        limit_min: -110,
-        rotation_constraint_coef:1.0,
-        rotation_constraint_axe: 0,
-        step_incr: incr
-    },    
-]
+        event : {
+            start : {
+                in_args : [ 'play_btn' ],
+                fn : (obj) => {
+                    let status = false
+                    if( obj.Event.data.user['grab'].status )
+                    {
+                        status = true
+                    }
+                    return status;
+                }
+            },
+            end : null,
+            max_duration : 1,
+        },
+        action : {
+            
+            start : {
+                in_args : [ 'play_btn' ],
+                fn : (obj) => {
+                    obj.Game_engine.Animation.start( `first_anim`,"body_jump_happy", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                },
+                duration : 1,
+            },
+            /*
+            duration : {
+                in_args : [ 'pos' ],
+                fn : (obj) => {
+                    let p = obj.trsf.get().get_row(2)
+					// POSITION BASED
+					let volume =  (p.y +300)/600;
+					let lowPass = (p.x +200)/400*1500;
 
-scene_info["objs"]["play_button"]["event_cmds"] = {
-    'touchDown': [ "scene_info['cns']['step_incr'] = 0" ],
-}
 
+                    obj.Game_engine.Sound.modif( `gain_whiteSound`,{ volume : volume, lowPass : lowPass } ); //"sfx_wii_short_tick_02"
+                },
+                duration : 1,
+            },
+            */
+            end : {}
+        },
 
-
+    },
+   
+ )

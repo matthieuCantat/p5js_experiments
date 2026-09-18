@@ -210,13 +210,23 @@ Matrix2d.prototype = {
 		this.transform(1, 0, 0, 1, tx, 0);
 		return this;
 	},
-
+	
 	/**
 	 * Translate current matrix on y axis accumulative.
 	 * @param {number} ty - translation for y
 	 */
 	translateY: function(ty) {
 		this.transform(1, 0, 0, 1, 0, ty);
+		return this;
+	},
+
+	setTranslateX: function(tx) {
+		this.e = tx;
+		return this;
+	},
+
+	setTranslateY: function(ty) {
+		this.f = ty
 		return this;
 	},
 
@@ -573,6 +583,34 @@ Matrix2d.prototype = {
 		}
 
 		return this;
+	},
+
+	setWithTransformAttr( attr_to_value )
+	{
+		for( let attr in attr_to_value )
+		{
+			if( attr === 'translateX' )
+			{
+				this.setTranslateX( attr_to_value[attr] )
+			}
+			else if( attr === 'translateY' )
+			{
+				this.setTranslateY( attr_to_value[attr] )
+			}
+			else if( attr === 'rotate' )
+			{
+				this.setRotationDeg( attr_to_value[attr] )
+			}
+			else if( attr === 'scaleX' )
+			{
+				this.scaleX( attr_to_value[attr] )
+			}
+			else if( attr === 'scaleY' )
+			{
+				this.scaleY( attr_to_value[attr] )
+			}
+		
+		}
 	},
 
 

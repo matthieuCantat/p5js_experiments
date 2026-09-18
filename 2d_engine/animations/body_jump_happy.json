@@ -1,0 +1,14 @@
+
+
+{
+    "body_A" : {
+        "translateY" : [
+            { "t" : 5 , "v" : -200, "in_tan" : { "orient" : "flat", "length" : "auto4"}, "out_tan" : { "orient" : "flat", "length" : "auto4"} },
+            { "t" : 50 , "v" : 300, "in_tan" : { "orient" : "flat", "length" : "auto4"}, "out_tan" : { "orient" : "flat", "length" : "auto4"} }
+        ],
+        "rotate" : [
+            { "t" : 25 , "v" : 0, "in_tan" : { "orient" : "flat", "length" : "auto4"}, "out_tan" : { "orient" : "flat", "length" : "auto4"} },
+            { "t" : 200 , "v" : 360, "in_tan" : { "orient" : "flat", "length" : "auto4"}, "out_tan" : { "orient" : "flat", "length" : "auto4"} }
+        ]
+    }
+}
