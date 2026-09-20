@@ -119,8 +119,11 @@ export class Render
         
         // STYLE
         if( draw_args.color != null )
-            ctx.fillStyle = draw_args.color
-        ctx.strokeStyle = draw_args.stroke_color
+            ctx.fillStyle = `rgb(${draw_args.color[0]},${draw_args.color[1]},${draw_args.color[2]})`//draw_args.color
+        
+        if( draw_args.stroke_color != null )
+            ctx.strokeStyle = `rgb(${draw_args.stroke_color[0]},${draw_args.stroke_color[1]},${draw_args.stroke_color[2]})`//draw_args.color
+                    
         ctx.lineWidth = draw_args.stroke_width
 
 

@@ -1,4 +1,4 @@
-import { draw_circle, draw_line, cX_inv, cY_inv} from '../utils/draw.js'
+import { draw_circle, draw_line, cX_inv, cY_inv, COLORS_TO_RGB} from '../utils/draw.js'
 import { history_fill } from '../utils/utils.js'
 import Vector2d from '../utils/vector2d.js';
 import Matrix2d from '../utils/matrix2d.js';
@@ -88,8 +88,8 @@ export class User
 			draw_queue.push({
 				shape_type : 'circle',  
 				m : new Matrix2d().setTranslation(this.Coords.pPressed).setScale(size_animated), 
-				color : 'red',
-				stroke_color : 'black', 
+				color : COLORS_TO_RGB['red'],
+				stroke_color : COLORS_TO_RGB['black'], 
 				strokes_width : 5,            
 			})
 		}
@@ -124,8 +124,8 @@ export class User
 			draw_queue.push({
 				shape_type : 'circle',  
                 m : new Matrix2d().setTranslation(this.Coords.p).setScale(10), 
-                color : 'red',
-                stroke_color : 'black', 
+                color : COLORS_TO_RGB['red'],
+                stroke_color : COLORS_TO_RGB['black'], 
 				strokes_width : 5,            
             } )
 

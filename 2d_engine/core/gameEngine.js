@@ -7,6 +7,7 @@ import { Constraints_info } from './constraint.js'
 import { EventActions } from './eventActions.js'
 import {
 	COLORS,
+	COLORS_TO_RGB,
 	canvas,} from '../utils/draw.js'
 import { body } from './body.js'
 import { Logger } from './logger.js';
@@ -84,7 +85,7 @@ export class gameEngine {
         // background
         this.Render.queue_background.push( { 
             shape_type : 'uniform_background', 
-            color: 'grey' } )
+            color: COLORS_TO_RGB['grey'] } )
         
 
         // grid A
@@ -103,7 +104,7 @@ export class gameEngine {
                         {x:-x_abs, y: y_abs},
                         {x: x_abs, y: y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } )
                 this.Render.queue_background.push( { 
                     shape_type : 'line', 
@@ -111,7 +112,7 @@ export class gameEngine {
                         {x:-x_abs, y:-y_abs},
                         {x: x_abs, y:-y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } ) 
             }
 
@@ -128,7 +129,7 @@ export class gameEngine {
                         {x:x_abs, y:-y_abs},
                         {x:x_abs, y:y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } )
 
                 this.Render.queue_background.push( { 
@@ -137,7 +138,7 @@ export class gameEngine {
                         {x:-x_abs, y:-y_abs},
                         {x:-x_abs, y:y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } )                
             }
         }
@@ -159,7 +160,7 @@ export class gameEngine {
                         {x:-x_abs, y: y_abs},
                         {x: x_abs, y: y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } )
                 this.Render.queue_background.push( { 
                     shape_type : 'line', 
@@ -167,7 +168,7 @@ export class gameEngine {
                         {x:-x_abs, y:-y_abs},
                         {x: x_abs, y:-y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } ) 
             }
 
@@ -184,7 +185,7 @@ export class gameEngine {
                         {x:x_abs, y:-y_abs},
                         {x:x_abs, y:y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } )
 
                 this.Render.queue_background.push( { 
@@ -193,7 +194,7 @@ export class gameEngine {
                         {x:-x_abs, y:-y_abs},
                         {x:-x_abs, y:y_abs}
                     ], 
-                    stroke_color : 'black', 
+                    stroke_color : COLORS_TO_RGB['black'], 
                     stroke_width : grid_thickness } )                
             }
         }
@@ -203,7 +204,7 @@ export class gameEngine {
         {
             let grid_thickness = 2
             let grid_incr = 100
-            let grid_color = 'lightgrey'
+            let grid_color = COLORS_TO_RGB['lightgrey']
             for( let i = 0 ; i < 100; i++ )
             {
                 let y_abs = grid_incr*i
@@ -244,38 +245,38 @@ export class gameEngine {
         this.Render.queue_background.push( { 
             shape_type : 'line', 
             points : [{x:-this.DESKTOP_HALF_DIMENTIONS[0],y:0},{x:this.DESKTOP_HALF_DIMENTIONS[0],y:0}], 
-            stroke_color : 'black', 
+            stroke_color : COLORS_TO_RGB['black'], 
             stroke_width : 3 } )
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
             points : [{x:0,y:-this.DESKTOP_HALF_DIMENTIONS[1]},{x:0,y:this.DESKTOP_HALF_DIMENTIONS[1]}], 
-            stroke_color : 'black', 
+            stroke_color : COLORS_TO_RGB['black'], 
             stroke_width : 3 } )
             
         //PHONE DIMS
         this.Render.queue_background.push( { 
             shape_type : 'line', 
             points : [{x:-this.DESKTOP_HALF_DIMENTIONS[0],y:-this.PHONE_HALF_DIMENTIONS[1]},{x:this.DESKTOP_HALF_DIMENTIONS[0],y:-this.PHONE_HALF_DIMENTIONS[1]}], 
-            stroke_color : 'red', 
+            stroke_color : COLORS_TO_RGB['red'], 
             stroke_width : 3 } )                
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
             points : [{x:-this.DESKTOP_HALF_DIMENTIONS[0],y:this.PHONE_HALF_DIMENTIONS[1]},{x:this.DESKTOP_HALF_DIMENTIONS[0],y:this.PHONE_HALF_DIMENTIONS[1]}], 
-            stroke_color : 'red', 
+            stroke_color : COLORS_TO_RGB['red'], 
             stroke_width : 3 } )         
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
             points : [{x:-this.PHONE_HALF_DIMENTIONS[0],y:-this.DESKTOP_HALF_DIMENTIONS[1]},{x:-this.PHONE_HALF_DIMENTIONS[0],y:this.DESKTOP_HALF_DIMENTIONS[1]}], 
-            stroke_color : 'red', 
+            stroke_color : COLORS_TO_RGB['red'], 
             stroke_width : 3 } )       
 
         this.Render.queue_background.push( { 
             shape_type : 'line', 
             points : [{x:this.PHONE_HALF_DIMENTIONS[0],y:-this.DESKTOP_HALF_DIMENTIONS[1]},{x:this.PHONE_HALF_DIMENTIONS[0],y:this.DESKTOP_HALF_DIMENTIONS[1]}], 
-            stroke_color : 'red', 
+            stroke_color : COLORS_TO_RGB['red'], 
             stroke_width : 3 } ) 
         
         

@@ -4,6 +4,7 @@ isPointInside_rectangle,
 isPointInside_circle,
 isPointInside_triangle,
 COLORS_TO_RGB,
+getRGB,
 } from '../utils/draw.js';
 import { history_fill } from '../utils/utils.js';
 import Matrix2d from '../utils/matrix2d.js';
@@ -34,7 +35,7 @@ export class body
 	}
 
 
-	HIGHLIGHT_STROKE_COLOR = "yellow"
+	HIGHLIGHT_STROKE_COLOR = COLORS_TO_RGB["yellow"]
 	HIGHLIGHT_STROKE_WIDTH = 5
 	
 	constructor(
@@ -132,9 +133,18 @@ export class body
 		this.shapes_dynamic_data = []
 		for( let shape_info of this.args.shapes )
 		{
+			let shape_color = shape_info.color
+			if(typeof shape_info.color === 'string' || shape_info.color instanceof String)
+				shape_color = COLORS_TO_RGB[shape_info.color]
+			let stroke_color = shape_info.stroke_color
+			if(typeof shape_info.stroke_color === 'string' || shape_info.stroke_color instanceof String)
+				stroke_color = COLORS_TO_RGB[shape_info.stroke_color]
+			
+			
 			this.shapes_dynamic_data.push(
 				{
-					stroke_color : shape_info.stoke_color,
+					color : shape_color,
+					stroke_color : stroke_color,
 					stroke_width : shape_info.stroke_width,
 				}
 			)
@@ -458,7 +468,7 @@ export class body
         if( this.Time.one_update_debug_time_passed )
             logger.info("update");
 
-		if( this.visibility == false )
+		if( this.visibility === false )
 			return false
 
 		this.User.update()
@@ -478,6 +488,7 @@ export class body
 		//if(this.axe_cns_settings.enable)
 		//	axe_cns_info = this.update_matrix_axe_cns()
 		
+		
 
 		let is_selected = this.isSelected()
 		if( this.highlight_when_selected )
@@ -491,7 +502,7 @@ export class body
 				}
 				else
 				{
-					this.shapes_dynamic_data[i].stroke_color = this.args.shapes[i].stroke_color
+					this.shapes_dynamic_data[i].stroke_color = COLORS_TO_RGB[this.args.shapes[i].stroke_color]
 					this.shapes_dynamic_data[i].stroke_width = this.args.shapes[i].stroke_width	
 				}
 				
@@ -553,9 +564,9 @@ export class body
 
 	get_render_infos_interaction_shape_debug()
 	{
-		var color = 'black'
+		var color = COLORS_TO_RGB['black']
 		if( 0 < this.args.shapes.length )
-			color = this.args.shapes[0].color
+			color = this.shapes_dynamic_data[0].color
 
 		let draw_info = []
 		if( this.debug.shape_interaction_visibility )
@@ -601,22 +612,22 @@ export class body
 		return [ {
 			shape_type : 'circle',      
 			m : m, 
-			color : 'black',
-			stroke_color : 'black', 
+			color : COLORS_TO_RGB['black'],
+			stroke_color : COLORS_TO_RGB['black'], 
 			stroke_width : STROKE_THICKENESS,        
 		},
 		{
 			shape_type : 'rectangle',      
 			m : mAxeX, 
-			color : 'red',
-			stroke_color : 'black', 
+			color : COLORS_TO_RGB['red'],
+			stroke_color : COLORS_TO_RGB['black'], 
 			stroke_width : STROKE_THICKENESS,        
 		},
 		{
 			shape_type : 'rectangle',      
 			m : mAxeY, 
-			color : 'green',
-			stroke_color : 'black', 
+			color : COLORS_TO_RGB['green'],
+			stroke_color : COLORS_TO_RGB['black'], 
 			stroke_width : STROKE_THICKENESS,        
 		},	
 	]		
@@ -629,6 +640,8 @@ export class body
 		var draw_info = []
 		for( let i = 0; i < shapes_matrices.length; i++ )
 		{
+			
+			
 			draw_info.push(
 				{
 					shape_type : this.args.shapes[i].type,      
@@ -636,7 +649,7 @@ export class body
 					text: this.args.shapes[i].text,
 					text_centered : this.args.shapes[i].text_centered,
 					text_rotation : this.args.shapes[i].text_rotation,
-					color : this.args.shapes[i].color,
+					color : this.shapes_dynamic_data[i].color,
 					stroke_color : this.shapes_dynamic_data[i].stroke_color, 
 					stroke_width : this.shapes_dynamic_data[i].stroke_width,   	
 				}
@@ -665,29 +678,29 @@ export class body
 		render_infos.push({
 			shape_type : 'circle',  
 			m : new Matrix2d().setTranslation(pUserFirstGrab).setScale(5), 
-			color : 'yellow',
-			stroke_color : 'black', 
+			color : COLORS_TO_RGB['yellow'],
+			stroke_color : COLORS_TO_RGB['black'], 
 			strokes_width : 5,            
 		} )
 		
 		render_infos.push({
 			shape_type : 'circle',  
 			m : new Matrix2d().setTranslation(pCenter).setScale(5), 
-			color : 'yellow',
-			stroke_color : 'black', 
+			color : COLORS_TO_RGB['yellow'],
+			stroke_color : COLORS_TO_RGB['black'], 
 			strokes_width : 5,            
 		} )
 		
 		render_infos.push({
 			shape_type : 'line',
 			points : [pUserFirstGrab, pCenter] , 
-			stroke_color : 'yellow', 
+			stroke_color : COLORS_TO_RGB['yellow'], 
 			lineWidth : 2 })
 
 		render_infos.push({
 			shape_type : 'line',
 			points : [pUserFirstGrab, pUser] , 
-			stroke_color : 'red', 
+			stroke_color : COLORS_TO_RGB['red'], 
 			lineWidth : 2 })
 		
 		return render_infos
@@ -888,6 +901,11 @@ class Transform
 		this.m_body_modif = m.getMult( this.get_body().getInverse() )
 	}
 
+	set_local(m)
+	{
+		this.m_body_modif = m.getMult( this.m_parent_to_body.getInverse() )
+	}
+
 	setTranslate(p)
 	{
 		let m = this.get()
@@ -921,12 +939,13 @@ class Transform
 	{
 		// m_body
 		let m_body_init = this.m_parent_to_body
+	
 		if( this.obj_parent != null )
 			 m_body_init = this.m_parent_to_body.getMult(this.obj_parent.trsf.get())
 		return m_body_init		
 	}
 
-	get()
+	get( )
 	{
 		// m_body
 		let m_body_init = this.get_body()
@@ -935,6 +954,18 @@ class Transform
 
 		
 		return m_body_modified
+	}
+
+	get_local()
+	{
+		// m_body
+		let m_body_init = this.m_parent_to_body
+		// m_body_dyn
+		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
+
+
+		return m_body_modified		
+
 	}
 
 	

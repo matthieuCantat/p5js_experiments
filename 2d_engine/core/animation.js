@@ -95,6 +95,7 @@ class Animation
         'linear', // direction of the other key
         'flat', // flat 
         'neighbor', // direction between next - prev
+        'step',//no intepolation
     ]
 
     static tangeant_length_modes = [
@@ -128,12 +129,51 @@ class Animation
 
         for( let obj_name in this.anim_data_baked['values'] )
         {
-            let values = this.anim_data_baked['values'][obj_name][_t]
-            let m = this.Game_engine.Objs[obj_name].trsf.get()
-            m.setWithTransformAttr( values  )
-            this.Game_engine.Objs[obj_name].trsf.set(m)
-        }
+            let raw_values = this.anim_data_baked['values'][obj_name][_t]
+
+            if( raw_values === undefined )
+                continue
+
+            let m = this.Game_engine.Objs[obj_name].trsf.get_local()
+            m.setWithTransformAttr( raw_values  )
+            this.Game_engine.Objs[obj_name].trsf.set_local(m)
             
+            if( raw_values.visibility !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_visibility =raw_values.visibility !== 0
+            }
+
+            if( raw_values.colorX !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[0] = raw_values.colorX               
+            }
+            
+            if( raw_values.colorY !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[1] = raw_values.colorY              
+            }
+            
+            if( raw_values.colorZ !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[2] = raw_values.colorZ              
+            }
+
+            if( raw_values.colorStrokeX !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[0] = raw_values.colorStrokeX               
+            }
+            
+            if( raw_values.colorStrokeY !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[1] = raw_values.colorStrokeY              
+            }
+            
+            if( raw_values.colorStrokeZ !== undefined)
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[2] = raw_values.colorStrokeZ           
+            }            
+        }
+        
        
         this.t += 1
     }
@@ -151,10 +191,20 @@ async function bake_animation( anim_data )
         range : [ 999999, 0 ],
         values : {},
     }
+    let default_settings = {
+        "in_tan" : { 
+            "orient" : anim_data.default_settings.in_tan.orient, 
+            "length" : anim_data.default_settings.in_tan.length },
+        "out_tan" : { 
+            "orient" : anim_data.default_settings.out_tan.orient, 
+            "length" : anim_data.default_settings.out_tan.length },
+    }
 
     
     for( let obj in anim_data )
     {
+        if( obj === 'default_settings')
+            continue
         for( let attr in anim_data[obj] )
             {
                 attr_to_range[attr] = [ 999999, 0 ]
@@ -175,6 +225,9 @@ async function bake_animation( anim_data )
     
     for( let obj in anim_data )
     {
+        if( obj === 'default_settings')
+            continue
+
         anim_data_baked['values'][obj] = []
         let attr_to_anim = {}
         for( let attr in anim_data[obj] )
@@ -184,11 +237,11 @@ async function bake_animation( anim_data )
             let anim = []
             for( let i = 1 ; i < anim_data[obj][attr].length ; i++ )
             {
-
-                // BEFORE
                 let _range = anim_data[obj][attr][i].t - anim_data[obj][attr][i-1].t
+                
                 let pA = new Vector2d(anim_data[obj][attr][i-1].t, anim_data[obj][attr][i-1].v)
                 let pB = new Vector2d(anim_data[obj][attr][i].t, anim_data[obj][attr][i].v)
+                
                 let pA_before = null
                 if( 1 < i )
                     pA_before = new Vector2d(anim_data[obj][attr][i-2].t, anim_data[obj][attr][i-2].v)
@@ -197,13 +250,65 @@ async function bake_animation( anim_data )
                 if( i < anim_data[obj][attr].length -1 )
                     pB_after = new Vector2d(anim_data[obj][attr][i+1].t, anim_data[obj][attr][i+1].v)
 
+
+                // TANGEANT INFO
+
+                let out_tan_info = anim_data[obj][attr][i-1].out_tan
+                let out_tan = {}
+                if( out_tan_info === undefined ){
+                    out_tan = default_settings.out_tan
+                }
+                else{
+                    for( let attr in out_tan_info)
+                    {
+                        if( out_tan_info.attr === undefined)
+                            out_tan[attr] = default_settings.out_tan.attr
+                        else
+                            out_tan[attr] = out_tan_info.attr
+                    }
+                }
+
+                let in_tan_info = anim_data[obj][attr][i].in_tan
+                let in_tan = {}
+                if( in_tan_info === undefined ){
+                    in_tan = default_settings.in_tan
+                }
+                else{
+                    for( let attr in in_tan_info)
+                    {
+                        if( in_tan_info.attr === undefined)
+                            in_tan[attr] = default_settings.in_tan.attr
+                        else
+                        in_tan[attr] = in_tan_info.attr
+                    }
+                }                    
+                if( (out_tan.orient === 'step')||(in_tan.orient === 'step') )
+                {
+                    for( let i = 0 ; i < _range; i++)
+                    {
+                        anim.push(pA.y)
+                    }
+                    continue
+                }
+                if( (out_tan.orient === 'linear')&&(in_tan.orient === 'linear') )
+                    {
+                        for( let i = 0 ; i < _range; i++)
+                        {
+                            let coef = i/(_range-1)
+                            anim.push(pA.y * ( 1 - coef)  + pB.y * coef)
+                        }
+                        continue
+                    }
+
+                // BEFORE
+
                 let tanA = build_tangeant( 
                     false,
                     pA, 
                     pB, 
                     pA_before, 
                     pB_after, 
-                    anim_data[obj][attr][i-1].in_tan )
+                    out_tan )
 
                 let tanB  = build_tangeant( 
                     true,
@@ -211,7 +316,7 @@ async function bake_animation( anim_data )
                     pB, 
                     pA_before, 
                     pB_after, 
-                    anim_data[obj][attr][i].in_tan )
+                    in_tan )
 
                 let out_values = hermite_interpolation(
                     pA,
@@ -345,7 +450,7 @@ function hermite2D(p0, p1, m0, m1, t) {
 
 
 function build_tangeant( 
-    is_out_tangeant,
+    is_inverse_tangeant,
     pA, 
     pB, 
     pA_before, 
@@ -357,7 +462,7 @@ function build_tangeant(
     
     let coef = 1
     let pOutside = pA_before
-    if( is_out_tangeant)
+    if( is_inverse_tangeant)
     {
         p = pB
         v = pA.getSub( pB )

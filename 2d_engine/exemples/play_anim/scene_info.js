@@ -54,7 +54,7 @@ export var scene_info = {
 			"shapes" : [
 				{
 					"m": [0, -200, 0, 10, 50],
-					"color": "red",
+					"color": [255,0,0],
 					"type": "rectangle",
 					"stroke_color":"black",
 					"stroke_width":1,
