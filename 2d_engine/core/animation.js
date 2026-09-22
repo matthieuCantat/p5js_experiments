@@ -4,6 +4,7 @@ import Vector2d from '../utils/vector2d.js';
 
 var anim_to_baked = { 
     "body_jump_happy":null,
+    "windmill_idle":null,
 }
 
 /*
@@ -198,9 +199,10 @@ async function bake_animation( anim_data )
         "out_tan" : { 
             "orient" : anim_data.default_settings.out_tan.orient, 
             "length" : anim_data.default_settings.out_tan.length },
+        "loop" : anim_data.default_settings.loop,
     }
 
-    
+
     for( let obj in anim_data )
     {
         if( obj === 'default_settings')
@@ -219,6 +221,37 @@ async function bake_animation( anim_data )
                 anim_data_baked['range'][1] = Math.max(anim_data_baked['range'][1], attr_to_range[attr][1] )            
             }
     }
+            
+    
+
+    if( ( default_settings.loop !== undefined )&&( 0 < default_settings.loop ) )
+    {
+        let range_delta = anim_data_baked['range'][1] - anim_data_baked['range'][0]
+
+        for( let iter = 0 ; iter < default_settings.loop ; iter++)
+        {
+            for( let obj in anim_data )
+            {
+                if( obj === 'default_settings')
+                    continue
+                for( let attr in anim_data[obj] )
+                {
+                    let range_delta_attr = attr_to_range[attr][1] - attr_to_range[attr][0]
+                    let size = anim_data[obj][attr].length
+                    for( let i = 0 ; i < size ; i++ )
+                    {
+                        let t = anim_data[obj][attr][i].t + range_delta_attr * (iter+1)
+                        let v = anim_data[obj][attr][i].v
+                        anim_data[obj][attr].push( { "t" : t , "v" : v } )    
+                    }
+                    
+                }
+            }
+        }
+
+        anim_data_baked['range'][1] = anim_data_baked['range'][1] + range_delta * default_settings.loop
+    }
+
     
 
     

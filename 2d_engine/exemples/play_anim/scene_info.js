@@ -125,21 +125,6 @@ scene_info.eventActions.push(
                 },
                 duration : 1,
             },
-            /*
-            duration : {
-                in_args : [ 'pos' ],
-                fn : (obj) => {
-                    let p = obj.trsf.get().get_row(2)
-					// POSITION BASED
-					let volume =  (p.y +300)/600;
-					let lowPass = (p.x +200)/400*1500;
-
-
-                    obj.Game_engine.Sound.modif( `gain_whiteSound`,{ volume : volume, lowPass : lowPass } ); //"sfx_wii_short_tick_02"
-                },
-                duration : 1,
-            },
-            */
             end : {}
         },
 

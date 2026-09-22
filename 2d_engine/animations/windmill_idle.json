@@ -1,0 +1,24 @@
+
+
+{
+    "default_settings":
+    {
+        "in_tan" : { "orient" : "flat", "length" : "auto4"},
+        "out_tan" : { "orient" : "flat", "length" : "auto4"},
+        "loop" : 10
+    },
+    "root" : {
+        "translateY" : [
+            { "t" : 0 , "v" : 0 },
+            { "t" : 25 , "v" : 10 },
+            { "t" : 75 , "v" : -10 },
+            { "t" : 100 , "v" : 0 }
+        ],
+        "rotate" : [
+            { "t" : 0 , "v" : 0 },
+            { "t" : 200 , "v" : 360 },
+            { "t" : 400 , "v" : 0 },
+            { "t" : 500 , "v" : 0 }
+        ]
+    }
+}
