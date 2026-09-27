@@ -238,7 +238,7 @@ async function bake_animation( anim_data )
                 {
                     let range_delta_attr = attr_to_range[attr][1] - attr_to_range[attr][0]
                     let size = anim_data[obj][attr].length
-                    for( let i = 0 ; i < size ; i++ )
+                    for( let i = 1 ; i < size ; i++ )
                     {
                         let t = anim_data[obj][attr][i].t + range_delta_attr * (iter+1)
                         let v = anim_data[obj][attr][i].v
@@ -490,18 +490,25 @@ function build_tangeant(
     pB_after, 
     tan_info )
 {
-    let p = pA
-    let v = pB.getSub( pA )
-    
-    let coef = 1
-    let pOutside = pA_before
+    var p = null
+    var pTarget = null    
+    var pOutside = null
+    var coef = null
+
     if( is_inverse_tangeant)
     {
         p = pB
-        v = pA.getSub( pB )
-        coef = -1
+        pTarget = pA
         pOutside = pB_after
+        coef = -1   
+    }else{
+        p = pA
+        pTarget = pB    
+        pOutside = pA_before
+        coef = 1        
     }
+
+    let v = pTarget.getSub( p )
         
 
     // ORIENT
@@ -519,7 +526,7 @@ function build_tangeant(
         if( pOutside !== null )
         {
             
-            tanA = p.getSub(pOutside)
+            tanA = pTarget.getSub(pOutside)
             tanA.normalize()
             tanA.mult(v.mag())
         }
@@ -553,6 +560,11 @@ function build_tangeant(
         tanA.normalize()
         tanA.mult(tan_info.length)
     }
+
+    if( is_inverse_tangeant )
+        console.log(`start t:${p.x} v:${p.y} -> ${tanA.getRotationDeg()}`)
+    else
+        console.log(`end   t:${p.x} v:${p.y} -> ${tanA.getRotationDeg()}`)    
 
     return tanA
 }

@@ -245,11 +245,14 @@ export function draw_background_text(text,p,color,size)
 
 export function draw_line( 
 	ctx, 
-	{ points = [] , stroke_color = 'red', lineWidth = 5 }
+	{ m = null,
+		points = [] , 
+		stroke_color = 'red', 
+		lineWidth = 5 }
 
 )
 {
-	
+	console.log( 'line', points.length, lineWidth)	
     //ctx.save()
 	ctx.beginPath()
 	//ctx.color = [1,0,0]
@@ -260,12 +263,26 @@ export function draw_line(
 	if ( points.length == 0)
 		return 
 
-	ctx.moveTo( cX(points[0]), cY(points[0]) );
-	for( let i = 1; i < points.length; i++)
-		ctx.lineTo( cX(points[i]), cY(points[i]) )
+	let points_worlds = []
+	if( m === null ){
+		points_worlds = points
+	}
+	else{
+		
+		for( let i = 0; i < points.length; i++ )
+		{
+			points_worlds.push( points[i].getMult(m).getAdd(m.get_row(2)) )
+		}
+	}
+	
+
+	ctx.moveTo( cX(points_worlds[0]), cY(points_worlds[0]) );
+	for( let i = 1; i < points_worlds.length; i++)
+		ctx.lineTo( cX(points_worlds[i]), cY(points_worlds[i]) )
 
 	//ctx.stroke();
     //ctx.restore()
+	//ctx.closePath();
     
 }
 
@@ -383,16 +400,24 @@ export function draw_circle_from_matrix(ctx, { m = null, draw_mark=true })
 export function draw_triangle(ctx, { m = null } )
 {
 	let vA = new Vector2d(0,1)
-	let vB = vA.getRotated(3.14*2/3)
-	let vC = vA.getRotated(-3.14*2/3)
+	let vB = vA.getRotatedRad(3.14*2/3)
+	let vC = vA.getRotatedRad(-3.14*2/3)
 
 	vA.normalize()
 	vB.normalize()
 	vC.normalize()
 	
-	let pA = vA.getMult(m)
-	let pB = vB.getMult(m)
-	let pC = vC.getMult(m)
+	let vA_scaled = vA.getMult(m)
+	let vB_scaled = vB.getMult(m)
+	let vC_scaled = vC.getMult(m)
+	
+	let p = m.get_row(2)
+
+	let pA = vA_scaled.getAdd(p)
+	let pB = vB_scaled.getAdd(p)
+	let pC = vC_scaled.getAdd(p)
+	
+
 
 	//let vBCenter = pB.getSub(p)
 	//vY.normalize().mult(vBCenter.mag())
@@ -410,9 +435,10 @@ export function draw_triangle(ctx, { m = null } )
 export function draw_star(ctx, 
 	{ m = null,
 	nbr_branches=5, 
-	radius_hole_from_radius=0.4 })
+	radius_hole_from_radius=0.4 }
+)
 {
-
+	
 	
 	let vUp = new Vector2d(0,1)
 	let angle_unit = 3.14*2/(nbr_branches*2)
@@ -420,7 +446,7 @@ export function draw_star(ctx,
 	for( let i = 0; i < nbr_branches*2; i++ )
 	{
 		
-		let v = vUp.getRotated(angle_unit*i)
+		let v = vUp.getRotatedRad(angle_unit*i)
 		v.normalize()
 		if(i%2 !== 0)	
 			v.mult(radius_hole_from_radius)
@@ -431,7 +457,7 @@ export function draw_star(ctx,
 	ctx.beginPath();
 	for( let i = 0; i < local_vectors.length; i++ )
 	{
-		let p = local_vectors[i].getMult(m)
+		let p = local_vectors[i].getMult(m).getAdd( m.get_row(2) )
 
 		if( i == 0 )
 			ctx.moveTo(cX(p), cY(p))
@@ -457,8 +483,8 @@ export function draw_cross(ctx,
 	let local_vectors = []
 	for( let i = 0; i < 4; i++ )
 	{	
-		let vX_rotated = vX.getRotated(angle_unit*i)
-		let vY_rotated = vY.getRotated(angle_unit*i)
+		let vX_rotated = vX.getRotatedRad(angle_unit*i)
+		let vY_rotated = vY.getRotatedRad(angle_unit*i)
 		vX_rotated.normalize()
 		vY_rotated.normalize()		
 		let vX_rotated_min = vX_rotated.getMult(thickness)
@@ -474,7 +500,7 @@ export function draw_cross(ctx,
 	ctx.beginPath();
 	for( let i = 0; i < local_vectors.length; i++ )
 	{
-		let p = local_vectors[i].getMult(m)
+		let p = local_vectors[i].getMult(m).getAdd( m.get_row(2) )
 
 		if( i == 0 )
 			ctx.moveTo(cX(p), cY(p))
@@ -487,28 +513,32 @@ export function draw_cross(ctx,
 }
 
 
-export function draw_star_classic(ctx,m)
+export function draw_star_classic(ctx,{ m = null})
 {
-	draw_star(ctx,
-		m, 
-		5, 
-		0.4)
+	
+	draw_star(ctx,{
+		m : m,
+		nbr_branches : 5,
+		radius_hole_from_radius : 0.4}
+	)
 }
 
-export function draw_star_ai(ctx,m)
+export function draw_star_ai(ctx,{ m = null})
 {
-	draw_star(ctx,
-		m, 
-		4, 
-		0.25)
+	draw_star(ctx,{
+		m : m,
+		nbr_branches : 4,
+		radius_hole_from_radius : 0.25}
+	)
 }
 
-export function draw_star_realistic(ctx,m)
+export function draw_star_realistic(ctx,{ m = null})
 {
-	draw_star(ctx,
-		m, 
-		6, 
-		0.1)
+	draw_star(ctx,{
+		m : m,
+		nbr_branches : 6,
+		radius_hole_from_radius : 0.1}
+	)
 }
 
 
@@ -532,14 +562,14 @@ export function draw_trapezoid(ctx, { m = null, sub_draw = false })
 	let dist_axeY = vY.mag()*2
 
 	let vAD = pD.getSub(pA)
-	vAD.rotate(ANGLE)
+	vAD.rotateDeg(-ANGLE)
 	vAD.normalize()
 	let dist_AD = dist_axeY / Math.cos(radian(ANGLE))
 	vAD.mult(dist_AD)
 	let pD_trap = pA.getAdd(vAD)
 
 	let vBC = pC.getSub(pB)
-	vBC.rotate(-ANGLE)
+	vBC.rotate(ANGLE)
 	vBC.normalize()
 	let dist_BC = dist_axeY / Math.cos(radian(-ANGLE))
 	vBC.mult(dist_BC)

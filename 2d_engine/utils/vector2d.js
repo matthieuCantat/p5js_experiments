@@ -20,6 +20,8 @@ function round( value, decimals )
   return Math.round(value * factor) / factor;
 }
 
+var VECTOR_UP = null
+
 export default class Vector2d
 { 
     constructor(x,y)
@@ -106,13 +108,18 @@ export default class Vector2d
         
         return angle
     }    	
-    getRotationDeg(vOther, clockwise = true)
+    getRotationDeg(vOther = null, clockwise = true)
     {
+        if( vOther === null)
+            return deg( this.getRotationRad(VECTOR_UP, clockwise))
+
         return deg( this.getRotationRad(vOther, clockwise))
     }
 		
-    getRotation(vOther, clockwise = true)
+    getRotation(vOther = null, clockwise = true)
     {
+        if( vOther === null)
+            return this.getRotationRad(VECTOR_UP, clockwise)
         return this.getRotationDeg(vOther, clockwise)
     }
 
@@ -397,3 +404,6 @@ export default class Vector2d
 	}
         */	
 };
+
+
+VECTOR_UP = new Vector2d(0,1)

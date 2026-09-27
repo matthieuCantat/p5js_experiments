@@ -135,6 +135,7 @@ export class Render
             ctx.restore();
             return false
         }		
+        
         drawFunction( ctx, draw_args );
         
         // RENDER

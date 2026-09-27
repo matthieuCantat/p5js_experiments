@@ -652,6 +652,7 @@ export class body
 					color : this.shapes_dynamic_data[i].color,
 					stroke_color : this.shapes_dynamic_data[i].stroke_color, 
 					stroke_width : this.shapes_dynamic_data[i].stroke_width,   	
+					points: this.args.shapes[i].points,
 				}
 			)
 		}
