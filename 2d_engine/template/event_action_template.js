@@ -472,3 +472,58 @@ return [
     ]
 
 }
+
+
+export function get_swipe_navigation( file_left, file_right )
+{
+    return [
+
+    {
+        event : {
+            start : {
+                in_args : [ '_bg_center' ],
+                fn : (obj) => {return obj.Event.data.user['swipeLeft'].status;}
+            },
+            end : null,
+            max_duration : 1,
+        },
+        action : {
+            
+            start : {
+                in_args : [ ],
+                fn : () => {
+                    console.log('<<<< PREVIOUS PAGE')
+                    window.location.assign(`../${file_left}/index.html`);
+                },
+                duration : 1,
+            },	
+            end : {},
+        },
+
+    },         
+    {
+        event : {
+            start : {
+                in_args : [ '_bg_center' ],
+                fn : (obj) => {return obj.Event.data.user['swipeRight'].status;}
+            },
+            end : null,
+            max_duration : 1,
+        },
+        action : {
+            
+            start : {
+                in_args : [  ],
+                fn : () => {
+                    console.log('NEXT PAGE >>>>')
+                    window.location.assign(`../${file_right}/index.html`);
+                },
+                duration : 1,
+            },	
+            end : {},
+        },
+
+    },
+                 
+    ]
+}

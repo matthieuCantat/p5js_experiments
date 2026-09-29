@@ -1,7 +1,7 @@
 import Vector2d from '../../utils/vector2d.js';
 import Matrix2d from '../../utils/matrix2d.js';
 import { COLORS } from '../../utils/draw.js'
-import { get_body_sfx } from '../../template/event_action_template.js';
+import { get_body_sfx, get_swipe_navigation } from '../../template/event_action_template.js';
 
 		
 export var scene_info = {
@@ -121,4 +121,9 @@ for( let i = 0; i < nbr; i++)
     aCurrent += aIncr
 }
 
+
+
+
+for( let info of get_swipe_navigation("play_anim","rotation_and_slide_interaction") )
+    scene_info.eventActions.push( info )
 

@@ -1,3 +1,6 @@
+import { get_body_sfx, get_swipe_navigation} from '../../template/event_action_template.js'
+
+
 export var scene_info = {
     "objs": {
         "ground": {
@@ -238,7 +241,7 @@ export var scene_info = {
             //}
         }
     },
-    "cns": []
+    "cns": [],
     //    {
     //        "mode": "instance",
     //        "objs": ["bicycle", "wheelA", "wheelB", "gear_pedals"],
@@ -258,5 +261,11 @@ export var scene_info = {
     //        "mult": -0.01
     //    }
     //]
+    eventActions:[],
               
 }
+
+
+
+for( let info of get_swipe_navigation("all_shapesA","event_spawn") )
+    scene_info.eventActions.push( info )

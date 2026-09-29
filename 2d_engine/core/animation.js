@@ -560,11 +560,11 @@ function build_tangeant(
         tanA.normalize()
         tanA.mult(tan_info.length)
     }
-
+    /*
     if( is_inverse_tangeant )
         console.log(`start t:${p.x} v:${p.y} -> ${tanA.getRotationDeg()}`)
     else
         console.log(`end   t:${p.x} v:${p.y} -> ${tanA.getRotationDeg()}`)    
-
+    */
     return tanA
 }

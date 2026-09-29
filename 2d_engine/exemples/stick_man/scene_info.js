@@ -1,3 +1,6 @@
+import { get_body_sfx, get_swipe_navigation } from '../../template/event_action_template.js';
+
+
 export var scene_info = {
     "objs": {
         "root": {
@@ -777,3 +780,9 @@ export var scene_info = {
   
               
 }
+
+
+
+
+for( let info of get_swipe_navigation("sound_variation","all_shapesA") )
+	scene_info.eventActions.push( info )

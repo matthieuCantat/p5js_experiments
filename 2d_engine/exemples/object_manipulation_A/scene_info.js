@@ -1,4 +1,5 @@
 import { get_body_sfx } from '../../template/event_action_template.js'
+import { get_body_sfx, get_swipe_navigation} from '../../template/event_action_template.js'
 
 export var scene_info = {
     "objs":{
@@ -46,6 +47,5 @@ for( let info of get_body_sfx('obj') )
 
 
 
-
-
-		
+for( let info of get_swipe_navigation("event_spawn","play_anim") )
+  scene_info.eventActions.push( info )

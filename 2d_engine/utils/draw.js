@@ -252,7 +252,7 @@ export function draw_line(
 
 )
 {
-	console.log( 'line', points.length, lineWidth)	
+	//console.log( 'line', points.length, lineWidth)	
     //ctx.save()
 	ctx.beginPath()
 	//ctx.color = [1,0,0]
