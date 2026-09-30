@@ -776,7 +776,8 @@ export var scene_info = {
             }    
         },                                
     },
-    "cns": []
+    "cns": [],
+    eventActions : [],
   
               
 }

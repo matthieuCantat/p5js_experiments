@@ -6,6 +6,7 @@ import { get_body_sfx, get_swipe_navigation } from '../../template/event_action_
 export var scene_info = {
     "objs":{},
     "cns":[],
+    eventActions : [],
 }
 
 

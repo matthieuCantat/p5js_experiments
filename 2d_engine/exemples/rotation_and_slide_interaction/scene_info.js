@@ -303,6 +303,7 @@ export var scene_info = {
 			 		 
 	],	
 	
+	eventActions : [],
 						
 }
 
