@@ -138,5 +138,5 @@ scene_info.eventActions.push(
 
 
 
- for( let info of get_swipe_navigation("object_manipulation_A","rotate_cns_axe") )
+ for( let info of get_swipe_navigation("object_manipulation_A","rotate_cns_axe", scene_info.objs) )
     scene_info.eventActions.push( info )

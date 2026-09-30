@@ -47,5 +47,5 @@ for( let info of get_body_sfx('obj') )
 
 
 
-for( let info of get_swipe_navigation("event_spawn","play_anim") )
+for( let info of get_swipe_navigation("event_spawn","play_anim", scene_info.objs) )
   scene_info.eventActions.push( info )

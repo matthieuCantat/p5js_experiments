@@ -83,6 +83,6 @@ for( let j = 0; j <scales.length; j++)
 
 
 
-for( let info of get_swipe_navigation("stick_man","cns_bicycle") )
+for( let info of get_swipe_navigation("stick_man","cns_bicycle", scene_info.objs) )
     scene_info.eventActions.push( info )
 

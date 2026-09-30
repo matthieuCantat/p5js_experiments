@@ -309,6 +309,6 @@ for( let i = 0; i < settings_list.length; i++)
 
 
 
-for( let info of get_swipe_navigation("rotation_and_slide_interaction","sound_variation") )
+for( let info of get_swipe_navigation("rotation_and_slide_interaction","sound_variation",scene_info.objs) )
     scene_info.eventActions.push( info )
 

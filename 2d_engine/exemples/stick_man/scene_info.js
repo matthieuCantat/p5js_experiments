@@ -785,5 +785,5 @@ export var scene_info = {
 
 
 
-for( let info of get_swipe_navigation("sound_variation","all_shapesA") )
+for( let info of get_swipe_navigation("sound_variation","all_shapesA",scene_info.objs) )
 	scene_info.eventActions.push( info )

@@ -124,6 +124,6 @@ for( let i = 0; i < nbr; i++)
 
 
 
-for( let info of get_swipe_navigation("play_anim","rotation_and_slide_interaction") )
+for( let info of get_swipe_navigation("play_anim","rotation_and_slide_interaction",scene_info.objs) )
     scene_info.eventActions.push( info )
 

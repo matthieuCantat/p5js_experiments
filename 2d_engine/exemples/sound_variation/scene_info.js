@@ -681,5 +681,5 @@ scene_info.eventActions.push(
 
 
 
-for( let info of get_swipe_navigation("slide_behaviorA","stick_man") )
+for( let info of get_swipe_navigation("slide_behaviorA","stick_man",scene_info.objs) )
 	scene_info.eventActions.push( info )

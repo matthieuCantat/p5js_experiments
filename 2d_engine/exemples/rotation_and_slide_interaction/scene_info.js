@@ -309,6 +309,6 @@ export var scene_info = {
 
 
 
-for( let info of get_swipe_navigation("rotate_cns_axe","slide_behavior_A") )
+for( let info of get_swipe_navigation("rotate_cns_axe","slide_behavior_A",scene_info.objs) )
     scene_info.eventActions.push( info )
 

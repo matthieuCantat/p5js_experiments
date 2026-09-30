@@ -474,56 +474,72 @@ return [
 }
 
 
-export function get_swipe_navigation( file_left, file_right )
+export function get_swipe_navigation( file_left, file_right, objs_to_add )
 {
-    return [
+    let BACKGROUND_OBJS_NAMES = ['_bg_center','_bg_left','_bg_right','_bg_up','_bg_down']
+    
+    let objs_names = BACKGROUND_OBJS_NAMES
 
-    {
-        event : {
-            start : {
-                in_args : [ '_bg_center' ],
-                fn : (obj) => {return obj.Event.data.user['swipeLeft'].status;}
-            },
-            end : null,
-            max_duration : 1,
-        },
-        action : {
-            
-            start : {
-                in_args : [ ],
-                fn : () => {
-                    console.log('<<<< PREVIOUS PAGE')
-                    window.location.assign(`../${file_left}/index.html`);
+    
+    if( objs_to_add !== null )
+        for( let obj in objs_to_add )
+            objs_names.push(obj)
+
+    
+    let eventActions = []
+    eventActions.push(
+        {
+            event : {
+                start : {
+                    in_args : [ '_bg_center' ],
+                    fn : (obj) => {return obj.Event.data.user['swipeLeft'].status;}
                 },
-                duration : 1,
-            },	
-            end : {},
-        },
-
-    },         
-    {
-        event : {
-            start : {
-                in_args : [ '_bg_center' ],
-                fn : (obj) => {return obj.Event.data.user['swipeRight'].status;}
+                end : null,
+                max_duration : 1,
             },
-            end : null,
-            max_duration : 1,
-        },
-        action : {
-            
-            start : {
-                in_args : [  ],
-                fn : () => {
-                    console.log('NEXT PAGE >>>>')
-                    window.location.assign(`../${file_right}/index.html`);
-                },
-                duration : 1,
-            },	
-            end : {},
-        },
+            action : {
+                
+                start : {
+                    in_args : [ ],
+                    fn : () => {
+                        console.log('<<<< PREVIOUS PAGE')
+                        window.location.assign(`../${file_left}/index.html`);
+                    },
+                    duration : 1,
+                },	
+                end : {},
+            },
+    
+        }
+    )
 
-    },
-                 
-    ]
+    
+    eventActions.push(
+        {
+            event : {
+                start : {
+                    in_args : [ '_bg_center' ],
+                    fn : (obj) => {return obj.Event.data.user['swipeRight'].status;}
+                },
+                end : null,
+                max_duration : 1,
+            },
+            action : {
+                
+                start : {
+                    in_args : [  ],
+                    fn : () => {
+                        console.log('NEXT PAGE >>>>')
+                        window.location.assign(`../${file_right}/index.html`);
+                    },
+                    duration : 1,
+                },	
+                end : {},
+            },
+    
+        }            
+    )
+
+
+    return eventActions
 }
