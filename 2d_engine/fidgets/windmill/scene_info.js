@@ -435,7 +435,7 @@ export var scene_info = {
                 "speed_limit_rotate": 0.3
             },
         },   
-        "trap_upLeft": {
+        "trap_topLeft": {
             "m": [-50, 50, -45, 55, 10],
             "parent":"root",
             shapes : [

@@ -546,7 +546,7 @@ export function draw_star_realistic(ctx,{ m = null})
 
 export function draw_trapezoid(ctx, { m = null, sub_draw = false })
 {
-	let ANGLE = 45
+	let ANGLE = -45
 
 	let p = m.get_row(2)
 	let vX = m.get_row(0)

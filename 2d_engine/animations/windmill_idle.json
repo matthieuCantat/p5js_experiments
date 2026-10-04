@@ -5,7 +5,7 @@
     {
         "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
         "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "loop" : 2
+        "loop" : 10
     },
     "root" : {
         "translateY" : [
@@ -15,11 +15,62 @@
             { "t" : 75  , "v" : -100 },
             { "t" : 100 , "v" : 0 }            
         ],
-        "_rotate" : [
+        "_translateX" : [
+            { "t" : 0   , "v" : 0 },
+            { "t" : 40  , "v" : 10 },
+            { "t" : 80  , "v" : 0 },
+            { "t" : 120  , "v" : -10 },
+            { "t" : 160 , "v" : 0 }            
+        ],
+        "rotate" : [
             { "t" : 0 , "v" : 0 },
-            { "t" : 200 , "v" : 360 },
-            { "t" : 400 , "v" : 0 },
-            { "t" : 500 , "v" : 0 }
+            { "t" : 100 , "v" : 180 },
+            { "t" : 200 , "v" : 0 }
+        ]
+    },
+    "rectangle_translate_top" : {
+        "translateY" : [
+            { "t" : 0   , "v" : 0 },
+            { "t" : 25  , "v" : 30 },
+            { "t" : 75  , "v" : 30 },
+            { "t" : 90 , "v" : 0 },          
+            { "t" : 125 , "v" : 0 }  
+        ]
+    },
+    "rectangle_translate_left" : {
+        "translateX" : [
+            { "t" : 0   , "v" : 0 },
+            { "t" : 25  , "v" : 30 },
+            { "t" : 75  , "v" : 30 },
+            { "t" : 90 , "v" : 0 },          
+            { "t" : 125 , "v" : 0 }  
+        ]
+    },
+    "rectangle_translate_down" : {
+        "translateY" : [
+            { "t" : 0   , "v" : 0 },
+            { "t" : 25  , "v" : -30 },
+            { "t" : 75  , "v" : -30 },
+            { "t" : 90 , "v" : 0 },          
+            { "t" : 125 , "v" : 0 }  
+        ]
+    },
+    "rectangle_translate_right" : {
+        "translateX" : [
+            { "t" : 0   , "v" : 0 },
+            { "t" : 25  , "v" : -30 },
+            { "t" : 75  , "v" : -30 },
+            { "t" : 90 , "v" : 0 },          
+            { "t" : 125 , "v" : 0 }  
+        ]
+    },
+    "trap_topLeft": {
+        "_translateY" : [
+            { "t" : 0   , "v" : 0 },
+            { "t" : 50  , "v" : 30 },
+            { "t" : 75  , "v" : 30 },
+            { "t" : 90 , "v" : 0 },          
+            { "t" : 125 , "v" : 0 }  
         ]
     }
 }
