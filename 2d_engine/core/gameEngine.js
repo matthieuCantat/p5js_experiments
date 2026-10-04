@@ -46,8 +46,25 @@ export class gameEngine {
 
 
         // BACKGROUND
-       
+    }
 
+
+	loop(){
+		this.update();
+		this.draw();
+		requestAnimationFrame(this.loop.bind(this));
+	}
+
+	async launch(scene_info){
+		this.setup();
+		await this.load_libs()
+		this.load_scene(scene_info);
+		this.loop();
+	}    
+
+    async load_libs()
+    {
+        await this.Animation.init()
     }
 
     load_scene( scene_info )
@@ -409,6 +426,9 @@ export class gameEngine {
        
                 
     }
+
+
+
     
 }
 

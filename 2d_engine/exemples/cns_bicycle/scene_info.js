@@ -267,5 +267,5 @@ export var scene_info = {
 
 
 
-for( let info of get_swipe_navigation("all_shapesA","event_spawn", scene_info.objs) )
+for( let info of get_swipe_navigation("all_shapesA","curve_editor", scene_info.objs) )
     scene_info.eventActions.push( info )

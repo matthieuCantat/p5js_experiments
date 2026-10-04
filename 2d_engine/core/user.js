@@ -397,8 +397,11 @@ class Observer{
 	setup(doc)
 	{
 		logger.info("Observer setup")
-
+		if (document.readyState === "complete")
+			console.error("Already loaded cannot init Observer");
+		//console.log("Observer setup")
 		globalThis.window.onload = () => {this.setup_listeners(doc);}
+		//window.onload = () => {console.log("onLoad");}
 	}
 
 	setup_listeners(doc)
@@ -413,7 +416,6 @@ class Observer{
 
 	fill_from_event(event, interaction_type, action )
 	{
-		
 		// skip on computer if mouse move without interaction
 		let mouse_move = (( interaction_type == 'mouse')&&( action == 'move'))
 		let mouse_move_across_screen_without_interaction = (( mouse_move)&&(this.p == null))

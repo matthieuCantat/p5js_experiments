@@ -32,7 +32,7 @@ canvas.height = window.innerHeight - 20;
 
 // Create an offscreen canvas
 export const backgroundCanvas = document.getElementById("backgroundCanvas");
-console.log('backgroundCanvas',backgroundCanvas)
+//console.log('backgroundCanvas',backgroundCanvas)
 const bgCtx = backgroundCanvas.getContext("2d");
 backgroundCanvas.width = canvas.width;
 backgroundCanvas.height = canvas.height;

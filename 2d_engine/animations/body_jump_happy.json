@@ -3,13 +3,13 @@
 {
     "default_settings":
     {
-        "in_tan" : { "orient" : "flat", "length" : "auto4"},
-        "out_tan" : { "orient" : "flat", "length" : "auto4"}
+        "in_tan" : { "orient" : "flat", "length" : "auto2"},
+        "out_tan" : { "orient" : "flat", "length" : "auto2"}
     },
     "body_A" : {
         "translateY" : [
-            { "t" : 5 , "v" : -200},
-            { "t" : 50 , "v" : 300},
+            { "t" : 5   , "v" : -200},
+            { "t" : 50  , "v" : 300},
             { "t" : 100 , "v" : -200},
             { "t" : 200 , "v" : -200}
         ],

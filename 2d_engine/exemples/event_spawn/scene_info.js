@@ -262,5 +262,5 @@ for( let info of get_body_sfx('ROT') )
 
 
 
-for( let info of get_swipe_navigation("cns_bicycle","object_manipulation_A", scene_info.objs) )
+for( let info of get_swipe_navigation("curve_editor","object_manipulation_A", scene_info.objs) )
     scene_info.eventActions.push( info )

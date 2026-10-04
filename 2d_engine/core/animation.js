@@ -2,10 +2,6 @@
 import Vector2d from '../utils/vector2d.js';
 
 
-var anim_to_baked = { 
-    "body_jump_happy":null,
-    "windmill_idle":null,
-}
 
 /*
 // anim data
@@ -28,7 +24,12 @@ var anim_to_baked = {
 
 async function load_animation() {
 
-    for (const anim_name in anim_to_baked)
+    var anim_to_keys = { 
+        "body_jump_happy":null,
+        "windmill_idle":null,
+    }
+
+    for (const anim_name in anim_to_keys)
     {
         
         const url = `../../animations/${anim_name}.json`; // Replace with the path to your audio file
@@ -36,12 +37,12 @@ async function load_animation() {
         const response = await fetch(url);
         const anim = await response.json();
 
-        anim_to_baked[anim_name] = await bake_animation(anim)
+        anim_to_keys[anim_name] = anim//await bake_animation(anim)
     }
+
+    return anim_to_keys
 }
 
-// Load animation at startup
-load_animation();
 
 
 export class Animation_manager {
@@ -49,6 +50,13 @@ export class Animation_manager {
     constructor( Game_engine ) {
         this.played = {}
         this.Game_engine = Game_engine
+        this.anim_to_keys = null
+        this.anim_to_baked = null
+    }
+
+    async init() {
+        this.anim_to_keys = await load_animation()
+        this.anim_to_baked = await bake_animation_keys(this.anim_to_keys)
     }
     
     start( name,
@@ -56,7 +64,7 @@ export class Animation_manager {
             //fade_in_seconds = 0,
             //loop = false, }
         ){
-            this.played[name] = new Animation( this.Game_engine, anim_to_baked[animation_name])
+            this.played[name] = new Animation( this.Game_engine, this.anim_to_baked[animation_name])
             
     }
     
@@ -179,6 +187,20 @@ class Animation
         this.t += 1
     }
 
+}
+
+
+async function bake_animation_keys( anim_to_keys )
+{
+    
+        var anim_to_baked = {}
+        for (const anim_name in anim_to_keys)
+        {
+            let anim_data = anim_to_keys[anim_name]
+            let baked_anim = await bake_animation(anim_data)
+            anim_to_baked[anim_name] = baked_anim
+        }
+        return anim_to_baked
 }
 
 
@@ -317,21 +339,21 @@ async function bake_animation( anim_data )
                 }                    
                 if( (out_tan.orient === 'step')||(in_tan.orient === 'step') )
                 {
-                    for( let i = 0 ; i < _range; i++)
+                    for( let j = 0 ; j < _range; j++)
                     {
                         anim.push(pA.y)
                     }
                     continue
                 }
                 if( (out_tan.orient === 'linear')&&(in_tan.orient === 'linear') )
+                {
+                    for( let j = 0 ; j < _range; j++)
                     {
-                        for( let i = 0 ; i < _range; i++)
-                        {
-                            let coef = i/(_range-1)
-                            anim.push(pA.y * ( 1 - coef)  + pB.y * coef)
-                        }
-                        continue
+                        let coef = j/(_range)
+                        anim.push(pA.y * ( 1 - coef)  + pB.y * coef)
                     }
+                    continue
+                }
 
                 // BEFORE
 
@@ -356,13 +378,13 @@ async function bake_animation( anim_data )
                     pB,
                     tanA,
                     tanB,
-                    _range,
+                    _range+1,
                 )
                 
                 
 
-                for( let value of out_values )
-                    anim.push( value )
+                for( let j = 0 ; j < out_values.length-1; j++)
+                    anim.push( out_values[j] )
 
             }
 
@@ -428,6 +450,7 @@ function hermite_interpolation(
     //values.push(pA.y)
     for( let sample of samples )
         values.push( sample.y )
+    
     /*
     for( let i = 0 ; i < interpolation_range+2 ; i++ )
     {
@@ -466,6 +489,7 @@ function hermite2D(p0, p1, m0, m1, t) {
     const t2 = t * t;
     const t3 = t2 * t;
 
+
     // Cubic Hermite basis functions
     const h00 =  2 * t3 - 3 * t2 + 1;
     const h10 =      t3 - 2 * t2 + t;
@@ -490,10 +514,12 @@ function build_tangeant(
     pB_after, 
     tan_info )
 {
+    var MULT_TAN_LENGTH = 6.0
     var p = null
     var pTarget = null    
     var pOutside = null
     var coef = null
+
 
     if( is_inverse_tangeant)
     {
@@ -513,9 +539,10 @@ function build_tangeant(
 
     // ORIENT
     var tanA = null
+    
     if (tan_info.orient === 'flat')
     {
-        tanA = new Vector2d(v.mag()*coef,0)
+        tanA = new Vector2d(v.mag()*coef*MULT_TAN_LENGTH,0)
     }
     else if( tan_info.orient === 'linear' )
     {
@@ -528,7 +555,7 @@ function build_tangeant(
             
             tanA = pTarget.getSub(pOutside)
             tanA.normalize()
-            tanA.mult(v.mag())
+            tanA.mult(v.mag()*coef*MULT_TAN_LENGTH)
         }
         else
         {
@@ -538,10 +565,10 @@ function build_tangeant(
     }
     else
     {
-        tanA = new Vector2d(v.mag()*coef,0)
+        tanA = new Vector2d(v.mag()*coef*MULT_TAN_LENGTH,0)
         tanA.rotateDeg(tan_info.orient*coef)
     }
-
+    
     // LENGTH
     if (tan_info.length === 'auto4')
     {
@@ -560,11 +587,7 @@ function build_tangeant(
         tanA.normalize()
         tanA.mult(tan_info.length)
     }
-    /*
-    if( is_inverse_tangeant )
-        console.log(`start t:${p.x} v:${p.y} -> ${tanA.getRotationDeg()}`)
-    else
-        console.log(`end   t:${p.x} v:${p.y} -> ${tanA.getRotationDeg()}`)    
-    */
+        
+
     return tanA
 }

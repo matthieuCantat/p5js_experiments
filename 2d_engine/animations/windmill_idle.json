@@ -5,7 +5,7 @@
     {
         "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
         "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "loop" : 1
+        "loop" : 2
     },
     "root" : {
         "translateY" : [

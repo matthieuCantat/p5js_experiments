@@ -641,6 +641,41 @@ export class body
 		for( let i = 0; i < shapes_matrices.length; i++ )
 		{
 			
+			let points = this.args.shapes[i].points
+			if( typeof points === 'object' )
+			{
+				let data_type = Object.keys(points)[0]
+				if( data_type == 'baked_animation' )
+				{
+					let anim_name = points['baked_animation'][0]
+					let body_name = points['baked_animation'][1]
+					let anim_attr = points['baked_animation'][2]
+					
+					let anim = this.Game_engine.Animation.anim_to_baked[anim_name]
+					
+					let values = []
+					for( let j = 0; j < anim['values'][body_name].length; j++ )
+						values.push( new Vector2d( j, anim['values'][body_name][j][anim_attr] ) )
+
+					this.args.shapes[i].points = values
+				}	
+				if( data_type == 'animation_keys' )
+				{
+					let anim_name = points['animation_keys'][0]
+					let body_name = points['animation_keys'][1]
+					let anim_attr = points['animation_keys'][2]
+					
+					let anim = this.Game_engine.Animation.anim_to_keys[anim_name]
+					
+					let values = []
+					for( let j = 0; j < anim[body_name][anim_attr].length; j++ )
+						values.push( new Vector2d( anim[body_name][anim_attr][j].t, anim[body_name][anim_attr][j].v ) )
+
+					this.args.shapes[i].points = values
+				}			
+			}
+				
+			
 			
 			draw_info.push(
 				{
