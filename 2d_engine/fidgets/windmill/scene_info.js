@@ -1,562 +1,257 @@
-export var scene_info = {
+import { get_objs } from "../../template/scene_info_objs_utils.js";
 
-    "objs": {
-        "root": {
-            "m": [0, 0, 0, 18, 18],
-            shapes : [
-                {
-                    m : [0, 0, 0, 18, 18],
-                    color: "yellow",
-                    type : 'circle',
-                    stroke_color: "black",
-                    stroke_width: 1,
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [0, 0, 0, 18, 18],
-                    "type": "circle",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.1,
-                "rotate_resolution_priority": 0.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            "dyn_settings": {
-                "enable": false,
-                "friction_translate": 0.0001,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
+//____________________________OBJS HIERARCHY
+var hierarchy = {
+    "root": {
+        "m": [0,0,0,1,1],
+        "rectangle_rotate_top": {
+            "m": null,
+            "rectangle_translate_top" : {
+                "m": [0, 70, 0, 1, 1],
             },
         },
-        "rectangle_rotate_top": {
-            "m": [0, 0, 0, 1, 1],
-            "parent":"root",
-            interaction_shapes: [
-                {
-                    m : [0, 140, 0, 50, 50],
-                    "type": "rectangle",
-                }
-            ],
-            "shape_visibility": false,
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-0,0]],
-                rotate_limits: [-90,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },   
         "rectangle_rotate_left": {
-            "m": [0, 0, 0, 1, 1],
-            "parent":"root",
-            interaction_shapes: [
-                {
-                    m : [140, 0, 0, 50, 50],
-                    "type": "rectangle",
-                }
-            ],
-            "shape_visibility": false,
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-0,0]],
-                rotate_limits: [-0,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
+            "m": null,
+            "rectangle_translate_left": {
+                "m": [-70, 0, -90, 1, 1],
             },
         },
         "rectangle_rotate_down": {
-            "m": [0, 0, 0, 1, 1],
-            "parent":"root",
-            interaction_shapes: [
-                {
-                    m : [0, -140, 0, 50, 50],
-                    "type": "rectangle",
-                }
-            ],
-            "shape_visibility": false,
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
+            "m": null,
+            "rectangle_translate_down": {
+                "m": [0, -70, 180, 1, 1],
             },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-0,0]],
-                rotate_limits: [-270,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },   
+        },
         "rectangle_rotate_right": {
-            "m": [0, 0, 0, 1, 1],
-            "parent":"root",
-            interaction_shapes: [
-                {
-                    m : [-140, 0, 0, 50, 50],
-                    "type": "rectangle",
-                }
-            ],
-            "shape_visibility": false,
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-0,0]],
-                rotate_limits: [-180,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },  
-        "rectangle_translate_top": {
-            "m": [0, 0, 0, 50, 20],
-            "parent":"rectangle_rotate_top",
-            shapes : [
-                {
-                    m : [0, 70, 0, 8, 40],
-                    color: "white",
-                    type : 'rectangle',
-                    stroke_color: "black",
-                    stroke_width: 1,    
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [0, 70, 0, 8, 40],
-                    "type": "rectangle",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-0,70]],
-                rotate_limits: [0,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },   
-        "rectangle_translate_left": {
-            "m": [0, 0, 0, 50, 20],
-            "parent":"rectangle_rotate_left",
-            shapes : [
-                {
-                    m : [70, 0, 0, 40, 8],
-                    color: "white",
-                    type : 'rectangle',
-                    stroke_color: "black",
-                    stroke_width: 1,
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [70, 0, 0, 40, 8],
-                    "type": "rectangle",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,70],[-0,0]],
-                rotate_limits: [-170,170],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
+            "m": null,
+            "rectangle_translate_right": {
+                "m": [70, 0, 90, 1, 1],
             },
         },
-        "rectangle_translate_down": {
-            "m": [0, 0, 0, 20, 50],
-            "parent":"rectangle_rotate_down",
-            shapes : [
-                {
-                    m : [0, -70, 0, 8, 40],
-                    color: "white",
-                    type : 'rectangle',
-                    stroke_color: "black",
-                    stroke_width: 1,
-                }
-            ],
-            interaction_shapes: [   
-                {
-                    m : [0, -70, 0, 8, 40],
-                    "type": "rectangle",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-70,0]],
-                rotate_limits: [0,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },   
-        "rectangle_translate_right": {
-            "m": [0, 0, 0, 20, 50],
-            parent : "rectangle_rotate_right",
-            shapes : [
-                {
-                    m : [-70, 0, 0, 40, 8],
-                    color: "white",
-                    type : 'rectangle',
-                    stroke_color: "black",
-                    stroke_width: 1,
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [-70, 0, 0, 40, 8],
-                    "type": "rectangle",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[-70,0],[-0,0]],
-                rotate_limits: [0,0],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },          
-        "trap_topRight": {
-            "m": [50, 50, 45, 55, 10],
-            "parent":"root",
-            shapes : [
-                {
-                    m : [50, 50, 45, 55, 10],
-                    color: "red",
-                    type : 'trapezoid',
-                    stroke_color: "red",
-                    stroke_width: 1,
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-27,20]],
-                rotate_limits: [0,45],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
+        "trap_topRight_parent": {
+            "m": [50, 50, 45, 1, 1], 
+            "trap_topRight" : {
+                "m": null, 
             },
         },
-        "trap_downRight": {
-            "m": [50, -50, 135, 55, 10],
-            "parent":"root",
-            shapes : [
-                {
-                    m : [50, -50, 135, 55, 10],  
-                    color: "red",
-                    type : 'trapezoid',
-                    stroke_color: "red",
-                    stroke_width: 1,
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [50, -50, 135, 55, 10],
-                    "type": "trapezoid",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
+        "trap_downRight_parent": {
+            "m": [50, -50, 135, 1,1],
+            "trap_downRight" : {
+                "m": null,
             },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-27,20]],
-                rotate_limits: [0,45],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
+        },
+        "trap_topLeft_parent": {
+            "m": [-50, 50, -45, 1, 1],
+            "trap_topLeft" : {
+                "m": null,
             },
-        },  
-        "trap_downLeft": {
-            "m": [-50, -50, -135, 55, 10],
-            "parent":"root",
-            shapes : [
-                {
-                    m : [-50, -50, -135, 55, 10],  
-                    color: "red",
-                    type : 'trapezoid',
-                    stroke_color: "red",
-                    stroke_width: 1,
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [-50, -50, -135, 55, 10],
-                    "type": "trapezoid",
-                }
-            ],
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
+        },
+        "trap_downLeft_parent": {
+            "m": [-50, -50, -135, 1, 1],
+            "trap_downLeft" : {
+                "m": null,
             },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-27,20]],
-                rotate_limits: [0,45],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },   
-        "trap_topLeft": {
-            "m": [-50, 50, -45, 55, 10],
-            "parent":"root",
-            shapes : [
-                {
-                    m : [-50, 50, -45, 55, 10],
-                    color: "red",
-                    type : 'trapezoid',
-                    stroke_color: "red",
-                    stroke_width: 1,                    
-                }
-            ],
-            interaction_shapes: [
-                {
-                    m : [-50, 50, -45, 55, 10],
-                    type: "trapezoid",
-                }
-            ],          
-            "interaction_settings": {
-                "enable": true,
-                "coef": 0.2,
-                "rotate_resolution_priority": 1.0,
-                "radius_threshold": 0,
-                "do_translation": true
-            },
-            transform_settings : {
-                parent_limit_space : false,
-                translate_limits: [[0,0],[-27,20]],
-                rotate_limits: [0,45],
-            },            
-            "dyn_settings": {
-                "enable": false,
-                enable_gravity:false,
-                mass:0.9,
-                "friction_translate": 0.1,
-                "friction_rotate": 0.001,
-                "speed_limit_translate": 30,
-                "speed_limit_rotate": 0.3
-            },
-        },   
-         
-        "play_btn": {
-			"m": [0, -300, 0, 1, 1],
-			"shapes" : [
-				{
-					"m": [0, -300, 0, 25, 25],
-					"color": "red",
-					"type": "circle",
-					"stroke_color":"black",
-					"stroke_width":1,
-				}
-			],
-			"interaction_shapes": [
-				{
-					"m" :  [ 0, -300, 0, 25, 25],
-					"type": "circle",
-				}
-			],
-			"interaction_settings": {
-				"enable": true,
-				"coef": 1.0,
-				"rotate_resolution_priority": 0.0,
-				"radius_threshold": 0,
-				"do_translation": true
-			},
-			transform_settings : {
-				parent_limit_space : false,
-				translate_limits: [[0,0],[0,0]],
-				rotate_limits: [0,0],
-			},            
-			"dyn_settings": {
-				"enable": false,
-				enable_gravity:false,
-				mass:0.9,
-				"friction_translate": 0.1,
-				"friction_rotate": 0.001,
-				"speed_limit_translate": 30,
-				"speed_limit_rotate": 0.3
-			},
-			"debug":{
-				"shape_interaction_visibility" : false,
-			},		
-			event_type : "simple",		        
-		},	        
+        }
+    },        
+}
+
+
+//____________________________OBJS SHAPES
+
+var shapes = {
+    "root" : {
+        shapes : [
+            {
+                m_local : [0, 0, 0, 18, 18],
+                color: "yellow",
+                type : 'circle',
+                stroke_color: "black",
+                stroke_width: 1,
+            }
+        ],
+        interaction_shapes: [
+            {
+                m : [0, 0, 0, 18, 18],
+                type: "circle",
+            }
+        ],
     },
+    "rectangle_rotate_top" : {
+        interaction_shapes: [
+            {
+                m : [0, 140, 0, 50, 50],
+                "type": "rectangle",
+            }
+        ],
+    },   
+    "rectangle_rotate_left" : {
+        interaction_shapes: [
+            {
+                m : [140, 0, 0, 50, 50],
+                "type": "rectangle",
+            }
+        ],           
+    },
+    "rectangle_rotate_down" : {    
+        interaction_shapes: [
+            {
+                m : [0, -140, 0, 50, 50],
+                "type": "rectangle",
+            }
+        ],
+    },
+    "rectangle_rotate_right" : {        
+        interaction_shapes: [
+            {
+                m : [-140, 0, 0, 50, 50],
+                "type": "rectangle",
+            }
+        ],
+    },
+
+}
+
+
+var options = {
+    "rectangle_rotate_top" : {
+        transform_settings : {
+            parent_limit_space : false,
+            translate_limits: [[0,0],[-0,0]],
+            rotate_limits: [-90,0],
+        },           
+    },   
+    "rectangle_rotate_left" : {
+        transform_settings : {
+            parent_limit_space : false,
+            translate_limits: [[0,0],[-0,0]],
+            rotate_limits: [-0,0],
+        },            
+    },
+    "rectangle_rotate_down" : {    
+        transform_settings : {
+            parent_limit_space : false,
+            translate_limits: [[0,0],[-0,0]],
+            rotate_limits: [-270,0],
+        },
+    },
+    "rectangle_rotate_right" : {        
+        transform_settings : {
+            parent_limit_space : false,
+            translate_limits: [[0,0],[-0,0]],
+            rotate_limits: [-180,0],
+        },
+    },
+}
+
+
+
+let obj_names_rectangles = [
+    "rectangle_translate_top", 
+    "rectangle_translate_left", 
+    "rectangle_translate_down", 
+    "rectangle_translate_right"]
+for( let n of obj_names_rectangles )
+{
+    shapes[n] = {
+        shapes : [
+            {
+                m_local : [0, 0, 0, 8, 40],
+                color: "white",
+                type : 'rectangle',
+                stroke_color: "black",
+                stroke_width: 1,    
+            }
+        ],
+        interaction_shapes: [
+            {
+                m_local : [0, 0, 0, 8, 40],
+                "type": "rectangle",
+            }
+        ],
+    }
+    options[n] = {
+        transform_settings : {
+            parent_limit_space : false,
+            translate_limits: [[0,0],[-0,70]],
+            rotate_limits: [0,0],
+        }
+    }
+}
+    
+
+let obj_names_trap = [
+    "trap_topRight", 
+    "trap_downRight", 
+    "trap_downLeft", 
+    "trap_topLeft"]
+for( let n of obj_names_trap )
+{
+    shapes[n] = {
+        shapes : [
+            {
+                m_local : [0, 0, 0, 55, 10],
+                color: "red",
+                type : 'trapezoid',
+                stroke_color: "red",
+                stroke_width: 1,
+            }
+        ],
+        interaction_shapes: [
+            {
+                m_local : [0, 0, 0, 55, 10],
+                "type": "trapezoid",
+            }
+        ],
+    }
+
+    options[n] = {
+        transform_settings : {
+            parent_limit_space : false,
+            translate_limits: [[0,0],[-27,20]],
+            rotate_limits: [0,45],
+        }    
+    }
+}
+
+
+//____________________________OBJS OPTIONS
+
+
+
+for ( let obj_name in shapes )
+{
+    if( shapes[obj_name].hasOwnProperty("interaction_shapes") === false )
+        continue
+    if( options.hasOwnProperty(obj_name) === false )
+        options[obj_name] = {}
+    options[obj_name]["interaction_settings"] = {
+        "enable": true,
+        "coef": 0.2,
+        "rotate_resolution_priority": 1.0,
+        "radius_threshold": 0,
+        "do_translation": true
+    }
+}
+
+export var scene_info = {
+    "objs": get_objs(hierarchy, shapes, options),          
     "cns": [],
     "eventActions":[],
-    //    {
-    //        "mode": "instance",
-    //        "objs": ["bicycle", "wheelA", "wheelB", "gear_pedals"],
-    //        "attrs": ["ty", "ty", "ty", "ty"],
-    //        "mult": 1
-    //    },
-    //    {
-    //        "mode": "instance",
-    //        "objs": ["bicycle", "wheelA", "wheelB"],
-    //        "attrs": ["ty", "r", "r"],
-    //        "mult": -0.02
-    //    },
-    //    {
-    //        "mode": "instance",
-    //        "objs": ["bicycle", "gear_pedals"],
-    //        "attrs": ["ty", "r"],
-    //        "mult": -0.01
-    //    }
-    //]
-              
 }
+
+
 
 
 scene_info.eventActions.push( 
     {
         event : {
             start : {
-                in_args : [ 'play_btn' ],
+                in_args : [ 'root' ],
                 fn : (obj) => {
                     let status = false
                     if( 5 < obj.Game_engine.Time.frame)
-                    //if( obj.Event.data.user['grab'].status )
-                    {
                         status = true
-                    }
+                    
                     return status;
                 }
             },
@@ -566,7 +261,7 @@ scene_info.eventActions.push(
         action : {
             
             start : {
-                in_args : [ 'play_btn' ],
+                in_args : [ 'root' ],
                 fn : (obj) => {
                     obj.Game_engine.Animation.start( `first_anim`,"windmill_idle", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
                 },

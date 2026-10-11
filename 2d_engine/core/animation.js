@@ -1,6 +1,10 @@
 
+import Matrix2d from '../utils/matrix2d.js';
 import Vector2d from '../utils/vector2d.js';
 
+
+import { windmill_idle } from '../animations/windmill_idle.js';
+import { body_jump_happy } from '../animations/body_jump_happy.js';
 
 
 /*
@@ -25,20 +29,22 @@ import Vector2d from '../utils/vector2d.js';
 async function load_animation() {
 
     var anim_to_keys = { 
-        "body_jump_happy":null,
-        "windmill_idle":null,
+        "body_jump_happy":body_jump_happy,
+        "windmill_idle": windmill_idle,
     }
-
+    /*
+    // USE FETCH TO LOAD ANIMATION DATA FROM JSON FILES
     for (const anim_name in anim_to_keys)
     {
         
-        const url = `../../animations/${anim_name}.json`; // Replace with the path to your audio file
+        const url = `../../animations/${anim_name}.js`; // Replace with the path to your audio file
             
         const response = await fetch(url);
         const anim = await response.json();
 
         anim_to_keys[anim_name] = anim//await bake_animation(anim)
     }
+    */
 
     return anim_to_keys
 }
@@ -143,9 +149,16 @@ class Animation
             if( raw_values === undefined )
                 continue
 
-            let m = this.Game_engine.Objs[obj_name].trsf.get_local()
-            m.setWithTransformAttr( raw_values  )
-            this.Game_engine.Objs[obj_name].trsf.set_local(m)
+            if( this.Game_engine.Objs[obj_name] === undefined )
+                continue
+
+            let m_local_init = this.Game_engine.Objs[obj_name].trsf.get_local_init()
+            
+            let m_animation = new Matrix2d()
+            m_animation.setWithTransformAttr( raw_values  )
+            
+            let m_local = m_animation.getMult(m_local_init)
+            this.Game_engine.Objs[obj_name].trsf.set_local(m_local)
             
             if( raw_values.visibility !== undefined)
             {

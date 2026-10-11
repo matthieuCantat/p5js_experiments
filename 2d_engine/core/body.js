@@ -47,7 +47,8 @@ export class body
 		const defaultOptions = {
 			name : '',
 			parent : null,
-			m: new Matrix2d(),
+			m: null,
+			m_local : null,
 			visibility : true,
 			shapes_visibility : true,
 			shapes : [],
@@ -171,6 +172,7 @@ export class body
 		if( this.args.parent != null )
 			parent_obj = this.Game_engine.Objs[this.args.parent]
 		this.trsf = new Transform(  this.args.m, 
+									this.args.m_local,
 									this.args.shapes,
 									this.args.interaction_shapes,
 									parent_obj,
@@ -814,6 +816,7 @@ class Transform
 	}
 
 	constructor( arg_m, 
+		arg_m_local = null,
 		arg_shapes_info = null,
 		arg_interaction_shapes_info = null,
 		obj_parent = null,
@@ -824,30 +827,78 @@ class Transform
 		this.obj_parent = obj_parent
 
 		// BODY
-		let in_body_matrix = null
-		if( arg_m instanceof Matrix2d)
-			in_body_matrix = arg_m
-		else
-			in_body_matrix = new Matrix2d(arg_m) // if not a matrix, convert it to one
+		var in_body_matrix = new Matrix2d()
+		
+		if( this.obj_parent != null )
+			in_body_matrix = this.obj_parent.trsf.get()
+		
+		
+		if( arg_m !== null )
+		{
+			if( arg_m instanceof Matrix2d)
+				in_body_matrix = arg_m
+			else
+			{
+				//console.log(this.body.name,arg_m[2])
+				in_body_matrix = new Matrix2d(arg_m) // if not a matrix, convert it to one		
+			}
+				
+		}
+				
 
+		if( ( arg_m_local !== null )&&( this.obj_parent != null ))
+		{
+			let m_parent = this.obj_parent.trsf.get()
+
+			if( arg_m_local instanceof Matrix2d)
+				in_body_matrix = arg_m_local.getMult(m_parent)
+			else
+			{
+				let m_local = new Matrix2d(arg_m_local) 
+				in_body_matrix = m_local.getMult(m_parent)
+			}
+		}
+		
 		let m_body_world = new Matrix2d(in_body_matrix).normalize()
 
+				
 		// PARENT
 		this.m_parent_to_body = m_body_world
 		if( this.obj_parent != null )
-			this.m_parent_to_body = m_body_world.getMult(this.obj_parent.trsf.get().getInverse())
+		{
+			let m_parent = this.obj_parent.trsf.get()
+			this.m_parent_to_body = m_body_world.getMult(m_parent.getInverse())
+		}
+
+
+
+
 
 		// SHAPES
 		var in_shapes_matices = []
 		for( const shape_info of arg_shapes_info )
 		{
-			let m = null
-			if( ( shape_info.m === null)||( shape_info.m === undefined) )
-				m = in_body_matrix
-			else if( shape_info.m instanceof Matrix2d)
-				m = shape_info.m
-			else
-				m = new Matrix2d(shape_info.m) // if not a matrix, convert it to one	
+			let m = in_body_matrix
+			if(( shape_info.m !== undefined )&&(shape_info.m !== null))
+			{
+				if( shape_info.m instanceof Matrix2d)
+					m = shape_info.m
+				else
+					m = new Matrix2d(shape_info.m) // if not a matrix, convert it to one
+			}
+
+			if(( shape_info.m_local !== undefined )&&(shape_info.m_local !== null))
+			{
+				
+				let m_local = null
+				if( shape_info.m instanceof Matrix2d)
+					m_local = shape_info.m_local
+				else
+					m_local = new Matrix2d(shape_info.m_local) // if not a matrix, convert it to one
+
+				m = m_local.getMult(m_body_world)
+			}
+			
 			in_shapes_matices.push( m )
 		}
 
@@ -865,14 +916,30 @@ class Transform
 		{
 			let shape_info = arg_interaction_shapes_info[i]
 
-			let m = null
-			if( shape_info.m === null)
-				m = in_shapes_matices[i]
-			if( shape_info.m instanceof Matrix2d)
-				m = shape_info.m
-			else
-				m = new Matrix2d(shape_info.m) // if not a matrix, convert it to one	
-				in_interactions_matices.push( m )
+
+
+			let m = in_shapes_matices[i]
+			if(( shape_info.m !== undefined )&&(shape_info.m !== null))
+			{
+				if( shape_info.m instanceof Matrix2d)
+					m = shape_info.m
+				else
+					m = new Matrix2d(shape_info.m) // if not a matrix, convert it to one
+			}
+
+			if(( shape_info.m_local !== undefined )&&(shape_info.m_local !== null))
+			{
+				
+				let m_local = null
+				if( shape_info.m instanceof Matrix2d)
+					m_local = shape_info.m_local
+				else
+					m_local = new Matrix2d(shape_info.m_local) // if not a matrix, convert it to one
+
+				m = m_local.getMult(m_body_world)
+			}		
+			
+			in_interactions_matices.push( m )
 		}
 
 		if( arg_interaction_shapes_info.length === 0 )
@@ -990,6 +1057,12 @@ class Transform
 
 		
 		return m_body_modified
+	}
+
+	
+	get_local_init()
+	{
+		return this.m_parent_to_body
 	}
 
 	get_local()
