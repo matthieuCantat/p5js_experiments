@@ -4,6 +4,7 @@ import Vector2d from '../utils/vector2d.js';
 
 
 import { windmill_idle } from '../animations/windmill_idle.js';
+import { windmill_transformation } from '../animations/windmill_transformation.js';
 import { body_jump_happy } from '../animations/body_jump_happy.js';
 
 
@@ -31,6 +32,7 @@ async function load_animation() {
     var anim_to_keys = { 
         "body_jump_happy":body_jump_happy,
         "windmill_idle": windmill_idle,
+        "windmill_transformation": windmill_transformation,
     }
     /*
     // USE FETCH TO LOAD ANIMATION DATA FROM JSON FILES
@@ -368,7 +370,7 @@ async function bake_animation( anim_data )
                 {
                     for( let j = 0 ; j < _range; j++)
                     {
-                        let coef = j/(_range)
+                        let coef = j/(_range-1)
                         anim.push(pA.y * ( 1 - coef)  + pB.y * coef)
                     }
                     continue

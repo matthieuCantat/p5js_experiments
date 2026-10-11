@@ -4,6 +4,9 @@ import { get_objs } from "../../template/scene_info_objs_utils.js";
 var hierarchy = {
     "root": {
         "m": [0,0,0,1,1],
+        "round_center": {
+            "m": null,
+        },
         "rectangle_rotate_top": {
             "m": null,
             "rectangle_translate_top" : {
@@ -28,29 +31,32 @@ var hierarchy = {
                 "m": [70, 0, 90, 1, 1],
             },
         },
-        "trap_topRight_parent": {
-            "m": [50, 50, 45, 1, 1], 
-            "trap_topRight" : {
-                "m": null, 
+        "traps" : {
+            "m": null,
+            "trap_topRight_parent": {
+                "m": [50, 50, 45, 1, 1], 
+                "trap_topRight" : {
+                    "m": null, 
+                },
             },
-        },
-        "trap_downRight_parent": {
-            "m": [50, -50, 135, 1,1],
-            "trap_downRight" : {
-                "m": null,
+            "trap_downRight_parent": {
+                "m": [50, -50, 135, 1,1],
+                "trap_downRight" : {
+                    "m": null,
+                },
             },
-        },
-        "trap_topLeft_parent": {
-            "m": [-50, 50, -45, 1, 1],
-            "trap_topLeft" : {
-                "m": null,
+            "trap_topLeft_parent": {
+                "m": [-50, 50, -45, 1, 1],
+                "trap_topLeft" : {
+                    "m": null,
+                },
             },
-        },
-        "trap_downLeft_parent": {
-            "m": [-50, -50, -135, 1, 1],
-            "trap_downLeft" : {
-                "m": null,
-            },
+            "trap_downLeft_parent": {
+                "m": [-50, -50, -135, 1, 1],
+                "trap_downLeft" : {
+                    "m": null,
+                },
+            }
         }
     },        
 }
@@ -59,7 +65,7 @@ var hierarchy = {
 //____________________________OBJS SHAPES
 
 var shapes = {
-    "root" : {
+    "round_center" : {
         shapes : [
             {
                 m_local : [0, 0, 0, 18, 18],
@@ -263,7 +269,7 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.start( `first_anim`,"windmill_idle", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                    obj.Game_engine.Animation.start( `first_anim`,"windmill_transformation", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },
