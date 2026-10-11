@@ -12,7 +12,7 @@ export var scene_info = {
 			"m": [0, 200, 0, 1, 1],
 			"shapes" : [
 				{
-					"m": [-150, 300, 0, 2, 1.3],
+					"m": [-200, 300, 0, 2, 1.3],
 					"color": [0,0,0],
 					"type": "text",
 					"stroke_color":"black",
@@ -20,19 +20,19 @@ export var scene_info = {
 					"text": "windmill_idle_root_translateY",
 				},
 				{
-					"m": [-150, 150, 0, 3, 1.5],
+					"m": [-400, 150, 0, 1, 1.5],
 					//"color": [255,0,0],
 					"type": "line",
 					"stroke_color":"green",
-					"stroke_width":1,
+					"stroke_width":2,
 					points : { 'animation_keys' : ['windmill_idle','root','translateY'] },
 				},
 				{
-					"m": [-150, 150, 0, 3, 1.5],
+					"m": [-400, 150, 0, 1, 1.5],
 					//"color": [255,0,0],
 					"type": "line",
 					"stroke_color":"red",
-					"stroke_width":1,
+					"stroke_width":2,
 					points : { 'baked_animation' : ['windmill_idle','root','translateY'] },
 				},
 			],

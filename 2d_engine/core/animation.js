@@ -210,6 +210,7 @@ async function bake_animation_keys( anim_to_keys )
         for (const anim_name in anim_to_keys)
         {
             let anim_data = anim_to_keys[anim_name]
+            //console.log( anim_name )
             let baked_anim = await bake_animation(anim_data)
             anim_to_baked[anim_name] = baked_anim
         }
@@ -221,7 +222,7 @@ async function bake_animation_keys( anim_to_keys )
 async function bake_animation( anim_data )
 {
     
-    let attr_to_range = {}
+    let obj_attr_to_range = {}
 
     var anim_data_baked = {
         range : [ 999999, 0 ],
@@ -237,51 +238,56 @@ async function bake_animation( anim_data )
         "loop" : anim_data.default_settings.loop,
     }
 
-
+    // GET RANGE OF EACH ATTRIBUTE
     for( let obj in anim_data )
     {
         if( obj === 'default_settings')
             continue
+
+        obj_attr_to_range[obj] = {}
+
         for( let attr in anim_data[obj] )
+        {
+            obj_attr_to_range[obj][attr] = [ 999999, 0 ]
+            for( let i = 0 ; i < anim_data[obj][attr].length ; i++ )
             {
-                attr_to_range[attr] = [ 999999, 0 ]
-                for( let i = 0 ; i < anim_data[obj][attr].length ; i++ )
-                {
-                    attr_to_range[attr][0] = Math.min(attr_to_range[attr][0], anim_data[obj][attr][i].t )
-                    attr_to_range[attr][1] = Math.max(attr_to_range[attr][1], anim_data[obj][attr][i].t )
-                }
-        
-                // RANGE
-                anim_data_baked['range'][0] = Math.min(anim_data_baked['range'][0], attr_to_range[attr][0] )
-                anim_data_baked['range'][1] = Math.max(anim_data_baked['range'][1], attr_to_range[attr][1] )            
+                obj_attr_to_range[obj][attr][0] = Math.min(obj_attr_to_range[obj][attr][0], anim_data[obj][attr][i].t )
+                obj_attr_to_range[obj][attr][1] = Math.max(obj_attr_to_range[obj][attr][1], anim_data[obj][attr][i].t )
             }
+            //console.log(obj,attr,obj_attr_to_range[obj][attr])
+            // RANGE
+            anim_data_baked['range'][0] = Math.min(anim_data_baked['range'][0], obj_attr_to_range[obj][attr][0] )
+            anim_data_baked['range'][1] = Math.max(anim_data_baked['range'][1], obj_attr_to_range[obj][attr][1] )            
+        }
     }
             
     
-
+    // GENERATE ANIM LOOP
     if( ( default_settings.loop !== undefined )&&( 0 < default_settings.loop ) )
     {
         let range_delta = anim_data_baked['range'][1] - anim_data_baked['range'][0]
 
-        for( let iter = 0 ; iter < default_settings.loop ; iter++)
+        for( let obj in anim_data )
         {
-            for( let obj in anim_data )
+            if( obj === 'default_settings')
+                continue
+            for( let attr in anim_data[obj] )
             {
-                if( obj === 'default_settings')
-                    continue
-                for( let attr in anim_data[obj] )
+                let range_delta_attr = obj_attr_to_range[obj][attr][1] - obj_attr_to_range[obj][attr][0]
+                let size = anim_data[obj][attr].length
+                        
+                for( let iter = 0 ; iter < default_settings.loop ; iter++)
                 {
-                    let range_delta_attr = attr_to_range[attr][1] - attr_to_range[attr][0]
-                    let size = anim_data[obj][attr].length
                     for( let i = 1 ; i < size ; i++ )
                     {
                         let t = anim_data[obj][attr][i].t + range_delta_attr * (iter+1)
                         let v = anim_data[obj][attr][i].v
                         anim_data[obj][attr].push( { "t" : t , "v" : v } )    
                     }
-                    
                 }
+                
             }
+
         }
 
         anim_data_baked['range'][1] = anim_data_baked['range'][1] + range_delta * default_settings.loop
@@ -405,7 +411,7 @@ async function bake_animation( anim_data )
 
             attr_to_anim[attr] = []
             // fill from start
-            let delta_from_start = attr_to_range[attr][0] - anim_data_baked['range'][0]
+            let delta_from_start = obj_attr_to_range[obj][attr][0] - anim_data_baked['range'][0]
             for( let i = 0 ; i < delta_from_start ; i++ )
                 attr_to_anim[attr].push( anim[0] )
         
@@ -414,7 +420,7 @@ async function bake_animation( anim_data )
                 attr_to_anim[attr].push( anim[i] )
             
             // fill to end
-            let delta_from_end = anim_data_baked['range'][1] - attr_to_range[attr][attr_to_range[attr].length-1]
+            let delta_from_end = anim_data_baked['range'][1] - obj_attr_to_range[obj][attr][obj_attr_to_range[obj][attr].length-1]
             for( let i = 0 ; i < delta_from_end ; i++ )
                 attr_to_anim[attr].push( anim[anim.length-1] )            
 
