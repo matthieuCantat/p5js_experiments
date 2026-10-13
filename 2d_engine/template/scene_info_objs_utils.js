@@ -90,3 +90,52 @@ export function get_objs(hierarchy, shapes, options)
     return objs
 }
 
+
+export function draw_anim_curve( anim, body, attr, m )
+{
+	return {
+		"m": [0, 0, 0, 1, 1],
+		"shapes" : [
+			{
+				"m": [-200, 300, 0, 2, 1.3],
+				"color": [0,0,0],
+				"type": "text",
+				"stroke_color":"black",
+				"stroke_width":1,
+				"text": "windmill_idle_root_translateY",
+			},
+			{
+				"m": m,
+				"color": [0,255,0],
+				"type": "point",
+				"stroke_color":"green",
+				"stroke_width":5,
+				points : { 'animation_keys' : [anim, body, attr] },
+			},
+			{
+				"m": m,
+				//"color": [255,0,0],
+				"type": "line",
+				"stroke_color":"green",
+				"stroke_width":2,
+				points : { 'animation_keys' : [anim, body, attr] },
+			},
+			{
+				"m": m,
+				"color": [255,0,0],
+				"type": "point",
+				"stroke_color":"yellow",
+				"stroke_width":2,
+				points : { 'baked_animation' : [anim, body, attr] },
+			},				
+			{
+				"m": m,
+				//"color": [255,0,0],
+				"type": "line",
+				"stroke_color":"red",
+				"stroke_width":2,
+				points : { 'baked_animation' : [anim, body, attr] },
+			},
+		],		        
+	} 
+}

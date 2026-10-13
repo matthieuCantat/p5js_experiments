@@ -269,7 +269,7 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.start( `first_anim`,"windmill_transformation", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                    obj.Game_engine.Animation.start( `first_anim`,"windmill_idle", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },

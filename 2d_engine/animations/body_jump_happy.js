@@ -3,24 +3,21 @@
 export var body_jump_happy ={
     "default_settings":
     {
-        "in_tan" : { "orient" : "flat", "length" : "auto2"},
-        "out_tan" : { "orient" : "flat", "length" : "auto2"}
+        "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
+        "out_tan" : { "orient" : "neighbor", "length" : "auto4"}
     },
     "body_A" : {
         "translateY" : [
-            { "t" : 5   , "v" : -200},
-            { "t" : 50  , "v" : 300},
-            { "t" : 100 , "v" : -200},
-            { "t" : 200 , "v" : -200}
+            { "t" : 5   , "v" : 0},
+            { "t" : 10 , "v" :  -10 },
+            { "t" : 50  , "v" : 500},
+            { "t" : 100 , "v" : 0, "in_tan" : { "orient" : "linear"}, "out_tan" : { "orient" : "linear"} },
+            { "t" : 150  , "v" : 100},
+            { "t" : 200 , "v" : 0},
         ],
-        "rotate" : [
-            { "t" : 25 , "v" : 0 },
-            { "t" : 200 , "v" : 360 },
-            { "t" : 400 , "v" : 0 },
-            { "t" : 500 , "v" : 0 }
-        ],
-        "_scaleY" : [
+        "scaleY" : [
             { "t" : 5 , "v" : 1 },
+            { "t" : 10 , "v" : 0.8 },
             { "t" : 50 , "v" : 1.1 },
             { "t" : 100 , "v" : 1 },
             { "t" : 200 , "v" : 1 }

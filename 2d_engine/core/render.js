@@ -14,6 +14,7 @@ isPointInside_rectangle,
 isPointInside_circle,
 isPointInside_triangle,
 draw_line,
+draw_point,
 draw_uniform_background,
 } from '../utils/draw.js';
 import Matrix2d from '../utils/matrix2d.js';
@@ -51,6 +52,7 @@ export class Render
         cross : draw_cross,
         text : draw_text,
         line : draw_line,
+        point : draw_point,
         uniform_background : draw_uniform_background,
     }
 

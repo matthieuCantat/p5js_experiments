@@ -2,7 +2,7 @@ import Vector2d from '../../utils/vector2d.js';
 import Matrix2d from '../../utils/matrix2d.js';
 import { COLORS } from '../../utils/draw.js'
 import { get_body_sfx, get_swipe_navigation } from '../../template/event_action_template.js'
-
+import { draw_anim_curve } from '../../template/scene_info_objs_utils.js'
 
 
 export var scene_info = {
@@ -98,6 +98,11 @@ export var scene_info = {
 	"eventActions" : []					
 }
 
+
+scene_info.objs['anim_curve'] = draw_anim_curve( 'body_jump_happy', 
+	'body_A', 
+	'translateY',
+	[-200,0,0,1,0.7] )
 
 
 

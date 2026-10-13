@@ -5,7 +5,9 @@ export var windmill_transformation = {
     {
         "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
         "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "loop" : 0
+        "loop" : 1,
+        "loop_mode" : "loop",
+        "loop_range_mode" : "obj",//"attr"
     },
     "round_center" : {
         "scaleX" : [

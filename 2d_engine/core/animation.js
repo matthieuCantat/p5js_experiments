@@ -238,6 +238,8 @@ async function bake_animation( anim_data )
             "orient" : anim_data.default_settings.out_tan.orient, 
             "length" : anim_data.default_settings.out_tan.length },
         "loop" : anim_data.default_settings.loop,
+        "loop_mode" : anim_data.default_settings.loop_mode,
+        "loop_range_mode" : anim_data.default_settings.loop_range_mode,
     }
 
     // GET RANGE OF EACH ATTRIBUTE
@@ -267,7 +269,9 @@ async function bake_animation( anim_data )
     // GENERATE ANIM LOOP
     if( ( default_settings.loop !== undefined )&&( 0 < default_settings.loop ) )
     {
-        let range_delta = anim_data_baked['range'][1] - anim_data_baked['range'][0]
+        let range_min = anim_data_baked['range'][0]
+        let range_max = anim_data_baked['range'][1]
+        let range_delta = range_max - range_min
 
         for( let obj in anim_data )
         {
@@ -275,17 +279,88 @@ async function bake_animation( anim_data )
                 continue
             for( let attr in anim_data[obj] )
             {
-                let range_delta_attr = obj_attr_to_range[obj][attr][1] - obj_attr_to_range[obj][attr][0]
+                let range_min_attr = obj_attr_to_range[obj][attr][0]
+                let range_max_attr = obj_attr_to_range[obj][attr][1]
+                let range_delta_attr = range_max_attr - range_min_attr
+                
+
+                var range_current = range_delta_attr
+                if( default_settings.loop_range_mode === 'obj' )
+                {
+                    range_current = range_delta
+                    if( range_min != range_min_attr)
+                    {
+                        let first_value = anim_data[obj][attr][0].v
+
+                        anim_data[obj][attr][0]["in_tan"] = { "orient" : "linear"}
+
+                        anim_data[obj][attr].unshift( { 
+                            "t" : range_min , 
+                            "v" : first_value,
+                            //"in_tan" : { "orient" : "linear"},
+                            "out_tan" : { "orient" : "linear"},  
+                        } ) 
+                    }
+                    if( range_max != range_max_attr)
+                    {
+                        let last_i = anim_data[obj][attr].length-1
+                        let last_value = anim_data[obj][attr][last_i].v
+
+                        anim_data[obj][attr][last_i]["out_tan"] = { "orient" : "linear"}
+
+                        anim_data[obj][attr].push( { 
+                            "t" : range_max , 
+                            "v" : last_value,
+                            "in_tan" : { "orient" : "linear"},
+                            //"out_tan" : { "orient" : "linear"}, 
+                        } ) 
+                    }
+
+                }
                 let size = anim_data[obj][attr].length
+                    
                         
                 for( let iter = 0 ; iter < default_settings.loop ; iter++)
                 {
-                    for( let i = 1 ; i < size ; i++ )
+                    if(( default_settings.loop_mode === 'pingpong' )&&( iter % 2 === 0 ))
                     {
-                        let t = anim_data[obj][attr][i].t + range_delta_attr * (iter+1)
-                        let v = anim_data[obj][attr][i].v
-                        anim_data[obj][attr].push( { "t" : t , "v" : v } )    
+                        for( let i = size-1 ; -1 < i ; i-- )
+                        {
+                            
+                            let t = ( range_current - anim_data[obj][attr][i].t ) + range_current * (iter+1)
+                            let v = anim_data[obj][attr][i].v
+                            let in_tan = anim_data[obj][attr][i].out_tan
+                            let out_tan = anim_data[obj][attr][i].in_tan
+
+                            let key = { "t" : t , "v" : v }
+                            if( in_tan !== undefined )
+                                key.in_tan = in_tan
+                            if( out_tan !== undefined )
+                                key.out_tan = out_tan
+                            anim_data[obj][attr].push( key )    
+                        }
                     }
+                    else
+                    {
+                        for( let i = 1 ; i < size ; i++ )
+                        {
+                            let t = anim_data[obj][attr][i].t + range_current * (iter+1)
+                            let v = anim_data[obj][attr][i].v
+                            let in_tan = anim_data[obj][attr][i].in_tan
+                            let out_tan = anim_data[obj][attr][i].out_tan
+
+                            let key = { "t" : t , "v" : v }
+
+                            if( in_tan !== undefined )
+                                key.in_tan = in_tan
+
+                            if( out_tan !== undefined )
+                                key.out_tan = out_tan       
+                                       
+                            anim_data[obj][attr].push( key )    
+                        }
+                    }
+                    
                 }
                 
             }
@@ -330,34 +405,37 @@ async function bake_animation( anim_data )
                 // TANGEANT INFO
 
                 let out_tan_info = anim_data[obj][attr][i-1].out_tan
-                let out_tan = {}
+                var out_tan = {}
                 if( out_tan_info === undefined ){
                     out_tan = default_settings.out_tan
                 }
                 else{
-                    for( let attr in out_tan_info)
+                    for( let _attr in out_tan_info)
                     {
-                        if( out_tan_info.attr === undefined)
-                            out_tan[attr] = default_settings.out_tan.attr
+                      
+                        if( out_tan_info[_attr] === undefined)
+                            out_tan[_attr] = default_settings.out_tan[_attr]
                         else
-                            out_tan[attr] = out_tan_info.attr
+                            out_tan[_attr] = out_tan_info[_attr]
                     }
                 }
-
+               
                 let in_tan_info = anim_data[obj][attr][i].in_tan
                 let in_tan = {}
                 if( in_tan_info === undefined ){
                     in_tan = default_settings.in_tan
                 }
                 else{
-                    for( let attr in in_tan_info)
+                    for( let _attr in in_tan_info)
                     {
-                        if( in_tan_info.attr === undefined)
-                            in_tan[attr] = default_settings.in_tan.attr
+                        if( in_tan_info[_attr] === undefined)
+                            in_tan[_attr] = default_settings.in_tan[_attr]
                         else
-                        in_tan[attr] = in_tan_info.attr
+                            in_tan[_attr] = in_tan_info[_attr]
                     }
-                }                    
+                }     
+                
+                
                 if( (out_tan.orient === 'step')||(in_tan.orient === 'step') )
                 {
                     for( let j = 0 ; j < _range; j++)
@@ -366,13 +444,18 @@ async function bake_animation( anim_data )
                     }
                     continue
                 }
+
+                let linear_anim = []
+                for( let j = 0 ; j < _range; j++)
+                {
+                    let coef = j/(_range-1)
+                    linear_anim.push(pA.y * ( 1 - coef)  + pB.y * coef)
+                }
+
                 if( (out_tan.orient === 'linear')&&(in_tan.orient === 'linear') )
                 {
-                    for( let j = 0 ; j < _range; j++)
-                    {
-                        let coef = j/(_range-1)
-                        anim.push(pA.y * ( 1 - coef)  + pB.y * coef)
-                    }
+                    for( let v of linear_anim)
+                        anim.push( v )
                     continue
                 }
 
@@ -394,7 +477,7 @@ async function bake_animation( anim_data )
                     pB_after, 
                     in_tan )
 
-                let out_values = hermite_interpolation(
+                let hermite_values = hermite_interpolation(
                     pA,
                     pB,
                     tanA,
@@ -403,9 +486,25 @@ async function bake_animation( anim_data )
                 )
                 
                 
+                //linear_anim
+                for( let j = 0 ; j < _range; j++)
+                {
+                    let coef = j/(_range-1)
 
-                for( let j = 0 ; j < out_values.length-1; j++)
-                    anim.push( out_values[j] )
+                    let value = hermite_values[j]
+                    if (out_tan.orient === 'linear')
+                    {
+                        value = linear_anim[j] * ( 1 - coef )  + value * coef
+                    }
+                    
+                    if(in_tan.orient === 'linear')
+                    {
+                        value = linear_anim[j] * coef  + value * ( 1 - coef )
+                    }
+                    
+                    anim.push( value )
+                }
+                    
 
             }
 
@@ -603,7 +702,7 @@ function build_tangeant(
         tanA.normalize()
         tanA.mult(l)
     }
-    else
+    else if( tan_info.length !== undefined )
     {
         tanA.normalize()
         tanA.mult(tan_info.length)

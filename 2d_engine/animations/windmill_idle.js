@@ -5,7 +5,9 @@ export var windmill_idle = {
     {
         "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
         "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "loop" : 10
+        "loop" : 2,
+        "loop_mode" : "loop",// "loop","pingpong"
+        "loop_range_mode" : "obj",//"obj","attr"
     },
     "root" : {
         "translateY" : [

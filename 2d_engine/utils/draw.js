@@ -287,6 +287,71 @@ export function draw_line(
 }
 
 
+export function draw_point( 
+	ctx, 
+	{ m = null,
+		points = [] , 
+		stroke_width = 10,
+		stroke_color = 'red', 
+		lineWidth = 5 }
+
+)
+{
+	ctx.beginPath()
+	
+	//console.log( 'line', points.length, lineWidth)	
+    //ctx.save()
+	//ctx.beginPath()
+	//ctx.color = [1,0,0]
+    //ctx.strokeStyle = stroke_color
+	//ctx.fillStyle = color
+	//ctx.lineWidth = lineWidth;
+
+	if ( points.length == 0)
+		return 
+
+	let points_worlds = []
+	if( m === null ){
+		points_worlds = points
+	}
+	else{
+		
+		for( let i = 0; i < points.length; i++ )
+		{
+			points_worlds.push( points[i].getMult(m).getAdd(m.get_row(2)) )
+		}
+	}
+	
+
+	let size = stroke_width
+	for( let i = 0; i < points_worlds.length; i++)
+	{
+			
+		//ctx.translate(cX(points_worlds[i]), cY(points_worlds[i]));
+		//ctx.rotate(0);
+		
+		//if( sub_draw == false )
+		//	ctx.beginPath();
+		let x = cX(points_worlds[i])
+		let y = cY(points_worlds[i])
+		ctx.rect( x,
+				y,
+				size,
+				size)
+
+		//if( sub_draw == false )
+		//	ctx.closePath();
+	}
+		
+
+	//ctx.stroke();
+    //ctx.restore()
+	//ctx.closePath();
+    
+	ctx.closePath();
+}
+
+
 
 export function draw_rectangle(ctx, { m = null, sub_draw = false } )
 {

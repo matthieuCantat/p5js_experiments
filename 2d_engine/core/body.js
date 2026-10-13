@@ -135,11 +135,13 @@ export class body
 		for( let shape_info of this.args.shapes )
 		{
 			let shape_color = shape_info.color
-			if(typeof shape_info.color === 'string' || shape_info.color instanceof String)
-				shape_color = COLORS_TO_RGB[shape_info.color]
+
+			if(typeof shape_color === 'string' || shape_color instanceof String)
+				shape_color = COLORS_TO_RGB[shape_color]
+			
 			let stroke_color = shape_info.stroke_color
-			if(typeof shape_info.stroke_color === 'string' || shape_info.stroke_color instanceof String)
-				stroke_color = COLORS_TO_RGB[shape_info.stroke_color]
+			if(typeof stroke_color === 'string' || stroke_color instanceof String)
+				stroke_color = COLORS_TO_RGB[stroke_color]
 			
 			
 			this.shapes_dynamic_data.push(
