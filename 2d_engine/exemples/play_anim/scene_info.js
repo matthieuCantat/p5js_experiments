@@ -58,7 +58,7 @@ export var scene_info = {
 					"color": [255,0,0],
 					"type": "rectangle",
 					"stroke_color":"black",
-					"stroke_width":1,
+					"stroke_width":4,
 				}
 			],
 			"interaction_shapes": [

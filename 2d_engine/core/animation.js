@@ -696,6 +696,12 @@ function build_tangeant(
         tanA.normalize()
         tanA.mult(l)
     }
+    else if( tan_info.length === 'auto3' )
+    {
+        let l = tanA.mag()/3
+        tanA.normalize()
+        tanA.mult(l)
+    }
     else if( tan_info.length === 'auto2' )
     {
         let l = tanA.mag()/2

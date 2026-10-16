@@ -1,19 +1,27 @@
 
 
+import { keys_generate_loop,keys_blend_with_value } from "../template/animation_utils.js";
+
 export var body_jump_happy ={
     "default_settings":
     {
         "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "out_tan" : { "orient" : "neighbor", "length" : "auto4"}
+        "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
+        "loop" : 0,
+        "loop_mode" : "loop",// "loop","pingpong"        
+        "loop_range_mode" : "obj",//"obj","attr"
     },
     "body_A" : {
         "translateY" : [
             { "t" : 5   , "v" : 0},
-            { "t" : 10 , "v" :  -10 },
-            { "t" : 50  , "v" : 500},
-            { "t" : 100 , "v" : 0, "in_tan" : { "orient" : "linear"}, "out_tan" : { "orient" : "linear"} },
-            { "t" : 150  , "v" : 100},
-            { "t" : 200 , "v" : 0},
+            { "t" : 10 , "v" :  -10 , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
+            { "t" : 50  , "v" : 500 , "in_tan" : { "orient" : "flat", "length" : "auto3" }, "out_tan" : { "orient" : "flat", "length" : "auto3"} },
+            { "t" : 100 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
+            { "t" : 150 , "v" : 200, "in_tan" : { "orient" : "flat", "length" : "auto3" }, "out_tan" : { "orient" : "flat", "length" : "auto3"} },
+            { "t" : 200 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
+            { "t" : 250 , "v" : 50  , "in_tan" : { "orient" : "flat", "length" : "auto3" }, "out_tan" : { "orient" : "flat", "length" : "auto3"} },
+            { "t" : 300 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
+                
         ],
         "scaleY" : [
             { "t" : 5 , "v" : 1 },
@@ -28,30 +36,11 @@ export var body_jump_happy ={
             { "t" : 100 , "v" : 0 },
             { "t" : 200 , "v" : 0 }
         ],
-        "colorX" : [
-            { "t" : 5 , "v" : 255 },
-            { "t" : 50 , "v" : 0 },
-            { "t" : 100 , "v" : 255 },
-            { "t" : 200 , "v" : 0 }
-        ],
-        "colorY" : [
-            { "t" : 40 , "v" : 0 },
-            { "t" : 70 , "v" : 0 },
-            { "t" : 100 , "v" : 255 },
-            { "t" : 200 , "v" : 0 }
-        ]
-        ,
-        "colorZ" : [
-            { "t" : 40 , "v" : 0 },
-            { "t" : 70 , "v" : 0 },
-            { "t" : 100 , "v" : 255 },
-            { "t" : 200 , "v" : 0 }
-        ],
-        "colorStrokeZ" : [
-            { "t" : 5 , "v" : 255 },
-            { "t" : 50 , "v" : 0 },
-            { "t" : 100 , "v" : 255 },
-            { "t" : 200 , "v" : 0 }
-        ]
+        "colorX" : keys_blend_with_value( keys_generate_loop( 20, [0,255], 20, 5), 255, 20 ),
+        "colorY" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 5),   0, 20 ),
+        "colorZ" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 5),   0, 20 ),
+        "colorStrokeX" : keys_blend_with_value( keys_generate_loop( 20, [0,255], 20, 10),  0, 20 ),
+        "colorStrokeY" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 10),  0, 20 ),
+        "colorStrokeZ" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 10),  0, 20 ),
     }
 }
