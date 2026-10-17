@@ -947,6 +947,7 @@ class Transform
 		if( arg_interaction_shapes_info.length === 0 )
 			in_interactions_matices = in_shapes_matices
 
+		
 		this.m_body_to_interactions = []
 		for( let m of in_interactions_matices )
 		{

@@ -87,7 +87,7 @@ export class Animation_manager {
         this.played[name].start_ending( fade_out_seconds )
     }
 
-    update()
+    update(  )
     {
         for( let name in this.played )
         {
@@ -135,9 +135,12 @@ class Animation
 
   
 
-    update()
+    update( t_override = null )
     {
         let _t = this.t
+        if( t_override !== null )
+            _t = t_override
+        console.log(_t)
         _t = Math.min(this.anim_data_baked['range'][1], _t )
         _t =  Math.max(this.anim_data_baked['range'][0], _t ) 
         _t = _t- this.anim_data_baked['range'][0]

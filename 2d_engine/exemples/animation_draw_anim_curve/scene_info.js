@@ -100,12 +100,20 @@ export var scene_info = {
 }
 
 
-scene_info.objs['anim_curve'] = draw_anim_curve(
+scene_info.objs['anim_curve_root_ty'] = draw_anim_curve(
 				'windmill_idle',
 				'root',
 				'translateY',
-				[-200, 0, 0, 1, 3.0] )
+				[-200, 100, 0, 1., 1.0] )
 
+
+scene_info.objs['anim_curve_root_r'] = draw_anim_curve(
+	'windmill_idle',
+	'root',
+	'rotate',
+	[-200, -200, 0, 1., 1.0] )
+
+		
 
 
 

@@ -232,7 +232,6 @@ let settings_list = [
 ]
 
 
-scene_info.objs["root"] = {}
 
 let p = new Vector2d(p_start)
 let scale = new Vector2d(60,20)
