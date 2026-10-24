@@ -5,22 +5,22 @@ import { keys_generate_loop,keys_blend_with_value } from "../template/animation_
 export var body_jump_happy ={
     "default_settings":
     {
-        "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "loop" : 0,
+        "in_tan" : { "orient" : "neighbor", "length" : "auto8"},
+        "out_tan" : { "orient" : "neighbor", "length" : "auto8"},
+        "loop" : 1,
         "loop_mode" : "loop",// "loop","pingpong"        
         "loop_range_mode" : "obj",//"obj","attr"
     },
     "body_A" : {
         "translateY" : [
             { "t" : 5   , "v" : 0},
-            { "t" : 10 , "v" :  -10 , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
-            { "t" : 50  , "v" : 500 , "in_tan" : { "orient" : "flat", "length" : "auto3" }, "out_tan" : { "orient" : "flat", "length" : "auto3"} },
-            { "t" : 100 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
-            { "t" : 150 , "v" : 200, "in_tan" : { "orient" : "flat", "length" : "auto3" }, "out_tan" : { "orient" : "flat", "length" : "auto3"} },
-            { "t" : 200 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
-            { "t" : 250 , "v" : 50  , "in_tan" : { "orient" : "flat", "length" : "auto3" }, "out_tan" : { "orient" : "flat", "length" : "auto3"} },
-            { "t" : 300 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto3" }, "out_tan" : { "orient" : 90    , "length" : "auto3"} },
+            { "t" : 10 , "v" :  -10 , "in_tan" : { "orient" : -90   , "length" : "auto8" }, "out_tan" : { "orient" : 90    , "length" : "auto8"} },
+            { "t" : 50  , "v" : 500 , "in_tan" : { "orient" : "flat", "length" : "auto8" }, "out_tan" : { "orient" : "flat", "length" : "auto8"} },
+            { "t" : 100 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto8" }, "out_tan" : { "orient" : 90    , "length" : "auto8"} },
+            { "t" : 150 , "v" : 200, "in_tan" : { "orient" : "flat", "length" : "auto8" }, "out_tan" : { "orient" : "flat", "length" : "auto8"} },
+            { "t" : 200 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto8" }, "out_tan" : { "orient" : 90    , "length" : "auto8"} },
+            { "t" : 250 , "v" : 50  , "in_tan" : { "orient" : "flat", "length" : "auto8" }, "out_tan" : { "orient" : "flat", "length" : "auto8"} },
+            { "t" : 300 , "v" : 0   , "in_tan" : { "orient" : -90   , "length" : "auto8" }, "out_tan" : { "orient" : 90    , "length" : "auto8"} },
                 
         ],
         "scaleY" : [
