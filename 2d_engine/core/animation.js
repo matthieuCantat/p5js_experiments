@@ -243,7 +243,29 @@ async function bake_animation( anim_data )
         "loop" : anim_data.default_settings.loop,
         "loop_mode" : anim_data.default_settings.loop_mode,
         "loop_range_mode" : anim_data.default_settings.loop_range_mode,
+        "offset" : anim_data.default_settings.offset,
     }
+
+
+    // add offset to every key
+
+    if( default_settings.offset !== undefined )
+    {
+        for( let obj in anim_data )
+        {
+            if( obj === 'default_settings')
+                continue
+            for( let attr in anim_data[obj] )
+            {
+                for( let i = 0 ; i < anim_data[obj][attr].length ; i++ )
+                {
+                    anim_data[obj][attr][i].t += default_settings.offset
+                }
+            }
+        }
+    }
+
+
 
     // GET RANGE OF EACH ATTRIBUTE
     for( let obj in anim_data )
@@ -268,11 +290,9 @@ async function bake_animation( anim_data )
         }
     }
 
-    //////////////////////////////////////////////////
-    //anim_data_baked['range'][0] = 0 // let start from 0
-    //////////////////////////////////////////////////
+    // total range must start at 0
+    anim_data_baked['range'][0] = 0
 
-    
             
     
     // GENERATE ANIM LOOP
@@ -475,12 +495,12 @@ function hermite_interpolation(
     interpolation_range,    
 )
 {
-    let sample_range = 100
+    let SAMPLE_RANGE = 1000// or SECTION TIME DELTA MAX
 
     let samples = []
-    for( let i = 0 ; i < sample_range; i++ )
+    for( let i = 0 ; i < SAMPLE_RANGE; i++ )
     {
-        let u = i/(sample_range-1)
+        let u = i/(SAMPLE_RANGE-1)
         let p = hermite2D(pA, pB, tanA, tanB, u)
         //let p = bezier2D(pA, pB, tanA, tanB, u)
         samples.push(p)
@@ -656,35 +676,11 @@ function build_tangeant(
         tanA.rotateDeg(tan_info.orient*coef)
     }
     
-    // LENGTH
     
-    if (tan_info.length === 'auto8')
+    // LENGTH
+    if( (typeof(tan_info.length) === 'string')&&( tan_info.length.startsWith('auto') ) )
     {
-        let l = tanA.mag()/8
-        tanA.normalize()
-        tanA.mult(l)
-    }
-    else if (tan_info.length === 'auto6')
-    {
-        let l = tanA.mag()/6
-        tanA.normalize()
-        tanA.mult(l)
-    }
-    else if (tan_info.length === 'auto4')
-    {
-        let l = tanA.mag()/4
-        tanA.normalize()
-        tanA.mult(l)
-    }
-    else if( tan_info.length === 'auto3' )
-    {
-        let l = tanA.mag()/3
-        tanA.normalize()
-        tanA.mult(l)
-    }
-    else if( tan_info.length === 'auto2' )
-    {
-        let l = tanA.mag()/2
+        let l = tanA.mag()/ parseInt( tan_info.length.substring(4) )
         tanA.normalize()
         tanA.mult(l)
     }

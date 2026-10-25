@@ -9,14 +9,14 @@ export var scene_info = {
     "eventActions":[],
 }
 
-
+/*
 
 scene_info.objs['anim_curve_root_r'] = draw_anim_curve(
 	'windmill_transformation',
 	'rectangle_rotate_top',
 	'rotate',
-	[-1300, -200, 0, 1.0, 1.0] )
-
+	[-200, -200, 0, 1.0, 1.0] )
+*/
 
 
 scene_info.eventActions.push( 
@@ -40,7 +40,7 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.start( `first_anim`,"windmill_transformation", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                    obj.Game_engine.Animation.start( `first_anim`,"windmill_idle", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },
@@ -50,3 +50,5 @@ scene_info.eventActions.push(
     },
    
  )
+//windmill_transformation
+//windmill_idle

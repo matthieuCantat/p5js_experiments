@@ -1,35 +1,20 @@
-
+import { keys_generate_loop,keys_blend_with_value } from "../template/animation_utils.js";
 
 export var windmill_idle = {
     "default_settings":
     {
-        "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
-        "loop" : 2,
+        "in_tan" : { "orient" : "neighbor", "length" : "auto6"},
+        "out_tan" : { "orient" : "neighbor", "length" : "auto6"},
+        "loop" : 15,
         "loop_mode" : "loop",// "loop","pingpong"
         "loop_range_mode" : "obj",//"obj","attr"
     },
-    "root" : {
-        "translateY" : [
-            { "t" : 0   , "v" : 0 },
-            { "t" : 25  , "v" : 100 },
-            { "t" : 50  , "v" : 0 },
-            { "t" : 75  , "v" : -100 },
-            { "t" : 100 , "v" : 0 }            
-        ],
-        "translateX" : [
-            { "t" : 0   , "v" : 0 },
-            { "t" : 40  , "v" : 5 },
-            { "t" : 80  , "v" : 0 },
-            { "t" : 120  , "v" : -5 },
-            { "t" : 160 , "v" : 0 }            
-        ],
-        "rotate" : [
-            { "t" : 0 , "v" : 0 },
-            { "t" : 100 , "v" : 180 },
-            { "t" : 200 , "v" : 0 }
-        ]
-    },
+}
+
+windmill_idle["root"] = {
+    "translateY" : keys_generate_loop( 25, [0,100,0,-100], 10, 0),
+    "translateX" : keys_generate_loop( 30, [0,5,0,-5], 10, 0),
+    "rotate"     : keys_generate_loop( 100, [0,180,0], 3, 0),
 }
 
 
@@ -68,3 +53,5 @@ for( let n of obj_names_trap )
         ]
     }
 }
+    
+
