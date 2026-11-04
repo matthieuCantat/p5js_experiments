@@ -744,6 +744,17 @@ Matrix2d.prototype = {
 		return this;
 	},
 
+	blend: function( m, coef ) {
+		let pX = this.getTranslateX() * ( 1 - coef ) + m.getTranslateX() * coef
+		let pY = this.getTranslateY() * ( 1 - coef ) + m.getTranslateY() * coef
+		let r  = this.getRotation()   * ( 1 - coef ) + m.getRotation()   * coef
+		this.setTranslateX(pX)
+		this.setTranslateY(pY)
+		this.setRotation(r)
+		return this;
+	},
+
+
 
 	/**
 	 * Apply current matrix to x and y point.

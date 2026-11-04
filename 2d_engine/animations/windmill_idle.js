@@ -1,21 +1,22 @@
-import { keys_generate_loop,keys_blend_with_value } from "../template/animation_utils.js";
+import { keys_generate_loop,keys_blend_with_value, keys_generate_fix_size_loop } from "../template/animation_utils.js";
 
 export var windmill_idle = {
     "default_settings":
     {
-        "in_tan" : { "orient" : "neighbor", "length" : "auto6"},
-        "out_tan" : { "orient" : "neighbor", "length" : "auto6"},
-        "loop" : 15,
+        "in_tan" : { "orient" : "neighbor", "length" : "auto4"},
+        "out_tan" : { "orient" : "neighbor", "length" : "auto4"},
+        "loop" : 2,
         "loop_mode" : "loop",// "loop","pingpong"
         "loop_range_mode" : "obj",//"obj","attr"
     },
 }
 
 windmill_idle["root"] = {
-    "translateY" : keys_generate_loop( 25, [0,100,0,-100], 10, 0),
-    "translateX" : keys_generate_loop( 30, [0,5,0,-5], 10, 0),
-    "rotate"     : keys_generate_loop( 100, [0,180,0], 3, 0),
+    "translateY" : keys_generate_fix_size_loop( 400 , [ 0, 35 , 0, -35,  0 ], 3  ),
+    "translateX" : keys_generate_fix_size_loop( 400 , [ 0, 5  , 0, -5 ,  0 ], 2  ),
+    "rotate"     : keys_generate_fix_size_loop( 400 , [ 0, 200, 0, -230, 0]  ),
 }
+
 
 
 let obj_names_rectangles = [
@@ -26,13 +27,7 @@ let obj_names_rectangles = [
 for( let n of obj_names_rectangles )
 {
     windmill_idle[n] = {
-        "translateY" : [
-            { "t" : 0   , "v" : 0 },
-            { "t" : 25  , "v" : 30 },
-            { "t" : 75  , "v" : 30 },
-            { "t" : 90  , "v" : 0 },          
-            { "t" : 125 , "v" : 0 }  
-        ]
+        "translateY" : keys_generate_fix_size_loop( 400 , [ 0, 30, 30, 0, 0]  ),
     }
 }
 
@@ -44,14 +39,10 @@ let obj_names_trap = [
 for( let n of obj_names_trap )
 {
     windmill_idle[n] = {
-        "translateY" : [
-            { "t" : 0   , "v" : 0 },
-            { "t" : 50  , "v" : 20 },
-            { "t" : 75  , "v" : 20 },
-            { "t" : 90 , "v" : 0 },          
-            { "t" : 125 , "v" : 0 }  
-        ]
+        "translateY" : keys_generate_fix_size_loop( 400 , [ 0, 20, 20, 0, 0]  ),
+          
     }
 }
+
     
 

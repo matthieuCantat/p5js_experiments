@@ -68,11 +68,11 @@ export class Animation_manager {
     }
     
     start( name,
-           animation_name
-            //fade_in_seconds = 0,
+           animation_name,
+           { fade_in_seconds = 0 },
             //loop = false, }
         ){
-            this.played[name] = new Animation( this.Game_engine, this.anim_to_baked[animation_name])
+            this.played[name] = new Animation( this.Game_engine, this.anim_to_baked[animation_name], { fade_in_seconds : fade_in_seconds })
             
     }
     
@@ -81,10 +81,19 @@ export class Animation_manager {
         
     }
 
-    end( name, { fade_out_seconds = 0 } )
+    end( name = null, fade_out_seconds = 0 )
     {
-        
-        this.played[name].start_ending( fade_out_seconds )
+        if( name === null)
+        {
+            for( let n in this.played )
+                if( this.played[n] !== undefined )  
+                    this.played[n].start_ending( fade_out_seconds = fade_out_seconds )
+            return
+        }
+
+        if( this.played[name] === undefined )
+            return
+        this.played[name].start_ending( { fade_out_seconds : fade_out_seconds } )
     }
 
     update(  )
@@ -121,7 +130,9 @@ class Animation
                
     ]
 
-    constructor( Game_engine, anim_baked,
+    constructor( Game_engine, 
+        anim_baked,
+        { fade_in_seconds = null },
     )
     {
         this.is_finish = false
@@ -130,10 +141,22 @@ class Animation
 
         this.t = 0
         this.anim_data_baked = anim_baked
-       
+
+        this.fade_out_seconds = null
+        this.fade_out_seconds_remained = null
+
+        this.fade_in_seconds = fade_in_seconds
+        this.fade_in_seconds_remained = fade_in_seconds
+
+        
     }
 
-  
+    start_ending( { fade_out_seconds = 0 } )
+    {
+        this.fade_out_seconds = fade_out_seconds
+        this.fade_out_seconds_remained = fade_out_seconds
+    }
+
 
     update( t_override = null )
     {
@@ -145,8 +168,8 @@ class Animation
         _t =  Math.max(this.anim_data_baked['range'][0], _t ) 
         _t = _t- this.anim_data_baked['range'][0]
         
-        
 
+        let valid_obj_names = []
         for( let obj_name in this.anim_data_baked['values'] )
         {
             let raw_values = this.anim_data_baked['values'][obj_name][_t]
@@ -156,6 +179,14 @@ class Animation
 
             if( this.Game_engine.Objs[obj_name] === undefined )
                 continue
+
+            valid_obj_names.push(obj_name)
+        }
+        
+        
+        for( let obj_name of valid_obj_names )
+        {
+            let raw_values = this.anim_data_baked['values'][obj_name][_t]
 
             let m_local_init = this.Game_engine.Objs[obj_name].trsf.get_local_init()
             
@@ -203,7 +234,64 @@ class Animation
         
        
         this.t += 1
+
+
+
+        
+        
+        if( this.fade_in_seconds_remained !== null )
+        {
+            if( 0 < this.fade_in_seconds_remained  )
+            {
+                for( let obj_name of valid_obj_names )
+                {
+                    
+                    let m = this.Game_engine.Objs[obj_name].trsf.get_local()
+                    let coef = this.fade_in_seconds_remained / this.fade_in_seconds // 0 when its done
+                    let m_blended = new Matrix2d()
+                    m_blended.blend(  m, 1-coef )
+                    this.Game_engine.Objs[obj_name].trsf.set_local(m_blended)   
+                }                              
+                this.fade_in_seconds_remained -= 1    
+            }
+            
+        }
+    
+
+
+        
+        if( this.fade_out_seconds_remained !== null )
+        {
+            if( 0 < this.fade_out_seconds_remained  )
+            {
+                for( let obj_name of valid_obj_names )
+                {
+                    let m = this.Game_engine.Objs[obj_name].trsf.get_local()
+                    let coef = this.fade_out_seconds_remained / this.fade_out_seconds // 0 when its done
+                    let m_blended = new Matrix2d()
+                    m_blended.blend(  m, coef )
+                    this.Game_engine.Objs[obj_name].trsf.set_local(m_blended)   
+                }                              
+                
+            }
+            else
+            {
+                this.is_finish = true
+
+                for( let obj_name of valid_obj_names )
+                    this.Game_engine.Objs[obj_name].trsf.set_local(new Matrix2d())                
+                
+            }
+            this.fade_out_seconds_remained -= 1
+        }
+
+
+
+
+
+        return
     }
+    
 
 }
 
