@@ -148,7 +148,7 @@ class Animation
         this.fade_in_seconds = fade_in_seconds
         this.fade_in_seconds_remained = fade_in_seconds
 
-        
+        this._last_matrices_locals = {}
     }
 
     start_ending( { fade_out_seconds = 0 } )
@@ -160,6 +160,8 @@ class Animation
 
     update( t_override = null )
     {
+
+
         let _t = this.t
         if( t_override !== null )
             _t = t_override
@@ -248,9 +250,13 @@ class Animation
                     
                     let m = this.Game_engine.Objs[obj_name].trsf.get_local()
                     let coef = this.fade_in_seconds_remained / this.fade_in_seconds // 0 when its done
-                    let m_blended = new Matrix2d()
-                    m_blended.blend(  m, 1-coef )
-                    this.Game_engine.Objs[obj_name].trsf.set_local(m_blended)   
+                    let m_blended = this._last_matrices_locals[obj_name]
+                    if( m_blended !== undefined )
+                    {
+                        m_blended.blend(  m, 1-coef )
+                        this.Game_engine.Objs[obj_name].trsf.set_local(m_blended)   
+                    }
+
                 }                              
                 this.fade_in_seconds_remained -= 1    
             }
@@ -268,9 +274,13 @@ class Animation
                 {
                     let m = this.Game_engine.Objs[obj_name].trsf.get_local()
                     let coef = this.fade_out_seconds_remained / this.fade_out_seconds // 0 when its done
-                    let m_blended = new Matrix2d()
-                    m_blended.blend(  m, coef )
-                    this.Game_engine.Objs[obj_name].trsf.set_local(m_blended)   
+                    let m_blended = this._last_matrices_locals[obj_name]
+                    if( m_blended !== undefined )
+                    {
+                        m_blended.blend(  m, coef )
+                        this.Game_engine.Objs[obj_name].trsf.set_local(m_blended)   
+                    }
+                  
                 }                              
                 
             }
@@ -286,6 +296,8 @@ class Animation
         }
 
 
+        for( let obj_name of valid_obj_names )
+            this._last_matrices_locals[obj_name] = this.Game_engine.Objs[obj_name].trsf.get_local()
 
 
 

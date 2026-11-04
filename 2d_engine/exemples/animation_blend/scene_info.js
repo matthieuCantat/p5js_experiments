@@ -9,17 +9,17 @@ export var scene_info = {
 
 scene_info["objs"]["play_idle"] =
 {
-    "m": [-100, -300, 0, 1, 1],
+    "m": [-140, -300, 0, 1, 1],
     "shapes" : [
         {
-            "m": [-100, -300, 0, 50, 25],
+            "m": [-140, -300, 0, 40, 25],
             "color": "green",
             "type": "rectangle",
             "stroke_color":"black",
             "stroke_width":1,
         },
         {
-            "m": [-150, -300, 0, 5, 5],
+            "m": [-175, -300, 0, 3, 3],
             "color": "black",
             "type": "text",
             "text": "idle",
@@ -29,7 +29,7 @@ scene_info["objs"]["play_idle"] =
     ],
     "interaction_shapes": [
         {
-            "m": [-100, -300, 0, 50, 25],
+            "m": [-140, -300, 0, 40, 25],
             "type": "circle",
         }
     ],
@@ -64,17 +64,17 @@ scene_info["objs"]["play_idle"] =
 
 scene_info["objs"]["play_transform"] =
 {
-    "m": [100, -300, 0, 1, 1],
+    "m": [-50, -300, 0, 1, 1],
     "shapes" : [
         {
-            "m": [100, -300, 0, 50, 25],
+            "m": [-50, -300, 0, 50, 25],
             "color": "red",
             "type": "rectangle",
             "stroke_color":"black",
             "stroke_width":1,
         },
         {
-            "m": [50, -300, 0, 3, 3],
+            "m": [-100, -300, 0, 3, 3],
             "color": "black",
             "type": "text",
             "text": "transform",
@@ -84,7 +84,7 @@ scene_info["objs"]["play_transform"] =
     ],
     "interaction_shapes": [
         {
-            "m" :  [ 100, -300, 0, 50, 25],
+            "m" :  [ -50, -300, 0, 50, 25],
             "type": "circle",
         }
     ],
