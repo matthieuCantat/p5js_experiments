@@ -43,14 +43,14 @@ for( let n of obj_names_rectangles )
     windmill_transformation[n] = {
         "translateY" : [
             { "t" : 0      , "v" : 0 },
-            { "t" : 4      , "v" : 0  , "out_tan" : { "orient" : "flat", "length" : "auto3"}  },  
-            { "t" : tA     , "v" : 100, "in_tan" : { "orient" : "flat", "length" : "auto3" } },  
+            { "t" : 4      , "v" : 0  , "out_tan" : { "orient" : "flat", "length" : "auto6"}  },  
+            { "t" : tA     , "v" : 100, "in_tan" : { "orient" : "flat", "length" : "auto6" } },  
             { "t" : tA+d   , "v" : 100 },  
             { "t" : tB     , "v" : 100 },       
             { "t" : tB+d   , "v" : 100 },   
-            { "t" : tC     , "v" : 0 },  
-            { "t" : tC+d   , "v" : 0 },  
-            { "t" : tC+d+20, "v" : 0 },  
+            { "t" : tC     , "v" : 20 },  
+            { "t" : tC+d   , "v" : 20 },  
+            { "t" : tC+d+20, "v" : 20 },  
         ]
     }
 }
@@ -94,6 +94,7 @@ let obj_names_trap = [
     "trap_downRight", 
     "trap_downLeft", 
     "trap_topLeft"]
+    
 for( let n of obj_names_trap )
 {
     windmill_transformation[n] = {

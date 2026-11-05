@@ -5,6 +5,7 @@ import Vector2d from '../utils/vector2d.js';
 
 import { windmill_idle } from '../animations/windmill_idle.js';
 import { windmill_transformation } from '../animations/windmill_transformation.js';
+import { windmill_entrance } from '../animations/windmill_entrance.js';
 import { body_jump_happy } from '../animations/body_jump_happy.js';
 
 
@@ -33,6 +34,7 @@ async function load_animation() {
         "body_jump_happy":body_jump_happy,
         "windmill_idle": windmill_idle,
         "windmill_transformation": windmill_transformation,
+        "windmill_entrance" : windmill_entrance,
     }
     /*
     // USE FETCH TO LOAD ANIMATION DATA FROM JSON FILES
