@@ -21,7 +21,7 @@ scene_info["objs"]["play_idle"] =
     ],
     "interaction_shapes": [
         {
-            "m": [-100, -300, 0, 50, 25],
+            "m": [-150, -300, 0, 50, 25],
             "type": "circle",
         }
     ],
@@ -78,18 +78,29 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'play_idle' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.start( `idle_anim`,"windmill_idle", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                    obj.Game_engine.Animation.start( `idle_anim`,"windmill_transformation", { volume : 1, fade_in_seconds : 0, loop : true, time_input : false } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },
             duration : {
                 in_args : [ 'play_idle' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.update( 10); //"sfx_wii_short_tick_02"
+                    
+                    let delta = ( obj.trsf.get_local().getTranslateX() + 150 ) 
+                    console.log('duration', delta)
+                    obj.Game_engine.Animation.update( `idle_anim`, delta ); //"sfx_wii_short_tick_02"
                 },
                 duration : 100,
             },
-            end : {}
+            
+            end : {
+                in_args : [ 'play_idle' ],
+                fn : (obj) => {
+                    console.log('end')
+                },
+                duration : 1,
+            }
+        
         },
 
     },

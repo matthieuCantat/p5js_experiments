@@ -71,10 +71,13 @@ export class Animation_manager {
     
     start( name,
            animation_name,
-           { fade_in_seconds = 0 },
+           { fade_in_seconds = 0, time_input = true },
             //loop = false, }
         ){
-            this.played[name] = new Animation( this.Game_engine, this.anim_to_baked[animation_name], { fade_in_seconds : fade_in_seconds })
+            this.played[name] = new Animation( 
+                this.Game_engine, 
+                this.anim_to_baked[animation_name], 
+                { fade_in_seconds : fade_in_seconds, time_input : time_input})
             
     }
     
@@ -98,18 +101,26 @@ export class Animation_manager {
         this.played[name].start_ending( { fade_out_seconds : fade_out_seconds } )
     }
 
-    update(  )
+    update( name = null , t_override = null )
     {
-        for( let name in this.played )
+        if( name === null)
         {
-            if( this.played[name].is_finish )
+            for( let name in this.played )
             {
-                delete( this.played[name] )
-                continue
+                if( this.played[name].is_finish )
+                {
+                    delete( this.played[name] )
+                    continue
+                }
+    
+                this.played[name].update()
             }
-
-            this.played[name].update()
         }
+        else
+        {
+            this.played[name].update( t_override)
+        }
+       
         
     }
 
@@ -134,11 +145,11 @@ class Animation
 
     constructor( Game_engine, 
         anim_baked,
-        { fade_in_seconds = null },
+        { fade_in_seconds = null, time_input = true },
     )
     {
         this.is_finish = false
-
+        this.time_input = time_input
         this.Game_engine = Game_engine
 
         this.t = 0
@@ -164,7 +175,10 @@ class Animation
     {
 
 
-        let _t = this.t
+        let _t = 0
+        
+        if( this.time_input === true)
+            _t = this.t
         if( t_override !== null )
             _t = t_override
         
