@@ -86,8 +86,8 @@ scene_info.eventActions.push(
                 in_args : [ 'play_idle' ],
                 fn : (obj) => {
                     
-                    let delta = ( obj.trsf.get_local().getTranslateX() + 150 ) 
-                    console.log('duration', delta)
+                    let delta = parseInt( obj.trsf.get_local().getTranslateX() + 150 ) 
+                    //console.log('duration', delta)
                     obj.Game_engine.Animation.update( `idle_anim`, delta ); //"sfx_wii_short_tick_02"
                 },
                 duration : 100,
