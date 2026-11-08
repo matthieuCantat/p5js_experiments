@@ -38,7 +38,7 @@ scene_info["objs"]["play_idle"] =
         rotate_limits: [0,0],
     },            
     "dyn_settings": {
-        "enable": false,
+        "enable": true,
         enable_gravity:false,
         mass:0.9,
         "friction_translate": 0.1,
@@ -62,7 +62,7 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'play_idle' ],
                 fn : (obj) => {
-                    let status = false
+                    let status = true
                     if( obj.Event.data.user['grab'].status )
                     {
                         status = true
