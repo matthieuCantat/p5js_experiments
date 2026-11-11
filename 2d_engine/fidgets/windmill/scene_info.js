@@ -18,7 +18,7 @@ scene_info.objs['anim_curve_root_r'] = draw_anim_curve(
 	[-200, -200, 0, 1.0, 1.0] )
 
 
-
+/*
 scene_info.eventActions.push( 
     {
         event : {
@@ -40,7 +40,7 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.start( `first_anim`,"windmill_entrance", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                    obj.Game_engine.Animation.start( `first_anim`,"windmill_explode", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },
@@ -52,3 +52,4 @@ scene_info.eventActions.push(
  )
 //windmill_transformation
 //windmill_idle
+*/

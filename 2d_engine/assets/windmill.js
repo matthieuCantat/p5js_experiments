@@ -198,7 +198,7 @@ for( let n of obj_names_trap )
                 m_local : [0, 0, 0, 55, 10],
                 color: "red",
                 type : 'trapezoid',
-                stroke_color: "red",
+                stroke_color: "black",
                 stroke_width: 1,
             }
         ],

@@ -6,6 +6,7 @@ import Vector2d from '../utils/vector2d.js';
 import { windmill_idle } from '../animations/windmill_idle.js';
 import { windmill_transformation } from '../animations/windmill_transformation.js';
 import { windmill_entrance } from '../animations/windmill_entrance.js';
+import { windmill_explode } from '../animations/windmill_explode.js';
 import { body_jump_happy } from '../animations/body_jump_happy.js';
 
 
@@ -35,6 +36,7 @@ async function load_animation() {
         "windmill_idle": windmill_idle,
         "windmill_transformation": windmill_transformation,
         "windmill_entrance" : windmill_entrance,
+        "windmill_explode" : windmill_explode,
     }
     /*
     // USE FETCH TO LOAD ANIMATION DATA FROM JSON FILES
@@ -219,35 +221,40 @@ class Animation
                 this.Game_engine.Objs[obj_name].shapes_visibility =raw_values.visibility !== 0
             }
 
-            if( raw_values.colorX !== undefined)
+            if( raw_values.colorR !== undefined)
             {
-                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[0] = raw_values.colorX               
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[0] = raw_values.colorR               
             }
             
-            if( raw_values.colorY !== undefined)
+            if( raw_values.colorG !== undefined)
             {
-                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[1] = raw_values.colorY              
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[1] = raw_values.colorG              
             }
             
-            if( raw_values.colorZ !== undefined)
+            if( raw_values.colorB !== undefined)
             {
-                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[2] = raw_values.colorZ              
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].color[2] = raw_values.colorB              
             }
 
-            if( raw_values.colorStrokeX !== undefined)
+            if( raw_values.colorStrokeR !== undefined)
             {
-                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[0] = raw_values.colorStrokeX               
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[0] = raw_values.colorStrokeR               
             }
             
-            if( raw_values.colorStrokeY !== undefined)
+            if( raw_values.colorStrokeG !== undefined)
             {
-                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[1] = raw_values.colorStrokeY              
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[1] = raw_values.colorStrokeG              
             }
             
-            if( raw_values.colorStrokeZ !== undefined)
+            if( raw_values.colorStrokeB !== undefined)
             {
-                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[2] = raw_values.colorStrokeZ           
-            }            
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_color[2] = raw_values.colorStrokeB           
+            }  
+            
+            if( raw_values.strokeSize !== undefined)
+                {
+                    this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_width = raw_values.strokeSize           
+                }             
         }
         
        

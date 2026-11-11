@@ -36,11 +36,11 @@ export var body_jump_happy ={
             { "t" : 100 , "v" : 0 },
             { "t" : 200 , "v" : 0 }
         ],
-        "colorX" : keys_blend_with_value( keys_generate_loop( 20, [0,255], 20, 5), 255, 0, 20 ),
-        "colorY" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 5),   0, 0, 20 ),
-        "colorZ" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 5),   0, 0, 20 ),
-        "colorStrokeX" : keys_blend_with_value( keys_generate_loop( 20, [0,255], 20, 10),  0, 0, 20 ),
-        "colorStrokeY" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 10),  0, 0, 20 ),
-        "colorStrokeZ" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 10),  0, 0, 20 ),
+        "colorR" : keys_blend_with_value( keys_generate_loop( 20, [0,255], 20, 5), 255, 0, 20 ),
+        "colorG" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 5),   0, 0, 20 ),
+        "colorB" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 5),   0, 0, 20 ),
+        "colorStrokeR" : keys_blend_with_value( keys_generate_loop( 20, [0,255], 20, 10),  0, 0, 20 ),
+        "colorStrokeG" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 10),  0, 0, 20 ),
+        "colorStrokeB" : keys_blend_with_value( keys_generate_loop( 15, [0,255], 20, 10),  0, 0, 20 ),
     }
 }
