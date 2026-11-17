@@ -94,6 +94,7 @@ export class Constraints_info
                 else 
                     expr_txt = `dst_obj.${dst_attr} = src_obj.${src_attr} ;`;
 
+                //console.log("connection expr_txt",expr_txt)
                 cns.connection_fn = Function("src_obj", "dst_obj", expr_txt);
                 
             }  

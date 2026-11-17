@@ -79,39 +79,47 @@ var shapes = {
             {
                 m : [0, 0, 0, 18, 18],
                 type: "circle",
+                
             }
         ],
     },
     "rectangle_rotate_top" : {
         interaction_shapes: [
+            /*
             {
-                m : [0, 140, 0, 50, 50],
+                m : [0, 140, 0, 100, 60],
                 "type": "rectangle",
             }
+            */
         ],
     },   
     "rectangle_rotate_left" : {
         interaction_shapes: [
+            /*
             {
-                m : [140, 0, 0, 50, 50],
+                m : [-140, 0, 0, 60, 100],
                 "type": "rectangle",
             }
+            */
         ],           
     },
     "rectangle_rotate_down" : {    
         interaction_shapes: [
             {
-                m : [0, -140, 0, 50, 50],
+                m : [0, -140, 0, 120, 80],
                 "type": "rectangle",
+                
             }
         ],
     },
     "rectangle_rotate_right" : {        
         interaction_shapes: [
+            /*
             {
-                m : [-140, 0, 0, 50, 50],
-                "type": "rectangle",
+                m : [140, 0, 0, 60, 100],
+                "type": "rectangle",    
             }
+            */
         ],
     },
 
@@ -123,28 +131,28 @@ var options = {
         transform_settings : {
             parent_limit_space : false,
             translate_limits: [[0,0],[-0,0]],
-            rotate_limits: [-90,0],
+            rotate_limits: [0,90],
         },           
     },   
     "rectangle_rotate_left" : {
         transform_settings : {
             parent_limit_space : false,
             translate_limits: [[0,0],[-0,0]],
-            rotate_limits: [-0,0],
+            rotate_limits: [0,180],
         },            
     },
     "rectangle_rotate_down" : {    
         transform_settings : {
             parent_limit_space : false,
             translate_limits: [[0,0],[-0,0]],
-            rotate_limits: [-270,0],
+            rotate_limits: [0,270],
         },
     },
     "rectangle_rotate_right" : {        
         transform_settings : {
             parent_limit_space : false,
             translate_limits: [[0,0],[-0,0]],
-            rotate_limits: [-180,0],
+            rotate_limits: [0,0],
         },
     },
 }
@@ -167,13 +175,7 @@ for( let n of obj_names_rectangles )
                 stroke_color: "black",
                 stroke_width: 1,    
             }
-        ],
-        interaction_shapes: [
-            {
-                m_local : [0, 0, 0, 8, 40],
-                "type": "rectangle",
-            }
-        ],
+        ]
     }
     options[n] = {
         transform_settings : {
@@ -183,6 +185,13 @@ for( let n of obj_names_rectangles )
         }
     }
 }
+
+shapes["rectangle_translate_down"].interaction_shapes = [
+    {
+        m_local : [0, 0, 0, 60, 60],
+        "type": "rectangle",   
+    }
+]
     
 
 let obj_names_trap = [
@@ -202,14 +211,16 @@ for( let n of obj_names_trap )
                 stroke_width: 1,
             }
         ],
+        /*
         interaction_shapes: [
             {
                 m_local : [0, 0, 0, 55, 10],
                 "type": "trapezoid",
+                
             }
         ],
+         */
     }
-
     options[n] = {
         transform_settings : {
             parent_limit_space : false,
@@ -237,10 +248,26 @@ for ( let obj_name in shapes )
         "radius_threshold": 0,
         "do_translation": true
     }
+    options[obj_name]["dyn_settings"] = {
+        'enable':true,
+        'mass':1,
+        'friction_translate':0.0001,
+        'friction_rotate':0.0001,
+        'speed_limit_translate': 30,
+        'speed_limit_rotate':0.3,		
+    }
+    options[obj_name]["debug"] = {
+        "shape_interaction_visibility": true,
+    }
 }
+
+
+
 
 export function get_windmill_objs()
 {
-    return get_objs(hierarchy, shapes, options)
+    return get_objs(hierarchy, shapes, options )
 }
+
+
 

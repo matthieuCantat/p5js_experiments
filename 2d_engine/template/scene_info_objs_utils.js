@@ -63,7 +63,7 @@ function extract_objs_matrices(hierarchy, obj_to_matrix, level=0)
 
 
 
-export function get_objs(hierarchy, shapes, options)
+export function get_objs(hierarchy, shapes, options )
 {
     var objs = {};
 
@@ -84,8 +84,12 @@ export function get_objs(hierarchy, shapes, options)
             "interaction_shapes": obj_shapes["interaction_shapes"] || [],
             "transform_settings": obj_options["transform_settings"] || {},
             "interaction_settings": obj_options["interaction_settings"] || {},
+            "dyn_settings": obj_options["dyn_settings"] || {},
+            "debug": obj_options["debug"] || {},
         }
     }
+
+
     
     return objs
 }

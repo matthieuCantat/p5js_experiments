@@ -293,6 +293,7 @@ export class body
 		
 		this.debug = this.args.debug
 
+
 	}
 
 
@@ -1038,6 +1039,35 @@ class Transform
 		let m = this.get()
 		m.setRotationDeg(value)
 		this.set(m)
+	}
+
+
+	set_local_translate(p)
+	{
+		let m = this.get_local()
+		m.setRow(2,p)
+		this.set_local(m)
+	}
+	
+	set_local_translateX( value )
+	{
+		let m = this.get_local()
+		m.setRow(2,new Vector2d(value,m.get_row(2).y))
+		this.set_local(m)
+	}
+
+	set_local_translateY( value )
+	{
+		let m = this.get_local()
+		m.setRow(2,new Vector2d(m.get_row(2).x,value))
+		this.set_local(m)
+	}
+
+	set_local_rotationDeg( value )
+	{
+		let m = this.get_local()
+		m.setRotationDeg(value)
+		this.set_local(m)
 	}
 
 
