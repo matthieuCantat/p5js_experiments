@@ -74,15 +74,46 @@ scene_info.cns = [
     out : [ 'trap_topRight', 'trsf.set_local_translateY()' ],
 },   
 
-/*
+
 
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local().getTranslateY()' ],
-    expression : ' A ',
-    out : [ 'trap_topRight', 'trsf.set_local_rotationDeg()' ],
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 ) ',
+    out : [ 'trap_topRight', 'trsf.set_local_modif_rotationDeg()' ],
 },
-*/
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 )',
+    out : [ 'trap_topLeft', 'trsf.set_local_modif_rotationDeg()' ],
+},
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 )',
+    out : [ 'trap_downRight', 'trsf.set_local_modif_rotationDeg()' ],
+},
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 )',
+    out : [ 'trap_downLeft', 'trsf.set_local_modif_rotationDeg()' ],
+},
+
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    condition : '( 1 - A / 70 ) === 1',
+    expression : '0',
+    out : [ 'traps', 'trsf.set_local_modif_rotationDeg()' ],
+},  
+
+
 ]	
 
 

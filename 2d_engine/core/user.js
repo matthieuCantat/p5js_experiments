@@ -1305,11 +1305,38 @@ class Selection
 		let selectable_objs_names = []
 		for( let n in Game_engine.Objs )
 		{
-			if(Game_engine.Objs[n].interaction.settings.enable == false)
+			if(Game_engine.Objs[n].interaction.settings.enable === false)
 				continue
 			selectable_objs_names.push(n)
 		}
-		return selectable_objs_names
+
+		// SORT PRIORITY
+		let priorities_unique = []
+		for( let n of selectable_objs_names )
+		{
+			
+			let priority = Game_engine.Objs[n].interaction.settings.priority
+			
+			if( priorities_unique.includes(priority) === false )
+				priorities_unique.push( priority )
+		}
+		priorities_unique.sort()
+
+		let selectable_objs_names_sorted = []
+		for( let i of priorities_unique )
+		{
+			for( let n of selectable_objs_names )
+			{
+				if( selectable_objs_names_sorted.includes(n) )
+					continue
+				
+				let priority = Game_engine.Objs[n].interaction.settings.priority
+				if( priority == i )
+					selectable_objs_names_sorted.push(n)
+			}
+		}
+
+		return selectable_objs_names_sorted
 	}
 
 

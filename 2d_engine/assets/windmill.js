@@ -62,6 +62,8 @@ var hierarchy = {
 }
 
 
+
+
 //____________________________OBJS SHAPES
 
 var shapes = {
@@ -79,51 +81,14 @@ var shapes = {
             {
                 m : [0, 0, 0, 18, 18],
                 type: "circle",
-                
             }
         ],
     },
-    "rectangle_rotate_top" : {
-        interaction_shapes: [
-            /*
-            {
-                m : [0, 140, 0, 100, 60],
-                "type": "rectangle",
-            }
-            */
-        ],
-    },   
-    "rectangle_rotate_left" : {
-        interaction_shapes: [
-            /*
-            {
-                m : [-140, 0, 0, 60, 100],
-                "type": "rectangle",
-            }
-            */
-        ],           
-    },
-    "rectangle_rotate_down" : {    
-        interaction_shapes: [
-            {
-                m : [0, -140, 0, 120, 80],
-                "type": "rectangle",
-                
-            }
-        ],
-    },
-    "rectangle_rotate_right" : {        
-        interaction_shapes: [
-            /*
-            {
-                m : [140, 0, 0, 60, 100],
-                "type": "rectangle",    
-            }
-            */
-        ],
-    },
-
 }
+
+
+
+
 
 
 var options = {
@@ -159,6 +124,13 @@ var options = {
 
 
 
+
+
+
+
+
+
+
 let obj_names_rectangles = [
     "rectangle_translate_top", 
     "rectangle_translate_left", 
@@ -186,13 +158,118 @@ for( let n of obj_names_rectangles )
     }
 }
 
+
+
+
+
+
+
+
+shapes["traps"] = {
+    interaction_shapes: [
+        {
+            m : [0, 0, 0, 120, 120],
+            "type": "circle",   
+        }
+    ],    
+}
+options["traps"] = {
+    transform_settings : {
+        parent_limit_space : false,
+        translate_limits: [[0,0],[0,0]],
+        //rotate_limits: [0,45],
+    }    
+}
+options["traps"]["interaction_settings"] = {
+    "enable": true,
+    "coef": 0.2,
+    "rotate_resolution_priority": 1.0,
+    "radius_threshold": 0,
+    "do_translation": true,
+    priority : 1,
+}
+options["traps"]["dyn_settings"] = {
+    'enable':true,
+    'mass':1,
+    'friction_translate':0.01,
+    'friction_rotate':0.01,
+    'speed_limit_translate': 3000,
+    'speed_limit_rotate':100.3,		
+}
+options["traps"]["debug"] = {
+    "shape_interaction_visibility": true,
+}
+
+
+
+
+
+
+//________________________________________________________rectangle_translate_down
+
 shapes["rectangle_translate_down"].interaction_shapes = [
     {
         m_local : [0, 0, 0, 60, 60],
         "type": "rectangle",   
     }
 ]
-    
+options["rectangle_translate_down"]["interaction_settings"] = {
+    "enable": true,
+    "coef": 0.2,
+    "rotate_resolution_priority": 1.0,
+    "radius_threshold": 0,
+    "do_translation": true,
+    priority : 3,
+}
+options["rectangle_translate_down"]["dyn_settings"] = {
+    'enable':true,
+    'mass':1,
+    'friction_translate':0.01,
+    'friction_rotate':0.01,
+    'speed_limit_translate': 3000,
+    'speed_limit_rotate':100.3,		
+}
+options["rectangle_translate_down"]["debug"] = {
+    "shape_interaction_visibility": true,
+}
+
+
+//________________________________________________________rectangle_rotate_down
+shapes["rectangle_rotate_down"] = {
+    interaction_shapes: [
+        {
+            m : [0, -140, 0, 120, 80],
+            "type": "rectangle",      
+        }
+    ],    
+}
+options["rectangle_rotate_down"]["interaction_settings"] = {
+    "enable": true,
+    "coef": 0.2,
+    "rotate_resolution_priority": 1.0,
+    "radius_threshold": 0,
+    "do_translation": true,
+    priority : 2,
+}
+options["rectangle_rotate_down"]["dyn_settings"] = {
+    'enable':true,
+    'mass':1,
+    'friction_translate':0.01,
+    'friction_rotate':0.01,
+    'speed_limit_translate': 3000,
+    'speed_limit_rotate':100.3,		
+}
+options["rectangle_rotate_down"]["debug"] = {
+    "shape_interaction_visibility": true,
+}
+
+
+
+
+
+
+
+
 
 let obj_names_trap = [
     "trap_topRight", 
@@ -233,33 +310,6 @@ for( let n of obj_names_trap )
 
 //____________________________OBJS OPTIONS
 
-
-
-for ( let obj_name in shapes )
-{
-    if( shapes[obj_name].hasOwnProperty("interaction_shapes") === false )
-        continue
-    if( options.hasOwnProperty(obj_name) === false )
-        options[obj_name] = {}
-    options[obj_name]["interaction_settings"] = {
-        "enable": true,
-        "coef": 0.2,
-        "rotate_resolution_priority": 1.0,
-        "radius_threshold": 0,
-        "do_translation": true
-    }
-    options[obj_name]["dyn_settings"] = {
-        'enable':true,
-        'mass':1,
-        'friction_translate':0.0001,
-        'friction_rotate':0.0001,
-        'speed_limit_translate': 30,
-        'speed_limit_rotate':0.3,		
-    }
-    options[obj_name]["debug"] = {
-        "shape_interaction_visibility": true,
-    }
-}
 
 
 

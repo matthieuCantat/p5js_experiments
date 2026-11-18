@@ -112,15 +112,21 @@ export class Constraints_info
                         continue
                     if( attr == 'out' )
                         continue
+                    if( attr == 'condition' )
+                        continue
                     in_args[attr] = cns[attr]
                 }
                 
                 let out_attr = null
                 if( cns.out instanceof Array )
                     out_attr = cns.out[1]
+
+                let in_condition_txt = null
+                if( cns.hasOwnProperty('condition') )
+                    in_condition_txt = cns.condition
                 
                 
-                let out_info = build_expression_function( in_expr_txt, in_args, out_attr )
+                let out_info = build_expression_function( in_expr_txt, in_args, out_attr, in_condition_txt )
                 
                 cns.expression_fn = out_info.function;
                 cns.args_names = out_info.args_names
@@ -376,10 +382,8 @@ export class Constraints_info
 
 
 
-
-export function build_expression_function( in_expr_txt, in_args, out_attr)
+function expression_build( in_expr_txt, in_args )
 {
-                    
     let expr_elements = in_expr_txt.split(' ')
     let args_names = []
     for( let i = 0 ; i < expr_elements.length; i++ )
@@ -412,12 +416,37 @@ export function build_expression_function( in_expr_txt, in_args, out_attr)
         }
 
     }
-    if( out_attr !== null )
-        args_names.push('out')
+   
     
     let in_expr_txt_modified = expr_elements.join(' ')
     
 
+
+    return { expr_txt : in_expr_txt_modified, args_names : args_names }
+}
+
+
+export function build_expression_function( in_expr_txt, in_args, out_attr, in_condition_txt )
+{
+    let out = expression_build( in_expr_txt, in_args )
+    let in_expr_txt_modified = out.expr_txt
+    let args_names = out.args_names
+
+    let in_condition_txt_modified = 'true'
+    if( in_condition_txt !== null )
+    {
+        let out_condition = expression_build( in_condition_txt, in_args )
+        in_condition_txt_modified = out_condition.expr_txt
+        out_condition.args_names.forEach( (arg_name) => {
+            if( args_names.indexOf(arg_name) == -1 )
+                args_names.push(arg_name)
+        })
+    }
+   
+
+    if( out_attr !== null )
+        args_names.push('out')
+    
     let expr_txt = ''
     if( out_attr == null )
     {
@@ -436,8 +465,11 @@ export function build_expression_function( in_expr_txt, in_args, out_attr)
     // add math function to args_names
     args_names.push('ctx')
 
+
+    let expr_txt_final = `if(${in_condition_txt_modified})${expr_txt}`
+
     //console.log(args_names,expr_txt)
-    var expression_fn = Function(...args_names, expr_txt);
+    var expression_fn = Function(...args_names, expr_txt_final);
     return { function : expression_fn, args_names : args_names }
 }
 

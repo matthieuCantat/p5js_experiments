@@ -67,7 +67,8 @@ export class body
 			interaction_shapes :[
 				{
 					m :null,
-					type : "rectangle"
+					type : "rectangle",
+					priority : 0,
 				}
 			],
 			highlight_when_selected : true,
@@ -190,6 +191,7 @@ export class body
 			'do_translation':true,
 			'radius_threshold':0,
 			'scale_selection_shape' : 1.0,
+			'priority':0,
 		}
 
 		let _interaction_settings = {...interaction_settings_default, ...in_options.interaction_settings}
@@ -1003,14 +1005,25 @@ class Transform
 	}
 
 
+	//////////////////////////////////////////////////////
+	// MANIPULATE IN WOLRD SPACE
+	//////////////////////////////////////////////////////
+
+	get( )
+	{
+		// m_body
+		let m_body_init = this.get_body()
+		// m_body_dyn
+		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
+
+		
+		return m_body_modified
+	}
+
+	
 	set(m)
 	{
 		this.m_body_modif = m.getMult( this.get_body().getInverse() )
-	}
-
-	set_local(m)
-	{
-		this.m_body_modif = m.getMult( this.m_parent_to_body.getInverse() )
 	}
 
 	setTranslate(p)
@@ -1042,6 +1055,29 @@ class Transform
 	}
 
 
+
+
+	//////////////////////////////////////////////////////
+	// MANIPULATE IN PARENT SPACE
+	//////////////////////////////////////////////////////
+
+	get_local()
+	{
+		// m_body
+		let m_body_init = this.m_parent_to_body
+		// m_body_dyn
+		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
+
+
+		return m_body_modified		
+
+	}
+	
+	set_local(m)
+	{
+		this.m_body_modif = m.getMult( this.m_parent_to_body.getInverse() )
+	}
+
 	set_local_translate(p)
 	{
 		let m = this.get_local()
@@ -1071,6 +1107,57 @@ class Transform
 	}
 
 
+
+	//////////////////////////////////////////////////////
+	// MANIPULATE IN INIT SPACE
+	//////////////////////////////////////////////////////
+
+	get_local_modif()
+	{
+		return this.m_body_modif
+	}
+
+	set_local_modif(m)
+	{
+		this.m_body_modif = m
+	}
+
+	set_local_modif_translate(p)
+	{
+		let m = this.get_local_modif()
+		m.setRow(2,p)
+		this.set_local_modif(m)
+	}
+	
+	set_local_modif_translateX( value )
+	{
+		let m = this.get_local_modif()
+		m.setRow(2,new Vector2d(value,m.get_row(2).y))
+		this.set_local_modif(m)
+	}
+
+	set_local_modif_translateY( value )
+	{
+		let m = this.get_local_modif()
+		m.setRow(2,new Vector2d(m.get_row(2).x,value))
+		this.set_local_modif(m)
+	}
+
+	set_local_modif_rotationDeg( value )
+	{
+		let m = this.get_local_modif()
+		m.setRotationDeg(value)
+		this.set_local_modif(m)
+	}
+
+
+	
+	//////////////////////////////////////////////////////
+	// OTHER
+	//////////////////////////////////////////////////////
+
+
+
 	get_body()
 	{
 		// m_body
@@ -1081,34 +1168,13 @@ class Transform
 		return m_body_init		
 	}
 
-	get( )
-	{
-		// m_body
-		let m_body_init = this.get_body()
-		// m_body_dyn
-		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
-
-		
-		return m_body_modified
-	}
-
-	
 	get_local_init()
 	{
 		return this.m_parent_to_body
 	}
 
-	get_local()
-	{
-		// m_body
-		let m_body_init = this.m_parent_to_body
-		// m_body_dyn
-		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
 
-
-		return m_body_modified		
-
-	}
+	
 
 	
 	getTranslate()
