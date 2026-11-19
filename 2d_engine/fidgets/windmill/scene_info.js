@@ -144,6 +144,14 @@ scene_info.cns = [
     out : [ 'traps', 'interaction.settings.enable' ],
 },
 
+// TRANSFORM LIMIT MODIFY
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( 1 - A / 70 ) * ( B / 270 ) === 1 ? [-90,0] : [0,0]',
+    out : [ 'rectangle_translate_down', 'trsf.transform_limit_args.rotate_limits' ],
+},
 
 ]	
 

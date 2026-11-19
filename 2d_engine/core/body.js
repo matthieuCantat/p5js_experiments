@@ -1228,10 +1228,6 @@ class Transform
 		
 		let do_interaction = ( (interaction.vCenter_to_userFirstGrab_mLocal != null )&&(interaction.settings.type == 'move' ) )
 		
-		let m_eval_start = new Matrix2d( this.get() )
-		let m_eval_start_local = new Matrix2d( this.get_local() )
-		let m_eval_start_local_modif = new Matrix2d( this.get_local_modif() )
-
 		if( do_interaction )
 		{
 			// INTERACTION
@@ -1544,7 +1540,7 @@ class Transform
 
 		let m_local = m.getMult(m_ref.getInverse())
 		*/
-		
+		transform_settings = this.transform_limit_args
 		
 		this.transform_limit_data.translate_collision_last = this.transform_limit_data.translate_collision
 		if ( transform_settings.translate_limits != null )
