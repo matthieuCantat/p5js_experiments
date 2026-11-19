@@ -13,6 +13,8 @@ export var scene_info = {
 
 //____________________________ CNS
 scene_info.cns = [
+
+// OTHER RECTANGLES TRANSLATE
 {
     mode: 'connection',
     src : [ 'rectangle_translate_down', 'trsf.get_local().getTranslateY()' ],
@@ -33,7 +35,7 @@ scene_info.cns = [
 
 
 
-
+// OTHER RECTANGLES ROTATE
 {
     mode: 'expression',
     A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
@@ -48,34 +50,39 @@ scene_info.cns = [
 }, 
 
 
-
+// OTHER TRAPS TRANSLATE
 {
     mode: 'expression',
-    A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
-    expression : ' A / 270 * -25 ',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_downRight', 'trsf.set_local_translateY()' ],
 },  
 {
     mode: 'expression',
-    A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
-    expression : ' A / 270 * -25 ',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_downLeft', 'trsf.set_local_translateY()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
-    expression : ' A / 270 * -25 ',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_topLeft', 'trsf.set_local_translateY()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
-    expression : ' A / 270 * -25 ',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_topRight', 'trsf.set_local_translateY()' ],
 },   
 
 
 
+// OTHER TRAPS ROTATE
 {
     mode: 'expression',
     A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
@@ -105,16 +112,42 @@ scene_info.cns = [
     out : [ 'trap_downLeft', 'trsf.set_local_modif_rotationDeg()' ],
 },
 
+
+
+// STOP DYN ROTATION
 {
     mode: 'expression',
     A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    condition : '( 1 - A / 70 ) === 1',
+    condition : '( 1 - A / 70 ) > 0.5',
     expression : '0',
     out : [ 'traps', 'trsf.set_local_modif_rotationDeg()' ],
 },  
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    condition : '( 1 - A / 70 ) > 0.5',
+    expression : '0',
+    out : [ 'traps', 'trsf.dyn_data.angular_momentum' ],
+},  
+
+// INTERACTION DISABLE
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    expression : ' 0.5 > ( 1 - A / 70 ) ',
+    out : [ 'rectangle_rotate_down', 'interaction.settings.enable' ],
+},
+{
+    mode: 'expression',
+    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
+    expression : ' 0.5 > ( 1 - A / 70 ) ',
+    out : [ 'traps', 'interaction.settings.enable' ],
+},
 
 
 ]	
+
+
 
 
 /*

@@ -965,7 +965,7 @@ class Transform
 
 		// FOR DYN
 		this.dyn_data = {
-			last_m : new Matrix2d(this.get()),
+			last_m : null,
 			momentum : new Vector2d(),
 			angular_momentum : 0,
 			t_speed : 0,
@@ -1223,35 +1223,101 @@ class Transform
 		border_collision_info
 	)
 	{
+		let transform_limit_space = ['init','parent'][0]
+		let dynamic_space = ['init','parent','world'][0]
+		
 		let do_interaction = ( (interaction.vCenter_to_userFirstGrab_mLocal != null )&&(interaction.settings.type == 'move' ) )
 		
+		let m_eval_start = new Matrix2d( this.get() )
+		let m_eval_start_local = new Matrix2d( this.get_local() )
+		let m_eval_start_local_modif = new Matrix2d( this.get_local_modif() )
 
-
-		let m = new Matrix2d( this.get() )
-		
 		if( do_interaction )
 		{
-			m = this.update_with_user_interaction( m, interaction )
-			m = this.update_with_transform_settings( m, transform_settings )
+			// INTERACTION
+			let m_world = this.get()
+			m_world = this.update_with_user_interaction( m_world, interaction )
+			this.set( m_world)
+
+			// TRANSFORM LIMIT
+			if( transform_limit_space == 'init' )
+			{
+				let m_local = this.get_local_modif()
+				m_local = this.update_local_with_transform_settings( m_local, transform_settings )
+				this.set_local_modif( m_local )
+			}
+			else if( transform_limit_space == 'local' )
+			{
+				let m_local = this.get_local()
+				m_local = this.update_local_with_transform_settings( m_local, transform_settings )
+				this.set_local( m_local )
+			}
+			
 		}
 
 
 		if( dyn_settings.enable )
 		{
-			m = this.update_with_dynamics( m , dyn_settings )
-			m = this.update_with_transform_settings( m, transform_settings )
-			m = this.update_with_border_collision( m, border_collision_info )
+			// DYNAMIC
+			if( dynamic_space == 'init' )
+			{
+				let m_local = this.get_local_modif()
+				m_local = this.update_with_dynamics( m_local, dyn_settings )
+				this.set_local_modif( m_local )
+			}
+			else if( dynamic_space == 'local' )
+			{
+				let m_local = this.get_local()
+				m_local = this.update_with_dynamics( m_local, dyn_settings )
+				this.set_local( m_local )
+			}
+			else if( dynamic_space == 'world' )
+			{
+				let m_local = this.get()
+				m_local = this.update_with_dynamics( m_local, dyn_settings )
+				this.set( m_local )
+			}
+
+			
+			// TRANSFORM LIMIT
+			if( transform_limit_space == 'init' )
+			{
+				let m_local = this.get_local_modif()
+				m_local = this.update_local_with_transform_settings( m_local, transform_settings )
+				this.set_local_modif( m_local )
+			}
+			else if( transform_limit_space == 'local' )
+			{
+				let m_local = this.get_local()
+				m_local = this.update_local_with_transform_settings( m_local, transform_settings )
+				this.set_local( m_local )
+			}
+			
+			// DYNAMIC SAVE
+			if( dynamic_space == 'init' )
+			{
+				let m_local = this.get_local_modif()
+				this.update_dynamic_data( m_local )
+			}
+			else if( dynamic_space == 'local' )
+			{
+				let m_local = this.get_local()
+				this.update_dynamic_data( m_local )
+			}
+			else if( dynamic_space == 'world' )
+			{
+				let m_local = this.get()
+				this.update_dynamic_data( m_local )
+			}
+
+
+			//m = this.update_with_border_collision( m, border_collision_info )
+			
 		}
-		
-		this.update_dynamic_data(m,dyn_settings)
-		this.set(m)
-		//this.m_body_modif = m.getMult(this.get_body().getInverse())
 
-		// fill info
 
 		
-
-
+		
 	}
 	
 	update_with_user_interaction( m , Interaction )
@@ -1467,9 +1533,9 @@ class Transform
 		return m
 	}
 
-	update_with_transform_settings( m , transform_settings)
+	update_local_with_transform_settings( m_local , transform_settings)
 	{
-
+		/*
 		let m_ref = null
 		if( transform_settings.parent_limit_space == true )
 			m_ref = this.obj_parent.trsf.get()
@@ -1477,8 +1543,9 @@ class Transform
 			m_ref = this.get_body()	
 
 		let m_local = m.getMult(m_ref.getInverse())
+		*/
 		
-
+		
 		this.transform_limit_data.translate_collision_last = this.transform_limit_data.translate_collision
 		if ( transform_settings.translate_limits != null )
 		{
@@ -1525,11 +1592,13 @@ class Transform
 
 
 			m_local.setRow( 2, p_local )
+			/*
 			let _m = m_local.getMult(m_ref) 
 
 			let _p = _m.get_row(2)
 			m.setRow( 2, _p)
 			//m = _m
+			*/
 		}
 		
 		
@@ -1603,23 +1672,27 @@ class Transform
 				this.transform_limit_data.rotate_collision_hit = true
 			
 			m_local.setRotation(r_clamped)
+			/*
 			let _m = m_local.getMult(m_ref) 
 
 			
 			m.setRow( 0,  _m.get_row(0) )
 			m.setRow( 1,  _m.get_row(1) )
+			*/
 		}	
 			
 		//parent_limit_space : false,
 		//translate_limits: [[-100,100],[0,0]],
 		//rotate_limits: [-15,14],
-		return m
+		return m_local
 	}
 
 
-	update_dynamic_data(m, dyn_settings)
+	update_dynamic_data(m)
 	{
-		
+		if( this.dyn_data.last_m === null )
+			this.dyn_data.last_m = new Matrix2d(m)
+
 		// momentum
 		let p = m.get_row(2)
 		let last_p = this.dyn_data.last_m.get_row(2)
