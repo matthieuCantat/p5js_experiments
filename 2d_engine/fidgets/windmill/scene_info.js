@@ -242,26 +242,55 @@ scene_info.cns = [
 
 
 
-
-/*
-scene_info.objs['anim_curve_root_r'] = draw_anim_curve(
-	'windmill_entrance',
-	'root',
-	'translateY',
-	[-200, -200, 0, 1.0, 1.0] )
-*/
-
-/*
+ 
 scene_info.eventActions.push( 
     {
         event : {
             start : {
+                in_args : [  ],
+                fn : (obj) => {
+                    return true;
+                }
+            },
+            end : null,
+            max_duration : 1,
+        },
+        action : {
+            
+            start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
+
+                    for( let cns of obj.Game_engine.Constraints.data )cns.enable = false
+
+                    obj.Game_engine.Animation.end(  null,{ fade_out_seconds  : 20 } )
+                    obj.Game_engine.Animation.start( 
+                        `transform_anim`,
+                        "windmill_entrance", 
+                        { volume : 1, fade_in_seconds : 20, loop : true, end_fn : ()=>{ for( let cns of obj.Game_engine.Constraints.data )cns.enable = true } } ); //"sfx_wii_short_tick_02"
+                },
+                duration : 1,
+            },
+            end : {}
+        },
+
+    },
+   
+ )
+
+
+ 
+ scene_info.eventActions.push( 
+    {
+        event : {
+            start : {
+                in_args : [ 'user_interaction_A' ],
+                fn : (obj) => {
                     let status = false
-                    if( 5 < obj.Game_engine.Time.frame)
+                    if( 0.99 < obj.trsf.get_local_modif().getTranslateX() / -70  )
+                    {
                         status = true
-                    
+                    }
                     return status;
                 }
             },
@@ -273,7 +302,9 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
-                    obj.Game_engine.Animation.start( `first_anim`,"windmill_explode", { volume : 1, fade_in_seconds : 0, loop : true } ); //"sfx_wii_short_tick_02"
+                    for( let cns of obj.Game_engine.Constraints.data )cns.enable = false
+                    obj.Game_engine.Animation.end(  null,{ fade_out_seconds  : 20 } )
+                    obj.Game_engine.Animation.start( `explode_anim`,"windmill_explode", { volume : 1, fade_in_seconds : 20, loop : true } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },
@@ -283,6 +314,3 @@ scene_info.eventActions.push(
     },
    
  )
-//windmill_transformation
-//windmill_idle
-*/

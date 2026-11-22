@@ -73,13 +73,13 @@ export class Animation_manager {
     
     start( name,
            animation_name,
-           { fade_in_seconds = 0, time_input = true },
+           { fade_in_seconds = 0, time_input = true, end_fn = null },
             //loop = false, }
         ){
             this.played[name] = new Animation( 
                 this.Game_engine, 
                 this.anim_to_baked[animation_name], 
-                { fade_in_seconds : fade_in_seconds, time_input : time_input})
+                { fade_in_seconds : fade_in_seconds, time_input : time_input, end_fn : end_fn})
             
     }
     
@@ -147,7 +147,7 @@ class Animation
 
     constructor( Game_engine, 
         anim_baked,
-        { fade_in_seconds = null, time_input = true },
+        { fade_in_seconds = null, time_input = true, end_fn = null },
     )
     {
         this.is_finish = false
@@ -164,6 +164,7 @@ class Animation
         this.fade_in_seconds_remained = fade_in_seconds
 
         this._last_matrices_locals = {}
+        this.end_fn = end_fn
     }
 
     start_ending( { fade_out_seconds = 0 } )
@@ -203,6 +204,13 @@ class Animation
             valid_obj_names.push(obj_name)
         }
         
+        if( valid_obj_names.length === 0 )
+        {
+            if( this.end_fn !== null )
+                this.end_fn()
+            
+        }
+
         
         for( let obj_name of valid_obj_names )
         {
@@ -252,9 +260,9 @@ class Animation
             }  
             
             if( raw_values.strokeSize !== undefined)
-                {
-                    this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_width = raw_values.strokeSize           
-                }             
+            {
+                this.Game_engine.Objs[obj_name].shapes_dynamic_data[0].stroke_width = raw_values.strokeSize           
+            }             
         }
         
        
@@ -309,6 +317,7 @@ class Animation
             }
             else
             {
+
                 this.is_finish = true
 
                 for( let obj_name of valid_obj_names )
@@ -318,6 +327,7 @@ class Animation
             this.fade_out_seconds_remained -= 1
         }
 
+        
 
         for( let obj_name of valid_obj_names )
             this._last_matrices_locals[obj_name] = this.Game_engine.Objs[obj_name].trsf.get_local()

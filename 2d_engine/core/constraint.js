@@ -145,6 +145,9 @@ export class Constraints_info
         
         for( let cns of this.data )
         {
+            if(( cns.enable !== undefined )&&(cns.enable === false))
+                continue
+
             if( cns.mode === 'connection' )
             {
                 let src_obj = this.Game_engine.Objs[cns.src[0]]
