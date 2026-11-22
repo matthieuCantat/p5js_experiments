@@ -373,7 +373,7 @@ options["user_interaction_A"] = {
     },
     interaction_settings : {
         "enable": true,
-        "coef": 0.2,
+        "coef": 1.0,
         "rotate_resolution_priority": 1.0,
         "radius_threshold": 0,
         "do_translation": true,
@@ -381,11 +381,11 @@ options["user_interaction_A"] = {
     },
     dyn_settings : {
         'enable':true,
-        'mass':1,
-        'friction_translate':0.01,
-        'friction_rotate':0.01,
+        'mass':0.1,
+        'friction_translate':0.001,
+        'friction_rotate':0.001,
         'speed_limit_translate': 3000,
-        'speed_limit_rotate':100.3,		
+        'speed_limit_rotate':1000.3,		
     },
     debug : {
     "shape_interaction_visibility": true,

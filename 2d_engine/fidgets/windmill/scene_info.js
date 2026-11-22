@@ -279,7 +279,6 @@ scene_info.eventActions.push(
  )
 
 
- 
  scene_info.eventActions.push( 
     {
         event : {
@@ -287,7 +286,7 @@ scene_info.eventActions.push(
                 in_args : [ 'user_interaction_A' ],
                 fn : (obj) => {
                     let status = false
-                    if( 0.99 < obj.trsf.get_local_modif().getTranslateX() / -70  )
+                    if( 0.90 < obj.trsf.get_local_modif().getTranslateX() / -70  )
                     {
                         status = true
                     }
@@ -302,9 +301,18 @@ scene_info.eventActions.push(
             start : {
                 in_args : [ 'root' ],
                 fn : (obj) => {
+                    
+
+                    let end_fn = ()=>{ 
+                        obj.Game_engine.Animation.start( 
+                        `transform_animB`,
+                        "windmill_entrance", 
+                        { volume : 1, fade_in_seconds : 20, loop : true, end_fn : ()=>{ for( let cns of obj.Game_engine.Constraints.data )cns.enable = true } } ); 
+                    }
+                    
                     for( let cns of obj.Game_engine.Constraints.data )cns.enable = false
                     obj.Game_engine.Animation.end(  null,{ fade_out_seconds  : 20 } )
-                    obj.Game_engine.Animation.start( `explode_anim`,"windmill_explode", { volume : 1, fade_in_seconds : 20, loop : true } ); //"sfx_wii_short_tick_02"
+                    obj.Game_engine.Animation.start( `explode_anim`,"windmill_explode", { volume : 1, fade_in_seconds : 20, loop : true, end_fn : end_fn } ); //"sfx_wii_short_tick_02"
                 },
                 duration : 1,
             },
