@@ -1396,6 +1396,7 @@ class Transform
 		//ADD DYN
 		let userInteracting = this.body.interaction.vCenter_to_userFirstGrab_mLocal !== null
 
+
 		let p = m.get_row(2)
 		let vMomentum = this.dyn_data.momentum.getMult(1-dyn_settings.friction_translate)
 	
@@ -1431,8 +1432,11 @@ class Transform
 		}
 
 		if( userInteracting == false )
+		{
 			m.setRow(2,pNext)
 			m.rotate(aNext)
+		}
+			
 
 		return m
 	}
