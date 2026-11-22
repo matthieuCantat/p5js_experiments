@@ -10,20 +10,20 @@ export var scene_info = {
 }
 
 
-
+let T_BUFFER = 0.05
+let R_BUFFER = 0.05
 //____________________________ CNS
 scene_info.cns = [
 
 
-
-
 //__________________________________user_interaction_A - TRANSFORM LIMIT - ROTATE
+
 {
     mode: 'expression',
     A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
     B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
     condition : '( B / 270 ) < 0.5',
-    expression : ' ( A / -70 )  < 0.99 ? [0,0] : [0,270]',
+    expression : ` ( A / -70 )  < 1.0 - ${T_BUFFER} ? [0,0] : [0,270] `,
     out : [ 'user_interaction_A', 'trsf.transform_limit_args.rotate_limits' ],
 },
 {
@@ -31,19 +31,19 @@ scene_info.cns = [
     A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
     B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
     condition : '0.5 < ( B / 270 )',
-    expression : ' 0.01 < ( A / -70 )   ? [270,270] : [0,270]',
+    expression : ` 0.0 + ${T_BUFFER} < ( A / -70 )   ? [270,270] : [0,270]`,
     out : [ 'user_interaction_A', 'trsf.transform_limit_args.rotate_limits' ],
 },
 {
     mode: 'expression',
     A : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
-    expression : '( A / 270 ) < 0.1 ? [-70,0] : [-70,-70]',
+    expression : `( A / 270 ) < 0.0 + ${R_BUFFER} ? [-70,0] : [-70,-70]`,
     out : [ 'user_interaction_A', 'trsf.transform_limit_args.translate_limits[1]' ],
 },
 {
     mode: 'expression',
     A : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' 0.9 < ( A / 270 )? [-70,0] : [0,0]',
+    expression : ` 1.0 - ${R_BUFFER} < ( A / 270 )? [-70,0] : [0,0]`,
     out : [ 'user_interaction_A', 'trsf.transform_limit_args.translate_limits[0]' ],
 },
 
