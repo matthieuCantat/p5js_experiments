@@ -10,8 +10,8 @@ export var scene_info = {
 }
 
 
-let T_BUFFER = 0.2
-let R_BUFFER = 0.2
+let T_BUFFER = 0.01
+let R_BUFFER = 0.01
 //____________________________ CNS
 scene_info.cns = [
 

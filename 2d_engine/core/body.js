@@ -1394,12 +1394,21 @@ class Transform
 	update_with_dynamics( m, dyn_settings )
 	{
 		//ADD DYN
+		let userInteracting = this.body.interaction.vCenter_to_userFirstGrab_mLocal !== null
+
+		let t_friction = dyn_settings.friction_translate
+		let r_friction = dyn_settings.friction_rotate
+		if( userInteracting )
+		{
+			t_friction = 1
+			r_friction = 1
+		}
 
 		let p = m.get_row(2)
-		let vMomentum = this.dyn_data.momentum.getMult(1-dyn_settings.friction_translate)
+		let vMomentum = this.dyn_data.momentum.getMult(1-t_friction)
 	
 		let pNext = p.getAdd(vMomentum)
-		let aNext = this.dyn_data.angular_momentum*(1-dyn_settings.friction_rotate)
+		let aNext = this.dyn_data.angular_momentum*(1-r_friction)
 	
 		if(dyn_settings.enable_gravity)
 		{
