@@ -171,7 +171,7 @@ for( let n of obj_names_rectangles )
 shapes["traps"] = {
     interaction_shapes: [
         {
-            m : [0, 0, 0, 120, 120],
+            m : [0, 0, 0, 105, 105],
             "type": "circle",   
         }
     ],    
@@ -200,6 +200,43 @@ options["traps"]["dyn_settings"] = {
     'speed_limit_rotate':100.3,		
 }
 options["traps"]["debug"] = {
+    "shape_interaction_visibility": true,
+}
+
+
+
+
+shapes["round_center"]['interaction_shapes'] = [
+        {
+            m : [0, 0, 0, 30, 30],
+            "type": "circle",   
+        }
+    ]
+
+options["round_center"] = {
+    transform_settings : {
+        parent_limit_space : false,
+        translate_limits: [[0,0],[0,0]],
+        rotate_limits: [0,0],
+    }    
+}
+options["round_center"]["interaction_settings"] = {
+    "enable": true,
+    "coef": 0.2,
+    "rotate_resolution_priority": 1.0,
+    "radius_threshold": 0,
+    "do_translation": true,
+    priority : 2,
+}
+options["round_center"]["dyn_settings"] = {
+    'enable':true,
+    'mass':1,
+    'friction_translate':0.01,
+    'friction_rotate':0.01,
+    'speed_limit_translate': 3000,
+    'speed_limit_rotate':100.3,		
+}
+options["round_center"]["debug"] = {
     "shape_interaction_visibility": true,
 }
 
@@ -322,7 +359,7 @@ for( let n of obj_names_trap )
 shapes["user_interaction_A"] = {
     interaction_shapes: [
     {
-        m : [0, -70, 0, 70, 70],
+        m : [0, -80, 0, 50, 50],
         "type": "rectangle",      
     }
     ] 
