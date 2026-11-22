@@ -1396,19 +1396,11 @@ class Transform
 		//ADD DYN
 		let userInteracting = this.body.interaction.vCenter_to_userFirstGrab_mLocal !== null
 
-		let t_friction = dyn_settings.friction_translate
-		let r_friction = dyn_settings.friction_rotate
-		if( userInteracting )
-		{
-			t_friction = 1
-			r_friction = 1
-		}
-
 		let p = m.get_row(2)
-		let vMomentum = this.dyn_data.momentum.getMult(1-t_friction)
+		let vMomentum = this.dyn_data.momentum.getMult(1-dyn_settings.friction_translate)
 	
 		let pNext = p.getAdd(vMomentum)
-		let aNext = this.dyn_data.angular_momentum*(1-r_friction)
+		let aNext = this.dyn_data.angular_momentum*(1-dyn_settings.friction_rotate)
 	
 		if(dyn_settings.enable_gravity)
 		{
@@ -1438,8 +1430,9 @@ class Transform
 			
 		}
 
-		m.setRow(2,pNext)
-		m.rotate(aNext)
+		if( userInteracting == false )
+			m.setRow(2,pNext)
+			m.rotate(aNext)
 
 		return m
 	}
