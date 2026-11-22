@@ -23,7 +23,7 @@ const logger = new Logger("gameEngine");
 export class gameEngine {
 
     DEBUG = {
-        draw_body_interaction_shapes : true,
+        draw_body_interaction_shapes : false,
         draw_body_matrices : false,
     }
     PHONE_HALF_DIMENTIONS = [ 180, 350 ]

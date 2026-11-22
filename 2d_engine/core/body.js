@@ -246,6 +246,8 @@ export class body
 			vCenter_to_userFirstGrab_mLocal : null,
 			pUser : this.Game_engine.User.Coords.p,
 			vOffset : null,	
+			//isActive : logic => { return (this.interaction.vCenter_to_userFirstGrab_mLocal !== null) },
+			isLastActive : false,
 		}
 
 		/////////////////////////////////////////////////////////
@@ -546,6 +548,11 @@ export class body
 		let vCenter_to_pPressed = pUserPressed.getSub( pCenter )
 		this.interaction.vCenter_to_userFirstGrab_mLocal = vCenter_to_pPressed.getMult(m.getInverse(), true)	
 		
+		// Update isLastActive for all objects in the game engine
+		for( let n in this.Game_engine.Objs )
+			this.Game_engine.Objs[n].interaction.isLastActive = false
+		this.interaction.isLastActive = true
+
 		return true		
 	}
 

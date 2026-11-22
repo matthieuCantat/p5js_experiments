@@ -14,37 +14,108 @@ export var scene_info = {
 //____________________________ CNS
 scene_info.cns = [
 
+
+
+
+//__________________________________user_interaction_A - TRANSFORM LIMIT - ROTATE
+{
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    condition : '( B / 270 ) < 0.5',
+    expression : ' ( A / -70 )  < 0.99 ? [0,0] : [0,270]',
+    out : [ 'user_interaction_A', 'trsf.transform_limit_args.rotate_limits' ],
+},
+{
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    condition : '0.5 < ( B / 270 )',
+    expression : ' 0.01 < ( A / -70 )   ? [270,270] : [0,270]',
+    out : [ 'user_interaction_A', 'trsf.transform_limit_args.rotate_limits' ],
+},
+{
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    expression : '( A / 270 ) < 0.1 ? [-70,0] : [-70,-70]',
+    out : [ 'user_interaction_A', 'trsf.transform_limit_args.translate_limits[1]' ],
+},
+{
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    expression : ' 0.9 < ( A / 270 )? [-70,0] : [0,0]',
+    out : [ 'user_interaction_A', 'trsf.transform_limit_args.translate_limits[0]' ],
+},
+
+
+
+
+
+
+
 // OTHER RECTANGLES TRANSLATE
 {
-    mode: 'connection',
-    src : [ 'rectangle_translate_down', 'trsf.get_local().getTranslateY()' ],
-    dst : [ 'rectangle_translate_left', 'trsf.set_local_translateX()' ],
-}, 	
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : 'A * -1 + B',
+    out : [ 'rectangle_translate_down', 'trsf.set_local_modif_translateY()' ],
+}, 		
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local().getTranslateY()' ],
-    expression : ' A * -1 ',
-    out : [ 'rectangle_translate_top', 'trsf.set_local_translateY()' ],
-}, 	
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : 'A * -1 + B',
+    out : [ 'rectangle_translate_left', 'trsf.set_local_modif_translateY()' ],
+}, 		
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local().getTranslateY()' ],
-    expression : ' A * -1 ',
-    out : [ 'rectangle_translate_right', 'trsf.set_local_translateX()' ],
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : 'A * -1 + B',
+    out : [ 'rectangle_translate_top', 'trsf.set_local_modif_translateY()' ],
+}, 
+{
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' A * -1 + B',
+    out : [ 'rectangle_translate_right', 'trsf.set_local_modif_translateY()' ],
 },
+
 
 
 
 // OTHER RECTANGLES ROTATE
 {
     mode: 'expression',
-    A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
+    A : [ 'user_interaction_A', 'trsf.get_local().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' A ',
+    out : [ 'rectangle_rotate_down', 'trsf.set_local_rotationDeg()' ],
+},
+{
+    mode: 'expression',
+    A : [ 'user_interaction_A', 'trsf.get_local().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
     expression : ' A * 180 / 270 ',
     out : [ 'rectangle_rotate_left', 'trsf.set_local_rotationDeg()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_rotate_down', 'trsf.get_local().getRotation()' ],
+    A : [ 'user_interaction_A', 'trsf.get_local().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
     expression : ' A * 90 / 270 ',
     out : [ 'rectangle_rotate_top', 'trsf.set_local_rotationDeg()' ],
 }, 
@@ -53,105 +124,119 @@ scene_info.cns = [
 // OTHER TRAPS TRANSLATE
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( B / 270 ) * -25 + ( A / -70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_downRight', 'trsf.set_local_translateY()' ],
 },  
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( B / 270 ) * -25 + ( A / -70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_downLeft', 'trsf.set_local_translateY()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( B / 270 ) * -25 + ( A / -70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_topLeft', 'trsf.set_local_translateY()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( B / 270 ) * -25 + ( A / 70 ) * 10 * ( 1 - ( B / 270 )) ',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( B / 270 ) * -25 + ( A / -70 ) * 10 * ( 1 - ( B / 270 )) ',
     out : [ 'trap_topRight', 'trsf.set_local_translateY()' ],
 },   
-
 
 
 // OTHER TRAPS ROTATE
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 ) ',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( A / -70 ) * 45 * ( B / 270 ) ',
     out : [ 'trap_topRight', 'trsf.set_local_modif_rotationDeg()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 )',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( A / -70 ) * 45 * ( B / 270 )',
     out : [ 'trap_topLeft', 'trsf.set_local_modif_rotationDeg()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 )',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( A / -70 ) * 45 * ( B / 270 )',
     out : [ 'trap_downRight', 'trsf.set_local_modif_rotationDeg()' ],
 },
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( 1 - A / 70 ) * 45 * ( B / 270 )',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    B : [ 'user_interaction_A', 'trsf.get_local_modif().getRotation()' ],
+    USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition :  'USED',
+    expression : ' ( A / -70 ) * 45 * ( B / 270 )',
     out : [ 'trap_downLeft', 'trsf.set_local_modif_rotationDeg()' ],
 },
+
+
+// OTHERS
+
 
 
 
 // STOP DYN ROTATION
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    condition : '( 1 - A / 70 ) > 0.5',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    USER : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition : '( USER !== null )&&( 0.5 > ( A / -70 )  )',
     expression : '0',
     out : [ 'traps', 'trsf.set_local_modif_rotationDeg()' ],
 },  
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    condition : '( 1 - A / 70 ) > 0.5',
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
+    USER : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition : '( USER !== null )&&( 0.5 > ( A / -70 ) )',
     expression : '0',
     out : [ 'traps', 'trsf.dyn_data.angular_momentum' ],
 },  
-
-// INTERACTION DISABLE
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    expression : ' 0.5 > ( 1 - A / 70 ) ',
-    out : [ 'rectangle_rotate_down', 'interaction.settings.enable' ],
-},
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    USER : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition : '( USER !== null )&&( ( A / -70 ) > 0.5 )',
+    expression : '0',
+    out : [ 'traps', 'trsf.set_local_modif_rotationDeg()' ],
+},  
 {
     mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    expression : ' 0.5 > ( 1 - A / 70 ) ',
-    out : [ 'traps', 'interaction.settings.enable' ],
-},
-
-// TRANSFORM LIMIT MODIFY
-{
-    mode: 'expression',
-    A : [ 'rectangle_translate_down', 'trsf.get_local_modif().getTranslateY()' ],
-    B : [ 'rectangle_rotate_down', 'trsf.get_local_modif().getRotation()' ],
-    expression : ' ( 1 - A / 70 ) * ( B / 270 ) === 1 ? [-90,0] : [0,0]',
-    out : [ 'rectangle_translate_down', 'trsf.transform_limit_args.rotate_limits' ],
-},
+    A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
+    USER : [ 'user_interaction_A', 'interaction.isLastActive' ],
+    condition : '( USER !== null )&&( ( A / -70 ) > 0.5 )',
+    expression : '0',
+    out : [ 'traps', 'trsf.dyn_data.angular_momentum' ],
+},  
 
 ]	
 

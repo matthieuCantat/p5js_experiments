@@ -4,6 +4,9 @@ import { get_objs } from "../template/scene_info_objs_utils.js";
 var hierarchy = {
     "root": {
         "m": [0,0,0,1,1],
+        "user_interaction_A": {
+            "m": [0, 70, 0, 1, 1],
+        },
         "round_center": {
             "m": null,
         },
@@ -204,7 +207,7 @@ options["traps"]["debug"] = {
 
 
 
-
+/*
 //________________________________________________________rectangle_translate_down
 
 shapes["rectangle_translate_down"].interaction_shapes = [
@@ -262,6 +265,7 @@ options["rectangle_rotate_down"]["dyn_settings"] = {
 options["rectangle_rotate_down"]["debug"] = {
     "shape_interaction_visibility": true,
 }
+*/
 
 
 
@@ -310,6 +314,46 @@ for( let n of obj_names_trap )
 
 //____________________________OBJS OPTIONS
 
+
+
+
+
+
+shapes["user_interaction_A"] = {
+    interaction_shapes: [
+    {
+        m : [0, -70, 0, 70, 70],
+        "type": "rectangle",      
+    }
+    ] 
+} 
+
+options["user_interaction_A"] = {    
+    transform_settings : {
+        parent_limit_space : false,
+        translate_limits: [[-70,0],[-0,70]],
+        rotate_limits: [0,270],
+    },
+    interaction_settings : {
+        "enable": true,
+        "coef": 0.2,
+        "rotate_resolution_priority": 1.0,
+        "radius_threshold": 0,
+        "do_translation": true,
+        priority : 5,
+    },
+    dyn_settings : {
+        'enable':true,
+        'mass':1,
+        'friction_translate':0.01,
+        'friction_rotate':0.01,
+        'speed_limit_translate': 3000,
+        'speed_limit_rotate':100.3,		
+    },
+    debug : {
+    "shape_interaction_visibility": true,
+    }
+}
 
 
 
