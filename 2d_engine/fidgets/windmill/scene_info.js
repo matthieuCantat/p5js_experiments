@@ -10,8 +10,8 @@ export var scene_info = {
 }
 
 
-let T_BUFFER = 0.05
-let R_BUFFER = 0.05
+let T_BUFFER = 0.1
+let R_BUFFER = 0.1
 //____________________________ CNS
 scene_info.cns = [
 
@@ -59,7 +59,7 @@ scene_info.cns = [
     A : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateY()' ],
     B : [ 'user_interaction_A', 'trsf.get_local_modif().getTranslateX()' ],
     USED : [ 'user_interaction_A', 'interaction.isLastActive' ],
-    condition :  'USED',
+    //condition :  'USED',
     expression : 'A * -1 + B',
     out : [ 'rectangle_translate_down', 'trsf.set_local_modif_translateY()' ],
 }, 		
