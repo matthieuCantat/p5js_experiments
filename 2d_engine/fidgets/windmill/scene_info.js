@@ -278,7 +278,7 @@ scene_info.eventActions.push(
    
  )
 
-
+/*
  scene_info.eventActions.push( 
     {
         event : {
@@ -322,3 +322,4 @@ scene_info.eventActions.push(
     },
    
  )
+ */
