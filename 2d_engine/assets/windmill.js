@@ -361,7 +361,7 @@ shapes["user_interaction_A"] = {
     shapes : [
         {
             m : [0, -80, 0, 50, 50],
-            color: "red",
+            color: "pink",
             type : 'rectangle',
             stroke_color: "black",
             stroke_width: 1,

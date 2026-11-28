@@ -1019,19 +1019,15 @@ class Transform
 
 	get( )
 	{
-		// m_body
-		let m_body_init = this.get_body()
-		// m_body_dyn
-		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
+		// this.obj_parent.m * this.m_parent_to_body * this.m_body_modif
 
-		
-		return m_body_modified
+		return this.m_body_modif.getMult(this.get_init())
 	}
 
 	
 	set(m)
 	{
-		this.m_body_modif = m.getMult( this.get_body().getInverse() )
+		this.m_body_modif = m.getMult( this.get_init().getInverse() )
 	}
 
 	setTranslate(p)
@@ -1071,13 +1067,8 @@ class Transform
 
 	get_local()
 	{
-		// m_body
-		let m_body_init = this.m_parent_to_body
-		// m_body_dyn
-		let m_body_modified = this.m_body_modif.getMult(m_body_init)		
-
-
-		return m_body_modified		
+		// this.obj_parent.m * this.m_parent_to_body * this.m_body_modif
+		return this.m_body_modif.getMult(this.m_parent_to_body)			
 
 	}
 	
@@ -1122,6 +1113,7 @@ class Transform
 
 	get_local_modif()
 	{
+		// this.obj_parent.m * this.m_parent_to_body * this.m_body_modif
 		return this.m_body_modif
 	}
 
@@ -1165,15 +1157,22 @@ class Transform
 	//////////////////////////////////////////////////////
 
 
-
-	get_body()
+	get_parent()
 	{
-		// m_body
-		let m_body_init = this.m_parent_to_body
-	
-		if( this.obj_parent != null )
-			 m_body_init = this.m_parent_to_body.getMult(this.obj_parent.trsf.get())
-		return m_body_init		
+		if( this.obj_parent === null )
+			return new Matrix2d()
+		
+		return this.obj_parent.trsf.get()
+	}
+
+	get_init()
+	{
+		// this.obj_parent.m * this.m_parent_to_body * this.m_body_modif
+		
+		if( this.obj_parent === null )
+			return this.m_parent_to_body
+		
+		return this.m_parent_to_body.getMult(this.obj_parent.trsf.get())		
 	}
 
 	get_local_init()
@@ -1247,13 +1246,21 @@ class Transform
 			if( transform_limit_space == 'init' )
 			{
 				let m_local = this.get_local_modif()
-				m_local = this.update_local_with_transform_settings( m_local, transform_settings, interaction )
+				m_local = this.update_local_with_transform_settings( 
+					m_local, 
+					transform_settings, 
+					interaction,
+					transform_limit_space )
 				this.set_local_modif( m_local )
 			}
 			else if( transform_limit_space == 'local' )
 			{
 				let m_local = this.get_local()
-				m_local = this.update_local_with_transform_settings( m_local, transform_settings, interaction )
+				m_local = this.update_local_with_transform_settings( 
+					m_local, 
+					transform_settings, 
+					interaction,
+					transform_limit_space )
 				this.set_local( m_local )
 			}
 			
@@ -1543,14 +1550,18 @@ class Transform
 		return m
 	}
 
-	update_local_with_transform_settings( m_local , transform_settings, Interaction = null)
+	update_local_with_transform_settings( 
+		m_local , 
+		transform_settings, 
+		Interaction = null,
+		transform_limit_space = null )
 	{
 		/*
 		let m_ref = null
 		if( transform_settings.parent_limit_space == true )
 			m_ref = this.obj_parent.trsf.get()
 		else
-			m_ref = this.get_body()	
+			m_ref = this.get_init()	
 
 		let m_local = m.getMult(m_ref.getInverse())
 		*/
@@ -1604,14 +1615,46 @@ class Transform
 			// UPDATE INTERACTION VECTOR
 			if(( Interaction !== null)&&( Transform.UPDATE_USER_GRAB_WHEN_COLLIDE ))
 			{
-				let v_transform_delta = p_local.getSub(p_local_new)
-				if( 0.01 < v_transform_delta.mag() )
+				// parent * init * modif
+
+				// vCenter_to_userFirstGrab_mLocal is local compare m
+				// m_local p_local are local compare m_local
+
+				// CONVERTION...
+				let p_local_mOut = null
+				let p_local_mOut_new = null
+				if( transform_limit_space === 'init' )
+				{
+					let m_init = this.get_init()
+					let p_world = p_local.getMult( m_init )
+					let p_world_new = p_local_new.getMult( m_init )
+
+					let m_out_inv = this.get().getInverse()
+					p_local_mOut = p_world.getMult(m_out_inv)
+					p_local_mOut_new = p_world_new.getMult(m_out_inv)
+				}
+				else if( transform_limit_space === 'parent' )
+				{
+					let m_parent = this.get_parent()
+					let p_world = p_local.getMult( m_parent )
+					let p_world_new = p_local_new.getMult( m_parent )
+
+					let m_out_inv = this.get().getInverse()
+					p_local_mOut = p_world.getMult(m_out_inv)
+					p_local_mOut_new = p_world_new.getMult(m_out_inv)					
+				}
+
+
+
+				let v_transform_delta_local = p_local_mOut.getSub(p_local_mOut_new)
+
+				if( 0.01 < v_transform_delta_local.mag() )
 				{
 					let _v = Interaction.vCenter_to_userFirstGrab_mLocal
 					let _l = _v.mag()
 					_v.normalize() 
 
-					let l_transform_delta_proj = v_transform_delta.dot(_v)
+					let l_transform_delta_proj = v_transform_delta_local.dot(_v)
 					
 					_v.mult( Math.max(_l + l_transform_delta_proj,0.01))
 					Interaction.vCenter_to_userFirstGrab_mLocal = _v
@@ -1782,7 +1825,7 @@ class Transform
 		
 
 		// speed local
-		let m_init = this.get_body()
+		let m_init = this.get_init()
 		let m_init_inv = m_init.getInverse()
 
 		let m_local = m.getMult( m_init_inv )
