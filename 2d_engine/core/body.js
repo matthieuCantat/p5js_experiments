@@ -818,6 +818,7 @@ class User
 class Transform
 {
 	static GRAVITY_VECTOR = new Vector2d(0,-0.981)
+	static UPDATE_USER_GRAB_WHEN_COLLIDE = true
 
 	static info_compute_values = {
 		t_speed_min : 0,
@@ -1246,13 +1247,13 @@ class Transform
 			if( transform_limit_space == 'init' )
 			{
 				let m_local = this.get_local_modif()
-				m_local = this.update_local_with_transform_settings( m_local, transform_settings )
+				m_local = this.update_local_with_transform_settings( m_local, transform_settings, interaction )
 				this.set_local_modif( m_local )
 			}
 			else if( transform_limit_space == 'local' )
 			{
 				let m_local = this.get_local()
-				m_local = this.update_local_with_transform_settings( m_local, transform_settings )
+				m_local = this.update_local_with_transform_settings( m_local, transform_settings, interaction )
 				this.set_local( m_local )
 			}
 			
@@ -1542,7 +1543,7 @@ class Transform
 		return m
 	}
 
-	update_local_with_transform_settings( m_local , transform_settings)
+	update_local_with_transform_settings( m_local , transform_settings, Interaction = null)
 	{
 		/*
 		let m_ref = null
@@ -1563,7 +1564,7 @@ class Transform
 
 
 			let p_local = m_local.get_row(2)
-
+			
 			
 			
 			
@@ -1595,12 +1596,30 @@ class Transform
 			//if( this.transform_limit_data.translate_collision != this.transform_limit_data.translate_collision_last)
 			//	this.transform_limit_data.translate_collision_hit = true
 
+			let p_local_new = new Vector2d( x_new, y_new )
+			m_local.setRow( 2, p_local_new )
 
-			p_local.x = x_new
-			p_local.y = y_new
 
 
-			m_local.setRow( 2, p_local )
+			// UPDATE INTERACTION VECTOR
+			if(( Interaction !== null)&&( Transform.UPDATE_USER_GRAB_WHEN_COLLIDE ))
+			{
+				let v_transform_delta = p_local.getSub(p_local_new)
+				if( 0.01 < v_transform_delta.mag() )
+				{
+					let _v = Interaction.vCenter_to_userFirstGrab_mLocal
+					let _l = _v.mag()
+					_v.normalize() 
+
+					let l_transform_delta_proj = v_transform_delta.dot(_v)
+					
+					_v.mult( Math.max(_l + l_transform_delta_proj,0.01))
+					Interaction.vCenter_to_userFirstGrab_mLocal = _v
+				}
+					
+			}
+			
+			
 			/*
 			let _m = m_local.getMult(m_ref) 
 
@@ -1681,13 +1700,25 @@ class Transform
 				this.transform_limit_data.rotate_collision_hit = true
 			
 			m_local.setRotation(r_clamped)
-			/*
-			let _m = m_local.getMult(m_ref) 
+
 
 			
-			m.setRow( 0,  _m.get_row(0) )
-			m.setRow( 1,  _m.get_row(1) )
-			*/
+
+			// UPDATE INTERACTION VECTOR
+			if(( Interaction !== null)&&( Transform.UPDATE_USER_GRAB_WHEN_COLLIDE ))
+			{
+				let r_delta = r - r_clamped
+				if( 0.01 < r_delta )
+				{
+					let _v = Interaction.vCenter_to_userFirstGrab_mLocal
+					_v.rotate(-r_delta)
+
+					Interaction.vCenter_to_userFirstGrab_mLocal = _v
+				}
+					
+			}
+
+			
 		}	
 			
 		//parent_limit_space : false,

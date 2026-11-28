@@ -357,6 +357,17 @@ for( let n of obj_names_trap )
 
 
 shapes["user_interaction_A"] = {
+    /*
+    shapes : [
+        {
+            m : [0, -80, 0, 50, 50],
+            color: "red",
+            type : 'rectangle',
+            stroke_color: "black",
+            stroke_width: 1,
+        }
+    ],
+    */
     interaction_shapes: [
     {
         m : [0, -80, 0, 50, 50],
